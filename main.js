@@ -70,22 +70,21 @@ module.exports.loop = function () {
             if (creep.memory.role == raceWorker.HARVESTER) {
                 roleHarvester.run(creep);
             } else if (creep.memory.role == raceWorker.UPGRADER) {
-                roleUpgrader.run(creep);
-                
+                roleUpgrader.run(creep);               
             } else if (creep.memory.role == raceWorker.BUILDER) {
                 roleBuilder.run(creep);
             } else if(creep.memory.role == raceWorker.REPAIRER) {
                 roleRepairer.run(creep);
             }
-            console.log(creep.name + " has " + creep.ticksToLive + 
-                " ticks to live and is a " + creep.memory.role);           
+            //console.log(creep.name + " has " + creep.ticksToLive + 
+            //    " ticks to live and is a " + creep.memory.role);           
         } // for(var name in Game.creeps)
         
         var sources = creep.room.find(FIND_SOURCES);
         for ( var i in  sources ) {
             console.log("source " + sources[i] );
         }
-        console.log(JSON.stringify(Memory))
+        //console.log(JSON.stringify(Memory))
         console.log('CPU time used from the beginning of the current game tick ' + Game.cpu.getUsed());
         console.log('CPU limit ' + Game.cpu.limit);
         console.log('Avialible CPUat current tick ' + Game.cpu.tickLimit);

@@ -12,7 +12,7 @@
 var raceWorker = {
     blockSize: 50 + 100 + 50,
 	maxCpuLoad: 0.7,	
-	havesterThreshold: 0.4,
+	havesterThreshold: 0.4,	
 	builderRatio: 0.5,
 	repairerRatio: 0.1,
 	

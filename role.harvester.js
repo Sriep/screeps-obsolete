@@ -6,27 +6,44 @@
  * var mod = require('role.harvester');
  * mod.thing == 'a thing'; // true
  */
-
+var roleBase = require("role.base");
+ 
 var roleHarvester = {
 
     /** @param {Creep} creep **/
     run: function(creep) {
+        // Need to fill up with energy
         if(creep.carry.energy < creep.carryCapacity) {
-            var sources = creep.room.find(FIND_SOURCES);
-            if(creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(sources[0]);
-                var sid = sources[0].id;
-                Memory.sources = {id : sid};
-                //Memory.sources = {id : sid};
-                //sources[0].memory.customers = sources[0].memory.customers +1;
-            }
+            var sourceId = creep.memory.targetSourceId;
+            // Has not decided which source to target
+            if (sourceId === undefined || 0 == sourceId)
+            {            
+                //console.log(creep.name + "Needs to fill up with energy and has no sourceId");
+                var targetSource = roleBase.findTargetSource(creep);
+                //console.log(creep.name + "Has new target " + targetSource);
+                if(creep.harvest(targetSource) == ERR_NOT_IN_RANGE) { 
+                   // console.log("Target sources" + targetSource );
+                    creep.memory.targetSourceId = targetSource.id;
+                    creep.moveTo(targetSource);
+                }   
+             // Contiue moving towards source or havest it if there       
+             } else {    
+                //console.log(creep.name + "Needs to fill up with energy and has sourceid" 
+                //    + creep.memory.targetSourceId); 
+                var source = Game.getObjectById(creep.memory.targetSourceId);                
+                if(creep.harvest(source) == ERR_NOT_IN_RANGE) {                   
+                    creep.moveTo(source);
+                } 
+            } // if (sourceId)             
         }
+        // Find somewher to deliver energy
         else {
             var targets = creep.room.find(FIND_STRUCTURES, {
                     filter: (structure) => {
                         return (structure.structureType == STRUCTURE_EXTENSION ||
                                 structure.structureType == STRUCTURE_SPAWN ||
-                                structure.structureType == STRUCTURE_TOWER) && structure.energy < structure.energyCapacity;
+                                structure.structureType == STRUCTURE_TOWER) 
+                        && structure.energy < structure.energyCapacity;
                     }
             });
             if(targets.length > 0) {
@@ -39,3 +56,19 @@ var roleHarvester = {
 };
 
 module.exports = roleHarvester;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
