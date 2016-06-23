@@ -11,191 +11,156 @@
 
 var raceWorker = {
     blockSize: 50 + 100 + 50,
-	maxCpuLoad: 0.7,	
-	havesterThreshold: 0.4,	
-	builderRatio: 0.5,
+	
 	repairerRatio: 0.1,
+	repairerThreshold: 3,
+	havesterRation: 0.5,
 	
-	HARVESTER: "harvester",
-	UPGRADER: "upgrader",
-	BUILDER: "builder",
-	REPAIRER: "repairer",
-
-	stopSawning: function(cpuLoad) {
-		return 	cpuLoad > this.maxCpuLoad;
+	ROLE_HARVESTER: "harvester",
+	ROLE_UPGRADER: "upgrader",
+	ROLE_BUILDER: "builder",
+	ROLE_REPAIRER: "repairer",
+	ROLE_DEFULT: this.ROLE_HARVESTER,
+	
+	switchRoles: function(delta1, delta2, role1, role2) {
+        //console.log("Start of swich Roles " + " deta1 " + delta1 + " deta2 " + delta2 
+        //    + " role1 " + role1 + " role2 " + role2);	    
+        var deltaChange = 0;
+	    if (delta1 > 0 && delta2 < 0) {
+            deltaChange = Math.min(delta1, -1*delta2);
+            var creeps = _.filter(Game.creeps, (creep) => creep.memory.role == role2); 
+            for (var i = 0; i < deltaChange; i++)   {
+                creeps[i].memory.role = role1;   
+                //console.log("Changed " + creeps[i].name + "'s role " + creeps[i]);
+            }
+	    } else if (delta2 > 0 && delta1 < 0) {
+            deltaChange = Math.min(delta2, -1*delta1);
+            var creeps = _.filter(Game.creeps, (creep) => creep.memory.role == role1); 
+            for (var i = 0; i < deltaChange; i++)   {
+                creeps[i].memory.role = role2; 
+                //console.log("Changed " + creeps[i].name + "'s role " + creeps[i]);
+            }
+            deltaChange = -1*deltaChange;
+        }
+        //console.log("In swich Roles " + " deta1 " + delta1 + " deta2 " + delta2 
+       //     + " role1 " + role1 + " role2 " + role2);
+        return deltaChange;
 	},
 	
-	energyAtCapacity: function(roomName) {
-	    return Game.rooms[roomName].energyAvailable 
-	            == Game.rooms[roomName].energyCapacityAvailable; 
+	setUnrolledCreeps: function(role)
+	{
+	    for(var name in Memory.creeps) {
+            if(Game.creeps[name].memory.role === undefined ) {
+                Game.creeps[name].memory.role = this.ROLE_HARVESTER;
+            }
+        }
 	},
 	
-	assingCpuOverload: function(roomName) {
-        var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == this.HARVESTER);
-        console.log("Harvesters: " + harvesters);
-        if (harvesters.length) {
-            for(var creep in harvesters) {
-                harvesters[creep].memory.role = this.UPGRADER;
-            }	         
-        } // (harvesters.length)
-        
-        var builders = _.filter(Game.creeps, (creep) => creep.memory.role == this.BUILDER);	 
-        var constructionSites = Game.rooms[roomName].find(FIND_CONSTRUCTION_SITES);	
-        console.log("Construction sites: " + constructionSites.length);
-        console.log("Builders: " + builders);
-        if (constructionSites.length == 0) {        
-            for(var creep in builders) {
-                builders[creep].memory.role = this.UPGRADER;
-            }  
-        } else {               
-            var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == this.UPGRADER);
-            console.log("Upgraders: " + upgraders);
-            var numCreeps = builders.length + upgraders.length;
-            var reqBuilders = Math.floor(numCreeps * this.builderRatio);
-            if ( reqBuilders > builders.length ) {
-                numNewBuilders = reqBuilders - builders.length;
-                for (var i = 0; i < numNewBuilders; i++)   {
-                    upgraders[i].memory.role = this.BUILDER;    
-                }
-            } else if (builders.length > reqBuilders) {
-                numNewUpgraders =  builders.length - reqBuilders;
-                for (var i = 0; i < numNewUpgraders; i++)   {
-                    builders[i].memory.role = this.UPGRADER;    
-                }               
-            } // ( reqBuilders > numBuilders )
-        } //(constructionSites.length == 0)        
-    },
-	
-	assignCpuLoadHigh: function(roomName) {
-	    var builders = _.filter(Game.creeps, (creep) => creep.memory.role == this.BUILDER);	 
-        var constructionSites = Game.rooms[roomName].find(FIND_CONSTRUCTION_SITES);	
-        console.log("Construction sites: " + constructionSites.length);
-        console.log("Builders: " + builders);
-        if (constructionSites.length == 0) {        
-            for(var creep in builders) {
-                builders[creep].memory.role = this.UPGRADER;
-            }  
-        } else {
-            var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == this.HARVESTER);
-            var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == this.UPGRADER);
-            console.log("Harvesters: " + harvesters);
-            console.log("Upgraders: " + upgraders);
-            var numCreeps = builders.length + harvesters.length; + upgraders.length;
-            var reqBuilders = Math.floor(numCreeps * this.builderRatio);
-            if ( reqBuilders > builders.length ) {
-                numNewBuilders = reqBuilders - builders.length;
-                var looseUpgraders = 0;
-                var looseHavesters = 0;
-                if (numNewBuilders < upgraders.length)
-                {
-                    for (var i = 0; i < numNewBuilders; i++)   {
-                        upgraders[i].memory.role = this.BUILDER;    
-                    }
-                } else {
-                    for (var i = 0; i < upgraders.length; i++)   {
-                        upgraders[i].memory.role = this.BUILDER;    
-                    }                
-                    looseHavesters = numNewBuilders - upgraders.length;
-                    for (var i = 0; i < looseHavesters; i++)   {
-                        upgraders[i].memory.role = this.BUILDER;    
-                    }  
-                } // (numNewBuilders < upgraders.length)
-            } else if (builders.length > reqBuilders) {
-                numNewUpgraders =  builders.length - reqBuilders;
-                for (var i = 0; i < numNewUpgraders; i++)   {
-                    builders[i].memory.role = this.UPGRADER;    
-                }               
-            } // ( reqBuilders > numBuilders )                       
-        }	    
-	},
-	
-	assignCpuLoadLow: function(roomName) {
-        var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == this.UPGRADER);
-        console.log("Upgraders: " + upgraders);
-        if (upgraders.length) {
-            for(var creep in upgraders) {
-                upgraders[creep].memory.role = this.HARVESTER;
-            }	         
-        } // (upgraders.length)
-        
-        var builders = _.filter(Game.creeps, (creep) => creep.memory.role == this.BUILDER);	 
-        var constructionSites = Game.rooms[roomName].find(FIND_CONSTRUCTION_SITES);	
-        console.log("Construction sites: " + constructionSites.length);
-        console.log("Builders: " + builders);
-        if (constructionSites.length == 0) {        
-            for(var creep in builders) {
-                builders[creep].memory.role = this.HARVESTER;
-            }  
-        } else {              
-            var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == this.HARVESTER);
-            console.log("Harvesters: " + harvesters);
-            var numCreeps = builders.length + harvesters.length;
-            var reqBuilders = Math.floor(numCreeps * this.builderRatio);
-            if ( reqBuilders > builders.length ) {
-                numNewBuilders = reqBuilders - builders.length;
-                for (var i = 0; i < numNewBuilders; i++)   {
-                    harvesters[i].memory.role = this.BUILDER;    
-                }
-            } else if (builders.length > reqBuilders) {
-                numNewUpgraders =  builders.length - reqBuilders;
-                for (var i = 0; i < numNewUpgraders; i++)   {
-                    builders[i].memory.role = this.HARVESTER;    
-                }               
-            } // ( reqBuilders > numBuilders )
-        } //(constructionSites.length == 0) 	    
-	},
-	
-	assignRoles: function(cpuLoad, roomName) {
-	    if (this.stopSawning(cpuLoad) && energyAtCapacity(roomName)) {
-	        console.log("CPU overload, cpuLoad is " + cpuLoad);    
-	        this.assingCpuOverload(roomName);
-	    } else if (cpuLoad > this.havesterThreshold) {
-	        console.log("CPU load high, cpuLoad is " + cpuLoad);    
-		    this.assignCpuLoadHigh(roomName);
-		} else {
-		    console.log("CPU load low, cpuLoad is " + cpuLoad);    
-		    this.assignCpuLoadLow(roomName);
-		}
+	assignRoles: function(roomName) {
+	    this.setUnrolledCreeps(this.ROLE_HARVESTER);
 	    
-		var repairers = _.filter(Game.creeps, (creep) => creep.memory.role == this.REPAIRER); 
-		var damagedStructures = Game.rooms[roomName].find(FIND_STRUCTURES, {
+	    var creepCount = Object.keys(Game.creeps).length;
+	    //console.log("Creep count" + creepCount);
+		
+		var havesters_needed = Math.ceil(creepCount * this.havesterRation);
+		
+		var builders_needed = 0;
+        var constructionSites = Game.rooms[roomName].find(FIND_CONSTRUCTION_SITES);	
+        
+        if (constructionSites.length) {
+            builders_needed = creepCount - havesters_needed;     
+        }
+
+        
+        var repairers_needed=0;
+  		var damagedStructures = Game.rooms[roomName].find(FIND_STRUCTURES, {
             		filter: object => object.hits < object.hitsMax
         });	
-        console.log("Damaged structures: " + damagedStructures.length);
-		if (repairers.length) {
-            if (damagedStructures.length == 0) {        
-                for(var creep in repairers) {
-                    repairers[creep].memory.role = this.HARVESTER;
-                }        
-            }          
-		} else {
-		    if (damagedStructures.length) {
-		        var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == this.UPGRADER);
-		        if (upgraders.length)
-		        {
-		            upgraders[0].memory.role = this.REPAIRER;    
-		        }		        
-		    }		        
-		}
+        if (damagedStructures.length && creepCount >= this.repairerThreshold) {
+            repairers_needed = Math.ceil(( creepCount - havesters_needed)  * this.repairerRatio);
+            builders_needed = Math.max(0, builders_needed - repairers_needed);
+        }
+	    
+	    var upgraders_needed = creepCount - havesters_needed - builders_needed - repairers_needed;
+	    
+		var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_HARVESTER);	
+		var builders = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_BUILDER);	 		
+		var repairers = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_REPAIRER); 
+		var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_UPGRADER);
+	    var dHavesters = havesters_needed - harvesters.length;
+	    var dBuilders = builders_needed - builders.length;
+	    var dRepairers = repairers_needed - repairers.length;
+	    var dUpgraders = upgraders_needed - upgraders.length;
+
+	    /*console.log("havesters_neededt " + havesters_needed 
+	        + " builders_needed " + builders_needed 
+	        +  " repairers_needed " + repairers_needed 
+	        + " upgraders_needed " + upgraders_needed );
+	    console.log("harvesters.length " + harvesters.length 
+	        + " builders.length " + builders.length 
+	        +  " repairers.length " + repairers.length 
+	        + " upgraders.length " + upgraders.length);*/
+		console.log("Harvesters: " + harvesters.length + " delta " + dHavesters);
+		console.log("Upgraders: " + upgraders.length + " delta " + dUpgraders);
+		console.log("Builders: " + builders.length + " delta " + dBuilders);
+		console.log("Repairers: " + repairers.length + " delta " + dRepairers);
+	    //console.log("About to call swithc Rols " , "role1" + this.HARVESTER + "role2" + this.HARVESTER);
+	    if (dHavesters != 0)
+	    {        
+	        delta = this.switchRoles(dHavesters, dUpgraders, this.ROLE_HARVESTER, this.ROLE_UPGRADER);
+            dHavesters = dHavesters + delta;
+            dUpgraders = dUpgraders - delta;
+        }
+	    if (dHavesters != 0)
+	    {
+            delta = this.switchRoles(dHavesters, dBuilders, this.ROLE_HARVESTER, this.ROLE_BUILDER);
+            dHavesters = dHavesters + delta;
+            dBuilders = dBuilders - delta;
+        }
+        if (dHavesters != 0)
+	    {
+            delta = this.switchRoles(dHavesters, dRepairers, this.ROLE_HARVESTER, this.ROLE_REPAIRER);
+            dHavesters = dHavesters + delta;
+            dRepairers = dRepairers - delta;
+        }
+
+	    if (dBuilders != 0)
+	    {
+            delta = this.switchRoles(dBuilders, dUpgraders, this.ROLE_BUILDER, this.ROLE_UPGRADER);
+            dBuilders = dBuilders + delta;
+            dUpgraders = dUpgraders - delta;
+        }
+        if (dBuilders != 0)
+	    {
+            delta = this.switchRoles(dBuilders, dRepairers, this.ROLE_BUILDER, this.ROLE_REPAIRER);
+            dBuilders = dBuilders + delta;
+            dRepairers = dRepairers - delta;
+        }
+        
+        if (dRepairers != 0)
+	    {
+            delta = this.switchRoles(dRepairers, dUpgraders, this.ROLE_REPAIRER, this.ROLE_UPGRADER);
+            dRepairers = dRepairers + delta;
+            dUpgraders = dUpgraders - delta;
+        }
+
 		
-		//DEBUG code for console
-		var repairers = _.filter(Game.creeps, (creep) => creep.memory.role == this.REPAIRER); 
-		var builders = _.filter(Game.creeps, (creep) => creep.memory.role == this.BUILDER);	 
-		var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == this.HARVESTER);
-		var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == this.UPGRADER);
-		console.log("Harvesters: " + harvesters.length);
-		console.log("Upgraders: " + upgraders.length);
-		console.log("Builders: " + builders.length);
-		console.log("Repairers: " + repairers.length);
+		/*DEBUG code for console
+		var creepCount = Object.keys(Game.creeps).length;
+	    console.log("Creep count" + creepCount);
+		var repairers = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_REPAIRER); 
+		var builders = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_BUILDER);	 
+		var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_HARVESTER);
+		var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_UPGRADER);
+		console.log("Harvesters: " + harvesters.length + " delta " + dHavesters);
+		console.log("Upgraders: " + upgraders.length + " delta " + dUpgraders);
+		console.log("Builders: " + builders.length + " delta " + dBuilders);
+		console.log("Repairers: " + repairers.length + " delta " + dRepairers);*/
 	},
 	
 	/** @param {cpuLoad, roomName, spawnName}  **/
-	spawn: function(cpuLoad, roomName, spawnName) {
-	    console.log("In raceWorker.build cpuload: " + cpuLoad);
-		if (this.stopSawning(cpuLoad)) {
-			return;	
-	    }
-		
+	spawn: function(roomName, spawnName) {
+		console.log("In spawn room Name is " + roomName + " spawn Name is " + spawnName);
 		var energy = Game.rooms[roomName].energyAvailable; 
 		if  (energy < this.blockSize) {
 			return;
@@ -213,19 +178,58 @@ var raceWorker = {
 				body.push(MOVE);
 			} // for   			
 			var newName = Game.spawns[spawnName].createCreep(
-				body, undefined, {role: this.UPGRADER});  
+				body, undefined, {role: this.ROLE_HARVESTER});  
 			console.log("New creep " + newName + " is born");
     	} // if ( energy >= biggestCreep ) 				
 	}, // spawn	
 	
 	forceSpawn: function(spawnName) {
-		var energy = Game.rooms[roomName].energyAvailable; 
-		if  (energy > this.blockSize) {
+		//var energy = Game.rooms[roomName].energyAvailable; 
+		//if  (energy > this.blockSize) {
 			var newName = Game.spawns[spawnName].createCreep(
-				[WOREK, CARRY, MOVE] , undefined, {role: this.UPGRADER});  
+				[WORK, CARRY, MOVE] , undefined, {role: this.ROLE_HARVESTER});  
 			console.log("New creep " + newName + " is born");			
-		}
+		//}
 	}
+	//var raceWorker = require("race.worker");
+	//raceWorker.forceSpawn("Spawn1");
+	
 }
 
 module.exports = raceWorker;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

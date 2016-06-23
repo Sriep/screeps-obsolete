@@ -4,7 +4,7 @@ var roleHarvester = require("role.harvester");
 var roleUpgrader = require("role.upgrader");
 var roleBuilder = require("role.builder");
 var roleRepairer = require("role.repairer");
-var spawnWorker = require("spawn.worker");
+//var spawnWorker = require("spawn.worker");
 var roadBuilder = require("road.builder");
 
 
@@ -62,25 +62,26 @@ module.exports.loop = function () {
 		}
 		
 		var cpuLoad = AverageCPU/Game.cpu.limit;
-        raceWorker.spawn(cpuLoad, roomName, "Spawn1");
-        raceWorker.assignRoles(cpuLoad, roomName);
+		console.log("In main room name is " + roomName);
+        raceWorker.spawn(roomName, "Spawn1");
+        raceWorker.assignRoles(roomName);
     
         for(var name in Game.creeps) {
             var creep = Game.creeps[name];
-            if (creep.memory.role == raceWorker.HARVESTER) {
+            if (creep.memory.role == raceWorker.ROLE_HARVESTER) {
                 roleHarvester.run(creep);
-            } else if (creep.memory.role == raceWorker.UPGRADER) {
+            } else if (creep.memory.role == raceWorker.ROLE_UPGRADER) {
                 roleUpgrader.run(creep);               
-            } else if (creep.memory.role == raceWorker.BUILDER) {
+            } else if (creep.memory.role == raceWorker.ROLE_BUILDER) {
                 roleBuilder.run(creep);
-            } else if(creep.memory.role == raceWorker.REPAIRER) {
+            } else if(creep.memory.role == raceWorker.ROLE_REPAIRER) {
                 roleRepairer.run(creep);
             }
             //console.log(creep.name + " has " + creep.ticksToLive + 
             //    " ticks to live and is a " + creep.memory.role);           
         } // for(var name in Game.creeps)
         
-        var sources = creep.room.find(FIND_SOURCES);
+        var sources = Game.rooms[roomName].find(FIND_SOURCES);
         for ( var i in  sources ) {
             console.log("source " + sources[i] );
         }

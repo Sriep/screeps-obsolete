@@ -18,22 +18,26 @@ var roleBase = {
 	},
 	
 	findTargetSource: function(creep) {
+	    //console.log("findTargetSourcefindTargetSourcefindTargetSourcefindTargetSourcefindTargetSource");
 	    var sources = creep.room.find(FIND_SOURCES);
-        sources.sort((a,b) => this.distanceBetween(a, creep) 
+        //console.log("Unsorted sources" + sources);
+	    sources.sort((a,b) => this.distanceBetween(a, creep) 
                     - this.distanceBetween(b, creep));   	    
-	    console.log("sorted sources" + sources);
+	    //console.log("sorted sources" + sources);
 	    for ( var sIndex in  sources ) {
-            sources[sIndex].client = 0;
+            sources[sIndex].clients= 0;
             for(var cIndex in Game.creeps) {
                 if (Game.creeps[cIndex].memory.targetSourceId == sources[sIndex].id)
                 {
-                    sources[sIndex].client = sources[sIndex].clients +1;
+                    sources[sIndex].clients = sources[sIndex].clients +1;
                 }   // if             
             }   //  for(var cIndex in Game.creeps)          
         } // for ( var sIndex in  sources ) 
         var target = sources[0];
-        console.log("In roleBase.findTargetSource source0 " + sources[0] 
-                        + " source1 " + sources[1]);
+        //console.log("In roleBase.findTargetSource source0 " + sources[0] 
+        //                + " source1 " + sources[1]);
+        //console.log("Source clinets " + sources[0].clients 
+        //                + " sournce1 " + sources[1].clients );
         if (sources.length > 1) {
             if (sources[0].clients > sources[1].clients + this.sourceClinetThreshold) {
                 target = sources[1];   

@@ -33,16 +33,16 @@ var roleRepairer = {
 
         if(creep.memory.building && creep.carry.energy == 0) {
             creep.memory.building = false;
-            console.log(creep + "stop building");
+            //console.log(creep + "stop building");
         }
         if(!creep.memory.building && creep.carry.energy == creep.carryCapacity) {
             creep.memory.building = true;
-            console.log(creep + "start building");
+            //console.log(creep + "start building");
         }
                
         if(creep.memory.building) {   
         	var target = this.findTarget(creep);       	
-        	console.log("creep: " + creep + " target: " + target );
+        	//console.log("creep: " + creep + " target: " + target );
         	if (0 != target) {
                 if(creep.repair(target) == ERR_NOT_IN_RANGE) {
                 	console.log(creep + "more to target");

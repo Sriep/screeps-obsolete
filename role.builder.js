@@ -25,20 +25,20 @@ var roleBuilder = {
         // just run out of energy
         if(creep.memory.building && creep.carry.energy == 0) {
             creep.memory.building = false;
-            console.log(creep + "stop building");
+            //console.log(creep + "stop building");
         }
         
         // just filled up with energy
         if(!creep.memory.building && creep.carry.energy == creep.carryCapacity) {
             creep.memory.building = true;
             creep.memory.targetSourceId = 0;
-            console.log(creep + "start building");
+            //console.log(creep + "start building");
         }
          
         // moving towards construction site
         if(creep.memory.building) {   
         	var target = this.findTarget(creep);
-        	console.log("creep: " + creep + " target: " + target );
+        	//console.log("creep: " + creep + " target: " + target );
         	if (0 != target) {
                 if(creep.build(target) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(target);
@@ -49,7 +49,7 @@ var roleBuilder = {
         // moving towards source
         else {
             var sourceId = creep.memory.targetSourceId;
-            console.log("sourceid " + sourceId + " memory " + creep.memory);
+            //console.log("sourceid " + sourceId + " memory " + creep.memory);
             
             // Has not decided which source to target
             if (sourceId === undefined || 0 == sourceId)
