@@ -1,18 +1,22 @@
-var roleHarvester = require('role.harvester');
-var roleUpgrader = require('role.upgrader');
-var roleBuilder = require('role.builder');
-var spawnWorker = require('spawn.worker');
-var roadBuilder = require('road.builder');
+
+var raceWorker = require("race.worker");
+var roleHarvester = require("role.harvester");
+var roleUpgrader = require("role.upgrader");
+var roleBuilder = require("role.builder");
+var roleRepairer = require("role.repairer");
+var spawnWorker = require("spawn.worker");
+var roadBuilder = require("road.builder");
+
 
 // Any modules that you use that modify the game's prototypes should be require'd
 // before you require the profiler.
-var profiler = require('screeps-profiler');
+var profiler = require("screeps-profiler");
 // This line monkey patches the global prototypes.
 profiler.enable();
 
 module.exports.loop = function () {
     profiler.wrap(function() {
-        var tower = Game.getObjectById('TOWER_ID');
+        var tower = Game.getObjectById("TOWER_ID");
         if(tower) {
             var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
                 filter: (structure) => structure.hits < structure.hitsMax
@@ -27,6 +31,23 @@ module.exports.loop = function () {
             }
         }
         
+        var AverageCPU = 0;
+        CPU_MEMORY_LENGTH = 20;
+        if ("cpuUsage" in Memory)
+        {
+        	for (var i in Memory.cpuUsage)
+        	{
+        		AverageCPU = AverageCPU + Memory.cpuUsage[i];   
+        	}
+        	if (Memory.cpuUsage.length > 0)
+        	{
+        		AverageCPU = AverageCPU/Memory.cpuUsage.length
+        	}
+        } else {
+        	Memory.cpuUsage = new Array(CPU_MEMORY_LENGTH).fill(0);
+        }
+        console.log("Average CPUs " + AverageCPU);
+        
         for(var name in Memory.creeps) {
             if(!Game.creeps[name]) {
                 delete Memory.creeps[name];
@@ -35,51 +56,45 @@ module.exports.loop = function () {
         
 		var roomName;
         for(var name in Game.rooms) {
-			console.log('Room "'+name+'" has '+Game.rooms[name].energyAvailable+' energy');
-			console.log('Room "'+name+'" has '+Game.rooms[name].energyCapacityAvailable+' max energy capacity');
+			console.log("Room " + name+" has "+Game.rooms[name].energyAvailable+" energy");
+			console.log("Room " +name+" has "+Game.rooms[name].energyCapacityAvailable+" max energy capacity");
 			roomName = name;
 		}
-        
-        var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester');
-        console.log('Harvesters: ' + harvesters.length);
-        if (harvesters.length <= 0) {
-        	spawnWorker.run('harvester', roomName, "Spawn1", 0.0)
-        } else if (harvesters.length < 6) {
-            spawnWorker.run('harvester', roomName, "Spawn1", 0.8);
-        } else {
-        
-            var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == 'upgrader');
-            console.log('Upgraders: ' + upgraders.length);
-            if(upgraders.length < 7) {
-                spawnWorker.run('upgrader', roomName, "Spawn1", 0.8);
-            } else {
-        
-                var builders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder');
-                console.log('Builders: ' + harvesters.length);
-                if(builders.length < 0) {
-                    spawnWorker.run('builder', roomName, "Spawn1", 0.8);
-                } // if(builders.length < 4)
-            } // upgraders.length < 4) 
-        } // harvesters.length <= 0) 
-        
+		
+		var cpuLoad = AverageCPU/Game.cpu.limit;
+        raceWorker.spawn(cpuLoad, roomName, "Spawn1");
+        raceWorker.assignRoles(cpuLoad, roomName);
     
         for(var name in Game.creeps) {
             var creep = Game.creeps[name];
-            if(creep.memory.role == 'harvester') {
+            if (creep.memory.role == raceWorker.HARVESTER) {
                 roleHarvester.run(creep);
-            }
-            if(creep.memory.role == 'upgrader') {
+            } else if (creep.memory.role == raceWorker.UPGRADER) {
                 roleUpgrader.run(creep);
-            }
-            if(creep.memory.role == 'builder') {
+                
+            } else if (creep.memory.role == raceWorker.BUILDER) {
                 roleBuilder.run(creep);
+            } else if(creep.memory.role == raceWorker.REPAIRER) {
+                roleRepairer.run(creep);
             }
+            console.log(creep.name + " has " + creep.ticksToLive + 
+                " ticks to live and is a " + creep.memory.role);           
         } // for(var name in Game.creeps)
         
+        var sources = creep.room.find(FIND_SOURCES);
+        for ( var i in  sources ) {
+            console.log("source " + sources[i] );
+        }
+        console.log(JSON.stringify(Memory))
         console.log('CPU time used from the beginning of the current game tick ' + Game.cpu.getUsed());
         console.log('CPU limit ' + Game.cpu.limit);
         console.log('Avialible CPUat current tick ' + Game.cpu.tickLimit);
         console.log('Accumulated CPU in bucket ' + Game.cpu.bucket);
+        if (Memory.cpuUsage.length > 0)
+        {
+        	Memory.cpuUsage.shift();
+        }
+        Memory.cpuUsage.push(Game.cpu.getUsed());
         console.log('*********************************************************');
     }) // profiler.wrap(function()
 }

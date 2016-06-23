@@ -12,16 +12,9 @@ var roleBuilder = {
 	findTarget: function(creep) {
 		var constructionSites = creep.room.find(FIND_CONSTRUCTION_SITES);
 		if(constructionSites.length) {
+		    constructionSites.sort((a,b) => this.distanceBetween(a, creep) - this.distanceBetween(b, creep));
 			return 	constructionSites[0]; 
 		}
-		var damagedStructures = creep.room.find(FIND_STRUCTURES, {
-            		filter: object => object.hits < object.hitsMax
-        });	
-        damagedStructures.sort((a,b) => a.hits - b.hits);
-        if(damagedStructures.length > 0) {
-        	return 	damagedStructures[0];
-        }
-        var empty = [];
         return 0;
 	},
 	
@@ -41,12 +34,13 @@ var roleBuilder = {
         }
         if(!creep.memory.building && creep.carry.energy == creep.carryCapacity) {
             creep.memory.building = true;
+            creep.memory.targetSourceId = 0;
             console.log(creep + "start building");
         }
                
         if(creep.memory.building) {   
         	var target = this.findTarget(creep);
-        	console.log("creep: " + creep + " target: " + target + " target length: "  +  target.length);
+        	console.log("creep: " + creep + " target: " + target );
         	if (0 != target) {
                 if(creep.build(target) == ERR_NOT_IN_RANGE) {
                 	console.log(creep + "more to target");
@@ -57,16 +51,52 @@ var roleBuilder = {
         	} //if
         } // if(creep.memory.building) 
         else {
-        	console.log(creep + "more to source");
-            var sources = creep.room.find(FIND_SOURCES);
-            console.log("sources before soft" + sources);
-            sources.sort((a,b) => this.distanceBetween(a, creep) - this.distanceBetween(b, creep));
-            console.log("sources after soft" + sources);
-            if(creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(sources[0]);
-            }
+            var sourceId = creep.memory.targetSourceId;
+            console.log("sourceid " + sourceId + " memory " + creep.memory);
+            if (sourceId === undefined)
+            { 
+                //var source = creep.pos.findClosestByRange(FIND_SOURCES);
+                var sources = creep.room.find(FIND_SOURCES);
+                sources.sort((a,b) => this.distanceBetween(a, creep) 
+                    - this.distanceBetween(b, creep));     
+                 if(creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) { 
+                    console.log("sources[0]" + sources[0] );
+                    creep.memory.targetSourceId = sources[0].id;
+                    creep.moveTo(sources[0]);
+                 }                              
+            } else {                   
+                var source = Game.getObjectById(creep.memory.targetSourceId);                
+                if(creep.harvest(source) == ERR_NOT_IN_RANGE) {                   
+                    creep.moveTo(source);
+                } 
+            } // if (sourceId)
         } //else
     } //function
 };
 
 module.exports = roleBuilder;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

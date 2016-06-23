@@ -15,6 +15,10 @@ var roleHarvester = {
             var sources = creep.room.find(FIND_SOURCES);
             if(creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(sources[0]);
+                var sid = sources[0].id;
+                Memory.sources = {id : sid};
+                //Memory.sources = {id : sid};
+                //sources[0].memory.customers = sources[0].memory.customers +1;
             }
         }
         else {
