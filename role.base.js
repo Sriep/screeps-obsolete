@@ -21,8 +21,11 @@ var roleBase = {
 	
 	findTargetSource: function(creep) {
 	    var sources = creep.room.find(FIND_SOURCES);
-	    sources.sort((a,b) => this.distanceBetween(a, creep) 
-                    - this.distanceBetween(b, creep));   	    
+	    //console.log("soures before sort" + sources);
+	    sources.sort((a,b) => b.energy - a.energy);   
+	    //console.log("soures after sort" + sources);
+	    //sources.sort((a,b) => this.distanceBetween(a, creep) 
+        //            - this.distanceBetween(b, creep));   	    
 	    for ( var sIndex in  sources ) {
             sources[sIndex].clients= 0;
             for(var cIndex in Game.creeps) {
