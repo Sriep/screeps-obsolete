@@ -6,6 +6,9 @@ npm-debug.log*
 # JSdoc
 out
 JSDoc
+*.out
+*.bat
+*.bat*
 
 #grunt files
 Gruntfile.js
