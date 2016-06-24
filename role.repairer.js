@@ -6,6 +6,7 @@
  * var mod = require('role.builder');
  * mod.thing == 'a thing'; // true
  */
+var roleBase = require("role.base");
 
 var roleRepairer = {
 	
@@ -31,39 +32,48 @@ var roleRepairer = {
     /** @param {Creep} creep **/
     run: function(creep) {
 
-        if(creep.memory.building && creep.carry.energy == 0) {
-            creep.memory.building = false;
-            //console.log(creep + "stop building");
-        }
-        if(!creep.memory.building && creep.carry.energy == creep.carryCapacity) {
-            creep.memory.building = true;
-            //console.log(creep + "start building");
-        }
-               
-        if(creep.memory.building) {   
+        roleBase.checkCarryState(creep);          
+        // moving towards construction site      
+        if(creep.memory.carrying) {   
         	var target = this.findTarget(creep);       	
-        	//console.log("creep: " + creep + " target: " + target );
         	if (0 != target) {
                 if(creep.repair(target) == ERR_NOT_IN_RANGE) {
-                	console.log(creep + "more to target");
                     creep.moveTo(target);
-                } else {
-                	console.log(creep + "built to target");
                 }
         	} //if
-        } // if(creep.memory.building) 
+        } // if(creep.memory.building)
+        // moving towards source
         else {
-        	//console.log(creep + "more to source");
-            var sources = creep.room.find(FIND_SOURCES);
-            //console.log("sources before soft" + sources);
-            sources.sort((a,b) => this.distanceBetween(a, creep) - this.distanceBetween(b, creep));
-            //console.log("sources after sort" + sources);
-            if(creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(sources[0]);
-                //sources[0].memory.customers = sources[0].memory.customers +1;
-            }
+            roleBase.fillUpEnergy(creep);
         } //else
     } //function
 };
 
 module.exports = roleRepairer;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

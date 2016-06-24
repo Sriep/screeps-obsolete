@@ -1,12 +1,14 @@
-/*
- * Module code goes here. Use 'module.exports' to export things:
- * module.exports.thing = 'a thing';
- *
- * You can import it from another modules like this:
- * var mod = require('role.builder');
- * mod.thing == 'a thing'; // true
+/**
+ * @fileOverview Screeps module. Abstract base class functions and data
+ * for roles worker creeps can take.
+ * @author Piers Shepperson
  */
-
+ 
+/**
+ * Abstract base class functions and data for roles worker creeps can take.
+ * Methods for finding and moving towards targets.
+ * @module roleBase
+ */
 var roleBase = {
     sourceClinetThreshold: 1,
     
@@ -18,12 +20,9 @@ var roleBase = {
 	},
 	
 	findTargetSource: function(creep) {
-	    //console.log("findTargetSourcefindTargetSourcefindTargetSourcefindTargetSourcefindTargetSource");
 	    var sources = creep.room.find(FIND_SOURCES);
-        //console.log("Unsorted sources" + sources);
 	    sources.sort((a,b) => this.distanceBetween(a, creep) 
                     - this.distanceBetween(b, creep));   	    
-	    //console.log("sorted sources" + sources);
 	    for ( var sIndex in  sources ) {
             sources[sIndex].clients= 0;
             for(var cIndex in Game.creeps) {
@@ -34,19 +33,86 @@ var roleBase = {
             }   //  for(var cIndex in Game.creeps)          
         } // for ( var sIndex in  sources ) 
         var target = sources[0];
-        //console.log("In roleBase.findTargetSource source0 " + sources[0] 
-        //                + " source1 " + sources[1]);
-        //console.log("Source clinets " + sources[0].clients 
-        //                + " sournce1 " + sources[1].clients );
         if (sources.length > 1) {
             if (sources[0].clients > sources[1].clients + this.sourceClinetThreshold) {
                 target = sources[1];   
             }
         }
         return target;  
-	}
+	},
 	
-        
+	checkCarryState: function (creep) {	
+	    if(creep.memory.carrying === undefined) {
+	        creep.memory.carrying = false
+	    }
+	        
+	    // Just run out of energy
+	    if(creep.memory.carrying && creep.carry.energy == 0) {
+            creep.memory.carrying = false;
+        } 
+        // Just filled up with energy
+        if(!creep.memory.carrying && creep.carry.energy == creep.carryCapacity) {
+            creep.memory.carrying = true;
+            creep.memory.targetSourceId = 0;
+        }          	    
+	},        	
+	
+	fillUpEnergy: function(creep) {
+        var sourceId = creep.memory.targetSourceId;
+        // Has not decided which source to target
+        if (sourceId === undefined || 0 == sourceId)
+        {            
+            var targetSource = this.findTargetSource(creep);
+            if(creep.harvest(targetSource) == ERR_NOT_IN_RANGE) { 
+                creep.memory.targetSourceId = targetSource.id;
+                creep.moveTo(targetSource);
+            }   
+         // Contiue moving towards source or havest it if there       
+         } else {    
+            var source = Game.getObjectById(creep.memory.targetSourceId);                
+            if(creep.harvest(source) == ERR_NOT_IN_RANGE) {                   
+                creep.moveTo(source);
+            } 
+        } // if (sourceId)             
+    }       
 };
 
 module.exports = roleBase;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

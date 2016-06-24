@@ -4,9 +4,8 @@ var roleHarvester = require("role.harvester");
 var roleUpgrader = require("role.upgrader");
 var roleBuilder = require("role.builder");
 var roleRepairer = require("role.repairer");
-//var spawnWorker = require("spawn.worker");
 var roadBuilder = require("road.builder");
-
+var cpuUsage = require("cpu.usage");
 
 // Any modules that you use that modify the game's prototypes should be require'd
 // before you require the profiler.
@@ -30,42 +29,24 @@ module.exports.loop = function () {
                 tower.attack(closestHostile);
             }
         }
-        
-        var AverageCPU = 0;
-        CPU_MEMORY_LENGTH = 20;
-        if ("cpuUsage" in Memory)
-        {
-        	for (var i in Memory.cpuUsage)
-        	{
-        		AverageCPU = AverageCPU + Memory.cpuUsage[i];   
-        	}
-        	if (Memory.cpuUsage.length > 0)
-        	{
-        		AverageCPU = AverageCPU/Memory.cpuUsage.length
-        	}
-        } else {
-        	Memory.cpuUsage = new Array(CPU_MEMORY_LENGTH).fill(0);
-        }
-        console.log("Average CPUs " + AverageCPU);
-        
+  
         for(var name in Memory.creeps) {
             if(!Game.creeps[name]) {
                 delete Memory.creeps[name];
             }
         }
+                
+        var cpuLoad = cpuUsage.averageCpuLoad();
         
-		var roomName;
         for(var name in Game.rooms) {
 			console.log("Room " + name+" has "+Game.rooms[name].energyAvailable+" energy");
 			console.log("Room " +name+" has "+Game.rooms[name].energyCapacityAvailable+" max energy capacity");
-			roomName = name;
+			var roomName = name;
+			
+            raceWorker.spawn(roomName, "Spawn1");
+            raceWorker.assignRoles(roomName);			
 		}
-		
-		var cpuLoad = AverageCPU/Game.cpu.limit;
-		console.log("In main room name is " + roomName);
-        raceWorker.spawn(roomName, "Spawn1");
-        raceWorker.assignRoles(roomName);
-    
+		  
         for(var name in Game.creeps) {
             var creep = Game.creeps[name];
             if (creep.memory.role == raceWorker.ROLE_HARVESTER) {
@@ -81,25 +62,28 @@ module.exports.loop = function () {
             //    " ticks to live and is a " + creep.memory.role);           
         } // for(var name in Game.creeps)
         
+        /*
         var sources = Game.rooms[roomName].find(FIND_SOURCES);
         for ( var i in  sources ) {
             console.log("source " + sources[i] );
-        }
+        }*/
         //console.log(JSON.stringify(Memory))
+        console.log("CPULoad is " + cpuLoad);
         console.log('CPU time used from the beginning of the current game tick ' + Game.cpu.getUsed());
         console.log('CPU limit ' + Game.cpu.limit);
         console.log('Avialible CPUat current tick ' + Game.cpu.tickLimit);
         console.log('Accumulated CPU in bucket ' + Game.cpu.bucket);
-        if (Memory.cpuUsage.length > 0)
-        {
-        	Memory.cpuUsage.shift();
-        }
-        Memory.cpuUsage.push(Game.cpu.getUsed());
-        console.log('*********************************************************');
+        console.log('************************ " + Game.time + " *********************************');
+        cpuUsage.updateCpuUsage();
     }) // profiler.wrap(function()
 }
 
-
+//Game.spawns.Spawn1.createCreep( [MOVE], 'Scout1' );
+//target = Game.getObjectById("55db312fefa8e3fe66e04878"); 
+//Game.creeps["Scout1"].moveTo(target);
+//Game.creeps["Scout1"].move(LEFT);
+//Game.creeps["Scout1"].moveTo(1,40);
+//console.log("Scouts bodyarry is" + Game.creeps["Scout1"].bodyarray);
 
 
 

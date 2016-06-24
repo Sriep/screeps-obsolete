@@ -10,7 +10,7 @@
 var roadBuilder = {
 	blockSzie : 50 + 100 +50,	
     
-	/** @param {from object, to object} creep **/
+	//** @param {from object, to object} creep **/
     run: function( from, to ) {
     	console.log("Create road from: " + from + "to: " + to );
     	

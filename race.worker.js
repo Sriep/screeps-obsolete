@@ -1,17 +1,26 @@
-/* Piers Shepperson
- *
- *
- * Module code goes here. Use 'module.exports' to export things:
- * module.exports.thing = 'a thing';
- *
- * You can import it from another modules like this:
- * var mod = require('role.builder');
- * mod.thing == 'a thing'; // true
+/**
+ * @fileOverview Screeps module. Abstract object containing data and functions
+ * for use by worker creeps. 
+ * @author Piers Shepperson
  */
-
+ 
+/**
+ * Data and functions used by all workers.
+ * Workers are used to carry stuff around, and are made up of 
+ * WORK, MOVE and CARRY parts. They can have various roles depening on
+ * what they are carrying and where to and from.
+ * @module raceWorker
+ */
 var raceWorker = {
-    blockSize: 50 + 100 + 50,
+    
+    /**
+    * The energy cost of a block of parts. [ WORK, CARRY, MOVE ]. 
+    * A Worker creep is constructed from multiple copies of these blocks. 
+    * @constant
+    */
+    blockSize: 100 + 50 + 50,
 	
+    buildRatio: 0.5,
 	repairerRatio: 0.1,
 	repairerThreshold: 3,
 	havesterRation: 0.5,
@@ -49,13 +58,17 @@ var raceWorker = {
 	
 	setUnrolledCreeps: function(role)
 	{
-	    for(var name in Memory.creeps) {
+	    for(var name in Game.creeps) {
             if(Game.creeps[name].memory.role === undefined ) {
                 Game.creeps[name].memory.role = this.ROLE_HARVESTER;
             }
         }
 	},
 	
+/**
+ * Assigns roles to all the creeps in a room.
+ * @param   {number} roomName  The index of the room in the Game.rooms hash.
+ */
 	assignRoles: function(roomName) {
 	    this.setUnrolledCreeps(this.ROLE_HARVESTER);
 	    
@@ -65,19 +78,19 @@ var raceWorker = {
 		var havesters_needed = Math.ceil(creepCount * this.havesterRation);
 		
 		var builders_needed = 0;
-        var constructionSites = Game.rooms[roomName].find(FIND_CONSTRUCTION_SITES);	
-        
+        var constructionSites = Game.rooms[roomName].find(FIND_CONSTRUCTION_SITES);	       
         if (constructionSites.length) {
-            builders_needed = creepCount - havesters_needed;     
+            builders_needed = Math.ceil(
+                (creepCount - havesters_needed) * this.buildRatio);     
         }
-
         
         var repairers_needed=0;
   		var damagedStructures = Game.rooms[roomName].find(FIND_STRUCTURES, {
             		filter: object => object.hits < object.hitsMax
         });	
         if (damagedStructures.length && creepCount >= this.repairerThreshold) {
-            repairers_needed = Math.ceil(( creepCount - havesters_needed)  * this.repairerRatio);
+            repairers_needed = Math.ceil(( 
+                creepCount - havesters_needed)  * this.repairerRatio);
             builders_needed = Math.max(0, builders_needed - repairers_needed);
         }
 	    
@@ -92,14 +105,6 @@ var raceWorker = {
 	    var dRepairers = repairers_needed - repairers.length;
 	    var dUpgraders = upgraders_needed - upgraders.length;
 
-	    /*console.log("havesters_neededt " + havesters_needed 
-	        + " builders_needed " + builders_needed 
-	        +  " repairers_needed " + repairers_needed 
-	        + " upgraders_needed " + upgraders_needed );
-	    console.log("harvesters.length " + harvesters.length 
-	        + " builders.length " + builders.length 
-	        +  " repairers.length " + repairers.length 
-	        + " upgraders.length " + upgraders.length);*/
 		console.log("Harvesters: " + harvesters.length + " delta " + dHavesters);
 		console.log("Upgraders: " + upgraders.length + " delta " + dUpgraders);
 		console.log("Builders: " + builders.length + " delta " + dBuilders);
@@ -143,22 +148,9 @@ var raceWorker = {
             dRepairers = dRepairers + delta;
             dUpgraders = dUpgraders - delta;
         }
-
-		
-		/*DEBUG code for console
-		var creepCount = Object.keys(Game.creeps).length;
-	    console.log("Creep count" + creepCount);
-		var repairers = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_REPAIRER); 
-		var builders = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_BUILDER);	 
-		var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_HARVESTER);
-		var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_UPGRADER);
-		console.log("Harvesters: " + harvesters.length + " delta " + dHavesters);
-		console.log("Upgraders: " + upgraders.length + " delta " + dUpgraders);
-		console.log("Builders: " + builders.length + " delta " + dBuilders);
-		console.log("Repairers: " + repairers.length + " delta " + dRepairers);*/
 	},
 	
-	/** @param {cpuLoad, roomName, spawnName}  **/
+	//** @param {cpuLoad, roomName, spawnName}  **/
 	spawn: function(roomName, spawnName) {
 		console.log("In spawn room Name is " + roomName + " spawn Name is " + spawnName);
 		var energy = Game.rooms[roomName].energyAvailable; 

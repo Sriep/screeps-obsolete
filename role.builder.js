@@ -22,52 +22,19 @@ var roleBuilder = {
 
     /** @param {Creep} creep **/
     run: function(creep) {
-        // just run out of energy
-        if(creep.memory.building && creep.carry.energy == 0) {
-            creep.memory.building = false;
-            //console.log(creep + "stop building");
-        }
-        
-        // just filled up with energy
-        if(!creep.memory.building && creep.carry.energy == creep.carryCapacity) {
-            creep.memory.building = true;
-            creep.memory.targetSourceId = 0;
-            //console.log(creep + "start building");
-        }
-         
+        roleBase.checkCarryState(creep);  
         // moving towards construction site
-        if(creep.memory.building) {   
+        if(creep.memory.carrying) {   
         	var target = this.findTarget(creep);
-        	//console.log("creep: " + creep + " target: " + target );
         	if (0 != target) {
                 if(creep.build(target) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(target);
                 }
         	} //if (0 != target)
-        } // if(creep.memory.building) 
-        
+        } // if(creep.memory.building)        
         // moving towards source
         else {
-            var sourceId = creep.memory.targetSourceId;
-            //console.log("sourceid " + sourceId + " memory " + creep.memory);
-            
-            // Has not decided which source to target
-            if (sourceId === undefined || 0 == sourceId)
-            { 
-                var targetSource = roleBase.findTargetSource(creep);
-                
-                if(creep.harvest(targetSource) == ERR_NOT_IN_RANGE) { 
-                    console.log("Target sources" + targetSource );
-                    creep.memory.targetSourceId = targetSource.id;
-                    creep.moveTo(targetSource);
-                }  
-            // Contiue moving towards source or havest it if there    
-            } else {                   
-                var source = Game.getObjectById(creep.memory.targetSourceId);                
-                if(creep.harvest(source) == ERR_NOT_IN_RANGE) {                   
-                    creep.moveTo(source);
-                } 
-            } // if (sourceId)
+            roleBase.fillUpEnergy(creep);
         } //else
     } //function
 };

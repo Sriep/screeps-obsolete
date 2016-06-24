@@ -6,24 +6,28 @@
  * var mod = require('role.upgrader');
  * mod.thing == 'a thing'; // true
  */
-
+var roleBase = require("role.base");
 
 var roleUpgrader = {
 
     /** @param {Creep} creep **/
-    run: function(creep) {
-        if(creep.carry.energy == 0) {
-            var sources = creep.room.find(FIND_SOURCES);
-            if(creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(sources[0]);
-                //sources[0].memory.customers = sources[0].memory.customers +1;
-            }
-        }
+    run: function(creep) {    
+        roleBase.checkCarryState(creep);   
+        
+        // moving towards construction site
+        if(creep.memory.carrying) {   
+        	var target = creep.room.controller;
+        	if (0 != target) {
+                if(creep.upgradeController(target) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(target);
+                }
+        	} //if (0 != target)
+        } // if(creep.memory.building)        
+        // moving towards source
         else {
-            if(creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(creep.room.controller);
-            }
-        }
+            roleBase.fillUpEnergy(creep);
+        } //else    
+ 
     }
 };
 
