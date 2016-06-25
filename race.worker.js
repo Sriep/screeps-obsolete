@@ -83,9 +83,10 @@ var raceWorker = {
 	
 /**
  * Assigns roles to all the creeps in a room.
+ * @function roomName
  * @param   {number} roomName  The index of the room in the Game.rooms hash.
  */
-	assignRoles: function(roomName) {
+assignRoles: function(roomName) {
 	    this.setUnrolledCreeps(this.ROLE_HARVESTER);
 	    
 	    var creepCount = Object.keys(Game.creeps).length;
@@ -179,29 +180,39 @@ var raceWorker = {
         return body;	    
 	},
 	
-	//** @param {cpuLoad, roomName, spawnName}  **/
-	spawn: function(roomName, spawnName, size) {
-		console.log("In spawn room Name is " + roomName + " spawn Name is " + spawnName);
-		var energy = Game.rooms[roomName].energyAvailable; 
-		if  (energy < this.blockSize) {
-			return;
+    /**
+    * Spawn a worker creep
+    * @function spawn
+    * @param   {number} roomName  The index of the room in the Game.rooms hash.
+    * @param   {number} spawnName  The index of the spawn at which to spawn the
+    *   new creep.
+    * @param   {number} The cost of the creep. Creep is generated as follows.
+    *   number = Creates a creep that costs at least this ammount. Does not 
+    *   spawn a creep if insufficent energy.
+    *   undefined = Creats the biggist creep that can be spawned with the 
+    *   room's current maximum energy capacity.  Does not spawn a creep if
+    *   insufficent energy.
+    */
+	spawn: function(roomName, spawnName, cost) {
+		//console.log("In spawn room Name is " + roomName + " spawn Name is " + spawnName);
+		if (cost == undefined || cost == 0)
+		{
+		     cost = Game.rooms[roomName].energyCapacityAvailable;    
 		}
-		
-		var capacity = Game.rooms[roomName].energyCapacityAvailable; 
-		var numBlocks = Math.floor(capacity / this.blockSize);
-    	var biggestCreep = this.blockSize * numBlocks;
-    	if ( energy >= biggestCreep ) {
-			var numBlocks = Math.floor(energy/this.blockSize);
-			var body = [];
-			for (i = 0; i < numBlocks; i++) {
-				body.push(WORK);
-				body.push(CARRY);
-				body.push(MOVE);
-			} // for   			
-			var newName = Game.spawns[spawnName].createCreep(
-				body, undefined, {role: this.ROLE_HARVESTER});  
-			console.log("New creep " + newName + " is born");
-    	} // if ( energy >= biggestCreep ) 				
+		var body = this.bodyWorker(cost);
+		var canDo = Game.spawns[spawnName].canCreateCreep(body)
+		if (canDo != OK) {		    
+		    console.log("Failed to create creep, error " + canDo);
+            return canDo;   
+		}			
+		var result = Game.spawns[spawnName].createCreep(
+		                    body, undefined, {role: this.ROLE_HARVESTER});  
+		if  (_.isString(result)) {
+		    console.log("New creep " + result + " is born");
+		} else {
+		    console.log("Failed to create creep, error " + result);    
+		}
+		return result;		
 	}, // spawn	
 	
 	forceSpawn: function(spawnName) {
@@ -212,8 +223,8 @@ var raceWorker = {
 			console.log("New creep " + newName + " is born");			
 		//}
 	},
-	//var raceWorker = require("race.worker");
-	//raceWorker.forceSpawn("Spawn1");
+	//var raceWorker = require("race.worker");raceWorker.forceSpawn("Spawn1");
+	//
 	
 	moveCreeps: function() {
         for(var name in Game.creeps) {

@@ -1,4 +1,8 @@
-
+/**
+ * @fileOverview Screeps main processing loop.
+ * @author Piers Shepperson
+ */
+ 
 var raceWorker = require("race.worker");
 var roleHarvester = require("role.harvester");
 var roleUpgrader = require("role.upgrader");
@@ -17,7 +21,7 @@ profiler.enable();
 module.exports.loop = function () {
     profiler.wrap(function() {
         PathFinder.use(true);    
-        var tower = Game.getObjectById("TOWER_ID");
+        /*var tower = Game.getObjectById("TOWER_ID");
         if(tower) {
             var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
                 filter: (structure) => structure.hits < structure.hitsMax
@@ -30,7 +34,12 @@ module.exports.loop = function () {
             if(closestHostile) {
                 tower.attack(closestHostile);
             }
-        }
+        }*/
+        //closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+        //closestHostile(closestHostile);
+        //hostile = Game.getObjectById(576e5ad65b8ba9d162b967e8);
+        //tower = Game.getObjectById(576ce5599b0f1fa6144bae55);
+        //tower.attack(hostile);
   
         for(var name in Memory.creeps) {
             if(!Game.creeps[name]) {
@@ -48,8 +57,7 @@ module.exports.loop = function () {
 			var controllerLevel = Game.rooms[roomIndex].controller.level;
             raceWorker.spawn(roomIndex, "Spawn1");
             raceWorker.assignRoles(roomIndex);			
-		}
-		 
+		}		 
 		raceWorker.moveCreeps();
 		
 		//for(var i in Game.creeps) {
@@ -70,6 +78,20 @@ module.exports.loop = function () {
         //{
         //    console.log(sources[i] + " has asspoints " + roomOwned.accessPoints(myroom, sources[i].pos));    
         //}
+        
+        var now = new Date();
+        hour = now.getHours();
+        min  = now.getMinutes();
+        sec  = now.getSeconds();
+        date = now.getDate();     
+        month = now.getMonth() + 1;  
+        year = now.getFullYear();
+        var longtime = hour + ":" + min + ":" + sec + " "
+            + date + "/" + month + "/" + year;
+        if (Game.time % 1500 == 0) { 
+            Game.notify("Tick Time Date Contoller\n"
+                + Game.time + " " + longtime + " " + myroom.controller.progress);           
+        }
         
         console.log("Havest equlib " + roomOwned.eqlibHavesters(myroom, true));
         console.log("Upgrade equlib " + roomOwned.equlibUpgraders(myroom, true));        
