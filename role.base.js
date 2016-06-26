@@ -52,6 +52,7 @@ var roleBase = {
 	    // Just run out of energy
 	    if(creep.memory.carrying && creep.carry.energy == 0) {
             creep.memory.carrying = false;
+            creep.memory.offloadTargetId = undefined;
         } 
         // Just filled up with energy
         if(!creep.memory.carrying && creep.carry.energy == creep.carryCapacity) {

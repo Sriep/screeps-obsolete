@@ -93,16 +93,17 @@ assignRoles: function(room) {
     this.setUnrolledCreeps(this.ROLE_HARVESTER);
     var roomOwned = require("room.owned");
     var creepCount = Object.keys(Game.creeps).length;
-    var equlibriumHavesters;
+    var havesters_needed;
     if (room.memory.state == roomOwned.GameState.WAR)
     {
-        equlibriumHavesters = roomOwned.warTimeHavesters(room);
+        havesters_needed = roomOwned.warTimeHavesters(room);
     } else {
-        equlibriumHavesters = roomOwned.eqlibHavesters(room);
+        havesters_needed = roomOwned.eqlibHavesters(room);
     }
-    //console.log("In assignRoles equlibriumHavesters" , equlibriumHavesters );
-    var havesters_needed = Math.ceil(equlibriumHavesters); 
-    //console.log("In assignRoles havesters_needed" , havesters_needed );
+    havesters_needed = Math.min(havesters_needed, creepCount);
+    console.log("In assignRoles equlibriumHavesters" , havesters_needed );
+    havesters_needed = Math.ceil(havesters_needed); 
+    console.log("In assignRoles havesters_needed" , havesters_needed );
     //havesters_needed = 3;
 
     var builders_needed = 0;
@@ -139,45 +140,45 @@ assignRoles: function(room) {
     console.log("Builders: " + builders.length + " delta " + dBuilders);
     console.log("Repairers: " + repairers.length + " delta " + dRepairers);
     //console.log("About to call swithc Rols " , "role1" + this.HARVESTER + "role2" + this.HARVESTER);
-    if (dHavesters != 0)
-    {        
-        delta = this.switchRoles(dHavesters, dUpgraders, this.ROLE_HARVESTER, this.ROLE_UPGRADER);
-        dHavesters = dHavesters + delta;
-        dUpgraders = dUpgraders - delta;
-    }
-    if (dHavesters != 0)
-    {
-        delta = this.switchRoles(dHavesters, dBuilders, this.ROLE_HARVESTER, this.ROLE_BUILDER);
-        dHavesters = dHavesters + delta;
-        dBuilders = dBuilders - delta;
-    }
-    if (dHavesters != 0)
-    {
-        delta = this.switchRoles(dHavesters, dRepairers, this.ROLE_HARVESTER, this.ROLE_REPAIRER);
-        dHavesters = dHavesters + delta;
-        dRepairers = dRepairers - delta;
-    }
+        if (dHavesters != 0)
+        {        
+            delta = this.switchRoles(dHavesters, dUpgraders, this.ROLE_HARVESTER, this.ROLE_UPGRADER);
+            dHavesters = dHavesters + delta;
+            dUpgraders = dUpgraders - delta;
+        }
+        if (dHavesters != 0)
+        {
+            delta = this.switchRoles(dHavesters, dBuilders, this.ROLE_HARVESTER, this.ROLE_BUILDER);
+            dHavesters = dHavesters + delta;
+            dBuilders = dBuilders - delta;
+        }
+        if (dHavesters != 0)
+        {
+            delta = this.switchRoles(dHavesters, dRepairers, this.ROLE_HARVESTER, this.ROLE_REPAIRER);
+            dHavesters = dHavesters + delta;
+            dRepairers = dRepairers - delta;
+        }
 
-    if (dBuilders != 0)
-    {
-        delta = this.switchRoles(dBuilders, dUpgraders, this.ROLE_BUILDER, this.ROLE_UPGRADER);
-        dBuilders = dBuilders + delta;
-        dUpgraders = dUpgraders - delta;
-    }
-    if (dBuilders != 0)
-    {
-        delta = this.switchRoles(dBuilders, dRepairers, this.ROLE_BUILDER, this.ROLE_REPAIRER);
-        dBuilders = dBuilders + delta;
-        dRepairers = dRepairers - delta;
-    }
+        if (dBuilders != 0)
+        {
+            delta = this.switchRoles(dBuilders, dUpgraders, this.ROLE_BUILDER, this.ROLE_UPGRADER);
+            dBuilders = dBuilders + delta;
+            dUpgraders = dUpgraders - delta;
+        }
+        if (dBuilders != 0)
+        {
+            delta = this.switchRoles(dBuilders, dRepairers, this.ROLE_BUILDER, this.ROLE_REPAIRER);
+            dBuilders = dBuilders + delta;
+            dRepairers = dRepairers - delta;
+        }
 
-    if (dRepairers != 0)
-    {
-        delta = this.switchRoles(dRepairers, dUpgraders, this.ROLE_REPAIRER, this.ROLE_UPGRADER);
-        dRepairers = dRepairers + delta;
-        dUpgraders = dUpgraders - delta;
-    }
-},
+        if (dRepairers != 0)
+        {
+            delta = this.switchRoles(dRepairers, dUpgraders, this.ROLE_REPAIRER, this.ROLE_UPGRADER);
+            dRepairers = dRepairers + delta;
+            dUpgraders = dUpgraders - delta;
+        }
+    },
 	/*
     bodyWorker: function (cost) {
         var numBlocks = Math.ceil(cost/this.blockSize);
@@ -232,12 +233,13 @@ assignRoles: function(room) {
     *   raceWorker.spawnWorker("W26S21", "Spawn1");        
     */
 	spawn: function(room, spawn, workerSize) {	
+        
 	    if (workerSize == undefined) {
 		     cost = room.energyAvailable;
 		} else {
 		    cost = this.blockSize * workerSize;
 		}
-		var body = this.bodyWorker(cost);
+		var body = this.body(cost);
 		var canDo = spawn.canCreateCreep(body)
 		if (canDo != OK) {		    
             return canDo;   
@@ -262,9 +264,10 @@ assignRoles: function(room) {
 	//var raceWorker = require("race.worker");raceWorker.forceSpawn("Spawn1");
 	//
 	
-	moveCreeps: function() {
-        for(var name in Game.creeps) {
-            var creep = Game.creeps[name];
+	moveCreeps: function(room) {
+        var creeps = room.find(FIND_MY_CREEPS);
+        for(var id in creeps) {
+            var creep = creeps[id];
             if (creep.memory.role == raceWorker.ROLE_HARVESTER) {
                 roleHarvester.run(creep);
             } else if (creep.memory.role == raceWorker.ROLE_UPGRADER) {

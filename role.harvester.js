@@ -10,6 +10,15 @@ var roleBase = require("role.base");
  
 var roleHarvester = {
 	findTarget: function(creep) {
+        oldTargetId = creep.memory.offloadTargetId;
+        if (oldTargetId !== undefined)
+        {           
+            target = Game.getObjectById(oldTargetId);
+            if (target.energy < target.energyCapacity)
+            {
+                return target;
+            }
+        }
 
         var towers = creep.room.find(FIND_STRUCTURES, {
                 filter: (structure) => {
@@ -17,22 +26,23 @@ var roleHarvester = {
                     && structure.energy < structure.energyCapacity * 0.5
                 }
         });	
-        console.log("Towers" + towers);
-        if (towers.length) {
+        if (towers.length >0) {
             return towers[0];    
         }
         
-        var targets = creep.room.find(FIND_STRUCTURES, {
+        target = creep.pos.findClosestByRange(FIND_STRUCTURES, {
                 filter: (structure) => {
                     return (structure.structureType == STRUCTURE_EXTENSION ||
                             structure.structureType == STRUCTURE_SPAWN ||
                             structure.structureType == STRUCTURE_TOWER) 
                     && structure.energy < structure.energyCapacity;
                 }
-        });	            
-		if(targets.length) {
-			return 	targets[0]; 
+        });	             
+        if(target) {
+            creep.memory.offloadTargetId = target.id;
+			return 	target; 
 		}
+
         return 0;
 	},	
 

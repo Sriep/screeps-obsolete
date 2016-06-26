@@ -12,6 +12,7 @@ var roleRepairer = require("role.repairer");
 var roadBuilder = require("road.builder");
 var cpuUsage = require("cpu.usage");
 var roomOwned = require("room.owned");
+var policy = require("policy");
 
 // Any modules that you use that modify the game's prototypes should be require'd
 // before you require the profiler.
@@ -22,7 +23,7 @@ profiler.enable();
 module.exports.loop = function () {
     profiler.wrap(function() {
         PathFinder.use(true);   
-
+        
         var tower = Game.getObjectById("576ce5599b0f1fa6144bae55");
         if(tower) {
             /*console.log("Found tower " + tower);
@@ -67,15 +68,21 @@ module.exports.loop = function () {
             //raceWorker.spawn(roomIndex, "Spawn1", raceWorker.biggistSpawnable(roomIndex));
             roomOwned.setWorkerSize(currentRoom, 6);
             if (0 ==  Object.keys(Game.creeps).length ) {
-                raceWorker.spawn(currentRoom, spawns[0], undefined);   
+                console.log("No creeps spawn return is "
+                    , raceBase.spawn(raceWorker, currentRoom, spawns[0], undefined));
+                //raceBase.spawn(raceWorker, currentRoom, spawns[0], undefined);
+                //raceWorker.spawn(currentRoom, spawns[0], undefined);   
             } else {
                 //raceWorker.spawn(currentRoom, spawns[0], 6);
                 raceBase.spawn(raceWorker, currentRoom, spawns[0], 6);
             }
             
-            raceWorker.assignRoles(currentRoom);			
+            raceWorker.assignRoles(currentRoom);
+            raceWorker.moveCreeps(currentRoom);
+            //var policy = require("policy");
+            //policy.enactPolicies();
 		}		 
-		raceWorker.moveCreeps();
+		
 		
 		//for(var i in Game.creeps) {
 		//    console.log(Game.creeps[i].name + " has fatigue " +  Game.creeps[i].fatigue );   
@@ -118,6 +125,7 @@ module.exports.loop = function () {
         console.log("************************ " + Game.time + " *********************************");
     }) // profiler.wrap(function()
 }
+//JSON.stringify(memory);
 //Game.rooms["W26S21"]
 //Game.spawns.Spawn1.createCreep( [MOVE], 'Scout1' );
 //target = Game.getObjectById("55db312fefa8e3fe66e04878"); 
