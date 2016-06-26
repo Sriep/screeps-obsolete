@@ -6,7 +6,7 @@
  
 /**
  * Abstract base object for policy decisions.
- * @module raceBase
+ * @module policy
  */
 var policy = {
 
@@ -16,7 +16,7 @@ var policy = {
     //policyRescue:  require("policy.rescue"),   
 
 
-    Policy: {
+   Type: {
         PEACE: "peace",
         CONSTRUCTION: "construction",
         DEFEND: "defence",
@@ -25,20 +25,18 @@ var policy = {
 
     enactPolicies: function()
     {
-        policyPeace = require("policy.peace");
         for(var i in Game.rooms) {
-            var currentPolicy = determinePolicy(Game.rooms[i]);
+            var currentPolicy = this.determinePolicy(Game.rooms[i]);
             currentPolicy.enactPolicy(Game.rooms[i])
         }
     },
 
     determinePolicy(room)
-    {
+    {      
         var oldPolicy = require("policy." + this.currentPolicyId(room)); 
         console.log("old policy is", JSON.stringify(oldPolicy));
-        var newPolicyId = oldPolicy.draftNewPolicyId(room);  
-        room.memory.currentPolicy =  newPolicyId;      
-        return require("policy." + newPolicyId);
+        room.memory.currentPolicy =  oldPolicy.draftNewPolicyId(room);  ;      
+        return require("policy." + room.memory.currentPolicy);
     },
 
     currentPolicyId: function(room)

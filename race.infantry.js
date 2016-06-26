@@ -7,7 +7,7 @@
 /**
  * Abstract base object containing data and functions for use by my infantry
  * creeps. Infantry contain mainly "ATTACK" and "MOVE" parts.
- * @module raceBase
+ * @module raceInfantry
  */
 var raceInfantry = {
     BLOCKSIZE: 80 + 50,

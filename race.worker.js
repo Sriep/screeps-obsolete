@@ -43,6 +43,10 @@ var raceWorker = {
 	maxSize: function(contolerLevel) {    
 	    return  Math.floor(roomController.maxProduction[contolerLevel] / this.blockSize);
 	},	
+
+    maxSizeFromEnergy: function(room)  {
+        return Math.floor(room.energyAvailable / this.BLOCKSIZE);
+    },
 	
 	switchRoles: function(delta1, delta2, role1, role2) {
         var deltaChange = 0;
@@ -224,7 +228,6 @@ assignRoles: function(room) {
     *   <li> undefined = Creats the biggist creep that can be spawned with the 
     *   room's current energy.  
     *   </ul>
-    * @description    
     * @returns {Number}  <a href="http://support.screeps.com/hc/en-us/articles/203084991-API-Reference">
     *   Screeps error code.</a>   
     * @example 

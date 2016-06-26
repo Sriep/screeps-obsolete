@@ -66,21 +66,11 @@ module.exports.loop = function () {
             //console.log("myspawns", spawns);
             //raceWorker.spawn(roomIndex, "Spawn1");
             //raceWorker.spawn(roomIndex, "Spawn1", raceWorker.biggistSpawnable(roomIndex));
-            roomOwned.setWorkerSize(currentRoom, 6);
-            if (0 ==  Object.keys(Game.creeps).length ) {
-                console.log("No creeps spawn return is "
-                    , raceBase.spawn(raceWorker, currentRoom, spawns[0], undefined));
-                //raceBase.spawn(raceWorker, currentRoom, spawns[0], undefined);
-                //raceWorker.spawn(currentRoom, spawns[0], undefined);   
-            } else {
-                //raceWorker.spawn(currentRoom, spawns[0], 6);
-                raceBase.spawn(raceWorker, currentRoom, spawns[0], 6);
-            }
-            
-            raceWorker.assignRoles(currentRoom);
-            raceWorker.moveCreeps(currentRoom);
+            //roomOwned.setWorkerSize(currentRoom, 6);
+            //raceWorker.assignRoles(currentRoom);
+            //raceWorker.moveCreeps(currentRoom);
             //var policy = require("policy");
-            //policy.enactPolicies();
+            policy.enactPolicies();
 		}		 
 		
 		

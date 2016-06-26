@@ -9,7 +9,7 @@
 /**
  * Abstract object containing data and functions
  * related to rooms in which we are fighting a war.
- * @module raceWorker
+ * @module roomWar
  */
 var roomWar = { 
     TOWER_DM_REDUCTION: 0.5,

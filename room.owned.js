@@ -8,7 +8,7 @@ roomWar = require("room.war");
 /**
  * Abstract object containing data and functions
  * related to owned rooms.
- * @module raceWorker
+ * @module roomOwned
  */
 var roomOwned = {  
     
