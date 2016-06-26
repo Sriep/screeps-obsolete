@@ -10,6 +10,18 @@ var roleBase = require("role.base");
  
 var roleHarvester = {
 	findTarget: function(creep) {
+
+        var towers = creep.room.find(FIND_STRUCTURES, {
+                filter: (structure) => {
+                    return (structure.structureType == STRUCTURE_TOWER) 
+                    && structure.energy < structure.energyCapacity * 0.5
+                }
+        });	
+        console.log("Towers" + towers);
+        if (towers.length) {
+            return towers[0];    
+        }
+        
         var targets = creep.room.find(FIND_STRUCTURES, {
                 filter: (structure) => {
                     return (structure.structureType == STRUCTURE_EXTENSION ||
@@ -17,7 +29,7 @@ var roleHarvester = {
                             structure.structureType == STRUCTURE_TOWER) 
                     && structure.energy < structure.energyCapacity;
                 }
-        });	    
+        });	            
 		if(targets.length) {
 			return 	targets[0]; 
 		}

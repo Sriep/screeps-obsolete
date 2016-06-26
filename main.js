@@ -2,7 +2,8 @@
  * @fileOverview Screeps main processing loop.
  * @author Piers Shepperson
  */
- 
+
+var raceBase = require("race.base"); 
 var raceWorker = require("race.worker");
 var roleHarvester = require("role.harvester");
 var roleUpgrader = require("role.upgrader");
@@ -20,9 +21,11 @@ profiler.enable();
 
 module.exports.loop = function () {
     profiler.wrap(function() {
-        PathFinder.use(true);    
-        /*var tower = Game.getObjectById("TOWER_ID");
+        PathFinder.use(true);   
+
+        var tower = Game.getObjectById("576ce5599b0f1fa6144bae55");
         if(tower) {
+            /*console.log("Found tower " + tower);
             var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
                 filter: (structure) => structure.hits < structure.hitsMax
             });
@@ -33,14 +36,14 @@ module.exports.loop = function () {
             var closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
             if(closestHostile) {
                 tower.attack(closestHostile);
-            }
-        }*/
+            }*/
+        }
         //closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
         //closestHostile(closestHostile);
         //hostile = Game.getObjectById(576e5ad65b8ba9d162b967e8);
         //tower = Game.getObjectById(576ce5599b0f1fa6144bae55);
         //tower.attack(hostile);
-  
+        
         for(var name in Memory.creeps) {
             if(!Game.creeps[name]) {
                 delete Memory.creeps[name];
@@ -50,13 +53,27 @@ module.exports.loop = function () {
         var cpuLoad = cpuUsage.averageCpuLoad();
         
         for(var roomIndex in Game.rooms) {
+            var currentRoom = Game.rooms[roomIndex];
+            roomOwned.newTickUpdate(currentRoom);
+            defendRoom(roomIndex);
 			console.log("Room " + roomIndex+" has "
-			    +Game.rooms[roomIndex].energyAvailable+" energy");
+			    +currentRoom.energyAvailable+" energy");
 			console.log("Room " +roomIndex+" has "
-			    +Game.rooms[roomIndex].energyCapacityAvailable+" max energy capacity");
-			var controllerLevel = Game.rooms[roomIndex].controller.level;
-            raceWorker.spawn(roomIndex, "Spawn1");
-            raceWorker.assignRoles(roomIndex);			
+			    +currentRoom.energyCapacityAvailable+" max energy capacity");
+			var controllerLevel = currentRoom.controller.level;
+            spawns = currentRoom.find(FIND_MY_SPAWNS);
+            //console.log("myspawns", spawns);
+            //raceWorker.spawn(roomIndex, "Spawn1");
+            //raceWorker.spawn(roomIndex, "Spawn1", raceWorker.biggistSpawnable(roomIndex));
+            roomOwned.setWorkerSize(currentRoom, 6);
+            if (0 ==  Object.keys(Game.creeps).length ) {
+                raceWorker.spawn(currentRoom, spawns[0], undefined);   
+            } else {
+                //raceWorker.spawn(currentRoom, spawns[0], 6);
+                raceBase.spawn(raceWorker, currentRoom, spawns[0], 6);
+            }
+            
+            raceWorker.assignRoles(currentRoom);			
 		}		 
 		raceWorker.moveCreeps();
 		
@@ -64,10 +81,10 @@ module.exports.loop = function () {
 		//    console.log(Game.creeps[i].name + " has fatigue " +  Game.creeps[i].fatigue );   
 		//}
 		
-        console.log("CPULoad is " + cpuLoad);
-        console.log('CPU time used from the beginning of the current game tick ' + Game.cpu.getUsed());
-        console.log("CPU usage " + JSON.stringify(Game.cpu));
-        console.log("Global contol level GCL " + JSON.stringify(Game.gcl));
+        console.log("CPULoad is " , cpuLoad);
+        console.log('CPU time used from the beginning of the current game tick ' , Game.cpu.getUsed());
+        console.log("CPU usage " , JSON.stringify(Game.cpu));
+        console.log("Global contol level GCL " , JSON.stringify(Game.gcl));
         //console.table([{"level":"level","progress":"progress","progressTotal":"progressTotal"}
         //                ,JSON.stringify(Game.gcl)]);
         cpuUsage.updateCpuUsage();
@@ -90,13 +107,14 @@ module.exports.loop = function () {
             + date + "/" + month + "/" + year;
         if (Game.time % 1500 == 0) { 
             Game.notify("Tick Time Date Contoller\n"
-                + Game.time + " " + longtime + " " + myroom.controller.progress);           
+                + Game.time +  " " + longtime + " " + myroom.controller.progress);           
         }
         
-        console.log("Havest equlib " + roomOwned.eqlibHavesters(myroom, true));
-        console.log("Upgrade equlib " + roomOwned.equlibUpgraders(myroom, true));        
-        console.log("harvest trip " + roomOwned.getHavestRoundTripLength(myroom, "true")); 
-        console.log("upgrade trip " + roomOwned.getUpgradeRondTripLength(myroom, "true")); 
+        console.log("Havest equlib " , roomOwned.eqlibHavesters(myroom));
+        console.log("Upgrade equlib " , roomOwned.equlibUpgraders(myroom));  
+        console.log("War Havest " , roomOwned.warTimeHavesters(myroom, undefined, true));  
+        //console.log("harvest trip " , roomOwned.getHavestRoundTripLength(myroom, "true")); 
+        //console.log("upgrade trip " , roomOwned.getUpgradeRondTripLength(myroom, "true")); 
         console.log("************************ " + Game.time + " *********************************");
     }) // profiler.wrap(function()
 }
@@ -108,7 +126,19 @@ module.exports.loop = function () {
 //Game.creeps["Scout1"].moveTo(1,40);
 //console.log("Scouts bodyarry is" + Game.creeps["Scout1"].bodyarray);
 
-Game.rooms["W26S21"]
+function defendRoom(roomName) {
+    
+    var hostiles = Game.rooms[roomName].find(FIND_HOSTILE_CREEPS);
+    
+    if(hostiles.length > 0) {
+        var username = hostiles[0].owner.username;
+        Game.notify(`User ${username} spotted in room ${roomName}`);
+        var towers = Game.rooms[roomName].find(
+            FIND_MY_STRUCTURES, {filter: {structureType: STRUCTURE_TOWER}});
+        towers.forEach(tower => tower.attack(hostiles[0]));
+    }
+}
+
 
 
 

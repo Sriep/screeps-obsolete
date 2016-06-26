@@ -3,15 +3,38 @@
  * related to owned rooms.
  * @author Piers Shepperson
  */
- 
- var raceWorker = require("race.worker");
- 
+raceWorker = require("race.worker");
+roomWar = require("room.war");
 /**
  * Abstract object containing data and functions
  * related to owned rooms.
  * @module raceWorker
  */
-var roomOwned = {    
+var roomOwned = {  
+    
+    GameState: {
+        PEACE: "peace",
+        CONSTRUCTION: "production",
+        WAR: "war",
+    },
+    
+    newTickUpdate: function(room) {
+        if (roomWar.enterWareState(room)) {
+            room.memory.state = this.GameState.WAR;
+        } else {
+            room.memory.state =  this.GameState.PEACE;  
+        }         
+    },
+    
+    peaceLoop: function(room) {
+        raceWorker.spawn(room.name, "Spawn1", 6);
+        raceWorker.assignRoles(room.name);			        
+    },
+
+    //enemyCreeps: function(room) {
+    //    return hostiles = room.find(FIND_HOSTILE_CREEPS); 
+    //},
+     
     avDistanceBetween: function (room, obj1, obj2) {
         console.log("In avDistanceBetween");
         var distance = 0;
@@ -109,78 +132,115 @@ var roomOwned = {
         return accessPoints;  
     },
     
-    sourceEnergyLT: function(room, source, workerHavestRate) {
-        //console.log("source " + source);
-        var access = this.accessPoints(room, source);
-        //console.log("sourceEnergyLT acesss " + access + " workerHavestRate " 
-        //    + workerHavestRate + " source.energyCapacity " + source.energyCapacity +
-        //    " ENERGY_REGEN_TIME " + ENERGY_REGEN_TIME);
-        return Math.min(access * workerHavestRate * CREEP_LIFE_TIME, 
-               source.energyCapacity * CREEP_LIFE_TIME / ENERGY_REGEN_TIME);        
-    },
     
-    havesterEenegyLT: function(room) {
+    havesterEenegyLT: function(room, workerSize) { 
+        if (workerSize === undefined) {
+            workerSize =  raceWorker.maxSize(room.controller.level);   
+        }
         var loadTime = 25;
         var offloadTime = 1;
         var roundTripTime = this.getHavestRoundTripLength(room);
         
         var timePerTrip = loadTime + offloadTime + roundTripTime;
         var tripsPerLife = 1500 / timePerTrip;
-        var energyPerTrip = 50 * raceWorker.size(room.controller.level);
-        
+        var energyPerTrip = 50 * workerSize; 
         return energyPerTrip * tripsPerLife;
     },
      
-    uplgraderEenegyLT: function(room) {
+    uplgraderEenegyLT: function(room, workerSize) {
+        if (workerSize === undefined) {
+            workerSize =  raceWorker.size(room.controller.level);   
+        }
         var loadTime = 25;
         var offloadTime = 50;
         var roundTripTime = this.getUpgradeRondTripLength(room);
         
         var timePerTrip = loadTime + offloadTime + roundTripTime;
         var tripsPerLife = 1500 / timePerTrip;
-        var energyPerTrip = 50 * raceWorker.size(room.controller.level);
-        
+        var energyPerTrip = 50 * workerSize;
         return energyPerTrip * tripsPerLife;
     },
     
-    eqlibHavesters: function(room, force)
+    setWorkerSize: function(room, workerSize, force)  {
+        if (workerSize === undefined) {
+            if (room.memory.workerSize === undefined) {
+                workerSize =  raceWorker.maxSize(room.controller.level);
+                force = true;
+            } else {
+                workerSize = room.memory.workerSize;
+            }               
+        } else {
+            if (workerSize != room.memory.workerSize) {
+                force = true;
+            }
+        }
+        room.memory.workerSize = workerSize;   
+        return force;
+    },
+    //var roomOwned = require("room.owned"); roomOwned.setWorkerSize()
+    
+    warTimeHavesters: function(room, workerSize, force)  {
+        force = this.setWorkerSize(room, workerSize, force);
+        workerSize = room.memory.workerSize;  
+        if (room.memory.warTimeHavesters === undefined || force == true)
+        {   
+            warTimeHavesters =  this.allSourcsEnergyLT(room, workerSize) 
+                                / this.havesterEenegyLT(room, workerSize); 
+            room.memory.warTimeHavesters = warTimeHavesters;  
+        }
+        return room.memory.warTimeHavesters;        
+    },
+    
+    sourceEnergyLT: function(room, source, workerHavestRate) {
+        var access = this.accessPoints(room, source);
+        return Math.min(access * workerHavestRate * CREEP_LIFE_TIME, 
+               source.energyCapacity * CREEP_LIFE_TIME / ENERGY_REGEN_TIME);        
+    },
+    
+    allSourcsEnergyLT: function(room, workerSize)
     {
+        var havestableSourcEnergyLT = 0;
+        sources = room.find(FIND_SOURCES);
+        for (var i in sources) {                
+            havestableSourcEnergyLT = havestableSourcEnergyLT 
+                + this.sourceEnergyLT(room, sources[i], 2 * workerSize);
+        }   
+        return havestableSourcEnergyLT;
+    },
+           
+    eqlibHavesters: function(room, workerSize, force) {
+        force = this.setWorkerSize(room, workerSize, force);
+        workerSize = room.memory.workerSize;  
+        
         if (room.memory.eqlibHavesters === undefined || force == true)
         {        
-            var havestRate = 2 * raceWorker.size(room.controller.level); 
-            var workerCost = 100 * havestRate;
-            var havestableSourcEnergyLT = 0;
-            sources = room.find(FIND_SOURCES);
-            for (var i in sources) {                
-                havestableSourcEnergyLT = havestableSourcEnergyLT 
-                    + this.sourceEnergyLT(room, sources[i], havestRate);
-            }
-            var hELT = this.havesterEenegyLT(room);
-            var uELT = this.uplgraderEenegyLT(room);
-            var sELT = havestableSourcEnergyLT;
+            workerCost = 200 * workerSize;
+            var havestRate = 2 * workerSize;           
+            var hELT = this.havesterEenegyLT(room, workerSize);
+            var uELT = this.uplgraderEenegyLT(room, workerSize);
+            var sELT = this.allSourcsEnergyLT(room, workerSize);
             var wCost = workerCost;
-            //console.log("eqlibHavesters sELT "+sELT+" hELT "+hELT+" uELT " + uELT 
-            //    + " wCost " + wCost);  
             room.memory.eqlibHavesters
                 = sELT / ( hELT + (uELT * hELT / wCost) - uELT );
         }
         return room.memory.eqlibHavesters; 
-    },
+    },    
     
-    equlibUpgraders: function(room, force)
-    {
+    equlibUpgraders: function(room, workerSize, force) {
+        force = this.setWorkerSize(room, workerSize, force);
+        workerSize = room.memory.workerSize;  
         if (room.memory.eqlibUpgraders === undefined || force == true)
         {        
-            var workerCost = 200 * raceWorker.size(room.controller.level); 
-            var hELT = this.havesterEenegyLT(room);
-            var havesters = this.eqlibHavesters(room, force);
-            //console.log("equlibUpgraders havesters "+havesters + " hELT " + hELT 
-            //    + " workerCost " + workerCost);
+            if (workerSize == undefined) {               
+                workerSize = raceWorker.maxSize(room.controller.level);
+            }
+            workerCost = 200 * workerSize;    
+            var hELT = this.havesterEenegyLT(room, workerSize);   
+            var havesters = this.eqlibHavesters(room, workerSize, force);
             room.memory.eqlibUpgraders = (( hELT / workerCost)-1 ) * havesters; 
         }
         return room.memory.eqlibUpgraders;            
-    }
-    
+    }    
 };
 
 module.exports = roomOwned;
