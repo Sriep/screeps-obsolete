@@ -5,6 +5,7 @@
  */
 raceWorker = require("race.worker");
 roomWar = require("room.war");
+roleBase = require("role.base");
 /**
  * Abstract object containing data and functions
  * related to owned rooms.
@@ -12,24 +13,18 @@ roomWar = require("room.war");
  */
 var roomOwned = {  
     
-    GameState: {
-        PEACE: "peace",
-        CONSTRUCTION: "production",
-        WAR: "war",
-    },
+    //newTickUpdate: function(room) {
+        //if (roomWar.enterWareState(room)) {
+       //     room.memory.state = this.GameState.WAR;
+       // } else {
+       //     room.memory.state =  this.GameState.PEACE;  
+       // }         
+    //},
     
-    newTickUpdate: function(room) {
-        if (roomWar.enterWareState(room)) {
-            room.memory.state = this.GameState.WAR;
-        } else {
-            room.memory.state =  this.GameState.PEACE;  
-        }         
-    },
-    
-    peaceLoop: function(room) {
-        raceWorker.spawn(room.name, "Spawn1", 6);
-        raceWorker.assignRoles(room.name);			        
-    },
+    //peaceLoop: function(room) {
+    //    raceWorker.spawn(room.name, "Spawn1", 6);
+   //     raceWorker.assignRoles(room.name);			        
+   // },
 
     //enemyCreeps: function(room) {
     //    return hostiles = room.find(FIND_HOSTILE_CREEPS); 
@@ -101,6 +96,28 @@ var roomOwned = {
         } 
         return  room.memory.upgradeTrip;        
     },
+
+    getBuilderRondTripLength: function (room, force) {
+        return this.getHavestRoundTripLength(room, force);       
+    },
+
+    getRepairerRondTripLength: function (room, force) {
+        return this.getUpgradeRondTripLength(room, force);       
+    },
+
+
+    roundTripLength(room,role,force) {
+        switch (role) {
+            case roleBase.Type.HARVESTER:
+                return this.getHavestRoundTripLength(room, force);
+            case roleBase.Type.UPGRADER:
+                return this.getUpgradeRondTripLength(room, force);
+            case roleBase.Type.BUILDER:
+                return this.getBuilderRondTripLength(room, force);
+            case roleBase.Type.REPAIRER:
+                return this.getRepairerRondTripLength(room, force);
+        }
+    },
     
     accessPoints: function (room, pos)
     {
@@ -131,8 +148,7 @@ var roomOwned = {
         } 
         return accessPoints;  
     },
-    
-    
+/*      
     havesterEenegyLT: function(room, workerSize) { 
         if (workerSize === undefined) {
             workerSize =  raceWorker.maxSize(room.controller.level);   
@@ -142,8 +158,9 @@ var roomOwned = {
         var roundTripTime = this.getHavestRoundTripLength(room);
         
         var timePerTrip = loadTime + offloadTime + roundTripTime;
-        var tripsPerLife = 1500 / timePerTrip;
-        var energyPerTrip = 50 * workerSize; 
+        var tripsPerLife = CREEP_LIFE_TIME / timePerTrip;
+        var energyPerTrip = CARRY_CAPACITY * workerSize; 
+console.log("In energyLigeTime tripsPerLife", tripsPerLife);       
         return energyPerTrip * tripsPerLife;
     },
      
@@ -156,8 +173,24 @@ var roomOwned = {
         var roundTripTime = this.getUpgradeRondTripLength(room);
         
         var timePerTrip = loadTime + offloadTime + roundTripTime;
-        var tripsPerLife = 1500 / timePerTrip;
-        var energyPerTrip = 50 * workerSize;
+        var tripsPerLife = CREEP_LIFE_TIME / timePerTrip;
+        var energyPerTrip = CARRY_CAPACITY * workerSize;
+        return energyPerTrip * tripsPerLife;
+    },*/
+
+    energyLifeTime: function (room, workerSize, role) {
+        if (workerSize === undefined) {
+            workerSize =  raceWorker.size(room.controller.level);   
+        }
+        var loadTime = roleBase.LoadTime[role];
+        var offloadTime = roleBase.OffloadTime[role];
+        var roundTripTime = this.roundTripLength(room, role);
+        
+        var timePerTrip = loadTime + offloadTime + roundTripTime;
+//console.log("In energylt koad time", loadTime, "offloadtiem", offloadTime, "roudtt", roundTripTime);
+        var tripsPerLife = CREEP_LIFE_TIME / timePerTrip;
+        var energyPerTrip = CARRY_CAPACITY * workerSize;
+////console.log("In energyLigeTime tripsPerLife",tripsPerLife,"role",role);        
         return energyPerTrip * tripsPerLife;
     },
     
@@ -177,19 +210,7 @@ var roomOwned = {
         room.memory.workerSize = workerSize;   
         return force;
     },
-    //var roomOwned = require("room.owned"); roomOwned.setWorkerSize()
-    
-    warTimeHavesters: function(room, workerSize, force)  {
-        force = this.setWorkerSize(room, workerSize, force);
-        workerSize = room.memory.workerSize;  
-        if (room.memory.warTimeHavesters === undefined || force == true)
-        {   
-            warTimeHavesters =  this.allSourcsEnergyLT(room, workerSize) 
-                                / this.havesterEenegyLT(room, workerSize); 
-            room.memory.warTimeHavesters = warTimeHavesters;  
-        }
-        return room.memory.warTimeHavesters;        
-    },
+    //var roomOwned = require("room.owned"); roomOwned.setWorkerSize()  
     
     sourceEnergyLT: function(room, source, workerHavestRate) {
         var access = this.accessPoints(room, source);
@@ -207,40 +228,98 @@ var roomOwned = {
         }   
         return havestableSourcEnergyLT;
     },
+
+    warTimeHavesters: function(room, workerSize, force)  {
+        force = this.setWorkerSize(room, workerSize, force);
+        workerSize = room.memory.workerSize;  
+        if (room.memory.warTimeHavesters === undefined || force == true)
+        {   
+            warTimeHavesters =  this.allSourcsEnergyLT(room, workerSize) 
+                / this.energyLifeTime(room, workerSize, roleBase.Type.HARVESTER);
+            room.memory.warTimeHavesters = warTimeHavesters;  
+        }
+        return room.memory.warTimeHavesters;        
+    },
            
-    eqlibHavesters: function(room, workerSize, force) {
+    peaceHavesters: function(room, workerSize, force) {
         force = this.setWorkerSize(room, workerSize, force);
         workerSize = room.memory.workerSize;  
         
-        if (room.memory.eqlibHavesters === undefined || force == true)
+        if (room.memory.peaceHavesters === undefined || force == true)
         {        
-            workerCost = 200 * workerSize;
-            var havestRate = 2 * workerSize;           
-            var hELT = this.havesterEenegyLT(room, workerSize);
-            var uELT = this.uplgraderEenegyLT(room, workerSize);
+            workerCost = raceWorker.BLOCKSIZE * workerSize;
+            var havestRate = 2 * workerSize;                      
+          //  var hELT = this.havesterEenegyLT(room, workerSize);
+ //console.log("peaceHavesters helt", hELT);
+            hELT = this.energyLifeTime(room, workerSize, roleBase.Type.HARVESTER);
+
+
+            var uELT = this.energyLifeTime(room, workerSize, roleBase.Type.UPGRADER);
+ //console.log("peacHavesters uelt", uELT)
+           // uELT = this.uplgraderEenegyLT(room, workerSize);
+ //console.log("peacHavesters uelt", uELT)
             var sELT = this.allSourcsEnergyLT(room, workerSize);
             var wCost = workerCost;
-            room.memory.eqlibHavesters
+            room.memory.peaceHavesters
                 = sELT / ( hELT + (uELT * hELT / wCost) - uELT );
         }
-        return room.memory.eqlibHavesters; 
+        return room.memory.peaceHavesters; 
     },    
     
-    equlibUpgraders: function(room, workerSize, force) {
+    peaceUpgraders: function(room, workerSize, force) {
         force = this.setWorkerSize(room, workerSize, force);
         workerSize = room.memory.workerSize;  
-        if (room.memory.eqlibUpgraders === undefined || force == true)
+        if (room.memory.peaceUpgraders === undefined || force == true)
         {        
             if (workerSize == undefined) {               
                 workerSize = raceWorker.maxSize(room.controller.level);
             }
-            workerCost = 200 * workerSize;    
-            var hELT = this.havesterEenegyLT(room, workerSize);   
-            var havesters = this.eqlibHavesters(room, workerSize, force);
-            room.memory.eqlibUpgraders = (( hELT / workerCost)-1 ) * havesters; 
+            workerCost = raceWorker.BLOCKSIZE * workerSize;    
+            var hELT = this.energyLifeTime(room, workerSize, roleBase.Type.HARVESTER);  
+            var havesters = this.peaceHavesters(room, workerSize, force);
+            room.memory.peaceUpgraders = (( hELT / workerCost)-1 ) * havesters; 
         }
-        return room.memory.eqlibUpgraders;            
-    }    
+        return room.memory.peaceUpgraders;            
+    },    
+
+    constructHavesters: function(room, workerSize, force)
+    {
+        force = this.setWorkerSize(room, workerSize, force);
+        workerSize = room.memory.workerSize;  
+        
+        if (room.memory.constructHavesters === undefined || force == true)
+        {        
+            workerCost = raceWorker.BLOCKSIZE * workerSize;
+            var havestRate = 2 * workerSize;           
+            var hELT = this.energyLifeTime(room, workerSize, roleBase.Type.HARVESTER);
+            var bELT = this.energyLifeTime(room, workerSize, roleBase.Type.BUILDER);
+            var sELT = this.allSourcsEnergyLT(room, workerSize);
+            var wCost = workerCost;
+//console.log("In consHav selt", sELT, "helt", hELT, "bELT", bELT, "wcost", wCost);
+            room.memory.constructHavesters
+                = sELT / ( hELT + (bELT * hELT / wCost) - bELT );
+        }
+        return room.memory.constructHavesters;   
+    },
+
+    constructBuilders: function(room, workerSize, force) {
+        force = this.setWorkerSize(room, workerSize, force);
+        workerSize = room.memory.workerSize;  
+        if (room.memory.consructBuilders === undefined || force == true)
+        {        
+            if (workerSize == undefined) {               
+                workerSize = raceWorker.maxSize(room.controller.level);
+            }
+            workerCost = raceWorker.BLOCKSIZE * workerSize;    
+            var hELT = this.energyLifeTime(room, workerSize, roleBase.Type.HARVESTER); 
+            var havesters = this.constructHavesters(room, workerSize, force);
+ //console.log("In consHav havesters", havesters, "workerCost", workerCost, "helt", hELT);           
+            room.memory.consructBuilders = (( hELT / workerCost)-1 ) * havesters; 
+        }   
+        return room.memory.consructBuilders; 
+    }
+
+
 };
 
 module.exports = roomOwned;

@@ -13,12 +13,13 @@ var raceWorker = require("race.worker");
  */
 var raceBase = {
 
-    spawn: function(race, room, spawn, workerSize) {	
-        if (workerSize == undefined) {
+    spawn: function(race, room, spawn, creepSize) {	
+        console.log("start base spaen workerSize", race, room, spawn, creepSize);
+        if (creepSize == undefined) {
             cost = room.energyAvailable;
             cost = Math.floor(cost/race.BLOCKSIZE);
         } else {
-            cost = race.BLOCKSIZE * workerSize;
+            cost = race.BLOCKSIZE * creepSize;
         }
         //console.log("In base.spawn cost", cost,"workersize", workerSize);
         var body = race.body(cost);
@@ -28,7 +29,7 @@ var raceBase = {
             return canDo;   
         }			
         var result = spawn.createCreep(
-                            body, undefined, {role: this.ROLE_HARVESTER});  
+                            body, undefined, {role: race.ROLE_DEFULT});  
         //console.log("In base spawn body is", body, "return is ", result);                        
         if  (_.isString(result)) {
             console.log("New creep " + result + " is born");

@@ -24,8 +24,8 @@ module.exports.loop = function () {
     profiler.wrap(function() {
         PathFinder.use(true);   
         
-        var tower = Game.getObjectById("576ce5599b0f1fa6144bae55");
-        if(tower) {
+        //var tower = Game.getObjectById("576ce5599b0f1fa6144bae55");
+        //if(tower) {
             /*console.log("Found tower " + tower);
             var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
                 filter: (structure) => structure.hits < structure.hitsMax
@@ -38,7 +38,7 @@ module.exports.loop = function () {
             if(closestHostile) {
                 tower.attack(closestHostile);
             }*/
-        }
+        //}
         //closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
         //closestHostile(closestHostile);
         //hostile = Game.getObjectById(576e5ad65b8ba9d162b967e8);
@@ -55,8 +55,8 @@ module.exports.loop = function () {
         
         for(var roomIndex in Game.rooms) {
             var currentRoom = Game.rooms[roomIndex];
-            roomOwned.newTickUpdate(currentRoom);
-            defendRoom(roomIndex);
+            //roomOwned.newTickUpdate(currentRoom);
+            //defendRoom(roomIndex);
 			console.log("Room " + roomIndex+" has "
 			    +currentRoom.energyAvailable+" energy");
 			console.log("Room " +roomIndex+" has "
@@ -107,9 +107,11 @@ module.exports.loop = function () {
                 + Game.time +  " " + longtime + " " + myroom.controller.progress);           
         }
         
-        console.log("Havest equlib " , roomOwned.eqlibHavesters(myroom));
-        console.log("Upgrade equlib " , roomOwned.equlibUpgraders(myroom));  
+        console.log("Havest equlib " , roomOwned.peaceHavesters(myroom, undefined, true));
+        console.log("Upgrade equlib " , roomOwned.peaceUpgraders(myroom, undefined, true));  
         console.log("War Havest " , roomOwned.warTimeHavesters(myroom, undefined, true));  
+        console.log("Consruct HAvesters " , roomOwned.constructHavesters(myroom, undefined, true));  
+        console.log("Costruct Builders " , roomOwned.constructBuilders(myroom, undefined, true));  
         //console.log("harvest trip " , roomOwned.getHavestRoundTripLength(myroom, "true")); 
         //console.log("upgrade trip " , roomOwned.getUpgradeRondTripLength(myroom, "true")); 
         console.log("************************ " + Game.time + " *********************************");
@@ -124,18 +126,18 @@ module.exports.loop = function () {
 //Game.creeps["Scout1"].moveTo(1,40);
 //console.log("Scouts bodyarry is" + Game.creeps["Scout1"].bodyarray);
 
-function defendRoom(roomName) {
+  //function defendRoom(room) {
+    /*
+        var hostiles = room.find(FIND_HOSTILE_CREEPS);
     
-    var hostiles = Game.rooms[roomName].find(FIND_HOSTILE_CREEPS);
-    
-    if(hostiles.length > 0) {
-        var username = hostiles[0].owner.username;
-        Game.notify(`User ${username} spotted in room ${roomName}`);
-        var towers = Game.rooms[roomName].find(
-            FIND_MY_STRUCTURES, {filter: {structureType: STRUCTURE_TOWER}});
-        towers.forEach(tower => tower.attack(hostiles[0]));
-    }
-}
+        if(hostiles.length > 0) {
+            var username = hostiles[0].owner.username;
+            Game.notify(`User ${username} spotted in room ${roomName}`);
+            var towers = room.find(FIND_MY_STRUCTURES, 
+                {filter: {structureType: STRUCTURE_TOWER}});
+            towers.forEach(tower => tower.attack(hostiles[0]));
+        }*/
+    //}
 
 
 

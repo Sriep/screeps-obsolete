@@ -6,11 +6,12 @@
     //Bace object
     policy = require("policy");
 
-    //policyConstruction = require("policy.construction");
-    //policyDefend = require("policy.defence");
+    policyConstruction = require("policy.construction");
+    policyDefend = require("policy.defence");
     //policyRescue = require("policy.rescue");
     raceBase = require("race.base");
     raceWorker = require("race.worker");
+    roomOwned = require("room.owned");
 
 
 /**
@@ -20,8 +21,9 @@
  * @module policyPeace
  */
 var policyPeace = {
-    
-    
+    REPAIR_THRESHOLD: 4,
+    REPAIR_RATIO: 0.1,
+   
     /**
      * Called when at peace. Determins what the new polciy for the comming 
      * tick should be.
@@ -30,30 +32,57 @@ var policyPeace = {
      * @returns {enum} Id of policy for comming tick. 
      */   
     draftNewPolicyId: function(room) {
-        //if (policyDefend.beingAttaced(room)) {         
-            //return policy.Type.DEFEND;
-        //}
+        if (policyDefend.beingAttaced(room)) {         
+            return policy.Type.DEFEND;
+        }
         policyRescue = require("policy.rescue");
         if (policyRescue.needsRescue(room)) {
             return policy.Type.RESCUE;
+        }
+        if (policyConstruction.constructionSite(room)) {
+            return policy.Type.CONSTRUCTION;
         }
         return policy.Type.PEACE;
     },
 
     /**
-     * Enact peac time policy. The main objective in peace time is to 
-     * transger as much source energy to the rooms controller as possible.
-     * @function enactPolicy
-     * @param   {Object} room  The room that might need rescuing.
-     * @returns {none} 
-     */
+    * Enact peace time policy. The main objective in peace time is to 
+    * transger as much source energy to the rooms controller as possible.
+    * <ul>
+    * <li> Spawn a worker if enought energy avaliable.
+    * <li> Determine the ratio of havesters, upgraders, builders and repaiers. 
+    * <li> Move all the workers in the room.
+    * </ul>
+    * @function enactPolicy
+    * @param   {Object} room  The room that might need rescuing.
+    * @returns {none} 
+    */
     enactPolicy: function(room) {
         spawns = room.find(FIND_MY_SPAWNS);
-        var workerSize = raceWorker.maxSize(room.controller);
-        raceBase.spawn(raceWorker, room, spawns[0], workerSize);
-        raceWorker.assignRoles(room, policy.Type.PEACE);
+        var wokerSize = this.workerBuildSize(room);
+        raceBase.spawn(raceWorker, room, spawns[0], wokerSize);
+
+        var nCreeps = room.find(FIND_MY_CREEPS).length;
+        var nHavesters = Math.ceil(roomOwned.peaceHavesters(room, undefined, true));
+        var nBuilders = 0;
+        var nRepairers = 0;
+        if (nCreeps - nHavesters > this.REPAIR_THRESHOLD) {
+            nRepairers = Math.max(1, (nCreeps-nBuilders)*this.REPAIR_RATIO);
+        }
+        var nUpgraders = nCreeps - nHavesters - nBuilders - nRepairers;
+        console.log("enact Peace roles havesters", nHavesters, "builders", nBuilders,
+            "upgraders", nUpgraders, "and repairers", nRepairers, "total creeps", nCreeps);
+        raceWorker.assignWorkerRoles(room, nHavesters, nUpgraders,
+                                nBuilders , nRepairers);
+
+
         raceWorker.moveCreeps(room);
-    }
+    },
+
+    workerBuildSize: function(room)
+    {
+        return raceWorker.maxSizeRoom(room);
+    },
 
 }
 

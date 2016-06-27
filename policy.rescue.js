@@ -11,6 +11,7 @@
     policyPeace= require("policy.peace");
     raceBase = require("race.base");
     raceWorker = require("race.worker");
+    raceInfantry = require("race.infantry");
 
 
 
@@ -22,6 +23,8 @@
  */
 var policyRescue = {
 
+    PANICK_ENEMY_CLOSE: 20,
+
     /**
      * Determins what the new polciy of or the comming tick should be. 
      * Last tick production was too low in comparison with contoller level.
@@ -31,11 +34,14 @@ var policyRescue = {
      * @returns {enum} Id of policy for comming tick. 
      */   
     draftNewPolicyId: function(room) {
-        //if (policyDefend.beingAttaced(room)) {         
-            //return policy.Type.DEFEND;
-        //}
+        if (policyDefend.beingAttaced(room)) {         
+            return policy.Type.DEFEND;
+        }
         if (this.needsRescue(room)) {
             return policy.Type.RESCUE;
+        }
+        if (policyConstruction.constructionSite(room)) {
+            return policy.Type.CONSTRUCTION;
         }
         return policy.Type.PEACE;
     },
@@ -50,11 +56,22 @@ var policyRescue = {
      */
     enactPolicy: function(room) {
         creeps = room.find(FIND_MY_CREEPS);
-        workParts = raceBase.countBodyParts(creeps, WORK);       
-        var workerSize = Math.max(workParts+1, raceWorker.maxSizeFromEnergy(room));
+        var infantrySize = infantrySize(room)
+
         spawns = room.find(FIND_MY_SPAWNS);
-        raceBase.spawn(raceWorker, room, spawns[0], workerSize);
-        raceWorker.assignRoles(room, policy.Type.RESCUE);
+        console.log("enact rescue wokersize", infantrySize, "woker parts", workParts,
+            "size form energy",raceWorker.maxSizeFromEnergy(room)) ;
+        raceBase.spawn(raceInfantry, room, spawns[0], infantrySize);
+
+        var nHavesters = room.find(FIND_MY_CREEPS).length;
+        var nBuilders = 0;
+        var nRepairers = 0;
+        var nUpgraders = 0;
+        console.log("enact Peace roles havesters", nHavesters, "builders", nBuilders,
+            "upgraders", nUpgraders, "and repairers", nRepairers);
+        raceWorker.assignWorkerRoles(room, nHavesters, nUpgraders,
+                                nBuilders , nRepairers);
+
         raceWorker.moveCreeps(room);     
     },
 
@@ -71,8 +88,20 @@ var policyRescue = {
     needsRescue: function(room) {
         creeps = room.find(FIND_MY_CREEPS);
         workParts = raceBase.countBodyParts(creeps, WORK);
-        console.log("In rescue policy needrescue work parts",workParts);
-        return workParts < raceWorker.maxSize(room.controller) - 2;
+        return workParts < raceWorker.maxSize(room.controller.level) - 2;
+    },
+
+    infantrySize: function(room) {
+        var targets = room.find(FIND_HOSTILE_CREEPS);
+        var spawns = Game.spawns;
+        for (var i in targets) {
+            if (targets[i].pos.inRangeTo(spawns[0],PANICK_ENEMY_CLOSE))
+            {
+                return Math.floor(room.energyCapacityAvailable
+                                        /raceInfantry.BLOCKSIZE); 
+            }
+        }
+        return Math.max(workParts+1, raceWorker.maxSizeFromEnergy(room));
     }
 
 }

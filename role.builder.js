@@ -14,7 +14,8 @@ var roleBuilder = {
 	findTarget: function(creep) {
 		var constructionSites = creep.room.find(FIND_CONSTRUCTION_SITES);
 		if(constructionSites.length) {
-		    constructionSites.sort((a,b) => roleBase.distanceBetween(a, creep) - roleBase.distanceBetween(b, creep));
+		    constructionSites.sort((a,b) => 
+                roleBase.distanceBetween(a, creep) - roleBase.distanceBetween(b, creep));
 			return 	constructionSites[0]; 
 		}
         return 0;

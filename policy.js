@@ -34,8 +34,8 @@ var policy = {
     determinePolicy(room)
     {      
         var oldPolicy = require("policy." + this.currentPolicyId(room)); 
-        console.log("old policy is", JSON.stringify(oldPolicy));
-        room.memory.currentPolicy =  oldPolicy.draftNewPolicyId(room);  ;      
+        room.memory.currentPolicy =  oldPolicy.draftNewPolicyId(room);  
+        console.log("Policy for room", room.name,"is",room.memory.currentPolicy);    
         return require("policy." + room.memory.currentPolicy);
     },
 
@@ -47,6 +47,7 @@ var policy = {
         }       
         return room.memory.currentPolicy;
     }
+    
 }
 
 module.exports = policy;

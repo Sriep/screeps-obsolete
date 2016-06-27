@@ -11,6 +11,7 @@
  */
 var raceInfantry = {
     BLOCKSIZE: 80 + 50,
+    ROLE_DEFULT: "infantry",
 
     body: function (cost) {
         var numBlocks = Math.ceil(cost/this.blockSize);

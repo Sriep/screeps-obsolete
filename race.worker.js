@@ -38,11 +38,16 @@ var raceWorker = {
 	ROLE_UPGRADER: "upgrader",
 	ROLE_BUILDER: "builder",
 	ROLE_REPAIRER: "repairer",
-	ROLE_DEFULT: this.ROLE_HARVESTER,
-	
-	maxSize: function(contolerLevel) {    
-	    return  Math.floor(roomController.maxProduction[contolerLevel] / this.blockSize);
-	},	
+	ROLE_DEFULT: "harvester",
+
+	maxSize: function(contolerLevel) { 
+        console.log("Warning In race.Worker.maxSize (congoller)");
+	    return  Math.floor(roomController.maxProduction[contolerLevel] / this.BLOCKSIZE);       
+    },	
+
+    maxSizeRoom: function(room) {
+        return Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE);
+    },
 
     maxSizeFromEnergy: function(room)  {
         return Math.floor(room.energyAvailable / this.BLOCKSIZE);
@@ -77,73 +82,43 @@ var raceWorker = {
         return deltaChange;
 	},
 	
-	setUnrolledCreeps: function(role)
-	{
-	    for(var name in Game.creeps) {
+    setUnrolledCreeps: function(role)
+    {
+        for(var name in Game.creeps) {
             if(Game.creeps[name].memory.role === undefined ) {
                 Game.creeps[name].memory.role = this.ROLE_HARVESTER;
             }
         }
-	},
-	
-    
-/**
- * Assigns roles to all the creeps in a room.
- * @function assignRoles
- * @param   {number} roomName  The index of the room in the Game.rooms hash.
- */
-assignRoles: function(room) {
-    //var room = Game.rooms[roomName];
-    this.setUnrolledCreeps(this.ROLE_HARVESTER);
-    var roomOwned = require("room.owned");
-    var creepCount = Object.keys(Game.creeps).length;
-    var havesters_needed;
-    if (room.memory.state == roomOwned.GameState.WAR)
-    {
-        havesters_needed = roomOwned.warTimeHavesters(room);
-    } else {
-        havesters_needed = roomOwned.eqlibHavesters(room);
-    }
-    havesters_needed = Math.min(havesters_needed, creepCount);
-    console.log("In assignRoles equlibriumHavesters" , havesters_needed );
-    havesters_needed = Math.ceil(havesters_needed); 
-    console.log("In assignRoles havesters_needed" , havesters_needed );
-    //havesters_needed = 3;
+    },
 
-    var builders_needed = 0;
-    var constructionSites = room.find(FIND_CONSTRUCTION_SITES);	       
-    if (constructionSites.length) {
-        builders_needed = Math.ceil(
-            (creepCount - havesters_needed) * this.buildRatio); 
-        builders_needed = Math.min(builders_needed, 2*constructionSites.length);
-    }
+    assignWorkerRoles: function(room, 
+                    havesters_needed, 
+                    upgraders_needed, 
+                    builders_needed, 
+                    repairers_needed)
+    {     
+        //console.log("In assignWorkerRoles");
+        //var unset = _.filter(Game.creeps, (creep) => creep.memory.role == undefined);
+        //console.log("unset", unset, "len", unset.length);
+        //for (var i in unset) {
+        //    unset[i].memory.role = roleBase.Type.HARVESTER;
+        //}
 
-    var repairers_needed=0;
-    var damagedStructures = room.find(FIND_STRUCTURES, {
-                filter: object => object.hits < object.hitsMax
-    });	
-    if (damagedStructures.length && creepCount >= this.repairerThreshold) {
-        repairers_needed = Math.ceil( 
-            (creepCount - havesters_needed)  * this.repairerRatio);
-        builders_needed = Math.max(0, builders_needed - repairers_needed);
-    }
+        var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_HARVESTER);	
+        var builders = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_BUILDER);	 		
+        var repairers = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_REPAIRER); 
+        var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_UPGRADER);
+       
+        var dHavesters = havesters_needed - harvesters.length;
+        var dBuilders = builders_needed - builders.length;
+        var dRepairers = repairers_needed - repairers.length;
+        var dUpgraders = upgraders_needed - upgraders.length;
 
-    var upgraders_needed = creepCount - havesters_needed - builders_needed - repairers_needed;
+        console.log("Harvesters: " + harvesters.length + " delta " + dHavesters);
+        console.log("Upgraders: " + upgraders.length + " delta " + dUpgraders);
+        console.log("Builders: " + builders.length + " delta " + dBuilders);
+        console.log("Repairers: " + repairers.length + " delta " + dRepairers);
 
-    var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_HARVESTER);	
-    var builders = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_BUILDER);	 		
-    var repairers = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_REPAIRER); 
-    var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_UPGRADER);
-    var dHavesters = havesters_needed - harvesters.length;
-    var dBuilders = builders_needed - builders.length;
-    var dRepairers = repairers_needed - repairers.length;
-    var dUpgraders = upgraders_needed - upgraders.length;
-
-    console.log("Harvesters: " + harvesters.length + " delta " + dHavesters);
-    console.log("Upgraders: " + upgraders.length + " delta " + dUpgraders);
-    console.log("Builders: " + builders.length + " delta " + dBuilders);
-    console.log("Repairers: " + repairers.length + " delta " + dRepairers);
-    //console.log("About to call swithc Rols " , "role1" + this.HARVESTER + "role2" + this.HARVESTER);
         if (dHavesters != 0)
         {        
             delta = this.switchRoles(dHavesters, dUpgraders, this.ROLE_HARVESTER, this.ROLE_UPGRADER);
@@ -182,18 +157,10 @@ assignRoles: function(room) {
             dRepairers = dRepairers + delta;
             dUpgraders = dUpgraders - delta;
         }
+
     },
-	/*
-    bodyWorker: function (cost) {
-        var numBlocks = Math.ceil(cost/this.blockSize);
-        var body = [];
-        for (i = 0; i < numBlocks; i++) {
-            body.push(WORK);
-            body.push(CARRY);
-            body.push(MOVE);
-        } // for
-        return body;	    
-    },*/
+    
+
     body: function (cost) {
         var numBlocks = Math.ceil(cost/this.BLOCKSIZE);
         var body = [];

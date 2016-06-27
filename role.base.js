@@ -10,6 +10,17 @@
  * @module roleBase
  */
 var roleBase = {
+
+    Type: {
+    	HARVESTER: "harvester",
+        UPGRADER: "upgrader",
+        BUILDER: "builder",
+        REPAIRER: "repairer",
+    },
+
+    LoadTime: {"harvester": 25, "upgrader": 25, "builder":25, "repairer": 25},
+    OffloadTime: {"harvester": 1, "upgrader": 50, "builder":5, "repairer": 50},
+
     sourceClinetThreshold: 1,
     
     distanceBetween: function( obj1, obj2) {
