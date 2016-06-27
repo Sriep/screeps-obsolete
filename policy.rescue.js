@@ -56,7 +56,6 @@ var policyRescue = {
      * @returns {none} 
      */
     enactPolicy: function(room) {
-        roleBase.forceCreps(roleBase.Type.HAVERSTER);
         creeps = room.find(FIND_MY_CREEPS);
         var workerSize = 0;
         if (creeps.length = 0) {
@@ -84,6 +83,21 @@ var policyRescue = {
                                 nBuilders , nRepairers);
 
         raceWorker.moveCreeps(room);     
+    },
+
+    switchPolicy: function(room, oldPolicyId)
+    {
+        switch(oldPolicyId) {
+        case policy.Type.RESCUE:
+            break;
+        case policy.Type.CONSTRUCTION:
+            break;
+        case policy.Type.DEFEND:
+            break;
+        case policy.Type.PEACE:   
+            policy.breakUpLinks(room); 
+        default:
+        }    
     },
 
     /**

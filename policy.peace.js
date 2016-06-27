@@ -23,7 +23,6 @@
 var policyPeace = {
     REPAIR_THRESHOLD: 3,
     REPAIR_RATIO: 0.1,
-    LINKING_WORKER_SIZE: 5,
    
     /**
      * Called when at peace. Determins what the new polciy for the comming 
@@ -79,17 +78,27 @@ var policyPeace = {
         raceWorker.moveCreeps(room);
     },
 
-    assignWorkesNoLinks: function (room) {
-        spawns = room.find(FIND_MY_SPAWNS);
-        var wokerSize = this.workerBuildSize(room);
-        raceBase.spawn(raceWorker, room, spawns[0], wokerSize);
+    switchPolicy: function(room, oldPolicyId)
+    {
+        switch(oldPolicyId) {
+        case policy.Type.RESCUE:
+            break;
+        case policy.Type.CONSTRUCTION:
+            break;
+        case policy.Type.DEFEND:
+            break;
+        case policy.Type.PEACE:   
+        default:
+        }    
+    },
 
+    assignWorkesNoLinks: function (room) {
         var nCreeps = room.find(FIND_MY_CREEPS).length;
         var nBuilders = 0;
         var nRepairers = 0;     
         var nHavesters = roomOwned.peaceHavesters(room, undefined, true);
         var nUpgraders = roomOwned.peaceUpgraders(room, undefined, true);
-
+        console.log("assingWorkers nonolink Havesres", nHavesters, "Upgares", nUpgraders);
         if (nHavesters + nUpgraders < nCreeps )
         {           
             if (this.energyStorageAtCapacity(room))
@@ -98,10 +107,9 @@ var policyPeace = {
             } else {
                 nHavesters = Math.ceil(nHavesters);
             }
-
         } else {
             spawns = room.find(FIND_MY_SPAWNS);
-            raceBase.spawn(raceWorker, room, spawns[0], this.LINKING_WORKER_SIZE);  
+            raceBase.spawn(raceWorker, room, spawns[0], policy.LINKING_WORKER_SIZE);  
             nHavesters = Math.ceil(nHavesters);
         }
 
@@ -109,7 +117,7 @@ var policyPeace = {
             nRepairers = 1;
         }
 
-        var nUpgraders = nCreeps - nHavesters - nBuilders - nRepairers - numlinkers;       
+        var nUpgraders = nCreeps - nHavesters - nBuilders - nRepairers;       
         console.log("enact Peace roles havesters", nHavesters, "builders", nBuilders,
                 "upgraders", nUpgraders, "and repairers", nRepairers,
                 "total creeps", nCreeps);
@@ -120,13 +128,11 @@ var policyPeace = {
     assingWorkersWithLinks: function(room) {
         var nCreeps = room.find(FIND_MY_CREEPS).length;
         var nLinkers = 2;
-        //var nHavesters = Math.ceil(roomOwned.linkHavesters(room, undefined, true));
-        //var nUpgraders = Math.ceil(roomOwned.linkUpgraders(room, undefined, true));
         var nHavesters = roomOwned.linkHavesters(room, undefined, true);
         var nUpgraders = roomOwned.linkUpgraders(room, undefined, true);
         console.log("assingWorkers linkHavesres", nHavesters, "linkUpgares", nUpgraders);
         var nEqulibCreeps = nHavesters + nUpgraders;
-         console.log("assingWorkersWithLinks nEqulibCreeps < nCreeps- nLinkers"
+        console.log("assingWorkersWithLinks nEqulibCreeps < nCreeps- nLinkers"
                 , nEqulibCreeps, nCreeps- nLinkers);
         if (nEqulibCreeps < nCreeps - nLinkers)
         {           
@@ -141,7 +147,7 @@ var policyPeace = {
         } else {
             console.log("assingWorkersWithLinks About to try a spawn")
             spawns = room.find(FIND_MY_SPAWNS);
-            raceBase.spawn(raceWorker, room, spawns[0], this.LINKING_WORKER_SIZE);  
+            raceBase.spawn(raceWorker, room, spawns[0], policy.LINKING_WORKER_SIZE);  
             nHavesters = Math.ceil(nHavesters);
         }
         var nBuilders = 0;
@@ -177,11 +183,7 @@ var policyPeace = {
         }
     },
 
-    workerBuildSize: function(room) 
-    {
-        return 5;
-        //return raceWorker.maxSizeRoom(room);
-    },
+
 
     processLinks: function(room)
     {        
@@ -219,6 +221,7 @@ var policyPeace = {
 */
     linkSourceContoller: function(linkFrom, linkTo, linkId, room)
     {
+        console.log("linkSourceContoller from" ,linkFrom, "to", linkTo, "id", linkId)
         sourceCreep = Game.getObjectById(linkFrom.creepId);
         source = Game.getObjectById(linkFrom.id);
         sourceLink = Game.getObjectById(linkFrom.linkId);
@@ -240,7 +243,7 @@ var policyPeace = {
                     return creep.id != controllerCreep.id;
                 }
             });
-console.log("In linkSourceContoller sourcecreeps", sourceCreep);
+            console.log("linkSourceContoller sourceCreep", sourceCreep);
             if (sourceCreep === null) {
                 return false;
             }
@@ -252,15 +255,14 @@ console.log("In linkSourceContoller sourcecreeps", sourceCreep);
                     return (creep.id != sourceCreep.id
                         && creep.carryCapacity == 250);
                 }
-            });
-console.log("In linkSourceContoller contollercreep", controllerCreep);            
+            });      
+            console.log("linkSourceContoller controllerCreep", controllerCreep);
             if (controllerCreep === null) {
                 return false;
             }
          
         }
-console.log("settingup link sourceCreep", sourceCreep,
-     "conCreep", controllerCreep);
+
         sourceCreep.memory.role = "linker";       
         controllerCreep.memory.role = "linker";  
         room.memory.links[linkId][0].creepId = sourceCreep.id;
@@ -289,5 +291,6 @@ console.log("settingup link sourceCreep", sourceCreep,
     }
     
 }
+
 
 module.exports = policyPeace;

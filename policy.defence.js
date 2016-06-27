@@ -56,7 +56,7 @@ var policyDefence = {
      * @returns {none} 
      */
     enactPolicy: function(room) {
-        roleBase.forceCreps(roleBase.Type.HAVERSTER);
+        //roleBase.forceCreeps(room, roleBase.Type.HAVERSTER);
         var nHavesters = room.find(FIND_MY_CREEPS).length;
         var nBuilders = 0;
         var nRepairers = 0;      
@@ -70,6 +70,21 @@ var policyDefence = {
         
         //npcInvaderBattle.defendRoom(room);
         roomWar.defendRoom(room);
+    },
+
+    switchPolicy: function(room, oldPolicyId)
+    {
+        switch(oldPolicyId) {
+        case policy.Type.RESCUE:
+            break;
+        case policy.Type.CONSTRUCTION:
+            break;
+        case policy.Type.DEFEND:
+            break;
+        case policy.Type.PEACE:  
+            policy.breakUpLinks(room);  
+        default:
+        }    
     },
 
     /**

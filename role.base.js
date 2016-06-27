@@ -24,12 +24,17 @@ var roleBase = {
 
     sourceClinetThreshold: 1,
 
-    forceCreps: function (role) {
+    forceCreeps: function (room, role) {
         creeps = room.find(FIND_MY_CREEPS);
         for (var i in creeps) {
-            creeps.memory.role = role;
+            console.log("looping in force creps ", creeps[i], creeps[i].memory.role);
+           // if (creeps[i].memory.role == this.LINKER 
+           //     || creeps[i].memory.role == undefined ) {
+                 creeps[i].memory.role = role;
+            //}
         }
     },
+    //roleBase = require("role.base"); roleBase.forceCreeps(Game.rooms["W26S21"], "harvester");
     
     distanceBetween: function( obj1, obj2) {
 		dx = obj1.pos.x - obj1.pos.x;
@@ -37,11 +42,12 @@ var roleBase = {
 		distance = Math.sqrt(dx*dx + dy*dy);
 		return distance;
 	},
-	
+
 	findTargetSource: function(creep) {
 	    var sources = creep.room.find(FIND_SOURCES, {
-            filter: function(source) {
-                return -1 == creep.room.memory.reservedSources.indexOf(source.id);
+            filter: function(source) {             
+                return (creep.room.memory.reservedSources === undefined
+                        || -1 == creep.room.memory.reservedSources.indexOf(source.id));
             }
         });
 	    sources.sort((a,b) => b.energy - a.energy);    	    

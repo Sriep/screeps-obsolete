@@ -3,7 +3,7 @@
  * decisions
  * @author Piers Shepperson
  */
- 
+ roleBase = require("role.base");
 /**
  * Abstract base object for policy decisions.
  * @module policy
@@ -14,7 +14,7 @@ var policy = {
     //policyConstruction:  require("policy.construction"),
     //policyDefend:  require("policy.defence"),
     //policyRescue:  require("policy.rescue"),   
-
+    LINKING_WORKER_SIZE: 5,
 
    Type: {
         PEACE: "peace",
@@ -34,9 +34,15 @@ var policy = {
     determinePolicy(room)
     {      
         var oldPolicy = require("policy." + this.currentPolicyId(room)); 
+        var oldPolicyId = this.currentPolicyId(room);
+
         room.memory.currentPolicy =  oldPolicy.draftNewPolicyId(room);  
+        var newPolicy = require("policy." + room.memory.currentPolicy)
+        if (oldPolicy != newPolicy) {
+           newPolicy.switchPolicy(room, oldPolicyId)
+        }
         console.log("Policy for room", room.name,"is",room.memory.currentPolicy);    
-        return require("policy." + room.memory.currentPolicy);
+        return newPolicy;
     },
 
     currentPolicyId: function(room)
@@ -46,7 +52,27 @@ var policy = {
             room.memory.currentPolicy = "peace";
         }       
         return room.memory.currentPolicy;
-    }
+    },
+
+    workerBuildSize: function(room) 
+    {
+        return policy.LINKING_WORKER_SIZE;
+        //return raceWorker.maxSizeRoom(room);
+    },
+
+    breakUpLinks: function (room)
+    {
+        creeps = room.find(FIND_MY_CREEPS);
+        for (var i in creeps)
+        {
+            if ("linker" == sourceCreep.memory.role ||
+                undefined == sourceCreep.memory.role)
+            {
+                sourceCreep.memory.role = roleBase.Type.HARVESTER;
+            }
+        }
+        room.memory.reservedSources = undefined; 
+    } 
     
 }
 

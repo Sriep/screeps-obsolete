@@ -52,9 +52,12 @@ var policyConstruction = {
      * @returns {none} 
      */
     enactPolicy: function(room) {
-        roleBase.forceCreps(roleBase.Type.HAVERSTER);
+        console.log("enact constrution rom", room);
+        //roleBase.forceCreeps(room, roleBase.Type.HAVERSTER);
+        this.assingWorkers(room);
+        /*
         spawns = room.find(FIND_MY_SPAWNS);
-        var wokerSize = this.workerBuildSize(room);
+        var wokerSize = policy.workerBuildSize(room);
         console.log("enact constr worksize", wokerSize);
         raceBase.spawn(raceWorker, room, spawns[0], wokerSize);
 
@@ -90,10 +93,64 @@ var policyConstruction = {
         console.log("enact Const roles havesters", nHavesters, "builders", nBuilders,
             "upgraders", nUpgraders, "and repairers", nRepairers, "total creeps", nCreeps);
         raceWorker.assignWorkerRoles(room, nHavesters, nUpgraders,
-                                nBuilders , nRepairers);
+                                nBuilders , nRepairers);*/
 
         raceWorker.moveCreeps(room);
     },
+
+    assingWorkers: function(room) {
+        var nCreeps = room.find(FIND_MY_CREEPS).length;
+        var nUpgraders = 0;
+        var nRepairers = 0;     
+        var nHavesters = roomOwned.constructHavesters(room, undefined, true);
+        var nBuilders = roomOwned.constructBuilders(room, undefined, true);
+console("polich constrution assingWorkes equib havesters", nHavesters, "equib build", nBuilders);
+
+        if (nHavesters + nBuilders < nCreeps )
+        {           
+            if (this.energyStorageAtCapacity(room))
+            {
+                nHavesters = Math.floor(nHavesters);
+            } else {
+                nHavesters = Math.ceil(nHavesters);
+            }
+        } else {
+            spawns = room.find(FIND_MY_SPAWNS);
+            raceBase.spawn(raceWorker, room, spawns[0], policy.LINKING_WORKER_SIZE);  
+            nHavesters = Math.ceil(nHavesters);
+        }
+
+        if (nCreeps - nHavesters > this.REPAIR_THRESHOLD) {
+            nRepairers = 1;
+        }
+        var nBuilders = nCreeps - nHavesters - nRepairers;  
+
+        var tripsNeeded = Math.ceil(this.totalConstruction(room)
+                                        /(policy.wokerSize*CARRY_CAPACITY));
+
+        console.log("enact Peace roles havesters", nHavesters, "builders", nBuilders,
+                "upgraders", nUpgraders, "and repairers", nRepairers,
+                "total creeps", nCreeps);
+        raceWorker.assignWorkerRoles(room, nHavesters, nUpgraders,
+                                nBuilders , nRepairers);
+    },
+
+    switchPolicy: function(room, oldPolicyId)
+    {
+        switch(oldPolicyId) {
+        case policy.Type.RESCUE:
+            break;
+        case policy.Type.CONSTRUCTION:
+            break;
+        case policy.Type.DEFEND:
+            break;
+        case policy.Type.PEACE: 
+            policy.breakUpLinks(room); 
+        default:
+        }    
+    },
+
+
 
     totalConstruction: function(room) {
         var sites = room.find(FIND_CONSTRUCTION_SITES);	 
@@ -111,11 +168,11 @@ var policyConstruction = {
         return (constructionSites.length > 0);  
     },
 
-    workerBuildSize: function(room)
-    {
-        return 5;
+    //workerBuildSize: function(room)
+    //{
+    //    return 5;
         //return raceWorker.maxSizeRoom(room);
-    },
+    //},
 
 }
 

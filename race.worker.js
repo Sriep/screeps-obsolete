@@ -98,12 +98,15 @@ var raceWorker = {
                     builders_needed, 
                     repairers_needed)
     {     
-
+console.log("assignRoles hav", havesters_needed, "up", upgraders_needed,
+     "bui",builders_needed,"rep",repairers_needed)
         var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_HARVESTER);	
         var builders = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_BUILDER);	 		
         var repairers = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_REPAIRER); 
         var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_UPGRADER);
         var linkers = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_LINKER);
+console.log("assignRoles hav", harvesters.length, harvesters, "up", upgraders.length,
+     "bui",builders.length,"rep",repairers.length)        
         var dHavesters = havesters_needed - harvesters.length;
         var dBuilders = builders_needed - builders.length;
         var dRepairers = repairers_needed - repairers.length;
