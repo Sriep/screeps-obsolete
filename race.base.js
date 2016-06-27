@@ -14,7 +14,7 @@ var raceWorker = require("race.worker");
 var raceBase = {
 
     spawn: function(race, room, spawn, creepSize) {	
-        console.log("start base spaen workerSize", race, room, spawn, creepSize);
+        console.log("Race base start base spaen workerSize", race, room, spawn, creepSize);
         if (creepSize == undefined) {
             cost = room.energyAvailable;
             cost = Math.floor(cost/race.BLOCKSIZE);

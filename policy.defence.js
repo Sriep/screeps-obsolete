@@ -9,6 +9,7 @@
     
     //policyDefend = require("policy.defence");
     //policyPeace= require("policy.peace");
+
     raceBase = require("race.base");
     raceWorker = require("race.worker");
     roomWar = require("room.war");
@@ -24,6 +25,8 @@
  */
 var policyDefence = {
 
+    PANICK_ENEMY_CLOSE: 20,
+
     /**
      * Determins what the new polciy of or the comming tick should be. 
      * This will changed if all enemy units are removed.
@@ -32,10 +35,11 @@ var policyDefence = {
      * @returns {enum} Id of policy for comming tick. 
      */   
     draftNewPolicyId: function(room) {
-        if (policyDefence.beingAttaced(room)) {         
+        if (this.beingAttaced(room)) {         
             return policy.Type.DEFEND;
         }
-        if (this.beingAttaced(room)) {
+        policyRescue = require("policy.rescue")
+        if (policyRescue.needsRescue(room)) {
             return policy.Type.RESCUE;
         }
         policyConstruction = require("policy.construction");
@@ -52,6 +56,7 @@ var policyDefence = {
      * @returns {none} 
      */
     enactPolicy: function(room) {
+        roleBase.forceCreps(roleBase.Type.HAVERSTER);
         var nHavesters = room.find(FIND_MY_CREEPS).length;
         var nBuilders = 0;
         var nRepairers = 0;      
@@ -60,12 +65,11 @@ var policyDefence = {
                                 nBuilders , nRepairers);
 
         spawns = room.find(FIND_MY_SPAWNS);
-        var infentrySize = Math.floor(
-            room.energyCapacityAvailable/raceInfantry.BLOCKSIZE);
-        raceBase.spawn(raceInfantry, room, spawns[0], infentrySize);
+        //var infantrySize = this.infantrySize(room)
+        //raceBase.spawn(raceInfantry, room, spawns[0], infantrySize);
         
-        npcInvaderBattle.defendRoom(room);
-        //roomWar.defendRoom(room);
+        //npcInvaderBattle.defendRoom(room);
+        roomWar.defendRoom(room);
     },
 
     /**
@@ -87,8 +91,20 @@ var policyDefence = {
                 }
         }
         return false;
-    }
-
+    },
+/*
+    infantrySize: function(room) {
+        var targets = room.find(FIND_HOSTILE_CREEPS);
+        var spawns = Game.spawns;
+        for (var i in targets) {
+            if (targets[i].pos.inRangeTo(spawns[0],this.PANICK_ENEMY_CLOSE))
+            {
+                return Math.floor(room.energyCapacityAvailable
+                                        /raceInfantry.BLOCKSIZE); 
+           }
+        }
+        return Math.max(workParts+1, raceWorker.maxSizeFromEnergy(room));
+    }*/
 }
 
 module.exports = policyDefence;

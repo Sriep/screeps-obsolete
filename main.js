@@ -24,27 +24,6 @@ module.exports.loop = function () {
     profiler.wrap(function() {
         PathFinder.use(true);   
         
-        //var tower = Game.getObjectById("576ce5599b0f1fa6144bae55");
-        //if(tower) {
-            /*console.log("Found tower " + tower);
-            var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-                filter: (structure) => structure.hits < structure.hitsMax
-            });
-            if(closestDamagedStructure) {
-                tower.repair(closestDamagedStructure);
-            }
-    
-            var closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-            if(closestHostile) {
-                tower.attack(closestHostile);
-            }*/
-        //}
-        //closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-        //closestHostile(closestHostile);
-        //hostile = Game.getObjectById(576e5ad65b8ba9d162b967e8);
-        //tower = Game.getObjectById(576ce5599b0f1fa6144bae55);
-        //tower.attack(hostile);
-        
         for(var name in Memory.creeps) {
             if(!Game.creeps[name]) {
                 delete Memory.creeps[name];
@@ -55,28 +34,14 @@ module.exports.loop = function () {
         
         for(var roomIndex in Game.rooms) {
             var currentRoom = Game.rooms[roomIndex];
-            //roomOwned.newTickUpdate(currentRoom);
-            //defendRoom(roomIndex);
 			console.log("Room " + roomIndex+" has "
 			    +currentRoom.energyAvailable+" energy");
 			console.log("Room " +roomIndex+" has "
 			    +currentRoom.energyCapacityAvailable+" max energy capacity");
 			var controllerLevel = currentRoom.controller.level;
             spawns = currentRoom.find(FIND_MY_SPAWNS);
-            //console.log("myspawns", spawns);
-            //raceWorker.spawn(roomIndex, "Spawn1");
-            //raceWorker.spawn(roomIndex, "Spawn1", raceWorker.biggistSpawnable(roomIndex));
-            //roomOwned.setWorkerSize(currentRoom, 6);
-            //raceWorker.assignRoles(currentRoom);
-            //raceWorker.moveCreeps(currentRoom);
-            //var policy = require("policy");
             policy.enactPolicies();
 		}		 
-		
-		
-		//for(var i in Game.creeps) {
-		//    console.log(Game.creeps[i].name + " has fatigue " +  Game.creeps[i].fatigue );   
-		//}
 		
         console.log("CPULoad is " , cpuLoad);
         console.log('CPU time used from the beginning of the current game tick ' , Game.cpu.getUsed());
@@ -106,12 +71,17 @@ module.exports.loop = function () {
             Game.notify("Tick Time Date Contoller\n"
                 + Game.time +  " " + longtime + " " + myroom.controller.progress);           
         }
-        
-        console.log("Havest equlib " , roomOwned.peaceHavesters(myroom, undefined, true));
-        console.log("Upgrade equlib " , roomOwned.peaceUpgraders(myroom, undefined, true));  
-        console.log("War Havest " , roomOwned.warTimeHavesters(myroom, undefined, true));  
-        console.log("Consruct HAvesters " , roomOwned.constructHavesters(myroom, undefined, true));  
-        console.log("Costruct Builders " , roomOwned.constructBuilders(myroom, undefined, true));  
+
+        var workerSize = 5;
+        var force = true;
+        console.log("Havest peace " , roomOwned.peaceHavesters(myroom, workerSize, force),"workersize", workerSize);
+        console.log("Upgrade peace " , roomOwned.peaceUpgraders(myroom, workerSize, force));  
+        console.log("War Havest " , roomOwned.warTimeHavesters(myroom, workerSize, force));  
+        console.log("Consruct HAvesters " , roomOwned.constructHavesters(myroom, workerSize, force));  
+        console.log("Costruct Builders " , roomOwned.constructBuilders(myroom, workerSize, force)); 
+        console.log("Havest links " , roomOwned.linkHavesters(myroom, workerSize, force),"workersize", workerSize);
+        console.log("Upgrade links " , roomOwned.linkUpgraders(myroom, workerSize, force));  
+
         //console.log("harvest trip " , roomOwned.getHavestRoundTripLength(myroom, "true")); 
         //console.log("upgrade trip " , roomOwned.getUpgradeRondTripLength(myroom, "true")); 
         console.log("************************ " + Game.time + " *********************************");
@@ -119,25 +89,7 @@ module.exports.loop = function () {
 }
 //JSON.stringify(memory);
 //Game.rooms["W26S21"]
-//Game.spawns.Spawn1.createCreep( [MOVE], 'Scout1' );
-//target = Game.getObjectById("55db312fefa8e3fe66e04878"); 
-//Game.creeps["Scout1"].moveTo(target);
-//Game.creeps["Scout1"].move(LEFT);
-//Game.creeps["Scout1"].moveTo(1,40);
-//console.log("Scouts bodyarry is" + Game.creeps["Scout1"].bodyarray);
 
-  //function defendRoom(room) {
-    /*
-        var hostiles = room.find(FIND_HOSTILE_CREEPS);
-    
-        if(hostiles.length > 0) {
-            var username = hostiles[0].owner.username;
-            Game.notify(`User ${username} spotted in room ${roomName}`);
-            var towers = room.find(FIND_MY_STRUCTURES, 
-                {filter: {structureType: STRUCTURE_TOWER}});
-            towers.forEach(tower => tower.attack(hostiles[0]));
-        }*/
-    //}
 
 
 

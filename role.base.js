@@ -16,12 +16,20 @@ var roleBase = {
         UPGRADER: "upgrader",
         BUILDER: "builder",
         REPAIRER: "repairer",
+        LINKER: "linker",
     },
 
     LoadTime: {"harvester": 25, "upgrader": 25, "builder":25, "repairer": 25},
     OffloadTime: {"harvester": 1, "upgrader": 50, "builder":5, "repairer": 50},
 
     sourceClinetThreshold: 1,
+
+    forceCreps: function (role) {
+        creeps = room.find(FIND_MY_CREEPS);
+        for (var i in creeps) {
+            creeps.memory.role = role;
+        }
+    },
     
     distanceBetween: function( obj1, obj2) {
 		dx = obj1.pos.x - obj1.pos.x;
@@ -31,12 +39,12 @@ var roleBase = {
 	},
 	
 	findTargetSource: function(creep) {
-	    var sources = creep.room.find(FIND_SOURCES);
-	    //console.log("soures before sort" + sources);
-	    sources.sort((a,b) => b.energy - a.energy);   
-	    //console.log("soures after sort" + sources);
-	    //sources.sort((a,b) => this.distanceBetween(a, creep) 
-        //            - this.distanceBetween(b, creep));   	    
+	    var sources = creep.room.find(FIND_SOURCES, {
+            filter: function(source) {
+                return -1 == creep.room.memory.reservedSources.indexOf(source.id);
+            }
+        });
+	    sources.sort((a,b) => b.energy - a.energy);    	    
 	    for ( var sIndex in  sources ) {
             sources[sIndex].clients= 0;
             for(var cIndex in Game.creeps) {

@@ -39,6 +39,7 @@ var raceWorker = {
 	ROLE_BUILDER: "builder",
 	ROLE_REPAIRER: "repairer",
 	ROLE_DEFULT: "harvester",
+    ROLE_LINKER: "linker",
 
 	maxSize: function(contolerLevel) { 
         console.log("Warning In race.Worker.maxSize (congoller)");
@@ -97,18 +98,12 @@ var raceWorker = {
                     builders_needed, 
                     repairers_needed)
     {     
-        //console.log("In assignWorkerRoles");
-        //var unset = _.filter(Game.creeps, (creep) => creep.memory.role == undefined);
-        //console.log("unset", unset, "len", unset.length);
-        //for (var i in unset) {
-        //    unset[i].memory.role = roleBase.Type.HARVESTER;
-        //}
 
         var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_HARVESTER);	
         var builders = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_BUILDER);	 		
         var repairers = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_REPAIRER); 
         var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_UPGRADER);
-       
+        var linkers = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_LINKER);
         var dHavesters = havesters_needed - harvesters.length;
         var dBuilders = builders_needed - builders.length;
         var dRepairers = repairers_needed - repairers.length;
@@ -118,7 +113,7 @@ var raceWorker = {
         console.log("Upgraders: " + upgraders.length + " delta " + dUpgraders);
         console.log("Builders: " + builders.length + " delta " + dBuilders);
         console.log("Repairers: " + repairers.length + " delta " + dRepairers);
-
+        console.log("Linkers: " + linkers.length);
         if (dHavesters != 0)
         {        
             delta = this.switchRoles(dHavesters, dUpgraders, this.ROLE_HARVESTER, this.ROLE_UPGRADER);

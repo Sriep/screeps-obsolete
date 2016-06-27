@@ -5,6 +5,7 @@
  */
     //Bace object
     policy = require("policy");
+    roomOwned = require("room.owned");
 
     //policyConstruction = require("policy.construction");
     policyDefend = require("policy.defence");
@@ -51,8 +52,10 @@ var policyConstruction = {
      * @returns {none} 
      */
     enactPolicy: function(room) {
+        roleBase.forceCreps(roleBase.Type.HAVERSTER);
         spawns = room.find(FIND_MY_SPAWNS);
         var wokerSize = this.workerBuildSize(room);
+        console.log("enact constr worksize", wokerSize);
         raceBase.spawn(raceWorker, room, spawns[0], wokerSize);
 
         var nCreeps = room.find(FIND_MY_CREEPS).length;
@@ -74,7 +77,7 @@ var policyConstruction = {
                 nRepairers = Math.max(1, (nCreeps-nBuilders)*this.REPAIR_RATIO);
             }              
             nBuilders = Math.min(tripsNeeded, nCreeps-nHavesters-nRepairers);  
-            console.log("enact const trips", tripsNeeded, "creeps", nCreeps);             
+            //console.log("enact const trips", tripsNeeded, "creeps", nCreeps);             
         } else {
             nHavesters = Math.ceil(roomOwned.constructHavesters(room, undefined, true));           
             if (nCreeps - nHavesters > this.REPAIR_THRESHOLD) {
@@ -104,13 +107,14 @@ var policyConstruction = {
 
     constructionSite: function(room) {
         var constructionSites = room.find(FIND_CONSTRUCTION_SITES);	  
-        console.log("In constructionSite", constructionSites.length )
+        //console.log("In constructionSite", constructionSites.length )
         return (constructionSites.length > 0);  
     },
 
     workerBuildSize: function(room)
     {
-        return raceWorker.maxSizeRoom(room);
+        return 5;
+        //return raceWorker.maxSizeRoom(room);
     },
 
 }

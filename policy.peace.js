@@ -21,8 +21,9 @@
  * @module policyPeace
  */
 var policyPeace = {
-    REPAIR_THRESHOLD: 4,
+    REPAIR_THRESHOLD: 3,
     REPAIR_RATIO: 0.1,
+    LINKING_WORKER_SIZE: 5,
    
     /**
      * Called when at peace. Determins what the new polciy for the comming 
@@ -58,32 +59,235 @@ var policyPeace = {
     * @returns {none} 
     */
     enactPolicy: function(room) {
+        var nCreeps = room.find(FIND_MY_CREEPS).length;
+        var numlinkers = 0;
+        var nHavesters = Math.ceil(roomOwned.peaceHavesters(room, undefined, true));
+        if (room.memory.links !== undefined 
+            && room.memory.links.length != 0
+            && nCreeps >= nHavesters + 2)
+        {
+            numlinkers = 2 * this.processLinks(room);
+        }
+    
+        if (numlinkers > 0) 
+        {
+            this.assingWorkersWithLinks(room);
+        }  else {
+            this.assignWorkesNoLinks(room);
+        } 
+
+        raceWorker.moveCreeps(room);
+    },
+
+    assignWorkesNoLinks: function (room) {
         spawns = room.find(FIND_MY_SPAWNS);
         var wokerSize = this.workerBuildSize(room);
         raceBase.spawn(raceWorker, room, spawns[0], wokerSize);
 
         var nCreeps = room.find(FIND_MY_CREEPS).length;
-        var nHavesters = Math.ceil(roomOwned.peaceHavesters(room, undefined, true));
         var nBuilders = 0;
-        var nRepairers = 0;
-        if (nCreeps - nHavesters > this.REPAIR_THRESHOLD) {
-            nRepairers = Math.max(1, (nCreeps-nBuilders)*this.REPAIR_RATIO);
+        var nRepairers = 0;     
+        var nHavesters = roomOwned.peaceHavesters(room, undefined, true);
+        var nUpgraders = roomOwned.peaceUpgraders(room, undefined, true);
+
+        if (nHavesters + nUpgraders < nCreeps )
+        {           
+            if (this.energyStorageAtCapacity(room))
+            {
+                nHavesters = Math.floor(nHavesters);
+            } else {
+                nHavesters = Math.ceil(nHavesters);
+            }
+
+        } else {
+            spawns = room.find(FIND_MY_SPAWNS);
+            raceBase.spawn(raceWorker, room, spawns[0], this.LINKING_WORKER_SIZE);  
+            nHavesters = Math.ceil(nHavesters);
         }
-        var nUpgraders = nCreeps - nHavesters - nBuilders - nRepairers;
+
+        if (nCreeps - nHavesters > this.REPAIR_THRESHOLD) {
+            nRepairers = 1;
+        }
+
+        var nUpgraders = nCreeps - nHavesters - nBuilders - nRepairers - numlinkers;       
         console.log("enact Peace roles havesters", nHavesters, "builders", nBuilders,
-            "upgraders", nUpgraders, "and repairers", nRepairers, "total creeps", nCreeps);
+                "upgraders", nUpgraders, "and repairers", nRepairers,
+                "total creeps", nCreeps);
         raceWorker.assignWorkerRoles(room, nHavesters, nUpgraders,
                                 nBuilders , nRepairers);
-
-
-        raceWorker.moveCreeps(room);
     },
 
-    workerBuildSize: function(room)
+    assingWorkersWithLinks: function(room) {
+        var nCreeps = room.find(FIND_MY_CREEPS).length;
+        var nLinkers = 2;
+        //var nHavesters = Math.ceil(roomOwned.linkHavesters(room, undefined, true));
+        //var nUpgraders = Math.ceil(roomOwned.linkUpgraders(room, undefined, true));
+        var nHavesters = roomOwned.linkHavesters(room, undefined, true);
+        var nUpgraders = roomOwned.linkUpgraders(room, undefined, true);
+        console.log("assingWorkers linkHavesres", nHavesters, "linkUpgares", nUpgraders);
+        var nEqulibCreeps = nHavesters + nUpgraders;
+         console.log("assingWorkersWithLinks nEqulibCreeps < nCreeps- nLinkers"
+                , nEqulibCreeps, nCreeps- nLinkers);
+        if (nEqulibCreeps < nCreeps - nLinkers)
+        {           
+            if (this.energyStorageAtCapacity(room))
+            {
+                console.log("about to reduce havesers nEqulibCreeps");
+                nHavesters = Math.floor(nHavesters);
+            } else {
+                nHavesters = Math.ceil(nHavesters);
+            }
+
+        } else {
+            console.log("assingWorkersWithLinks About to try a spawn")
+            spawns = room.find(FIND_MY_SPAWNS);
+            raceBase.spawn(raceWorker, room, spawns[0], this.LINKING_WORKER_SIZE);  
+            nHavesters = Math.ceil(nHavesters);
+        }
+        var nBuilders = 0;
+        var nRepairers = 0;     
+        if (nCreeps - nHavesters > this.REPAIR_THRESHOLD) {
+            nRepairers = 1;
+        } 
+        var nUpgraders = nCreeps - nHavesters - nBuilders - nRepairers - nLinkers;  
+               
+        console.log("enact Peace with links roles havesters", nHavesters, "builders", nBuilders,
+                "upgraders", nUpgraders, "and repairers", nRepairers
+                , "linkers", nLinkers, "total creeps", nCreeps);
+        raceWorker.assignWorkerRoles(room, nHavesters, nUpgraders,
+                                nBuilders , nRepairers);
+    },
+
+    energyStorageAtCapacity: function (room) {       
+        if (room.energyAvailable == room.energyCapacityAvailable) {
+            console.log("energyStorageAtCapacity room.energyAvailable", room.energyAvailable
+            ,"room.energyCapacityAvailable",room.energyCapacityAvailable);
+            var towers = room.find(FIND_MY_STRUCTURES, 
+                {filter: {structureType: STRUCTURE_TOWER}});
+            for (var i in towers) {
+                console.log("energyStorageAtCapacity towers tower[i].energy ", tower[i].energy 
+                   ,"tower[i].energyCapacity",tower[i].energyCapacity);            
+                if (tower[i].energy != tower[i].energyCapacity) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false
+        }
+    },
+
+    workerBuildSize: function(room) 
     {
-        return raceWorker.maxSizeRoom(room);
+        return 5;
+        //return raceWorker.maxSizeRoom(room);
     },
 
+    processLinks: function(room)
+    {        
+        var links = room.memory.links;
+        var numlinks = 0;
+        for (var i in links) {
+            var linkFrom = links[i][0];
+            var linkTo = links[i][1];
+            if (linkFrom.type == "source" && linkTo.type == "controller")
+            {
+                 if (this.linkSourceContoller(linkFrom, linkTo, i, room)) {
+                     numlinks = numlinks+1;
+                 } else {
+                     console.log("error setting up link");
+                 }
+            } else {
+                console.log("link",linkFrom.type ,"to",linkTo.type,"not implimented");   
+            }
+        }
+        return numlinks;
+    },
+/*
+    Memory.rooms["W26S21"].links = [ [ 
+        {type: "source",
+            id: "55db3176efa8e3fe66e04a52",
+            creepId: undefined,
+            linkId: "57711380ad3cbdff451970ec",
+            pos: {roomName: "W26S21", x: 7, y: 35 }}
+        ,{type: "controller",
+            id: "55db3176efa8e3fe66e04a51",
+            creepId: undefined,
+            linkId: "577111bdf2ced3fd46870349",
+            pos: {roomName: "W26S21", x: 36, y: 18 }
+            } ] ];
+*/
+    linkSourceContoller: function(linkFrom, linkTo, linkId, room)
+    {
+        sourceCreep = Game.getObjectById(linkFrom.creepId);
+        source = Game.getObjectById(linkFrom.id);
+        sourceLink = Game.getObjectById(linkFrom.linkId);
+
+        controllerCreep = Game.getObjectById(linkTo.creepId);       
+        controllerLink = Game.getObjectById(linkTo.linkId);
+        contoller = Game.getObjectById(linkTo.id);
+        
+        if ( sourceCreep === null ) {
+            sourceCreep = source.pos.findClosestByRange(FIND_MY_CREEPS, {
+                filter: function(creep) {
+                    if (creep.carryCapacity != 250) {
+                        return false;
+                    }
+                    if (controllerCreep == undefined)
+                    {
+                        return true
+                    }
+                    return creep.id != controllerCreep.id;
+                }
+            });
+console.log("In linkSourceContoller sourcecreeps", sourceCreep);
+            if (sourceCreep === null) {
+                return false;
+            }
+
+        }
+        if (controllerCreep === null  ) {
+             controllerCreep = source.pos.findClosestByRange(FIND_MY_CREEPS, {
+                filter: function(creep) {
+                    return (creep.id != sourceCreep.id
+                        && creep.carryCapacity == 250);
+                }
+            });
+console.log("In linkSourceContoller contollercreep", controllerCreep);            
+            if (controllerCreep === null) {
+                return false;
+            }
+         
+        }
+console.log("settingup link sourceCreep", sourceCreep,
+     "conCreep", controllerCreep);
+        sourceCreep.memory.role = "linker";       
+        controllerCreep.memory.role = "linker";  
+        room.memory.links[linkId][0].creepId = sourceCreep.id;
+        room.memory.links[linkId][1].creepId = controllerCreep.id;
+        if (room.memory.reservedSources === undefined) {
+           room.memory.reservedSources = [source.id]
+        } else {
+       //    room.memory.reservedSources.push("source.id");
+        }
+
+
+        sourceCreep.moveTo(linkFrom.pos.x, linkFrom.pos.y);
+        sourceCreep.harvest(source);
+        sourceCreep.transfer(sourceLink, RESOURCE_ENERGY);
+        
+        if (sourceLink.energy == sourceLink.energyCapacity
+            || controllerLink < 2 * controllerCreep.carryCapacity)
+        {
+            sourceLink.transferEnergy(controllerLink)
+        }
+        controllerLink.transferEnergy(controllerCreep)
+        controllerCreep.moveTo(linkTo.pos.x, linkTo.pos.y);
+        controllerCreep.transfer(sourceLink, RESOURCE_ENERGY);
+        controllerCreep.upgradeController(contoller); 
+        return true;
+    }
+    
 }
 
 module.exports = policyPeace;
