@@ -6,6 +6,12 @@
  
 var roomOwned = require("room.owned"); 
 var raceWorker = require("race.worker"); 
+var roleHarvester = require("role.harvester");
+var roleUpgrader = require("role.upgrader");
+var roleBuilder = require("role.builder");
+var roleRepairer = require("role.repairer");
+var roadBuilder = require("road.builder");
+
 /**
  * Abstract base object containing data and functions for use by my creeps.
  * This contains data and functions common to all races of creep. 
@@ -43,7 +49,23 @@ var raceBase = {
             count = count + creeps[i].getActiveBodyparts(part);
         }
         return count;
-    }
+    },
+
+    moveCreeps: function(room) {
+        var creeps = room.find(FIND_MY_CREEPS);
+        for(var id in creeps) {
+            var creep = creeps[id];
+            if (creep.memory.role == raceWorker.ROLE_HARVESTER) {
+                roleHarvester.run(creep);
+            } else if (creep.memory.role == raceWorker.ROLE_UPGRADER) {
+                roleUpgrader.run(creep);               
+            } else if (creep.memory.role == raceWorker.ROLE_BUILDER) {
+                roleBuilder.run(creep);
+            } else if(creep.memory.role == raceWorker.ROLE_REPAIRER) {
+                roleRepairer.run(creep);
+            }       
+        }     
+	}
 
 
 

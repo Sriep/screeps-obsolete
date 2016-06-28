@@ -62,17 +62,40 @@ var policy = {
 
     breakUpLinks: function (room)
     {
+        console.log("breakUpLinks");
         creeps = room.find(FIND_MY_CREEPS);
         for (var i in creeps)
         {
-            if ("linker" == sourceCreep.memory.role ||
-                undefined == sourceCreep.memory.role)
+            console.log("breakUpLinks", creeps[i].memory.role);
+            if ("linker" == creeps[i].memory.role ||
+                undefined == creeps[i].memory.role)
             {
-                sourceCreep.memory.role = roleBase.Type.HARVESTER;
+                console.log("sourceCreep.memory.role = roleBase.Type.HARVESTER");
+                creeps[i].memory.role = roleBase.Type.HARVESTER;
             }
         }
         room.memory.reservedSources = undefined; 
-    } 
+    } ,
+
+    energyStorageAtCapacity: function (room) {       
+        if (room.energyAvailable == room.energyCapacityAvailable) {
+            console.log("energyStorageAtCapacity room.energyAvailable", room.energyAvailable
+            ,"room.energyCapacityAvailable",room.energyCapacityAvailable);
+            var towers = room.find(FIND_MY_STRUCTURES, 
+                {filter: {structureType: STRUCTURE_TOWER}});
+            for (var i in towers) {
+                console.log("energyStorageAtCapacity towers tower[i].energy ", tower[i].energy 
+                   ,"tower[i].energyCapacity",tower[i].energyCapacity);            
+                if (tower[i].energy != tower[i].energyCapacity) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false
+        }
+    },
+
     
 }
 

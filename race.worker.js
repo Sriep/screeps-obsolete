@@ -232,21 +232,7 @@ console.log("assignRoles hav", harvesters.length, harvesters, "up", upgraders.le
 	//var raceWorker = require("race.worker");raceWorker.forceSpawn("Spawn1");
 	//
 	
-	moveCreeps: function(room) {
-        var creeps = room.find(FIND_MY_CREEPS);
-        for(var id in creeps) {
-            var creep = creeps[id];
-            if (creep.memory.role == raceWorker.ROLE_HARVESTER) {
-                roleHarvester.run(creep);
-            } else if (creep.memory.role == raceWorker.ROLE_UPGRADER) {
-                roleUpgrader.run(creep);               
-            } else if (creep.memory.role == raceWorker.ROLE_BUILDER) {
-                roleBuilder.run(creep);
-            } else if(creep.memory.role == raceWorker.ROLE_REPAIRER) {
-                roleRepairer.run(creep);
-            }       
-        }     
-	}
+
 	
 }
 

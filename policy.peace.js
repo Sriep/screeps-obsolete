@@ -75,7 +75,7 @@ var policyPeace = {
             this.assignWorkesNoLinks(room);
         } 
 
-        raceWorker.moveCreeps(room);
+        raceBase.moveCreeps(room);
     },
 
     switchPolicy: function(room, oldPolicyId)
@@ -101,7 +101,7 @@ var policyPeace = {
         console.log("assingWorkers nonolink Havesres", nHavesters, "Upgares", nUpgraders);
         if (nHavesters + nUpgraders < nCreeps )
         {           
-            if (this.energyStorageAtCapacity(room))
+            if (policy.energyStorageAtCapacity(room))
             {
                 nHavesters = Math.floor(nHavesters);
             } else {
@@ -136,7 +136,7 @@ var policyPeace = {
                 , nEqulibCreeps, nCreeps- nLinkers);
         if (nEqulibCreeps < nCreeps - nLinkers)
         {           
-            if (this.energyStorageAtCapacity(room))
+            if (policy.energyStorageAtCapacity(room))
             {
                 console.log("about to reduce havesers nEqulibCreeps");
                 nHavesters = Math.floor(nHavesters);
@@ -163,27 +163,6 @@ var policyPeace = {
         raceWorker.assignWorkerRoles(room, nHavesters, nUpgraders,
                                 nBuilders , nRepairers);
     },
-
-    energyStorageAtCapacity: function (room) {       
-        if (room.energyAvailable == room.energyCapacityAvailable) {
-            console.log("energyStorageAtCapacity room.energyAvailable", room.energyAvailable
-            ,"room.energyCapacityAvailable",room.energyCapacityAvailable);
-            var towers = room.find(FIND_MY_STRUCTURES, 
-                {filter: {structureType: STRUCTURE_TOWER}});
-            for (var i in towers) {
-                console.log("energyStorageAtCapacity towers tower[i].energy ", tower[i].energy 
-                   ,"tower[i].energyCapacity",tower[i].energyCapacity);            
-                if (tower[i].energy != tower[i].energyCapacity) {
-                    return false;
-                }
-            }
-            return true;
-        } else {
-            return false
-        }
-    },
-
-
 
     processLinks: function(room)
     {        

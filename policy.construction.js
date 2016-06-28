@@ -53,6 +53,8 @@ var policyConstruction = {
      */
     enactPolicy: function(room) {
         console.log("enact constrution rom", room);
+        //policy = require("policy");
+        //policy.breakUpLinks(room);
         //roleBase.forceCreeps(room, roleBase.Type.HAVERSTER);
         this.assingWorkers(room);
         /*
@@ -95,7 +97,7 @@ var policyConstruction = {
         raceWorker.assignWorkerRoles(room, nHavesters, nUpgraders,
                                 nBuilders , nRepairers);*/
 
-        raceWorker.moveCreeps(room);
+        raceBase.moveCreeps(room);
     },
 
     assingWorkers: function(room) {
@@ -104,11 +106,11 @@ var policyConstruction = {
         var nRepairers = 0;     
         var nHavesters = roomOwned.constructHavesters(room, undefined, true);
         var nBuilders = roomOwned.constructBuilders(room, undefined, true);
-console("polich constrution assingWorkes equib havesters", nHavesters, "equib build", nBuilders);
+console.log("polich constrution assingWorkes equib havesters", nHavesters, "equib build", nBuilders);
 
         if (nHavesters + nBuilders < nCreeps )
         {           
-            if (this.energyStorageAtCapacity(room))
+            if (policy.energyStorageAtCapacity(room))
             {
                 nHavesters = Math.floor(nHavesters);
             } else {
@@ -128,7 +130,7 @@ console("polich constrution assingWorkes equib havesters", nHavesters, "equib bu
         var tripsNeeded = Math.ceil(this.totalConstruction(room)
                                         /(policy.wokerSize*CARRY_CAPACITY));
 
-        console.log("enact Peace roles havesters", nHavesters, "builders", nBuilders,
+        console.log("enact const roles havesters", nHavesters, "builders", nBuilders,
                 "upgraders", nUpgraders, "and repairers", nRepairers,
                 "total creeps", nCreeps);
         raceWorker.assignWorkerRoles(room, nHavesters, nUpgraders,

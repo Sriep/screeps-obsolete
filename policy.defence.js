@@ -68,8 +68,9 @@ var policyDefence = {
         //var infantrySize = this.infantrySize(room)
         //raceBase.spawn(raceInfantry, room, spawns[0], infantrySize);
         
-        //npcInvaderBattle.defendRoom(room);
-        roomWar.defendRoom(room);
+        npcInvaderBattle.defendRoom(room);
+        raceBase.moveCreeps(room);
+        //roomWar.defendRoom(room);
     },
 
     switchPolicy: function(room, oldPolicyId)

@@ -82,7 +82,7 @@ var policyRescue = {
         raceWorker.assignWorkerRoles(room, nHavesters, nUpgraders,
                                 nBuilders , nRepairers);
 
-        raceWorker.moveCreeps(room);     
+        raceBase.moveCreeps(room);     
     },
 
     switchPolicy: function(room, oldPolicyId)
