@@ -3,7 +3,7 @@
  * for roles worker creeps can take.
  * @author Piers Shepperson
  */
- 
+ stats = require("stats");
 /**
  * Abstract base class functions and data for roles worker creeps can take.
  * Methods for finding and moving towards targets.
@@ -92,18 +92,18 @@ var roleBase = {
         if (sourceId === undefined || 0 == sourceId)
         {            
             var targetSource = this.findTargetSource(creep);
-            if(creep.harvest(targetSource) == ERR_NOT_IN_RANGE) { 
+            if(stats.harvest(creep, targetSource) == ERR_NOT_IN_RANGE) { 
                 creep.memory.targetSourceId = targetSource.id;
                 creep.moveTo(targetSource);
             }   
          // Contiue moving towards source or havest it if there       
          } else {    
             var source = Game.getObjectById(creep.memory.targetSourceId);                
-            if(creep.harvest(source) == ERR_NOT_IN_RANGE) {                   
+            if(stats.harvest(creep, source) == ERR_NOT_IN_RANGE) {                   
                 creep.moveTo(source);
             } 
         } // if (sourceId)             
-    }       
+    }      
 };
 
 module.exports = roleBase;

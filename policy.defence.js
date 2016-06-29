@@ -9,7 +9,7 @@
     
     //policyDefend = require("policy.defence");
     //policyPeace= require("policy.peace");
-
+    npcInvaderBattle = require("npc.invader.battle");
     raceBase = require("race.base");
     raceWorker = require("race.worker");
     roomWar = require("room.war");
@@ -61,16 +61,12 @@ var policyDefence = {
         var nBuilders = 0;
         var nRepairers = 0;      
         var nUpgraders = 0;
+        console.log("In enactPolicy");
         raceWorker.assignWorkerRoles(room, nHavesters, nUpgraders,
                                 nBuilders , nRepairers);
-
-        spawns = room.find(FIND_MY_SPAWNS);
-        //var infantrySize = this.infantrySize(room)
-        //raceBase.spawn(raceInfantry, room, spawns[0], infantrySize);
-        
+        spawns = room.find(FIND_MY_SPAWNS);       
         npcInvaderBattle.defendRoom(room);
         raceBase.moveCreeps(room);
-        //roomWar.defendRoom(room);
     },
 
     switchPolicy: function(room, oldPolicyId)
@@ -98,15 +94,15 @@ var policyDefence = {
         var hostiles = room.find(FIND_HOSTILE_CREEPS);
         var foundAttackPart = false;
         var i = 0;
-        while (!foundAttackPart && i < hostiles.length) {
-            if (hostiles[i].getActiveBodyparts(ATTACK) > 0
-                || hostiles[i].getActiveBodyparts(RANGED_ATTACK) > 0
-                || hostiles[i].getActiveBodyparts(CLAIM) > 0
-                || hostiles[i].getActiveBodyparts(WORK) > 0) {
-                    return true;
-                }
-        }
-        return false;
+        //while (!foundAttackPart && i < hostiles.length) {
+           // if (hostiles[i].getActiveBodyparts(ATTACK) > 0
+           //     || hostiles[i].getActiveBodyparts(RANGED_ATTACK) > 0
+           //     || hostiles[i].getActiveBodyparts(CLAIM) > 0
+           //     || hostiles[i].getActiveBodyparts(HEAL) > 0) {
+           //         return true;
+           //     }
+        //}
+        return hostiles.length > 0;
     },
 /*
     infantrySize: function(room) {

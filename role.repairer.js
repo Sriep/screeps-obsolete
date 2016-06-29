@@ -37,7 +37,7 @@ var roleRepairer = {
         if(creep.memory.carrying) {   
         	var target = this.findTarget(creep);       	
         	if (0 != target) {
-                if(creep.repair(target) == ERR_NOT_IN_RANGE) {
+                if(stats.repair(creep, target) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(target);
                 }
         	} //if

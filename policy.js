@@ -21,6 +21,8 @@ var policy = {
         CONSTRUCTION: "construction",
         DEFEND: "defence",
         RESCUE: "rescue",
+        FOREIGN_HARVEST: "foreign harvest",
+        FOREIGN_ROAD: "build foreign road",
     },
 
     enactPolicies: function()
@@ -35,7 +37,6 @@ var policy = {
     {      
         var oldPolicy = require("policy." + this.currentPolicyId(room)); 
         var oldPolicyId = this.currentPolicyId(room);
-
         room.memory.currentPolicy =  oldPolicy.draftNewPolicyId(room);  
         var newPolicy = require("policy." + room.memory.currentPolicy)
         if (oldPolicy != newPolicy) {
@@ -62,15 +63,11 @@ var policy = {
 
     breakUpLinks: function (room)
     {
-        console.log("breakUpLinks");
         creeps = room.find(FIND_MY_CREEPS);
         for (var i in creeps)
         {
-            console.log("breakUpLinks", creeps[i].memory.role);
-            if ("linker" == creeps[i].memory.role ||
-                undefined == creeps[i].memory.role)
-            {
-                console.log("sourceCreep.memory.role = roleBase.Type.HARVESTER");
+            if (undefined == creeps[i].memory.role 
+            || "linker" == creeps[i].memory.role )  {
                 creeps[i].memory.role = roleBase.Type.HARVESTER;
             }
         }
@@ -79,13 +76,9 @@ var policy = {
 
     energyStorageAtCapacity: function (room) {       
         if (room.energyAvailable == room.energyCapacityAvailable) {
-            console.log("energyStorageAtCapacity room.energyAvailable", room.energyAvailable
-            ,"room.energyCapacityAvailable",room.energyCapacityAvailable);
             var towers = room.find(FIND_MY_STRUCTURES, 
                 {filter: {structureType: STRUCTURE_TOWER}});
-            for (var i in towers) {
-                console.log("energyStorageAtCapacity towers tower[i].energy ", tower[i].energy 
-                   ,"tower[i].energyCapacity",tower[i].energyCapacity);            
+            for (var i in towers) {          
                 if (tower[i].energy != tower[i].energyCapacity) {
                     return false;
                 }

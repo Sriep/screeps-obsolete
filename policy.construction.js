@@ -52,51 +52,7 @@ var policyConstruction = {
      * @returns {none} 
      */
     enactPolicy: function(room) {
-        console.log("enact constrution rom", room);
-        //policy = require("policy");
-        //policy.breakUpLinks(room);
-        //roleBase.forceCreeps(room, roleBase.Type.HAVERSTER);
         this.assingWorkers(room);
-        /*
-        spawns = room.find(FIND_MY_SPAWNS);
-        var wokerSize = policy.workerBuildSize(room);
-        console.log("enact constr worksize", wokerSize);
-        raceBase.spawn(raceWorker, room, spawns[0], wokerSize);
-
-        var nCreeps = room.find(FIND_MY_CREEPS).length;
-        var nUpgraders = 0;
-        var nHavesters = Math.ceil(roomOwned.constructHavesters(room, undefined, true));
-        var nRepairers = 0;
-        if (nCreeps - nHavesters > this.REPAIR_THRESHOLD) {
-            nRepairers = Math.max(1, (nCreeps-nBuilders)*this.REPAIR_RATIO);
-        }
-
-        var tripsNeeded = Math.ceil(this.totalConstruction(room)
-                                        /(wokerSize*CARRY_CAPACITY));
-        var nHavesters = 0;
-        var nRepairers = 0;
-        var nBuilders = 0;
-        if (tripsNeeded < nCreeps) {
-            nHavesters = Math.ceil(roomOwned.peaceHavesters(room, undefined, true));           
-            if (nCreeps - nHavesters > this.REPAIR_THRESHOLD) {
-                nRepairers = Math.max(1, (nCreeps-nBuilders)*this.REPAIR_RATIO);
-            }              
-            nBuilders = Math.min(tripsNeeded, nCreeps-nHavesters-nRepairers);  
-            //console.log("enact const trips", tripsNeeded, "creeps", nCreeps);             
-        } else {
-            nHavesters = Math.ceil(roomOwned.constructHavesters(room, undefined, true));           
-            if (nCreeps - nHavesters > this.REPAIR_THRESHOLD) {
-                nRepairers = Math.max(1, (nCreeps-nBuilders)*this.REPAIR_RATIO);
-            }              
-            nBuilders = nCreeps-nHavesters-nRepairers;               
-        }
-        var nUpgraders = nCreeps-nHavesters-nRepairers- nBuilders;                                  
-
-        console.log("enact Const roles havesters", nHavesters, "builders", nBuilders,
-            "upgraders", nUpgraders, "and repairers", nRepairers, "total creeps", nCreeps);
-        raceWorker.assignWorkerRoles(room, nHavesters, nUpgraders,
-                                nBuilders , nRepairers);*/
-
         raceBase.moveCreeps(room);
     },
 
@@ -106,7 +62,6 @@ var policyConstruction = {
         var nRepairers = 0;     
         var nHavesters = roomOwned.constructHavesters(room, undefined, true);
         var nBuilders = roomOwned.constructBuilders(room, undefined, true);
-console.log("polich constrution assingWorkes equib havesters", nHavesters, "equib build", nBuilders);
 
         if (nHavesters + nBuilders < nCreeps )
         {           
