@@ -23,6 +23,7 @@ var policy = {
         RESCUE: "rescue",
         FOREIGN_HARVEST: "foreign harvest",
         FOREIGN_ROAD: "build foreign road",
+        CLAIM: "claim"
     },
 
     enactPolicies: function()
