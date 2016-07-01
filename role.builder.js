@@ -12,18 +12,20 @@ var roleBase = require("role.base");
 var roleBuilder = {
     
 	findTarget: function(creep) {
-		var constructionSites = creep.room.find(FIND_CONSTRUCTION_SITES);
+        return creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
+		/*var constructionSites = creep.room.find(FIND_CONSTRUCTION_SITES);
 		if(constructionSites.length) {
 		    constructionSites.sort((a,b) => 
                 roleBase.distanceBetween(a, creep) - roleBase.distanceBetween(b, creep));
-			return 	constructionSites[0]; 
+			return 	constructionSites[0];  n
 		}
-        return 0;
+        return 0;*/
 	},	
 
     /** @param {Creep} creep **/
     run: function(creep) {
-        roleBase.checkCarryState(creep);  
+        this.newRun(creep);
+       /* roleBase.checkCarryState(creep);
         // moving towards construction site
         if(creep.memory.carrying) {   
         	var target = this.findTarget(creep);
@@ -36,8 +38,36 @@ var roleBuilder = {
         // moving towards source
         else {
             roleBase.fillUpEnergy(creep);
-        } //else
-    } //function
+        } //else*/
+    }, //function
+
+    newRun: function(creep) {
+        var newTask = roleBase.checkTask(creep);
+        //console.log("newTasknewTasknewTasknewTasknewTask",newTask);
+        creep.memory.task = newTask;
+        console.log("newtask" ,newTask,"creep",creep,"creeptask",creep.memory.task);
+
+        // moving towards construction site
+        switch (creep.memory.task) {
+            case roleBase.Task.MOVE:
+                roleBase.move(creep);
+                break;
+            case roleBase.Task.CARRY:
+                var target = this.findTarget(creep);
+                if (0 != target) {
+                    if(creep.build(target) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(target);
+                    }
+                }
+                break;
+            case roleBase.Task.HARVEST:
+                roleBase.fillUpEnergy(creep);
+                break;
+            default:
+        }
+    }
+
+
 };
 
 module.exports = roleBuilder;

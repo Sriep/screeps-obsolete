@@ -41,10 +41,13 @@ var raceWorker = {
 	ROLE_DEFULT: "harvester",
     ROLE_LINKER: "linker",
 
+    LINKING_WORKERSIZE: 5,
+    MaxWorkerControllerLevel: [0,1,2,4,6,9,11,14,16],
+
 	maxSize: function(contolerLevel) { 
         console.log("Warning In race.Worker.maxSize (congoller)");
 	    return  Math.floor(roomController.maxProduction[contolerLevel] / this.BLOCKSIZE);       
-    },	
+    },
 
     maxSizeRoom: function(room) {
         return Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE);
@@ -54,11 +57,12 @@ var raceWorker = {
         return Math.floor(room.energyAvailable / this.BLOCKSIZE);
     },
 	
-	switchRoles: function(delta1, delta2, role1, role2) {
+	switchRoles: function(delta1, delta2, role1, role2, currentPolicy) {
         var deltaChange = 0;
 	    if (delta1 > 0 && delta2 < 0) {
             deltaChange = Math.min(delta1, -1*delta2);
-            var creeps = _.filter(Game.creeps, (creep) => creep.memory.role == role2); 
+            var creeps = _.filter(Game.creeps, (creep) => creep.memory.role == role2
+                && creep.memory.policyId == currentPolicy.id);
             for (var i = 0; i < deltaChange; i++)   {
                 if (creeps[i] !== undefined) {
                     creeps[i].memory.role = role1;   
@@ -69,7 +73,8 @@ var raceWorker = {
             }
 	    } else if (delta2 > 0 && delta1 < 0) {
             deltaChange = Math.min(delta2, -1*delta1);
-            var creeps = _.filter(Game.creeps, (creep) => creep.memory.role == role1); 
+            var creeps = _.filter(Game.creeps, (creep) => creep.memory.role == role1
+                && creep.memory.policyId == currentPolicy.id);
             for (var i = 0; i < deltaChange; i++)   {
                 if (creeps[i] !== undefined) {
                     creeps[i].memory.role = role2; 
@@ -92,7 +97,7 @@ var raceWorker = {
         }
     },
 
-    assignWorkerRoles: function(room, 
+    assignWorkerRoles: function(currentPolicy, 
                     havesters_needed, 
                     upgraders_needed, 
                     builders_needed, 
@@ -100,13 +105,17 @@ var raceWorker = {
     {     
 console.log("assignRoles hav", havesters_needed, "up", upgraders_needed,
      "bui",builders_needed,"rep",repairers_needed)
-        var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_HARVESTER);	
-        var builders = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_BUILDER);	 		
-        var repairers = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_REPAIRER); 
-        var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_UPGRADER);
-        var linkers = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_LINKER);
-console.log("assignRoles hav", harvesters.length, harvesters, "up", upgraders.length,
-     "bui",builders.length,"rep",repairers.length)        
+        var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_HARVESTER
+            && creep.memory.policyId == currentPolicy.id);
+        var builders = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_BUILDER
+            && creep.memory.policyId == currentPolicy.id);
+        var repairers = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_REPAIRER
+            && creep.memory.policyId == currentPolicy.id);
+        var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_UPGRADER
+            && creep.memory.policyId == currentPolicy.id);
+        var linkers = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_LINKER
+            && creep.memory.policyId == currentPolicy.id);
+
         var dHavesters = havesters_needed - harvesters.length;
         var dBuilders = builders_needed - builders.length;
         var dRepairers = repairers_needed - repairers.length;
@@ -119,43 +128,68 @@ console.log("assignRoles hav", harvesters.length, harvesters, "up", upgraders.le
         console.log("Linkers: " + linkers.length);
         if (dHavesters != 0)
         {        
-            delta = this.switchRoles(dHavesters, dUpgraders, this.ROLE_HARVESTER, this.ROLE_UPGRADER);
+            delta = this.switchRoles(dHavesters, dUpgraders, this.ROLE_HARVESTER, this.ROLE_UPGRADER, currentPolicy);
             dHavesters = dHavesters + delta;
             dUpgraders = dUpgraders - delta;
         }
         if (dHavesters != 0)
         {
-            delta = this.switchRoles(dHavesters, dBuilders, this.ROLE_HARVESTER, this.ROLE_BUILDER);
+            delta = this.switchRoles(dHavesters, dBuilders, this.ROLE_HARVESTER, this.ROLE_BUILDER, currentPolicy);
             dHavesters = dHavesters + delta;
             dBuilders = dBuilders - delta;
         }
         if (dHavesters != 0)
         {
-            delta = this.switchRoles(dHavesters, dRepairers, this.ROLE_HARVESTER, this.ROLE_REPAIRER);
+            delta = this.switchRoles(dHavesters, dRepairers, this.ROLE_HARVESTER, this.ROLE_REPAIRER, currentPolicy);
             dHavesters = dHavesters + delta;
             dRepairers = dRepairers - delta;
         }
 
         if (dBuilders != 0)
         {
-            delta = this.switchRoles(dBuilders, dUpgraders, this.ROLE_BUILDER, this.ROLE_UPGRADER);
+            delta = this.switchRoles(dBuilders, dUpgraders, this.ROLE_BUILDER, this.ROLE_UPGRADER, currentPolicy);
             dBuilders = dBuilders + delta;
             dUpgraders = dUpgraders - delta;
         }
         if (dBuilders != 0)
         {
-            delta = this.switchRoles(dBuilders, dRepairers, this.ROLE_BUILDER, this.ROLE_REPAIRER);
+            delta = this.switchRoles(dBuilders, dRepairers, this.ROLE_BUILDER, this.ROLE_REPAIRER, currentPolicy);
             dBuilders = dBuilders + delta;
             dRepairers = dRepairers - delta;
         }
 
         if (dRepairers != 0)
         {
-            delta = this.switchRoles(dRepairers, dUpgraders, this.ROLE_REPAIRER, this.ROLE_UPGRADER);
+            delta = this.switchRoles(dRepairers, dUpgraders, this.ROLE_REPAIRER, this.ROLE_UPGRADER, currentPolicy);
             dRepairers = dRepairers + delta;
             dUpgraders = dUpgraders - delta;
         }
+        console.log("Harvesters: " + harvesters.length);
+        console.log("Upgraders: " + upgraders.length );
+        console.log("Builders: " + builders.length );
+        console.log("Repairers: " + repairers.length );
+        console.log("Linkers: " + linkers.length);
+        this.initiliseWorkers(currentPolicy)
+    },
 
+    initiliseWorkers: function(policy)
+    {
+        console.log("initiliseWorkers policy",JSON.stringify(policy));
+      //  if ( policy !== undefined) {
+            console.log("polcy", JSON.stringify(policy));
+            var room = policy.room;
+            var creeps = Game.rooms[room].find(FIND_MY_CREEPS);
+            for (var i in creeps) {
+                if (creeps[i].memory.policyId == policy.id)
+                {
+                    creeps[i].memory.startRoom = room;
+                    creeps[i].memory.workRoom = room;
+                    creeps[i].memory.sourceRoom = room;
+                    creeps[i].memory.endRoom = room;
+                    creeps[i].memory.targetRoom = room;
+                }
+            }
+     //  }
     },
     
 
@@ -176,7 +210,7 @@ console.log("assignRoles hav", harvesters.length, harvesters, "up", upgraders.le
         return cost;
     },
 
-    spawnFromName(roomName, spawnName, wokerSize) {
+    spawnFromName: function(roomName, spawnName, wokerSize) {
         spawns = currentRoom.find(FIND_MY_SPAWNS);
         spawn(Game.rooms[roomName], spawns[spawnName], workerSize);
     },
@@ -200,20 +234,20 @@ console.log("assignRoles hav", harvesters.length, harvesters, "up", upgraders.le
     *   var raceWorker = require("race.worker");
     *   raceWorker.spawnWorker("W26S21", "Spawn1");        
     */
-	spawn: function(room, spawn, workerSize) {	
+	spawn: function(policy, spawn, workerSize) {
         
 	    if (workerSize == undefined) {
-		     cost = room.energyAvailable;
-		} else {
-		    cost = this.blockSize * workerSize;
-		}
+            workerSize = raceWorker.LINKING_WORKERSIZE;
+        }
+        var cost = this.blockSize * workerSize;
+
 		var body = this.body(cost);
 		var canDo = spawn.canCreateCreep(body)
 		if (canDo != OK) {		    
             return canDo;   
 		}			
 		var result = spawn.createCreep(
-		                    body, undefined, {role: this.ROLE_HARVESTER});  
+		                    body, undefined, {role: this.ROLE_HARVESTER, policyId: policy.id});
 		if  (_.isString(result)) {
 		    console.log("New creep " + result + " is born");
 		} else {
@@ -221,7 +255,7 @@ console.log("assignRoles hav", harvesters.length, harvesters, "up", upgraders.le
 		return result;		
 	}, // spawn	
 	
-	forceSpawn: function(spawn) {
+	quickSpawn: function(spawn) {
 		//var energy = Game.rooms[roomName].energyAvailable; 
 		//if  (energy > this.blockSize) {
 			var newName = spawn.createCreep(
@@ -229,11 +263,6 @@ console.log("assignRoles hav", harvesters.length, harvesters, "up", upgraders.le
 			console.log("New creep " + newName + " is born");			
 		//}
 	},
-	//var raceWorker = require("race.worker");raceWorker.forceSpawn("Spawn1");
-	//
-	
-
-	
 }
 
 module.exports = raceWorker;

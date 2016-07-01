@@ -10,6 +10,10 @@ JSDoc
 *.bat
 *.bat*
 
+# Webstorm
+.*
+*_
+
 #grunt files
 Gruntfile.js
 package.json

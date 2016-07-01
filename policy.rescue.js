@@ -3,17 +3,16 @@
  * decisions when the room needs rescuing.
  * @author Piers Shepperson
  */
-    //Bace object
+    //Base object
     policy = require("policy");
 
-    //policyConstruction = require("policy.construction");
-    //policyDefence = require("policy.defence");
+    policyConstruction = require("policy.construction");
+    policyDefence = require("policy.defence");
     //policyPeace= require("policy.peace");
     raceBase = require("race.base");
     raceWorker = require("race.worker");
     raceInfantry = require("race.infantry");
     roleBase = require("role.base");
-
 
 
 /**
@@ -23,7 +22,6 @@
  * @module policyRescue
  */
 var policyRescue = {
-
     /**
      * Determins what the new polciy of or the comming tick should be. 
      * Last tick production was too low in comparison with contoller level.
@@ -32,19 +30,19 @@ var policyRescue = {
      * @param   {Object} room  The room we are drafting the policy for.
      * @returns {enum} Id of policy for comming tick. 
      */   
-    draftNewPolicyId: function(room) {
-        policyDefence = require("policy.defence");
-        if (policyDefence.beingAttaced(room)) {         
-            return policy.Type.DEFEND;
+    draftNewPolicyId: function(oldPolicy) {
+        var room =  Game.rooms[oldPolicy.room];
+        //var policyDefend = require("policy.defend");
+        if (policyDefend.beingAttaced(room)) {
+            return policy.createDefendPolicy(room.name);
         }
         if (this.needsRescue(room)) {
-            return policy.Type.RESCUE;
+            return oldPolicy;
         }
-        policyConstruction = require("policy.construction");
-        if (policyConstruction.constructionSite(room)) {
-            return policy.Type.CONSTRUCTION;
+        if (policyConstruction.startConstruction(room)) {
+            return policy.createConstructionPolicy(room.name);
         }
-        return policy.Type.PEACE;
+        return  policy.createPeacePolicy(room.name);
     },
 
 
@@ -55,23 +53,24 @@ var policyRescue = {
      * @param   {Object} room  The room that might need rescuing.
      * @returns {none} 
      */
-    enactPolicy: function(room) {
-        creeps = room.find(FIND_MY_CREEPS);
+    enactPolicy: function(currentPolicy) {
+        currentPolicy.room = "W26S21";
+        var room = Game.rooms[currentPolicy.room];
+        room.memory.policyId = currentPolicy.id;
+        
         var workerSize = 0;
         if (creeps.length = 0) {
             workerSize = raceWorker.maxSizeFromEnergy(room);
         } else {
-            workParts = 0;
+            var workParts = 0;
             for (var i in creeps) {
                 workparts = workparts + creeps[i].getActiveBodyparts(WORK);
             }
-            workerSize = Math.min(raceWorker.maxSizeRoom(room), workParts+1); 
+            workerSize = Math.min(raceWorker.maxSizeRoom(room), workParts+1);
         }
 
-        spawns = room.find(FIND_MY_SPAWNS);
-        console.log("enact rescue wokersize", workerSize, "woker parts", workParts,
-            "size form energy",raceWorker.maxSizeFromEnergy(room)) ;
-        raceBase.spawn(raceWorker, room, spawns[0], workerSize);
+        var spawns = room.find(FIND_MY_SPAWNS);
+        raceBase.spawn(raceWorker, currentPolicy, spawns[0], workerSize);
 
         var nHavesters = room.find(FIND_MY_CREEPS).length;
         var nBuilders = 0;
@@ -79,15 +78,12 @@ var policyRescue = {
         var nUpgraders = 0;
         console.log("enact rescue roles havesters", nHavesters, "builders", nBuilders,
             "upgraders", nUpgraders, "and repairers", nRepairers);
-        raceWorker.assignWorkerRoles(room, nHavesters, nUpgraders,
-                                nBuilders , nRepairers);
-
-        raceBase.moveCreeps(room);     
+        raceWorker.assignWorkerRoles(currentPolicy, nHavesters, nUpgraders, nBuilders , nRepairers);
     },
 
-    switchPolicy: function(room, oldPolicyId)
+    switchPolicy: function(oldPolicy, newPolicy)
     {
-        switch(oldPolicyId) {
+        switch(oldPolicy.type) {
         case policy.Type.RESCUE:
             break;
         case policy.Type.CONSTRUCTION:
@@ -95,9 +91,10 @@ var policyRescue = {
         case policy.Type.DEFEND:
             break;
         case policy.Type.PEACE:   
-            policy.breakUpLinks(room); 
+            policy.breakUpLinks(Game.rooms[oldPolicy.room]);
         default:
-        }    
+        }
+        policy.reassignCreeps(oldPolicy, newPolicy);
     },
 
     /**
@@ -111,6 +108,9 @@ var policyRescue = {
      * @returns {Bool} True inidcates we should use a rescue policy. 
      */
     needsRescue: function(room) {
+        if (room === undefined) {
+            return false;
+        }
         creeps = room.find(FIND_MY_CREEPS);
         workParts = raceBase.countBodyParts(creeps, WORK);
         return workParts < raceWorker.maxSize(room.controller.level) - 2;

@@ -4,13 +4,15 @@
  * @author Piers Shepperson
  */
  
-var roomOwned = require("room.owned"); 
+//var roomOwned = require("room.owned");
 var raceWorker = require("race.worker"); 
 var roleHarvester = require("role.harvester");
 var roleUpgrader = require("role.upgrader");
 var roleBuilder = require("role.builder");
 var roleRepairer = require("role.repairer");
-var roadBuilder = require("road.builder");
+//var roadBuilder = require("road.builder");
+var roleBase = require("role.base");
+var roleNeutralBuilder = require("role.neutral.builder")
 
 /**
  * Abstract base object containing data and functions for use by my creeps.
@@ -19,31 +21,29 @@ var roadBuilder = require("road.builder");
  */
 var raceBase = {
 
-    spawn: function(race, room, spawn, creepSize) {	
-        console.log("Race base start base spaen workerSize", race, room, spawn, creepSize);
+    spawn: function (race, policy, spawn, creepSize) {
+       // console.log("in spawn policy ", JSON.stringify(policy));
         if (creepSize == undefined) {
-            cost = room.energyAvailable;
-            cost = Math.floor(cost/race.BLOCKSIZE);
-        } else {
-            cost = race.BLOCKSIZE * creepSize;
-        }
-        //console.log("In base.spawn cost", cost,"workersize", workerSize);
-        var body = race.body(cost);
-        //console.log("In racebase.spawn body is", body);
-        var canDo = spawn.canCreateCreep(body)
-        if (canDo != OK) {		    
-            return canDo;   
-        }			
-        var result = spawn.createCreep(
-                            body, undefined, {role: race.ROLE_DEFULT});  
-        //console.log("In base spawn body is", body, "return is ", result);                        
-        if  (_.isString(result)) {
-            console.log("New creep " + result + " is born");
+            creepSize = 1;
         } 
-        return result;		
+        var cost = race.BLOCKSIZE * creepSize;
+        var body = race.body(cost);
+        var canDo = spawn.canCreateCreep(body)
+        if (canDo != OK) {
+            return canDo;
+        }
+        console.log("spawning creep, size". creepSize, "boidy", body);
+        var result = spawn.createCreep(
+                body, undefined, {role: race.ROLE_DEFULT, policyId: policy.id});
+        if(_.isString(result)) {
+            console.log("New creep produced with name:", result);
+        }
+
+
+        return result;
     }, // spawn	
 
-    countBodyParts: function(creeps, part) {
+    countBodyParts: function (creeps, part) {
         var count = 0;
         for (var i in creeps) {
             count = count + creeps[i].getActiveBodyparts(part);
@@ -51,24 +51,23 @@ var raceBase = {
         return count;
     },
 
-    moveCreeps: function(room) {
-        var creeps = room.find(FIND_MY_CREEPS);
-        for(var id in creeps) {
-            var creep = creeps[id];
+    moveCreeps: function () {
+       // for (var roomindex  in  Game.rooms) {
+        for (var creepName in Game.creeps) {
+            var creep = Game.creeps[creepName];
             if (creep.memory.role == raceWorker.ROLE_HARVESTER) {
                 roleHarvester.run(creep);
             } else if (creep.memory.role == raceWorker.ROLE_UPGRADER) {
-                roleUpgrader.run(creep);               
+                roleUpgrader.run(creep);
             } else if (creep.memory.role == raceWorker.ROLE_BUILDER) {
                 roleBuilder.run(creep);
-            } else if(creep.memory.role == raceWorker.ROLE_REPAIRER) {
+            } else if (creep.memory.role == raceWorker.ROLE_REPAIRER) {
                 roleRepairer.run(creep);
-            }       
-        }     
-	}
-
-
-
+            } else if (creep.memory.role == roleBase.Type.NEUTRAL_BUILDER) {
+                roleNeutralBuilder.run(creep, creep.room);
+            }
+        }
+    }
 }
 
 module.exports = raceBase;

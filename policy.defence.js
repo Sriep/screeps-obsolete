@@ -34,19 +34,20 @@ var policyDefence = {
      * @param   {Object} room  The room we are drafting the policy for.
      * @returns {enum} Id of policy for comming tick. 
      */   
-    draftNewPolicyId: function(room) {
-        if (this.beingAttaced(room)) {         
-            return policy.Type.DEFEND;
+    draftNewPolicyId: function(oldPolicy) {
+        var room =  Game.rooms[oldPolicy.room];
+        if (this.beingAttaced(room)) {
+            return oldPolicy;
         }
-        policyRescue = require("policy.rescue")
+        var policyRescue = require("policy.rescue")
         if (policyRescue.needsRescue(room)) {
-            return policy.Type.RESCUE;
+            return policy.createRescuePolicy(room.name);
         }
-        policyConstruction = require("policy.construction");
-        if (policyConstruction.constructionSite(room)) {
-            return policy.Type.CONSTRUCTION;
+        var policyConstruction = require("policy.construction");
+        if (policyConstruction.startConstruction(room)) {
+            return policy.createConstructionPolicy(room.name);
         }
-        return policy.Type.PEACE;
+        return policy.createPeacePolicy(room.name);
     },
 
 
@@ -55,21 +56,21 @@ var policyDefence = {
      * @param   {Object} room  The room that might need rescuing.
      * @returns {none} 
      */
-    enactPolicy: function(room) {
-        //roleBase.forceCreeps(room, roleBase.Type.HAVERSTER);
+    enactPolicy: function(currentPolicy) {
+        currentPolicy.room = "W26S21";
+        var room = Game.rooms[currentPolicy.room];
+        room.memory.policyId = currentPolicy.id;
+
         var nHavesters = room.find(FIND_MY_CREEPS).length;
         var nBuilders = 0;
         var nRepairers = 0;      
         var nUpgraders = 0;
-        console.log("In enactPolicy");
-        raceWorker.assignWorkerRoles(room, nHavesters, nUpgraders,
+        raceWorker.assignWorkerRoles(currentPolicy, nHavesters, nUpgraders,
                                 nBuilders , nRepairers);
-        spawns = room.find(FIND_MY_SPAWNS);       
         npcInvaderBattle.defendRoom(room);
-        raceBase.moveCreeps(room);
     },
 
-    switchPolicy: function(room, oldPolicyId)
+    switchPolicy: function(oldPolicyId, newPolicy)
     {
         switch(oldPolicyId) {
         case policy.Type.RESCUE:
@@ -79,9 +80,10 @@ var policyDefence = {
         case policy.Type.DEFEND:
             break;
         case policy.Type.PEACE:  
-            policy.breakUpLinks(room);  
+            policy.breakUpLinks(Game.rooms[oldPolicy.room]);
         default:
-        }    
+        }
+        policy.reassignCreeps(oldPolicyId, newPolicy);
     },
 
     /**
@@ -91,6 +93,9 @@ var policyDefence = {
      * @returns {Bool} True inidcates we should use a rescue policy. 
      */
     beingAttaced: function(room) {
+        if (room == undefined) {
+            return false;
+        }
         var hostiles = room.find(FIND_HOSTILE_CREEPS);
         var foundAttackPart = false;
         var i = 0;

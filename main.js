@@ -3,7 +3,8 @@
  * @author Piers Shepperson
  */
 
-var raceBase = require("race.base"); 
+var raceBase = require("race.base");
+var freeMemory = require("free.memory");
 var raceWorker = require("race.worker");
 var roleHarvester = require("role.harvester");
 var roleUpgrader = require("role.upgrader");
@@ -15,6 +16,7 @@ var roomOwned = require("room.owned");
 var policy = require("policy");
 var stats = require("stats");
 
+
 // Any modules that you use that modify the game's prototypes should be require'd
 // before you require the profiler.
 var profiler = require("screeps-profiler");
@@ -25,13 +27,9 @@ module.exports.loop = function () {
     profiler.wrap(function() {
         var myroom = Game.rooms["W26S21"];   
         stats.startTick(myroom);
-        PathFinder.use(true);   
-        
-        for(var name in Memory.creeps) {
-            if(!Game.creeps[name]) {
-                delete Memory.creeps[name];
-            }
-        }
+        PathFinder.use(true);
+
+        freeMemory.freeCreeps();
                 
         var cpuLoad = cpuUsage.averageCpuLoad();
         
@@ -41,16 +39,17 @@ module.exports.loop = function () {
 			    +currentRoom.energyAvailable+" energy");
 			console.log("Room " +roomIndex+" has "
 			    +currentRoom.energyCapacityAvailable+" max energy capacity");
-			var controllerLevel = currentRoom.controller.level;
+			//var controllerLevel = currentRoom.controller.level;
             spawns = currentRoom.find(FIND_MY_SPAWNS);          
-		}		 
+		}
 		policy.enactPolicies();
+        raceBase.moveCreeps();
       //  console.log("CPULoad is " , cpuLoad);
        // console.log('CPU time used from the beginning of the current game tick ' , Game.cpu.getUsed());
       //  console.log("CPU usage " , JSON.stringify(Game.cpu));
       //  console.log("Global contol level GCL " , JSON.stringify(Game.gcl));       
                         
-
+/*
         var workerSize = 5;
         var force = true;
         console.log("Havest peace " , roomOwned.peaceHavesters(myroom, workerSize, force),"workersize", workerSize);
@@ -66,9 +65,10 @@ module.exports.loop = function () {
                             15000,     workerSize, force));  
 
         //console.log("harvest trip " , roomOwned.getHavestRoundTripLength(myroom, "true")); 
-        //console.log("upgrade trip " , roomOwned.getUpgradeRondTripLength(myroom, "true")); 
+        //console.log("upgrade trip " , roomOwned.getUpgradeRondTripLength(myroom, "true"));*/
         cpuUsage.updateCpuUsage();
         stats.endTick(myroom);
+        //Game.creeps["Adeline"].move(TOP);
         console.log("************************ " + Game.time + " *********************************");
     }) // profiler.wrap(function()
 }

@@ -89,7 +89,7 @@ var roomOwned = {
     },
 
 
-    roundTripLength(room,role,force) {
+    roundTripLength: function(room,role,force) {
         switch (role) {
             case roleBase.Type.HARVESTER:
                 return this.getHavestRoundTripLength(room, force);
@@ -178,7 +178,7 @@ var roomOwned = {
     setWorkerSize: function(room, workerSize, force)  {
         if (workerSize === undefined) {
             if (room.memory.workerSize === undefined) {
-                workerSize =  raceWorker.maxSize(room.controller.level);
+                workerSize =  raceWorker.maxSize(raceWorker.LINKING_WORKERSIZE);
                 force = true;
             } else {
                 workerSize = room.memory.workerSize;
@@ -209,9 +209,20 @@ var roomOwned = {
         return havestableSourcEnergyLT;
     },
 
+
+    allSourcesEnergy: function(room)
+    {
+        var havestableSourceEnergy = 0;
+        var sources = room.find(FIND_SOURCES);
+        for (var i in sources) {
+            havestableSourceEnergy += sources[i].energyCapacity
+        }
+        return havestableSourceEnergy;
+    },
+
     warTimeHavesters: function(room, workerSize, force)  {
-        force = this.setWorkerSize(room, workerSize, force);
-        workerSize = room.memory.workerSize;  
+        var force = this.setWorkerSize(room, workerSize, force);
+        var workerSize = room.memory.workerSize;
         if (room.memory.warTimeHavesters === undefined || force == true)
         {   
             warTimeHavesters =  this.allSourcsEnergyLT(room, workerSize) 
@@ -222,26 +233,29 @@ var roomOwned = {
     },
            
     peaceHavesters: function(room, workerSize, force) {
-        force = this.setWorkerSize(room, workerSize, force);
-        workerSize = room.memory.workerSize;  
+        //console.log("room",room,"workeSize",workerSize,"forse",force)
+        var force = this.setWorkerSize(room, workerSize, force);
+        var workerSize = room.memory.workerSize;
         
-        if (room.memory.peaceHavesters === undefined || force == true)
-        {        
+        if (room.memory.peaceHavesters === undefined || force == true) {
             workerCost = raceWorker.BLOCKSIZE * workerSize;
-            var havestRate = 2 * workerSize;                      
+            var havestRate = 2 * workerSize;
             hELT = this.energyLifeTime(room, workerSize, roleBase.Type.HARVESTER);
             var uELT = this.energyLifeTime(room, workerSize, roleBase.Type.UPGRADER);
             var sELT = this.allSourcsEnergyLT(room, workerSize);
             var wCost = workerCost;
+            //console.log("In peaceHavesters selt ",sELT," helt ",hELT," uelt ",uELT," wcost ",wCost);
             room.memory.peaceHavesters
                 = sELT / ( hELT + (uELT * hELT / wCost) - uELT );
         }
-        return room.memory.peaceHavesters; 
-    },    
+        //console.log("peaceHavesters",room.memory.peaceHavesters,"room" ,room,
+        //            "workerSize", workerSize);
+        return room.memory.peaceHavesters;
+    },
     
     peaceUpgraders: function(room, workerSize, force) {
-        force = this.setWorkerSize(room, workerSize, force);
-        workerSize = room.memory.workerSize;  
+        var force = this.setWorkerSize(room, workerSize, force);
+        var workerSize = room.memory.workerSize;
         if (room.memory.peaceUpgraders === undefined || force == true)
         {        
             if (workerSize == undefined) {               
@@ -256,9 +270,9 @@ var roomOwned = {
     },    
 
     supportUpgraders: function(room, exrtraWorkers, sourceEnerghLT, workerSize, force) {
-        force = this.setWorkerSize(room, workerSize, force);
-        workerSize = room.memory.workerSize;  
-        if (room.memory.linkUpgraders === undefined || force == true)
+        var force = this.setWorkerSize(room, workerSize, force);
+        var workerSize = room.memory.workerSize;
+        if (room.memory.supportUpgraders === undefined || force == true)
         {        
             if (workerSize == undefined) {               
                 workerSize = raceWorker.maxSize(room.controller.level);
@@ -266,16 +280,16 @@ var roomOwned = {
             workerCost = raceWorker.BLOCKSIZE * workerSize;    
             var hELT = this.energyLifeTime(room, workerSize, roleBase.Type.HARVESTER);  
             var havesters = this.supportHavesters(room, exrtraWorkers, sourceEnerghLT, workerSize, force);
-            room.memory.linkUpgraders = (( hELT / workerCost)-1 ) * havesters - exrtraWorkers; 
+            room.memory.supportUpgraders = (( hELT / workerCost)-1 ) * havesters - exrtraWorkers; 
         }
-        return room.memory.linkUpgraders;            
+        return room.memory.supportUpgraders;            
     },   
 
     supportHavesters: function(room, exrtraWorkers, sourceEnerghLT, workerSize, force) {
-        force = this.setWorkerSize(room, workerSize, force);
-        workerSize = room.memory.workerSize;  
+        var force = this.setWorkerSize(room, workerSize, force);
+        var workerSize = room.memory.workerSize;
         
-        if (room.memory.linkHavesters === undefined || force == true)
+        if (room.memory.supportHavesters === undefined || force == true)
         {        
             workerCost = raceWorker.BLOCKSIZE * workerSize;
             var havestRate = 2 * workerSize;                      
@@ -283,33 +297,30 @@ var roomOwned = {
             var uELT = this.energyLifeTime(room, workerSize, roleBase.Type.UPGRADER);
             //var sELT = this.allSourcsEnergyLT(room, workerSize);
             var wCost = workerCost;
-            room.memory.linkHavesters
+            room.memory.supportHavesters
                 = (sourceEnerghLT + exrtraWorkers*uELT) / ( hELT + (uELT * hELT / wCost) - uELT );
                // = (sELT/2 + 2*uELT) / ( hELT + (uELT * hELT / wCost) - uELT );
         }
-        return room.memory.linkHavesters; 
+        return room.memory.supportHavesters; 
     },   
 
-    numWorkersSupportable: function(room, energy, workerSize, force) {
-        force = this.setWorkerSize(room, workerSize, force);
-        workerSize = room.memory.workerSize;  
-        if (room.memory.linkUpgraders === undefined || force == true)
-        {        
-            if (workerSize == undefined) {               
-                workerSize = raceWorker.maxSize(room.controller.level);
-            }
-            workerCost = raceWorker.BLOCKSIZE * workerSize;    
+    workersSupportable: function(room, energy, workerSize, force) {
+        var force = this.setWorkerSize(room, workerSize, force);
+        var workerSize = room.memory.workerSize;
+        if (room.memory.workersSupportable === undefined || force == true)
+        {
+            var workerCost = raceWorker.BLOCKSIZE * workerSize;
             var hELT = this.energyLifeTime(room, workerSize, roleBase.Type.HARVESTER);  
-          //  var havesters = this.supportHavesters(room, exrtraWorkers, sourceEnerghLT, workerSize, force);
-            room.memory.linkUpgraders = energy / workerCost - energy / hELT;
+            room.memory.workersSupportable = energy / workerCost - energy / hELT;
         }
-        return room.memory.linkUpgraders;      
+        return room.memory.workersSupportable;
     },
 
     constructHavesters: function(room, workerSize, force)
     {
-        force = this.setWorkerSize(room, workerSize, force);
-        workerSize = room.memory.workerSize;  
+        //console.log("StartConstrutHarveser room",room,"workersize",workerSize,"fore",force);
+        var force = this.setWorkerSize(room, workerSize, force);
+        var workerSize = room.memory.workerSize;
         
         if (room.memory.constructHavesters === undefined || force == true)
         {        
@@ -319,6 +330,7 @@ var roomOwned = {
             var bELT = this.energyLifeTime(room, workerSize, roleBase.Type.BUILDER);
             var sELT = this.allSourcsEnergyLT(room, workerSize);
             var wCost = workerCost;
+            //console.log("In constructHavesters selt",sELT,"helt",hELT,"wcost",wCost,"belt",bELT);
             room.memory.constructHavesters
                 = sELT / ( hELT + (bELT * hELT / wCost) - bELT );
         }
@@ -326,8 +338,8 @@ var roomOwned = {
     },
 
     constructBuilders: function(room, workerSize, force) {
-        force = this.setWorkerSize(room, workerSize, force);
-        workerSize = room.memory.workerSize;  
+        var force = this.setWorkerSize(room, workerSize, force);
+        var workerSize = room.memory.workerSize;
         if (room.memory.consructBuilders === undefined || force == true)
         {        
             if (workerSize == undefined) {               
