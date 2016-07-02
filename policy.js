@@ -26,8 +26,13 @@ var policy = {
         CLAIM: "claim"
     },
 
-    createNeutralBuilderPolicy: function(startRoom, workRoom, sourceRoom, endRoom, workers, start) {
-        var p = { id : this.getNextPolicyId(),
+    createNeutralBuilderPolicy: function(startRoom
+                                        , workRoom
+                                        , sourceRoom
+                                        , endRoom
+                                        , workersContracted
+                                        , start) {
+        var newPolicy = { id : this.getNextPolicyId(),
                         type : policy.Type.FOREIGN_ROAD,
                         startRoom : startRoom,
                         workRoom : workRoom,
@@ -37,9 +42,29 @@ var policy = {
                         workersAssigned : 0,
                         shuttingDown : false};
         if (start) {
-            this.activatePolicy(policy);
+            var module = this.getModuleFromPolicy(newPolicy);
+            module.initilisePolicy(newPolicy)
+            if (0 < this.activatePolicy(newPolicy)) {
+                console.log("Created policy", newPolicy.type);
+            } else {
+                console.log("failed to activate policy", newPolicy.type)
+            }
         }
-        return p;
+        return newPolicy;
+    },
+
+    initilisePolicy: function(newPolicy) {
+        var module = this.getModuleFromPolicy(newPolicy)
+        if (undefined !== module) {
+            if (!module.initilisePolicy(newPolicy)) {
+                console.log("Failed to initilise policy",newPolicy.type)
+                return false;
+            }
+        } else {
+            console.log("Failed to load module for",newPolicy.type);
+            return false;
+        }
+        return true;
     },
 
     createRescuePolicy: function(room)
@@ -52,6 +77,13 @@ var policy = {
 
     createPeacePolicy: function(room)
     {
+        console.log("START CREATEPEACEPOLICT",room.name);
+        console.log("START CREATEPEACEPOLICT",room.name);
+        console.log("START CREATEPEACEPOLICT",room.name);
+        console.log("START CREATEPEACEPOLICT",room.name);
+        console.log("START CREATEPEACEPOLICT",room.name);
+        console.log("START CREATEPEACEPOLICT",room.name);
+        console.log("START CREATEPEACEPOLICT",room.name);
         var p = { id : this.getNextPolicyId(),
             type : policy.Type.PEACE,
             room : room};
@@ -75,36 +107,25 @@ var policy = {
 
     enactPolicies: function()
     {
-       // Memory.policies = undefined;
-        /*if (undefined === Memory.policies
-            || null ===  Memory.policies
-            ||  Memory.policies === [] ) {
-            Memory.policies= [];
-            var firstPolicy =  { id: 0,
-                                    type: policy.Type.PEACE,
-                                    room: "W26S21"};
-
-            this.activatePolicy(firstPolicy);
-        }*/
         this.checkRoomPolicies();
         var i = Memory.policies.length;
         while(i--) {
-            var oldPolicy = require("policy." + Memory.policies[i].type);
+            var oldPolicy = this.getModuleFromPolicy(Memory.policies[i]);
             var newPolicyDetails = oldPolicy.draftNewPolicyId(Memory.policies[i]);
             if (newPolicyDetails === null) {
-                console.log("Terminate policy",JSON.stringify(Memory.policies[i]));
+                console.log("Terminate policy",Memory.policies[i].type,Memory.policies[i].id);
                 Memory.policies.splice(i, 1);
             } else if ( newPolicyDetails.id != Memory.policies[i].id) {
-                var newPolicy = require("policy." + newPolicyDetails.type);
+                var newPolicy = this.getModuleFromPolicy(newPolicyDetails);
                 this.activatePolicy(newPolicyDetails);
                 newPolicy.switchPolicy(Memory.policies[i], newPolicyDetails);
-                console.log("Removing old policy",JSON.stringify(Memory.policies[i]));
+                console.log("Removing old policy",Memory.policies[i].type,"id", Memory.policies[i].id );
                 Memory.policies.splice(i, 1);
-                console.log("Enact new policy",JSON.stringify(newPolicyDetails));
+                console.log("Enact new policy",newPolicyDetails.type,newPolicyDetails.id);
                 newPolicy.enactPolicy(newPolicyDetails);
 
             } else {
-                console.log("Enact policy",JSON.stringify(Memory.policies[i]));
+                console.log("Enact policy",Memory.policies[i].type, Memory.policies[i].id);
                 oldPolicy.enactPolicy(Memory.policies[i]);
             } // if(newPolicyDetails !===
         } //while
@@ -114,34 +135,33 @@ var policy = {
         var policies = Memory.policies;
         for(var roomIndex in Game.rooms) {
             var room = Game.rooms[roomIndex]
-            console.log("check poicies for room", room.name);
             var roomPolicy = this.getPolicyFromId(room.memory.policyId);
             var foundPolicy = false;
-
             var policiesToBeTerminated = [];
             for (var policyIndex in policies) {
                 var policy = policies[policyIndex];
-                console.log("checking policy", JSON.stringify(policy), "for room", room.name)
                 if (policy.room !== undefined && policy.room == room.name) {
                     // Use the first policy found for the room terminate any others.
+                    console.log("found polcy for room", room);
                     if (!foundPolicy) {
                         foundPolicy = true;
                         room.policyId = policy.id;
                         room.currentPolicy = policy.type;
+                        console.log("first");
                     } else {
+                        console.log("susequent to be reomved");
                         policiesToBeTerminated.push(policy.id);
                     }
                 }
             } //(policyIndex in policies)
             // remove unwanted policies
             for (var i in policiesToBeTerminated) {
-                this.terminate(policiesToBeTerminated[i].id);
+                this.terminate(policiesToBeTerminated[i]);
             }
-
             // Room does not have a policy give it peace
             if (!foundPolicy) {
                 var newPolicy = this.createPeacePolicy(room.name);
-                console("New policy for room", room.name, "created", JSON.stringify(newPolciy));
+                console.log("checkRoomPolicies");
                 this.activatePolicy(newPolicy);
             }
         }
@@ -162,17 +182,19 @@ var policy = {
         }
     },
 
-
-    supportBurden: function(policy)
+    supportBurden: function(room)
     {
-        var room = Game.rooms[policy.workRoom];
+       // var room = Game.rooms[policy.workRoom];
         var supportCount = 0;
-        if (room !== undefined && room.dependantPolicies !== undefined)
+        if (room !== undefined && room.memory.dependantPolicies !== undefined)
         {
-            dPolicies = room.memory.dependantPolices;
+            dPolicies = room.memory.dependantPolicies;
             for (var i in dPolicies) {
                 var policy = this.getPolicyFromId(dPolicies[i]);
-                supportCount = supportCount + policy.workersContractedFor - policy.workersAssigned;
+
+                if (undefined !== policy) {
+                    supportCount = supportCount + policy.workersContractedFor - policy.workersAssigned;
+                }
             }
         }
         return supportCount;
@@ -180,7 +202,7 @@ var policy = {
 
     reassignCreeps: function (oldPolicy, newPolicy) {
         for (var creep in Game.creeps) {
-            if (Game.creeps[creep].memory.policyId = oldPolicy.id) {
+            if (Game.creeps[creep].memory.policyId == oldPolicy.id) {
                 Game.creeps[creep].memory.policyId = newPolicy.id
             }
         }
@@ -197,7 +219,31 @@ var policy = {
     
     activatePolicy: function(policyDetails) {
         policyDetails.id = this.getNextPolicyId();
-        return Memory.policies.push(policyDetails);
+        if (undefined === Memory.policies){
+            Memory.policies = [];
+        }
+        var module = this.getModuleFromPolicy(policyDetails);
+        console.log("activatePolicy id",policyDetails.id,"module",module);
+        if (module.initilisePolicy(policyDetails)) {
+            return Memory.policies.push(policyDetails);
+        } else {
+           return 0;
+        }
+    },
+
+    pushDependantPolicy: function (room,dPolicy) {
+        if (undefined !== room) {
+            if (undefined === room.memory.dependantPolicies
+                || null === room.memory.dependantPolicies)
+            {
+                room.memory.dependantPolicies = [];
+            }
+            room.memory.dependantPolicies.push(dPolicy.id);
+            console.log("InpushDependantPolicy about to return ture",room,dPolicy );
+            return true;
+        } else {
+            return false;
+        }
     },
 
     getPolicyFromId: function(id) {
@@ -241,38 +287,56 @@ var policy = {
         }
     },
 
-    convertContractWorkers: function(room, policy, availableRole) {
-        var depPolicies = room.memory.dependantPolices;
+    convertContractWorkers: function(room, policy, availableRole,freeWorkers) {
+       // console.log("in convertContractWorkers room", room, "policy", policy.type, "role", availableRole);
+        var depPolicies = room.memory.dependantPolicies;
         if (undefined == depPolicies) {
+         //   console.log("cannot find dependance policies room",room, "policy",polcy.id)
             return;
         }
         var workersAvailable = room.find(FIND_MY_CREEPS, {
             filter: function (creep) {
                 return creep.memory.role == availableRole
-                    && creep.memory.employerId == policy.id
+                    && creep.memory.policyId == policy.id
             }
         });
-        var policyIndex = 0;
+        var policyIndex = depPolicies.length;
         var workersAllotted = 0;
+      //  console.log("just before while policyIndex", policyIndex,"workers allowed"
+      //      ,workersAllotted,"wokers avalabe",workersAvailable.length);
+        while (--policyIndex >= 0 && workersAllotted < workersAvailable.length ) {
 
-        while (policyIndex < depPolicies.length
-                 && workersAllotted < avalable.length) {
-            var depPolicy = this.getPolicyFromId(depPolicies[policyIndex].policyId);
-            if (depPolicy !== null) {
+            var depPolicy = this.getPolicyFromId(depPolicies[policyIndex]);
+          //  console.log("fisrt line of while policy index", policyIndex, "workers alloted",workersAllotted,
+          //      "workers avaliable",workersAvailable.length,"depPolicy",depPolicy );
+
+            if (depPolicy === undefined) {// || depPolicy === null) {
+    //            console.log("about to splice policy at", policyIndex);
+                depPolicies.splice(policyIndex, 1);
+    //            console.log("spliced policy");
+            } else {
+             //   console.log("found valid contract policy", depPolicy.id);
                 var needed = depPolicy.workersContractedFor - depPolicy.workersAssigned;
                 var getting = Math.min(needed, workersAvailable.length - workersAllotted);
-                for (var i = 0; i < getting ; i++) {
+          //      console.log("getting", getting, "needed",needed,"orkersAvailable.length",
+          //          workersAvailable.length, "workersAllotted",workersAllotted);
+                for (var i = 0; i < getting; i++) {
                     var module = this.getModuleFromPolicy(depPolicy);
-                    module.assignWorker(workersAvailable[workersAllotted + i], policy);
+                    module.assignWorker(workersAvailable[workersAllotted + i], depPolicy);
                 }
                 workersAllotted += getting;
-                depPolicy++;
             }
+           // console.log("last line of while policy index", policyIndex, "workers alloted",workersAllotted,
+         //       "workers avaliable",workersAvailable.length,"depPolicy",depPolicy );
         }
+     //   console.log("leaving convertContractWorkers");
     },
 
     getModuleFromPolicy: function(policy) {
-            return require("policy." + policy.type);
+        var name = "policy." + policy.type;
+        var modulePtr = require(name);
+        //console.log("getModuleFromPolicy name",name);
+        return modulePtr;
     }
 }
 
