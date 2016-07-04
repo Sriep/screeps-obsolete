@@ -26,51 +26,37 @@ roleBase = require("role.base");
  */
 var policyNeutralRoad = {
 
-    draftNewPolicyId: function(oldPolicy) {
-        var workRoom = Game.rooms[oldPolicy.workRoom];
-        //If cannot find existing room all the creeps much have left.
-        //If no more build sits left we wish to stop building, and shut down if all creeps
-        //have return to end room.
-        var shuttingDown = ((workRoom === undefined || workroom == null)
-                                 && oldPolicy.shuttingDown == true )
-                            || (workRoom !== undefined &&
-                                workRoom.find(FIND_CONSTRUCTION_SITES).length == 0)
-
-        if (shuttingDown) {
-            var stillCreepsToSendHowe = false;
-            for (var i in Game.creeps)
-            {
-                if (Game.creeps[i].policy !== undefined
-                    && Game.creeps[i].memory.policy.id == oldPolicy.id) {
-                    if (Game.creep[i].memory.endRoom == oldPolicy.endRoom)
-                    {
-                        this.clearCreep();
-                    } else {
-                        stillCreepsToSendHowe = true;
-                    }
-                }
-            }
-            if (stillCreepsToSendHowe) {
-                return oldPolicy;
-            } else {
-                this.cleanUp(oldPolicy);
-                return null;
-            }
-        } else {
-            return oldPolicy;
+    initilisePolicy: function (newPolicy) {
+        if (undefined == newPolicy) {
+            return false;
         }
+        console.log("In activatePolicy", JSON.stringify( newPolicy));
+        var room = Game.rooms[newPolicy.startRoom];
+        if (undefined !== room) {
+            policy.pushDependantPolicy(room, newPolicy);
+        } else {
+            return false;
+        }
+    },
+
+
+
+    draftNewPolicyId: function(oldPolicy) {
+        console.log("In policyNeutralRoad draftNewPolicyId");
+        return oldPolicy;
     },
 
     assignWorker: function(creep, policy)
     {
+        console.log("In neutralbuilder",policy.type, "with",creep);
         creep.memory.role = roleBase.Type.NEUTRAL_BUILDER;
         creep.memory.policyId = policy.id;
         creep.memory.startRoom = policy.startRoom;
         creep.memory.workRoom = policy.workRoom;
         creep.memory.sourceRoom = policy.sourceRoom;
         creep.memory.endRoom = policy.endRoom;
-        policy.workersAssigned++;
-    }
+        policy.workersAssigned = policy.workersAssigned  +1;
+    },
 
     clearCreep: function(creep) {
         creep.memory.role = roleBase.Type.HARVESTER;

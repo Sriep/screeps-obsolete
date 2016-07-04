@@ -191,6 +191,16 @@ var roomOwned = {
         room.memory.workerSize = workerSize;   
         return force;
     },
+
+    countSiteAccess: function(room, roomObject)
+    {
+        var sites = room.find(roomObject);
+        var countAcces = 0;
+        for (var i in sites) {
+            countAcces += this.countAccessPoints(room, sites[i].pos);
+        }
+        return countAcces;
+    },
     
     sourceEnergyLT: function(room, source, workerHavestRate) {
         var access = this.countAccessPoints(room, source);

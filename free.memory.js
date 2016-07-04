@@ -15,7 +15,6 @@ var public = {
                 Memory.creeps[name] = undefined;
             }
         }
-        test11();
     },
     freeRooms: function ()
     {
@@ -26,8 +25,6 @@ var public = {
         }
     },
 };
-
-
 
     var test11 = function()
     {
