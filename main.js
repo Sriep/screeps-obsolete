@@ -26,23 +26,8 @@ profiler.enable();
 module.exports.loop = function () {
     profiler.wrap(function() {
         var myroom = Game.rooms["W26S21"];   
-        stats.startTick(myroom);
         PathFinder.use(true);
-        //Game.creeps["Peyton"].suicide();
-        freeMemory.freeCreeps();
-
-
-        mySuffArray = ["stuff1","stuff2"];
-        Memory.test = mySuffArray;
-        console.log("my memory.test",Memory.test);
-
-        //var profiler = require("policy");
-       // myPolicy =  policy.createNeutralBuilderPolicy("W26S21","W27S20", "W26S21", "W26S20",1,true);
-        //myPolicy =  policy.createNeutralBuilderPolicy("W26S21","W27S20", "W26S21", "W26S21",1,true);
-        //var profiler = require("policy");
-       // policy.createGiftWorkersPolicy("W26S21", "W27S21", 0, true);
-        //console.log("My new claim policy", myPolicy);
-        //policy.activate(myPolicy);
+        freeMemory.freeCreeps();      
         var cpuLoad = cpuUsage.averageCpuLoad();
         var roomcount = 0;
         var creepcount = 0;
@@ -57,21 +42,19 @@ module.exports.loop = function () {
 		}
         for (var i in Game.creeps) {creepcount++}
         console.log("Have",roomcount,"rooms and",creepcount,"creeps");
-
-        
-
-        //policy.breakUpLinks(myroom);
-        //Memory.policies = undefined;
-        //try {
-         policy.enactPolicies();
-      //  }
-     ///   catch (e) {
-           // console.log("Exception thrwon from enactPolicies\n",e);
-     //   }
+        policy.enactPolicies();
         raceBase.moveCreeps();
+        cpuUsage.updateCpuUsage();
 
+      //  var room = Game.rooms["W26S21"];
+      //  var tenTicksStats = SumStatsArray(room, "ticks");
+      //  console.log(room,"tenTicksStats",tenTicksStats)
 
-       //Game.creeps["Savannah"].moveTo(40,25);
+        //var ords = Game.market.orders;
+        //console.log("market",ords);
+        //Memory.market = ords;
+
+        //Game.creeps["Savannah"].moveTo(40,25);
     //    Game.creeps["Jayce"].memory.workRoom = "W27S21";
     //    Game.creeps["Jayce"].memory.sourceRoom = "W27S21";
     //    Game.creeps["Jayce"].memory.targetSourceId = 0;
@@ -120,8 +103,8 @@ module.exports.loop = function () {
 
         //console.log("harvest trip " , roomOwned.getHavestRoundTripLength(myroom, "true")); 
         //console.log("upgrade trip " , roomOwned.getUpgradeRondTripLength(myroom, "true"));*/
-        cpuUsage.updateCpuUsage();
-        stats.endTick(myroom);
+
+       // stats.endTick(myroom);
         //Game.creeps["Adeline"].move(TOP);
         console.log("************************ " + Game.time + " *********************************");
     }) // profiler.wrap(function()

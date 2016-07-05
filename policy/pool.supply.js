@@ -7,78 +7,60 @@
  * Supply object for using the pool
  * @module policy
  */
-var supplyCenters = Memory.policies[0].supplyCenters;
+var supplyCentres = Memory.policies[0].supplyCentres;
 
-
-
-var public = {
-
-    supplyId : undefined,
-    energyToTrade : undefined,
-    yardCapacity : undefined,
-    buildQueue : undefined,
-
-    updateCentre: function (Supplyid, energy, yardCapacity) {
-
-    },
-
-    pushNewRoom: function(Supplyid, energy, yardCapacity) {
-        var i = supplyCenters.push({});
-        supplyCenters[--i] = i;,
-        supplyCenters[i].supplyId = roomName;
-        supplyCenters[i].energyToTrade = energyToTrade;
-        supplyCenters[i].yardCapacity = yardCapacity;
-        supplyCenters[i].buildQueue = [];
+var supplyCenter = {
+    updateSupplyLevel: function(room, energy, yardCapacity)
+    {
+        if (Game.rooms[room] !== undefined) {
+            var centre = supplyCentres[room];
+            if (undefined != centre) {
+                centre[room].energyToTrade = energy;
+                centre[room].yardCapacity = yardCapacity;
+            } else {
+                this.newSupplyCenter(room, energy, yardCapacity);
+            }
+            return true;
+        } else {
+            return false
+        }
     },
 
     findMatchFor: function (order) {
-        var orderSupplyCenters = supplyCenters.sort( function (a,b) {
+        var orderedcentres = .values(supplyCentres).sort( function (a,b) {
            return Game.map.getRoomLinearDistance(a.room, order.room) 
                - Game.map.getRoomLinearDistance(b.room, order.room);
         });
-        for (var i in orderSupplyCenters) {
-            if (poolSupply.canSupply(orderSupplyCenters[i], order))
-                return orderSupplyCenters[i];
+        for (var i in orderedcentres) {
+            if (this.canSupply(orderedcentres[i].room, order))
+                return orderedcentres[i].room;
         }
         return null;
     },
 
-    canSupply: function (centre, order) {
-        return centre.energyToTrade > order.energyRequested
-            && centre.yardCapacity > order.energyRequested.;
+    canSupply: function (centerId, order) {
+        return supplyCentres[centerId].energyToTrade > order.energyRequested
+            && supplyCentres[centerId].yardCapacity > order.energyRequested.;
     },
 
-    completeOrder: function(center, order) {
-        center.buildqueue.push(order);
+    completeOrder: function(centerId, order) {
+        supplyCentres[centerId].buildqueue.push(order);
+        return true;
     },
 
-    acessSupplyData: function (roomName)  {
-        return supplyCenters.filter(function( obj ) {
-            return obj.roomName == roomName;
-        });
-       // return supplyCenters.find(x=> x.roomName == roomName);
-    },
+    newSupplyCenter: function(room, energy, yardCapacity) {
+        supplyCentres[room] = {};
+        supplyCentres[room].room = room;
+        supplyCentres[room].energyToTrade = energy;
+        supplyCentres[room].yardCapacity = yardCapacity;
+        supplyCentres[room].buildQueue = [];
+    }
 
-    supplyOffer: function(policyId, room, energy, yardCapacity)
-    {
-        centre = supplyCenters.filter(function( obj ) {
-            return obj.roomName == roomName;
-        });
-        if (null != centre) {
-            centre.policyId = policyId;
-            centre.eenergyToTrade = energy;
-            centre.yardCapacity = yardCapacity;
-        } else {
-            this.pushNewCentre(policyId, room, energy, yardCapacity);
-        }
-    },
-
-
-};
+}
 
 
 
-module.exports = public;
+module.exports = supplyCenter;
 
 
 

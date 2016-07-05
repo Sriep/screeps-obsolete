@@ -13,6 +13,7 @@ JSDoc
 # Webstorm
 .*
 *_
+Screeps-Typescript-Declarations/
 
 #grunt files
 Gruntfile.js
