@@ -4,7 +4,7 @@
  */
 
 var raceBase = require("race.base");
-var freeMemory = require("free.memory");
+var freememory = require("freememory");
 var raceWorker = require("race.worker");
 var roleHarvester = require("role.harvester");
 var roleUpgrader = require("role.upgrader");
@@ -15,6 +15,7 @@ var cpuUsage = require("cpu.usage");
 var roomOwned = require("room.owned");
 var policy = require("policy");
 var stats = require("stats");
+var roleBase = require("role.base");
 
 
 // Any modules that you use that modify the game's prototypes should be require'd
@@ -27,8 +28,8 @@ module.exports.loop = function () {
     profiler.wrap(function() {
         var myroom = Game.rooms["W26S21"];   
         PathFinder.use(true);
-        freeMemory.freeCreeps();      
-        var cpuLoad = cpuUsage.averageCpuLoad();
+        freememory.freeCreeps();
+        //var cpuLoad = cpuUsage.averageCpuLoad();
         var roomcount = 0;
         var creepcount = 0;
         for(var roomIndex in Game.rooms) {
@@ -37,7 +38,7 @@ module.exports.loop = function () {
 			    +currentRoom.energyAvailable+" energy and " +currentRoom.energyCapacityAvailable
                 +" max energy capacity");
 			//var controllerLevel = currentRoom.controller.level;
-            spawns = currentRoom.find(FIND_MY_SPAWNS);
+            var spawns = currentRoom.find(FIND_MY_SPAWNS);
             roomcount++;
 		}
         for (var i in Game.creeps) {creepcount++}
@@ -46,6 +47,32 @@ module.exports.loop = function () {
         raceBase.moveCreeps();
         cpuUsage.updateCpuUsage();
 
+      //  var module = require("role.base");
+      //  var func = "add";
+     //   console.log("add", module["add"](4,3));
+      //  var aria = Game.creeps["aria"];
+      //  var taskList = roleHarvester.getTaskList();
+      ////  var task = taskList[0];
+      //  console.log("task list",JSON.stringify(taskList[0]));
+       // console.log("task list task",task, "method", task.method,"findTarget",task.findTarget);
+
+
+       /* var add = function (a,b) {
+            return a+b;
+        };
+        var Test = function (lable, method)
+        {
+            this.lable = lable;
+            this.method = method;
+        };
+        var test = new Test("one",add);
+        console.log(JSON.stringify(test),"now add", test.method(3,5),"and lable", test.lable);
+*/
+       // stats = require("stats"); stats.deleteStats();
+
+        //for(var roomIndex in Game.rooms) {
+        //    Game.rooms[roomIndex].memory.stats = undefined;
+       // }
       //  var room = Game.rooms["W26S21"];
       //  var tenTicksStats = SumStatsArray(room, "ticks");
       //  console.log(room,"tenTicksStats",tenTicksStats)
@@ -106,11 +133,14 @@ module.exports.loop = function () {
 
        // stats.endTick(myroom);
         //Game.creeps["Adeline"].move(TOP);
+        //console.log(Game.market.orders);
         console.log("************************ " + Game.time + " *********************************");
     }) // profiler.wrap(function()
 }
 //JSON.stringify(memory);
 //Game.rooms["W26S21"]
+
+
 
 
 

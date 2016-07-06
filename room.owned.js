@@ -3,9 +3,8 @@
  * related to owned rooms.
  * @author Piers Shepperson
  */
-raceWorker = require("race.worker");
-roomWar = require("room.war");
-roleBase = require("role.base");
+var raceWorker = require("race.worker");
+var roleBase = require("role.base");
 /**
  * Abstract object containing data and functions
  * related to owned rooms.

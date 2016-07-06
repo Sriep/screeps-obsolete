@@ -7,7 +7,7 @@
  * Object for free up memory
  * @module raceInfantry
  */
-var public = {
+var freememory = {
     freeCreeps: function ()
     {
         for(var name in Memory.creeps) {
@@ -33,4 +33,4 @@ var public = {
 
 
 
-module.exports = public;
+module.exports = freememory;

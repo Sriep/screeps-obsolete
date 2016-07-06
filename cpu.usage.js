@@ -24,7 +24,7 @@ var cpuUsage = {
         		AverageCPU = AverageCPU/Memory.cpuUsage.length
         	}
         } else {
-        	Memory.cpuUsage = new Array(CPU_MEMORY_LENGTH).fill(0);
+        	Memory.cpuUsage = new Array(this.CPU_MEMORY_LENGTH).fill(0);
         }  
         return AverageCPU/Game.cpu.limit;  
     },

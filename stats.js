@@ -9,159 +9,138 @@
  * @module raceBase
  */
 
-function RoomStats (tick
-                    ,tickRange
-                    ,controllerProgress
-                    ,energyAvailable
-                    ,sourceEnergy
-                    ,minerals
-                    ,creeps
-                    ,harvester 
-                    ,upgrader 
-                    ,builder 
-                    ,repairer 
-                    ,linker 
-                    ,spawnBuilder 
-                    ,otherRoles ) {
-    this.tick = Game.time;
-    this.controllerProgress = controllerProgress;
-    this.energyAvailable = energyAvailable;
-    this.sourceEnergy  = sourceEnergy;
-    this.minerals = minerals;
-    this.creeps = creeps;
-    this.harvester = harvester;
-    this.upgrader = upgrader;
-    this.builder = builder;
-    this.repairer = repairer;
-    this.linker = linker;
-    this.spawnBuilder = spawnBuilder;
-    this.otherRoles = otherRoles;
-}
+var updateThisTicksStats = function (room) {
+    //console.log(room,"strange error");
+    var index = room.memory.stats["ticks"].length-1;
+    room.memory.stats["ticks"][index].controllerProgress = room.controller.progress;
+    room.memory.stats["ticks"][index].energyCapacityAvailable = room.energyCapacityAvailable;
+    room.memory.stats["ticks"][index].energyAvailable = room.energyAvailable;
 
-function RoomStatsTick (room) {
-    this.tick = Game.time;
-    this.range = 1;
-    this.controllerProgress = room.controller.progress;
-    this.energyAvailable = room.energyAvailable;
-    //console.log(room, "stats",stats,"json",JSON.stringify(stats));
-    var sourceEnergy = 0;
-    var sources = room.find(FIND_SOURCES)
-    for (var i in sources) {
-        sourceEnergy += sources[i].energy;
+    var energyRemaining = 0;
+    var sources = room.find(FIND_SOURCES);
+    for (var source in sources) {
+        energyRemaining = energyRemaining +  sources[source].energy;
     }
-    this.sourceEnergy = sourceEnergy;
+    room.memory.stats["ticks"][index].energyHarvested = room.memory.stats.sourceEnergyLastTick - energyRemaining;
+
     var countMinerals = 0;
-    var minerals = room.find(FIND_MINERALS)
-    for (var i in minerals) {
-        countMinerals += minerals[i].energy;
+    var minerals = room.find(FIND_MINERALS);
+    for (var mineral in minerals) {
+        countMinerals = countMinerals + minerals[mineral].mineralAmount;
     }
-    stats.minerals = countMinerals;
+    room.memory.stats["ticks"][index].mineralsHarvested = room.memory.stats.mineralsLastTick - countMinerals;
+
 
     var creeps = room.find(FIND_CREEPS);
-    this.creeps = creeps.length;
-/*
-    var harvester = 0;
-    var upgrader = 0;
-    var builder = 0;
-    var repairer = 0;
-    var linker = 0;
-    var miner= 0;
-    var spawnBuilder = 0;
-    var otherRoles = 0;
-*/
-    var tharvester = 0;
-    var tupgrader = 0;
-    var tbuilder = 0;
-    var trepairer = 0;
-    var tlinker = 0;
-    var tminer= 0;
-    var tspawnBuilder = 0;
-    var totherRoles = 0;
+    room.memory.stats["ticks"][index].creeps = creeps.length;
+
+    var _harvester = 0;
+    var _upgrader = 0;
+    var _builder = 0;
+    var _repairer = 0;
+    var _linker = 0;
+    var _miner= 0;
+    var _spawnBuilder = 0;
+    var _otherRoles = 0;
 
     for (var creep in creeps)
     {
-        switch (creeps[creep].memory.role) {
-            case"harvester":
-                tharvester =  tharvester  + 1; break;
-            case "upgrader":
-                tupgrader++; break;
-            case "builder":
-                tbuilder = tbuilder  + 1; break;
-            case "repairer":
-                trepairer = trepairer  + 1; break;
-            case "linker":
-                tlinker = tlinker  + 1; break;
-            case "miner":
-                tminer = tminer  + 1; break;
-            case "spawn.builder":
-                tspawnBuilder = tspawnBuilder  + 1; break;
-            default:
-                totherRoles++;
+        if (creeps[creep].memory === undefined)
+            console.log(creep, "stats",creeps[creep]);
+        if (creeps[creep].memory !== undefined)
+        {
+            switch (creeps[creep].memory.role) {
+                case"harvester":
+                    _harvester++; break;
+                case "upgrader":
+                    _upgrader++; break;
+                case "builder":
+                    _builder++; break;
+                case "repairer":
+                    _repairer++; break;
+                case "linker":
+                    _linker++; break;
+                case "miner":
+                    _miner ++; break;
+                case "spawn.builder":
+                    _spawnBuilder = _spawnBuilder  + 1; break;
+                default:
+                    _otherRoles++;
+            }
         }
-    }
-/*
-    this.harvester = 0;
-    this.upgrader = 0;
-    this.builder = 0;
-    this.repairer = 0;
-    this.linker = 0;
-    this.spawnBuilder = 0;
-    this.spawnBuilder = 0;
-    this.otherRoles = 0;*/
 
-    this.harvester = tharvester;
-    this.upgrader = tupgrader;
-    this.builder = tbuilder;
-    this.repairer = trepairer;
-    this.linker = tlinker;
-    this.spawnBuilder = tspawnBuilder;
-    this.otherRoles = totherRoles;
+    }
+
+    room.memory.stats["ticks"][index].harvester = _harvester;
+    room.memory.stats["ticks"][index].upgrader = _upgrader;
+    room.memory.stats["ticks"][index].builder = _builder;
+    room.memory.stats["ticks"][index].repairer = _repairer;
+    room.memory.stats["ticks"][index].linker = _linker;
+    room.memory.stats["ticks"][index].miner = _miner;
+    room.memory.stats["ticks"][index].spawnBuilder = _spawnBuilder;
+    room.memory.stats["ticks"][index].otherRoles = _otherRoles;
+}
+
+
+function RoomStatsTick (room) {
+    this.tick = Game.time;
+    this.time = new Date();
+    this.range = 1;
+    this.creepActions  = stats.EMPTY_CREEP_ACTIONS;
 }
 
 function SumStatsArray (room, name) {
-  //  if (!statsArray || statsArray.length == 0)
-  //      return;
- //   if (statsArray[0] == null) {return;}
-  // console.log(room,name,"room.memory.stats[name]", JSON.stringify( room.memory.stats[name]));
- //   return;
-    console.log(name,"test Sunstatearra", room.memory.stats["ticks"][0]);
-    this.tick = room.memory.stats[name][0].tick;
-  //var room = Game.rooms["W26S21"];
+    var lastEntry = room.memory.stats[name].length - 1;
 
-    this.range = room.memory.stats[name][0].range *  room.memory.stats[name][0].length;
-    _controllerProgress = 0;
-    _energyAvailable = 0;
-    _sourceEnergy  = 0;
-    _minerals = 0;
-    _creeps = 0;
-    _harvester = 0;
-    _upgrader = 0;
-    _builder = 0;
-    _repairer = 0;
-    _linker = 0;
-    _miner= 0;
-    _spawnBuilder = 0;
-    _otherRoles = 0;
+    this.tick = room.memory.stats[name][0].tick;
+    this.range = room.memory.stats[name][lastEntry].range *  room.memory.stats[name].length;
+
+    this.controllerProgress = room.memory.stats[name][lastEntry].controllerProgress;
+    this.energyCapacityAvailable  = room.memory.stats[name][lastEntry].energyCapacityAvailable;
+    this.energyAvailable = room.memory.stats[name][lastEntry].energyCapacityAvailable;
+    this.creepActions   = { harvest : 0, build : 0, upgrade : 0, repair : 0, extract : 0 };
+    var _energyHarvested= 0;
+    var _mineralsHarvested = 0;
+    var _creeps = 0;
+    var _harvester = 0;
+    var _upgrader = 0;
+    var _builder = 0;
+    var _repairer = 0;
+    var _linker = 0;
+    var _miner= 0;
+    var _spawnBuilder = 0;
+    var _otherRoles = 0;
+    
+    var _harvest = 0;
+    var _buld = 0;
+    var _upgrade = 0;
+    var _repair = 0;
+    var _extract= 0;
 
     for (var stats in room.memory.stats[name]) {
-        _controllerProgress = _controllerProgress + room.memory.stats[name][stats].controllerProgress;
-        _energyAvailable = _energyAvailable + room.memory.stats[name][stats].energyAvailable;
-        _sourceEnergy  = _sourceEnergy + room.memory.stats[name][stats].sourceEnergy;
-        _minerals = _minerals + room.memory.stats[name][stats].minerals;
+        _energyHarvested  = _energyHarvested + room.memory.stats[name][stats].energyHarvested;
+        _mineralsHarvested = _mineralsHarvested + room.memory.stats[name][stats].mineralsHarvested;
         _creeps = _creeps + room.memory.stats[name][stats].creeps;
         _harvester = _harvester + room.memory.stats[name][stats].harvester;
         _upgrader = _upgrader + room.memory.stats[name][stats].upgrader;
         _builder = _builder + room.memory.stats[name][stats].builder;
         _repairer = _repairer + room.memory.stats[name][stats].repairer;
         _linker = _linker + room.memory.stats[name][stats].linker;
+        _miner = _miner + room.memory.stats[name][stats].miner;
         _spawnBuilder = _spawnBuilder + room.memory.stats[name][stats].spawnBuilder;
         _otherRoles = _otherRoles + room.memory.stats[name][stats].otherRoles;
+        if (undefined !== room.memory.stats[name][stats].creepActions)
+        {
+            _harvest = _harvest + room.memory.stats[name][stats].creepActions["harvest"];
+            _buld = _buld + room.memory.stats[name][stats].creepActions["build"];
+            _upgrade = _upgrade + room.memory.stats[name][stats].creepActions["upgrade"];
+            _repair = _repair + room.memory.stats[name][stats].creepActions["repair"];
+            _extract= _extract + room.memory.stats[name][stats].creepActions["extract"];
+        }
     }
 
-    this.controllerProgress = _controllerProgress;
-    this.energyAvailable = _energyAvailable;
-    this.sourceEnergy  = _sourceEnergy;
-    this.minerals = _minerals;
+    this.energyHarvested  = _energyHarvested;
+    this.mineralsHarvested = _mineralsHarvested;
     this.creeps = _creeps;
     this.harvester = _harvester;
     this.upgrader = _upgrader;
@@ -170,62 +149,100 @@ function SumStatsArray (room, name) {
     this.linker = _linker;
     this.spawnBuilder = _spawnBuilder;
     this.otherRoles = _otherRoles;
-    console.log("tenTicksStats constuctor end of",this.upgrader );
-}
-/*
-function SunStatsArray (statsArray) {
-    if (!statsArray || statsArray.length == 0)
-        return;
-    if (statsArray[0] == null) {return;}
-    this.tick = statsArray[0].tick;
-    this.range = statsArray[0].range *  statsArray.length;
-    this.controllerProgress = 0;
-    this.energyAvailable = 0;
-    this.sourceEnergy  = 0;
-    this.minerals = 0;
-    this.creeps = 0;
 
-    for (var stats in statsArray) {
-        this.controllerProgress = this.controllerProgress + statsArray[stats].controllerProgress;
-        this.energyAvailable = this.energyAvailable + statsArray[stats].energyAvailable;
-        this.sourceEnergy  = this.sourceEnergy + statsArray[stats].sourceEnergy;
-        this.minerals = this.minerals + statsArray[stats].minerals;
-        this.creeps = this.creeps + statsArray[stats].creeps;
-        this.harvester = this.harvester + statsArray[stats].harvester;
-        this.upgrader = this.upgrader + statsArray[stats].upgrader;
-        this.builder = this.builder + statsArray[stats].builder;
-        this.repairer = this.repairer + statsArray[stats].repairer;
-        this.linker = this.linker + statsArray[stats].linker;
-        this.spawnBuilder = this.spawnBuilder + statsArray[stats].spawnBuilder;
-        this.otherRoles = this.otherRoles + statsArray[stats].otherRoles;
-    }
+    this.creepActions["harvest"] = _harvest;
+    this.creepActions["build"] = _buld;
+    this.creepActions["upgrade"] = _upgrade;
+    this.creepActions["repair"] = _repair;
+    this.creepActions["extract"] = _extract;
 }
-*/
 
 var stats = {
 
     NOTIFYPERIOD: 120,
-    on: false,
+    on: true,
+    Act: {
+        HARVEST: "harvest",
+        BUILD: "build",
+        UPGRADE: "upgrade",
+        REPAIR: "repair",
+        EXTRACT: "extract",
+        TRANSFER: "transfer"
+    },
+    EMPTY_STATS: { ticks : [], tenTicks : [], hundredTicks : [], generations : [] },
+    EMPTY_CREEP_ACTIONS: { harvest : 0, build : 0, upgrade : 0, repair : 0, extract : 0 },
 
-    updateStats: function (room) {
-        //room.memory.stats = { ticks : [], tenTicks : [], hundredTicks : [], generations : [] };
-        if (undefined === room.memory.stats) {
-            room.memory.stats = { ticks : [], tenTicks : [], hundredTicks : [], generations : [] };
+    initilise: function(room) {
+        if (undefined === room) {
+            return false;
+        } else if (undefined === room.controller) {
+            return false;
+        } else if ( !room.controller.my ){
+            return false;
+        } else {
+            room.memory.stats = this.EMPTY_STATS;
+          //  console.log(room,"in intilise mem",JSON.stringify( room.memory.stats));
+            this.rememberThisTicksResouceCounts(room);
+
+            return true;
         }
-        var thisTicksStats = new RoomStatsTick(room);
-        room.memory.stats["ticks"].push(thisTicksStats);
-        if ( (room.memory.stats["ticks"]).length >= 5) {
+    },
+
+    initiliseTick: function() {
+        for (var name in Game.rooms) {
+            var room = Game.rooms[name];
+           // room.memory.stats = undefined;
+            if (undefined === room.memory.stats
+                || {} === room.memory.stats
+                || !room.memory.stats ) {
+              //  console.log("in || {} === room.memory.stats ;")
+                if (!this.initilise(room)) {
+                    continue;
+                }
+            }
+            var thisTicksStats = new RoomStatsTick(room);
+         //   console.log(room,"stats mem",JSON.stringify( room.memory.stats));
+            var index = room.memory.stats["ticks"].push(thisTicksStats) -1;
+        }
+    },
+
+    rememberThisTicksResouceCounts: function(room) {
+        var energyAvalibale = 0;
+        var sources = room.find(FIND_SOURCES);
+        for (var source in sources) {
+            if (1 == sources[source].ticksToRegeneration) {
+                energyAvalibale = energyAvalibale + sources[source].energyCapacity
+            } else {
+                energyAvalibale = energyAvalibale + sources[source].energy;
+            }
+        }
+        room.memory.stats.sourceEnergyLastTick = energyAvalibale;
+
+        var countMinerals = 0;
+        var minerals = room.find(FIND_MINERALS)
+        for (var mineral in minerals) {
+            if (1 == minerals[mineral].ticksToRegeneration) {
+                countMinerals = undefined;
+            } else {
+                countMinerals = countMinerals + minerals[mineral].mineralAmount;
+            }
+        }
+        room.memory.stats.mineralsLastTick = countMinerals;
+    },
+
+    updateAggregateStats: function(room)  {
+        if ((room.memory.stats["ticks"]).length >= 10) {
             var tenTicksStats = new SumStatsArray(room, "ticks");
             room.memory.stats["tenTicks"].push(tenTicksStats);
             room.memory.stats["ticks"] = [];
         }
-        if  (room.memory.stats["tenTicks"].length >= 10) {
-            var hundredTicksStats = new SumStatsArray(room,"tenTicks");
+        if (room.memory.stats["tenTicks"].length >= 10) {
+            var hundredTicksStats = new SumStatsArray(room, "tenTicks");
             room.memory.stats["hundredTicks"].push(hundredTicksStats);
             room.memory.stats.tenTicks = [];
         }
-        if  (room.memory.stats.hundredTicks.length >= 15) {
-            var generationStats = new SumStatsArray(room,"hundredTicks");
+        if (room.memory.stats.hundredTicks.length >= 15) {
+            var generationStats = new SumStatsArray(room, "hundredTicks");
             room.memory.stats["generations"].push(generationStats);
             room.memory.stats.hundredTicks = [];
         }
@@ -233,98 +250,111 @@ var stats = {
             room.memory.stats["generations"].shift();
     },
 
-    startTick: function(room) {
-        if (Memory.stats === undefined) {
-            Memory.stats= [];
+    upadateTick: function() {
+        //return;
+        for (var name in Game.rooms) {
+            var room = Game.rooms[name];
+            updateThisTicksStats(room);
+            this.rememberThisTicksResouceCounts(room);
+            this.updateAggregateStats(room);
         }
-        var now = new Date();
-        Memory.stats.push({tick: Game.time, time: now});
+    },
+
+    updateCreepAction: function (room, action, power) {
+        var index = room.memory.stats["ticks"].length-1;
+        room.memory.stats["ticks"][index].creepActions[action] =
+            room.memory.stats["ticks"][index].creepActions[action] + power
     },
 
     build: function (creep,target) {
         var rtv = creep.build(target);
-        if (this.on && OK == rtv) {
-            index = Memory.stats.length -1;
-            if (undefined == Memory.stats[index].buildEnergy) {
-                Memory.stats[index].build = BUILD_POWER;
-            } else {
-                Memory.stats[index].build
-                         = Memory.stats[index].build + BUILD_POWER;
-            }
-        } 
+        if (OK = rtv && this.on)
+            this.updateCreepAction(creep.room, this.Act.BUILD, BUILD_POWER);
         return rtv;
     },
 
     harvest: function(creep, target) {
         var rtv = creep.harvest(target);
-        if (this.on && OK == rtv) {
-            index = Memory.stats.length -1;
-            if (undefined == Memory.stats[index].harvest) {
-                Memory.stats[index].harvest = HARVEST_POWER;
-            } else {
-                Memory.stats[index].harvest
-                         = Memory.stats[index].harvest + HARVEST_POWER;
-            }
-        } 
+        if (OK = rtv && this.on)
+            this.updateCreepAction(creep.room, this.Act.HARVEST, HARVEST_POWER);;
         return rtv;
     },
 
     upgradeController: function(creep, target) {
         var rtv = creep.upgradeController(target);
-        if (this.on && OK == rtv) {
-            index = Memory.stats.length -1;
-            if (undefined == Memory.stats[index].upgradeController) {
-                Memory.stats[index].upgradeController = UPGRADE_CONTROLLER_POWER;
-            } else {
-                Memory.stats[index].upgradeController
-                         = Memory.stats[index].upgradeController + UPGRADE_CONTROLLER_POWER;
-            }
-        }
+        if (OK = rtv && this.on)
+            this.updateCreepAction(creep.room, this.Act.UPGRADE, UPGRADE_CONTROLLER_POWER);;
         return rtv;
     },
 
     repair: function(creep, target) {
         var rtv = creep.repair(target);
-        if (this.on && OK == rtv) {
-            index = Memory.stats.length -1;
-            if (undefined == Memory.stats[index].repair) {
-                Memory.stats[index].repair = REPAIR_POWER;
-            } else {
-                Memory.stats[index].repair
-                         = Memory.stats[index].repair + REPAIR_POWER;
-            }
-        } 
+        if (OK = rtv && this.on)
+            this.updateCreepAction(creep.room, this.Act.REPAIR, 1);
         return rtv;
     },
 
-    endTick: function(room) {
-        index = Memory.stats.length -1;
-        Memory.stats[index].cpuUsed = Game.cpu.getUsed();
-        Memory.stats[index].gclProgress = Game.gcl.progress;
-        Memory.stats[index].controllerProgress = room.controller.progress;
-        Memory.stats[index].energyAvailable = room.energyAvailable;
-
-        var sources = room.find(FIND_SOURCES)
-        if (sources.length >= 1) {
-            Memory.stats[index].source1 = sources[0].energy ;
-            if (sources.length >= 2) {
-                Memory.stats[index].source2 = sources[1].energy ;
-            }  
-        }
-        this.notify(room);
+    transfer: function(creep, target, resourceType, amount) {
+        return creep.transfer(target, resourceType, amount);
     },
 
-    notify: function(room) {
-        var message = JSON.stringify(Memory.stats);
-        console.log("Memory.stats length ", message.length); 
-        if (message.length > 1000) {
-            console.log("PROBLEM STATS TOO LONG!!!!!!!!!!!!!!!!!!!!!!!!!!!! "
-            , message.length);
+    deleteStats: function () {
+        for (var name in Game.rooms) {
+            var room = Game.rooms[name];
+            room.memory.stats.ticks = undefined;
+            room.memory.stats.tenTicks = undefined;
+            room.memory.stats.hundredTicks = undefined;
+            room.memory.stats.generations = undefined;
+            room.memory.stats.sourceEnergyLastTick = undefined;
+            room.memory.stats.mineralsLastTick = undefined;
+            rooom.memory.test = undefined;
+            room.memory.stats = undefined;
         }
-        Game.notify(message, this.NOTIFYPERIOD);    
-        Memory.stats=[];    
-    } 
+    }
+    // stats = require("stats"); stats.deleteStats();
 
-}
+};
+
+
 
 module.exports = stats;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

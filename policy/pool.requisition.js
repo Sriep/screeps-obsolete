@@ -41,17 +41,17 @@ function getNextRequisitionId() {
     return latestId;   
 };
 
-requisition.prototype.paceRequisition = function(order) {
+Requisition.prototype.paceRequisition = function(order) {
     order.tick = Game.tick;
     if (order.isValid())
         requisitions[order.id] = order;
 };
 
-requisition.prototype.isValid = function() {
+Requisition.prototype.isValid = function() {
     return id !== undefined;
 };
 
-requisition.ptototype.createCopy = function(requisition) {
+Requisition.ptototype.createCopy = function(requisition) {
     id = requisition.id;
     requester = requisition.requester;
     creepRequested = requisition.creepRequested;
