@@ -12,6 +12,7 @@
 var gc = require("gc");
 var TaskActions = require("task.actions")
 var tasks = require("tasks");
+var TaskMoveXY = require("task.move.xy")
 
 /**
  * Task move object. Used when we need to find the object to move to.
@@ -19,18 +20,23 @@ var tasks = require("tasks");
  */
 
 function TaskMovePos (RoomPos) {
-    this.task = gc.TASK_MOVE_POS;
+    this.taskType = gc.TASK_MOVE_POS;
+    this.conflicts = gc.MOVE;
     this.roomPos = roomPos;
     this.loop = true;
     this.pickup = true;
 }
 
-TaskMoveFind.prototype.doTask = function(creep, task, actions) {
-    if (actions.isConflict(gc.MOVE))
-        return tasks.Result.Unfinished;
-
+TaskMovePos.prototype.doTask = function(creep, task, actions) {
+    if (task.startRoom === undefined)
+        task.startRoom = creep.room.name;
     if (creep.pos.x == 0 || creep.pos.x == 49 || creep.pos.y == 0 || creep.pos.y == 49  )
     {
+        
+        var roomsToVisit = Game.map.findRoute(creep.room.name, roomPos.room);
+        var pathToExit = creep.pos.findPathTo(roomPos);
+
+
         var nextStep = this.nextStepIntoRoom(creep.pos, creep.memory.targetRoom);
         var path = creep.pos.findPathTo(nextStep);
         if (undefined != path[0]){
@@ -38,8 +44,7 @@ TaskMoveFind.prototype.doTask = function(creep, task, actions) {
             return this.Task.MOVE;
         }
     } else {
-        var path = creep.pos.findPathTo(roomPos);
-        creep.move(path[0].direction);
+        return TaskMoveXY.doTask(creep, task, actions);
     }
 };
 
@@ -66,7 +71,7 @@ var nextStepIntoRoom = function(pos, nextRoom) {
     }
 };
 
-module.exports = TaskMoveFind;
+module.exports = TaskMovePos;
 
 
 

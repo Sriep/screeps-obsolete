@@ -6,7 +6,7 @@
  * @fileOverview Screeps module. Actions a creep has done this tick.
  * @author Piers Shepperson
  */
-
+var gc = require("gc");
 /**
  * Actions a creep has done this tick. Useful for determine what tasks are still
  * possible.
@@ -27,59 +27,63 @@ TaskActions.prototype.Unit = {
 };
 
 TaskActions.prototype.Creep = {
-    Harvest: "harvest",
-    Pickup: "pickup",
-    Dismantle: "dismantle",
-    Build: "build",
-    Drop: "drop",
-    Repair: "repair",
-    Transfer: "transfer",
-    Upgrade: "upgrade",
-    Claim: "claim",
-    Reserve: "reverse",
-    AttackController: "attack.controller",
-    Attack: "attack",
-    RangedAttack: "ranged.attack",
-    RangedHeal: "ranged.heal",
-    Heal: "heal",
-    MassAttack: "mass.attack",
-    Move: "move",
-    Suicide: "suicide"
+    Harvest: gc.HARVEST,
+    Pickup: gc.PICKUP,
+    Dismantle: gc.DISMANTLE,
+    Build: gc.BUILD,
+    Drop: gc.DROP,
+    Repair: gc.REPAIR,
+    Transfer: gc.TRANSFER,
+    Upgrade: gc.UPGRADE_CONTROLLER,
+    Claim: gc.CLAIM,
+    Reserve: gc.REVERSE,
+    AttackController: gc.ATTACK_CONTROLLER,
+    Attack: gc.ATTACK,
+    RangedAttack: gc.RANGED_ATTACK,
+    RangedHeal: gc.RANGED_HEAL,
+    Heal: gc.HEAL,
+    MassAttack: gc.MASS_ATTACK,
+    Move: gc.MOVE,
+    Suicide: gc.SUICIDE
 };
 
-TaskActions.prototype.isConflict =  function(newAction) {
-    if (this.actions.has(newAction))
+TaskActions.prototype.isConflict =  function(prevActions, nextAction ) {
+   // console.log("TaknAcions conflict does", JSON.stringify(prevActions) ,"conflict with",nextAction);
+    if (prevActions.actions.has(nextAction))
         return true;
-    if (newAction == this.Creep.Harvest)
-        return this.actions.has(this.Creep.Attack) ||  this.actions.has(this.Creep.Build)
-                || this.actions.has(this.Creep.Repair) || this.actions.has(this.Creep.RangedHeal)
-                || this.actions.has(this.Creep.Heal);
-    if (newAction == this.Creep.Attack)
-        return this.actions.has(this.Creep.Build) || this.actions.has(this.Creep.Repair)
-            || this.actions.has(this.Creep.RangedHeal)  || this.actions.has(this.Creep.Heal);
-    if (newAction == this.Creep.Build)
-        return  this.actions.has(this.Creep.Repair) || this.actions.has(this.Creep.RangedHeal)
-            || this.actions.has(this.Creep.Heal);
-    if (newAction == this.Creep.Repair)
-        return   this.actions.has(this.Creep.RangedHeal) || this.actions.has(this.Creep.Heal);
-    if (newAction == this.Creep.Repair)
-        return  this.actions.has(this.Creep.Heal);
+    if (nextAction == this.Creep.Harvest)
+        return prevActions.actions.has(this.Creep.Attack) ||  prevActions.actions.has(this.Creep.Build)
+                || prevActions.actions.has(this.Creep.Repair) || prevActions.actions.has(this.Creep.RangedHeal)
+                || prevActions.actions.has(this.Creep.Heal);
+    if (nextAction == this.Creep.Attack)
+        return prevActions.actions.has(this.Creep.Build) || prevActions.actions.has(this.Creep.Repair)
+            || prevActions.actions.has(this.Creep.RangedHeal)  || prevActions.actions.has(this.Creep.Heal);
+    if (nextAction == this.Creep.Build)
+        return  prevActions.actions.has(this.Creep.Repair) || prevActions.actions.has(this.Creep.RangedHeal)
+            || prevActions.actions.has(this.Creep.Heal);
+    if (nextAction == this.Creep.Repair)
+        return   prevActions.actions.has(this.Creep.RangedHeal) || prevActions.actions.has(this.Creep.Heal);
+    if (nextAction == this.Creep.RangedHeal)
+        return  prevActions.actions.has(this.Creep.Heal);
 
-    if (newAction == this.Creep.RangedAttack)
-        return this.actions.has(this.Creep.MassAttack) || this.actions.has(this.Creep.Build)
-            || this.actions.has(this.Creep.Repair)  || this.actions.has(this.Creep.RangedHeal);
-    if (newAction == this.Creep.MassAttack)
-        return  this.actions.has(this.Creep.Repair) || this.actions.has(this.Creep.Build)
-            || this.actions.has(this.Creep.RangedHeal);
-    if (newAction == this.Creep.Build)
-        return   this.actions.has(this.Creep.Repair) || this.actions.has(this.Creep.RangedHeal);
-    if (newAction == this.Creep.Repair)
-        return  this.actions.has(this.Creep.RangedHeal);
-    };
-
-TaskActions.prototype.done = function(action) {
-    return this.actions.add(action);
+    if (nextAction == this.Creep.RangedAttack)
+        return prevActions.actions.has(this.Creep.MassAttack) || prevActions.actions.has(this.Creep.Build)
+            || prevActions.actions.has(this.Creep.Repair)  || prevActions.actions.has(this.Creep.RangedHeal);
+    if (nextAction == this.Creep.MassAttack)
+        return  prevActions.actions.has(this.Creep.Repair) || prevActions.actions.has(this.Creep.Build)
+            || prevActions.actions.has(this.Creep.RangedHeal);
+    if (nextAction == this.Creep.Build)
+        return   prevActions.actions.has(this.Creep.Repair) || prevActions.actions.has(this.Creep.RangedHeal);
+    if (nextAction == this.Creep.Repair)
+        return  prevActions.actions.has(this.Creep.RangedHeal);
 };
+/*
+TaskActions.prototype.done = function(prevActios, newAction) {
+    console.log("TaknAcions is deond bfore", JSON.stringify(newAction));
+    var rtv = prevActios.actions.add(newAction);
+    console.log("TaknAcions is done after", JSON.stringify(newAction));
+    return rtv;
+};*/
 
 module.exports = TaskActions;
 /**

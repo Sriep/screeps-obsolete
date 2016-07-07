@@ -46,7 +46,7 @@ var updateThisTicksStats = function (room) {
     for (var creep in creeps)
     {
         if (creeps[creep].memory === undefined)
-            console.log(creep, "stats",creeps[creep]);
+        //    console.log(creep, "stats",creeps[creep]);
         if (creeps[creep].memory !== undefined)
         {
             switch (creeps[creep].memory.role) {
@@ -246,7 +246,7 @@ var stats = {
             room.memory.stats["generations"].push(generationStats);
             room.memory.stats.hundredTicks = [];
         }
-        if (room.memory.stats["generations"].length > 100)
+        if (room.memory.stats["generations"].length > 40)
             room.memory.stats["generations"].shift();
     },
 
@@ -278,6 +278,11 @@ var stats = {
         if (OK = rtv && this.on)
             this.updateCreepAction(creep.room, this.Act.HARVEST, HARVEST_POWER);;
         return rtv;
+    },
+
+    upgrade: function(creep, target) {
+        "use strict";
+        this.upgradeController(creep,target);
     },
 
     upgradeController: function(creep, target) {

@@ -16,7 +16,8 @@ var stats = require("stats");
  */
 
 function TaskOffload (offloadMethod, resource,  amount) {
-    this.task = gc.OFFLOAD;
+    this.taskType = gc.TASK_OFFLOAD;
+    this.conflicts = offloadMethod;
     this.offloadMethod = offloadMethod;
     if (offloadMethod == TaskOffload.Build
         || offloadMethod == TaskOffload.Repair
@@ -41,42 +42,89 @@ TaskOffload.prototype.offloadMethod = {
 };
 
 TaskOffload.prototype.doTask = function(creep, task, actions) {
-    console.log(creep,"In TaskOffload");
     var tasks = require("tasks");
-    if (actions.isConflict(task.offloadMethod))
-        return tasks.Result.Unfinished;
-    if (creep.carry[task.resource] == 0)
+    if (creep.carry[task.resource] == 0) {
+        console.log("tried Offloading witih no enrgy");
+        tasks.setTargetId(creep, undefined);
         return tasks.Result.Finished;
-    var target =  Game.getObjectById(tasks.getTargetId(creep));
+    }
+
+    var target = Game.getObjectById(tasks.getTargetId(creep));
+    if (!target) {
+        console.log(creep,"Offload, No target Id found");
+        tasks.setTargetId(creep, undefined);
+        if (creep.carry.energy == 0)
+            return gc.RESULT_FINISHED;
+        else {
+            switch (task.offloadMethod) {
+                case gc.BUILD:
+                case gc.REPAIR:
+                case gc.TRANSFER:
+                //    console.log(creep, "rolllback first switch");
+                    creep.say("no target");
+                    return gc.RESULT_ROLLBACK;
+                case gc.UPGRADE_CONTROLLER:
+                case gc.DROP:
+                default:
+                    return gc.RESULT_FINISHED;
+            }
+        }
+    }
+
     switch ( stats[task.offloadMethod](creep, target, task.resource, task.amount)) {
         case OK:
-            actions.done(taskAcations.Creep[task.offloadMethod]);
             if (creep.carry.energy == 0
-                || task.offlaodType == TaskOfflaod.Drop
-                || task.offlaodType == TaskOfflaod.Transfer ) {
-                return Task.Result.Finished;
+                || task.offlaodType == gc.DROP
+                || task.offlaodType == gc.TRANSFER ) {
+                console.log(creep,"offloaded all energy - FINSIHED");
+                tasks.setTargetId(creep, undefined);
+                return gc.RESULT_FINISHED;
             }
             else {
-                // Check to see if target object still exists, if not we are finished.
-                // For  when building and object changes from construction site to built object.
-                if (null == Game.getObjectById(tasks.getTargetId(creep)))
-                {
-                    return tasks.Result.Finished;
-                } else
-                    return tasks.Result.Unfinished;
+                switch (task.offloadMethod) {
+                    case gc.BUILD:
+                        if (Game.getObjectById(target.id)) {
+                         //   creep.say("build same")
+                            console.log("Build object still three, result unfinished");
+                            creep.say("empty");
+                            return gc.RESULT_UNFINSHED;                          
+                        }
+                    case gc.REPAIR:
+                    case gc.TRANSFER:
+                        tasks.setTargetId(creep, undefined);
+                        creep.say("next target")
+                        console.log("Built object need rollback for nest siet");
+                        return gc.RESULT_ROLLBACK;
+                    case gc.UPGRADE_CONTROLLER:
+                        return gc.RESULT_UNFINSHED;
+                    case gc.DROP:
+                    default:
+                        tasks.setTargetId(creep, undefined);
+                        return gc.RESULT_FINISHED;
+                }
+            }
+            break;
+        case ERR_FULL:
+            tasks.setTargetId(creep, undefined);
+            if (creep.carry.energy == 0)     {
+                console.log(creep,"offloaded all energy - FINSIHED");
+                return gc.RESULT_FINISHED;
+            } else {
+                creep.say("full")
+                console.log("transfer full go somewher else");
+                return gc.RESULT_ROLLBACK;
             }
         case ERR_NOT_IN_RANGE:
-            task.nextTask = lastTask;
-            return Task.Result.Failed;
         case ERR_NOT_OWNER:
         case ERR_BUSY:
         case ERR_NOT_ENOUGH_RESOURCES:
         case ERR_INVALID_TARGET:
-        case ERR_FULL:
         case ERR_NO_BODYPART:
         case ERR_RCL_NOT_ENOUGH:
         case ERR_INVALID_ARGS:
-            return tasks.Result.Failed;
+            console.log(creep,"Offload, some other error unfinished");
+            tasks.setTargetId(creep, undefined);
+            return gc.RESULT_UNFINSHED;
     }
 };
 

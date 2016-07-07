@@ -22,44 +22,77 @@ var tasks = {
     },
 
     Result: {
-        Finished: "finished",
-        Unfinished: "unfinished",
-        Failed: "failed"
+        Finished: gc.RESULT_FINISHED,
+        Unfinished: gc.RESULT_UNFINSHED,
+        Failed: gc.RESULT_FAILED,
+        Rollback: gc.RESULT_ROLLBACK
     },
+    
+    MAX_TASK_ACTIONS: 5,
     
     
     doTasks: function(creep) {
         var taskList = creep.memory.tasks.tasklist;
         result = this.Result.Finished;
-        var actions = new TaskActions(gc.CREEP);
-        while (result == this.Result.Finished || result == this.Result.Failed  || taskList.length == 0) {
+        var doneActions = new TaskActions(gc.CREEP);
+        var actionCount = 0;
+
+        while ((result == this.Result.Finished || result == this.Result.Failed  || result == this.Result.Rollback)
+                            && taskList.length > 0 && actionCount++ < this.MAX_TASK_ACTIONS) {
 
             var task = taskList[0];
-            var moduleName = "task." + task.task;
-            console.log(creep," module", taskModule, moduleName,"and task i2", JSON.stringify(task));
+            var moduleName = "task." + task.taskType;
             var taskModule = require(moduleName);
-         //   );
-            var result = taskModule.prototype.doTask(creep, task, actions);
-            if (result == this.Result.Finished || result == this.Result.Failed) {
-                if (taskList.length > 1) {
-                    taskList[1].lastTask = task;
+            if (task.pickup) {
+                this.pickUpLooseEnergy(creep);
+                doneActions.actions.add(gc.PICKUP);
+            }
+         //   console.log(creep ,"about to do task", task.taskType
+         //       ,"actions", JSON.stringify(doneActions.actions),"conflicts", task.conflicts);
+            
+            var result;
+            if (!TaskActions.prototype.isConflict(doneActions, task.conflicts)) {
+                result = taskModule.prototype.doTask(creep, task, doneActions);
+                console.log(creep, "done", task.taskType,"Task, return", result);
+                //creep.say(task.conflicts);
+                if (this.Result.Finished == result) {
+                    doneActions.actions.add(task.conflicts);
+                   // console.log(creep, "after is move in",doneActions.actions.has(gc.MOVE),
+                   //     "is build in",doneActions.actions.has(gc.BUILD),
+                   // "is PICKUP IN",doneActions.actions.has(gc.PICKUP),
+                   // "is harvest iin", doneActions.actions.has(gc.HARVEST),
+                   // "is repaier in",  doneActions.actions.has(gc.REPAIR));
                 }
-                if (task.nextTask) {
-                    taskList.unshift(task.nextTask);
-                } else {
-                    var doneTask = taskList.shift();
-                    if (task.loop) {
-                        taskList.push(doneTask);
-                    }
+            } else {
+                //console.log(creep,"conflict found",task.conflicts);
+                result = this.Result.Unfinished;
+            }
+            if (this.Result.Rollback == result && task.loop) {
+                if (2 <= taskList.length) {
+                    var topTask = taskList.pop();
+                    topTask.lastTask = task;
+                    console.log(creep,"rollback after",task.taskType,"got",topTask.taskType);
+                    taskList.unshift(topTask);
+                }
+            }  else  if (result == this.Result.Finished || result == this.Result.Failed) {
+              //  if (taskList.length > 1) {
+              //      taskList[1].lastTask = task;
+             //   }
+                var doneTask = taskList.shift();
+                if (task.loop) {
+                    taskList.push(doneTask);
                 }
             }
+            //console.log("end while result", result, "len", taskList.length, "actionCount", actionCount);
+           // return;
         } //while
-        
+
         if (result == this.Result.Unfinished) {
 
         } else if (0 == taskList.length) {
             emptyTaskList(creep);
         }
+       // console.log(creep,"finsihed doTasks");
     },
     
     showTasks: function (creep) {
@@ -69,8 +102,13 @@ var tasks = {
         }
     },
 
-        
 
+    pickUpLooseEnergy: function(creep){
+        var target = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY);
+        if(target) {
+            creep.pickup(target)
+        }
+    },
     
     unshiftTask: function (creep,task) {
         creep.memory.tasks.tasklist.unshift(task);
@@ -81,7 +119,7 @@ var tasks = {
     },
     
     setTargetId: function (creep, targetId) {
-        //console.log("in settarget id,", creep, targetId)
+       // console.log("Changed target id from", creep.memory.tasks.targetId, "to", targetId);
         creep.memory.tasks.targetId = targetId;
     },
 
