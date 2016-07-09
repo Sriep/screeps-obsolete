@@ -3,11 +3,11 @@
  * functions for handling statistics. 
  * @author Piers Shepperson
  */
-
 /**
  * Abstract base object containing data and functions for handling statistics. 
  * @module raceBase
  */
+"use strict";
 
 var updateThisTicksStats = function (room) {
     //console.log(room,"strange error");
@@ -110,6 +110,7 @@ function SumStatsArray (room, name) {
     var _miner= 0;
     var _spawnBuilder = 0;
     var _otherRoles = 0;
+    var _creepProduction = 0;
     
     var _harvest = 0;
     var _buld = 0;
@@ -129,6 +130,8 @@ function SumStatsArray (room, name) {
         _miner = _miner + room.memory.stats[name][stats].miner;
         _spawnBuilder = _spawnBuilder + room.memory.stats[name][stats].spawnBuilder;
         _otherRoles = _otherRoles + room.memory.stats[name][stats].otherRoles;
+        _creepProduction = _creepProduction + room.memory.stats[name][stats].creepProduction;
+
         if (undefined !== room.memory.stats[name][stats].creepActions)
         {
             _harvest = _harvest + room.memory.stats[name][stats].creepActions["harvest"];
@@ -149,6 +152,7 @@ function SumStatsArray (room, name) {
     this.linker = _linker;
     this.spawnBuilder = _spawnBuilder;
     this.otherRoles = _otherRoles;
+    this.creepProduction = _creepProduction;
 
     this.creepActions["harvest"] = _harvest;
     this.creepActions["build"] = _buld;
@@ -159,6 +163,11 @@ function SumStatsArray (room, name) {
 
 var stats = {
 
+
+    NUM_GENERATIONS_TO_STORE: 50,
+    TICKS_PER_TENTICKS: 10,
+    TENTICKS_PER_HUNDREDTICKS: 10,
+    HUNDREDTICKS_PER_GENERATION: 15,
     NOTIFYPERIOD: 120,
     on: true,
     Act: {
@@ -174,16 +183,17 @@ var stats = {
 
     initilise: function(room) {
         if (undefined === room) {
+            console.log("Initilising stats: room undefiend");
             return false;
         } else if (undefined === room.controller) {
+            console.log("Initilising stats:",room,"does not have a contoller.");
             return false;
         } else if ( !room.controller.my ){
+            console.log("Initilising stats:",room,"does  not belong to me.");
             return false;
         } else {
             room.memory.stats = this.EMPTY_STATS;
-          //  console.log(room,"in intilise mem",JSON.stringify( room.memory.stats));
             this.rememberThisTicksResouceCounts(room);
-
             return true;
         }
     },
@@ -192,10 +202,11 @@ var stats = {
         for (var name in Game.rooms) {
             var room = Game.rooms[name];
            // room.memory.stats = undefined;
+           // console.log("InicilisingStatis", room.memory.stats);
             if (undefined === room.memory.stats
                 || {} === room.memory.stats
                 || !room.memory.stats ) {
-              //  console.log("in || {} === room.memory.stats ;")
+                console.log("About to initialise stats for ",room);
                 if (!this.initilise(room)) {
                     continue;
                 }
@@ -203,6 +214,16 @@ var stats = {
             var thisTicksStats = new RoomStatsTick(room);
          //   console.log(room,"stats mem",JSON.stringify( room.memory.stats));
             var index = room.memory.stats["ticks"].push(thisTicksStats) -1;
+        }
+    },
+
+    upadateTick: function() {
+        //return;
+        for (var name in Game.rooms) {
+            var room = Game.rooms[name];
+            updateThisTicksStats(room);
+            this.rememberThisTicksResouceCounts(room);
+            this.updateAggregateStats(room);
         }
     },
 
@@ -231,33 +252,23 @@ var stats = {
     },
 
     updateAggregateStats: function(room)  {
-        if ((room.memory.stats["ticks"]).length >= 10) {
+        if ((room.memory.stats["ticks"]).length >= this.TICKS_PER_TENTICKS) {
             var tenTicksStats = new SumStatsArray(room, "ticks");
             room.memory.stats["tenTicks"].push(tenTicksStats);
             room.memory.stats["ticks"] = [];
         }
-        if (room.memory.stats["tenTicks"].length >= 10) {
+        if (room.memory.stats["tenTicks"].length >= this.TENTICKS_PER_HUNDREDTICKS) {
             var hundredTicksStats = new SumStatsArray(room, "tenTicks");
             room.memory.stats["hundredTicks"].push(hundredTicksStats);
             room.memory.stats.tenTicks = [];
         }
-        if (room.memory.stats.hundredTicks.length >= 15) {
+        if (room.memory.stats.hundredTicks.length >= this.HUNDREDTICKS_PER_GENERATION) {
             var generationStats = new SumStatsArray(room, "hundredTicks");
             room.memory.stats["generations"].push(generationStats);
             room.memory.stats.hundredTicks = [];
         }
-        if (room.memory.stats["generations"].length > 40)
+        if (room.memory.stats["generations"].length > this.NUM_GENERATIONS_TO_STORE)
             room.memory.stats["generations"].shift();
-    },
-
-    upadateTick: function() {
-        //return;
-        for (var name in Game.rooms) {
-            var room = Game.rooms[name];
-            updateThisTicksStats(room);
-            this.rememberThisTicksResouceCounts(room);
-            this.updateAggregateStats(room);
-        }
     },
 
     updateCreepAction: function (room, action, power) {
@@ -268,14 +279,14 @@ var stats = {
 
     build: function (creep,target) {
         var rtv = creep.build(target);
-        if (OK = rtv && this.on)
+        if (OK == rtv && this.on)
             this.updateCreepAction(creep.room, this.Act.BUILD, BUILD_POWER);
         return rtv;
     },
 
     harvest: function(creep, target) {
         var rtv = creep.harvest(target);
-        if (OK = rtv && this.on)
+        if (OK == rtv && this.on)
             this.updateCreepAction(creep.room, this.Act.HARVEST, HARVEST_POWER);;
         return rtv;
     },
@@ -287,20 +298,37 @@ var stats = {
 
     upgradeController: function(creep, target) {
         var rtv = creep.upgradeController(target);
-        if (OK = rtv && this.on)
+        if (OK == rtv && this.on)
             this.updateCreepAction(creep.room, this.Act.UPGRADE, UPGRADE_CONTROLLER_POWER);;
         return rtv;
     },
 
     repair: function(creep, target) {
         var rtv = creep.repair(target);
-        if (OK = rtv && this.on)
+        if (OK == rtv && this.on)
             this.updateCreepAction(creep.room, this.Act.REPAIR, 1);
         return rtv;
     },
 
     transfer: function(creep, target, resourceType, amount) {
         return creep.transfer(target, resourceType, amount);
+    },
+   // var result = spawn.createCreep(body, undefined, {policyId: policy.id});
+   // if(_.isString(result)) {
+   // raceBase.setRole(Game.creeps[result], race.ROLE_DEFULT);
+   // console.log("New creep produced with name:", result,JSON.stringify(result));
+
+    createCreep: function(spawn, body, name, policy) {
+        var rtv = spawn.createCreep(body, name, {policyId: policy});
+        if (_.isString(rtv) && this.on) {
+            var raceBase = require("race.base");
+            var room = spawn.room;
+            var index = room.memory.stats["ticks"].length-1;
+            var energyThisCreep = raceBase.getEnergyFromBody(body);
+            room.memory.stats["ticks"][index].creepProduction =
+                room.memory.stats["ticks"][index].creepProduction + energyThisCreep;
+        }
+        return rtv;
     },
 
     deleteStats: function () {

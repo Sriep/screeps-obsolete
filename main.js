@@ -19,11 +19,19 @@ profiler.enable();
 module.exports.loop = function () {
     profiler.wrap(function() {
         PathFinder.use(true);
-        ayrtepPad.top();
+        try {
+            ayrtepPad.top();
+        }
+        catch(exp) {
+            conole.log("ops",exp);
+        }
+        
         freememory.freeCreeps();
         policy.enactPolicies();
         raceBase.moveCreeps();
+
         ayrtepPad.bottom();
+
 
         console.log("************************ " + Game.time + " *********************************");
     }) // profiler.wrap(function()

@@ -2,12 +2,12 @@
  * @fileOverview Requisition object for using the pool
  * @author Piers Shepperson
  */
-
+var policyThePool = require("policy.the.pool");
+var raceBase = require("raceBase");
 /**
  * Requisition object for using the pool
  * @module policy
  */
-var requisitions = Memory.policies[0].requisitions;
 
 function Requisition (requesterId
                         ,creepBody
@@ -26,7 +26,8 @@ function Requisition (requesterId
     }
     this.id = getNextRequisitionId();
     this.requester = requesterId;
-    this.body = creepBody
+    this.body = creepBody;
+    this.energy = raceBase.getEnergyFromBody(creepBody);
     this.priority = priorityLevel;
     this.location = locationToDeliver;
     this.tick = undefined;
@@ -44,7 +45,7 @@ function getNextRequisitionId() {
 Requisition.prototype.paceRequisition = function(order) {
     order.tick = Game.tick;
     if (order.isValid())
-        requisitions[order.id] = order;
+        policyThePool.getRequisitions()[order.id] = order;
 };
 
 Requisition.prototype.isValid = function() {

@@ -3,7 +3,7 @@
         "allowUnknownTags": true
     },
     "source": {
-        "include": [ "."],
+        "include": [ ".", "./task", "./role", "./race", "./policy"],
         "exclude": [ "Gruntfile.js" ],
         "includePattern": ".+\\.js(doc|x)?$",
         "excludePattern": "(^|\\/|\\\\)_"

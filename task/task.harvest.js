@@ -26,16 +26,20 @@ function TaskHarvest () {
 TaskHarvest.prototype.doTask = function(creep, task, tasksActions) {
     if (creep.carry.energy == creep.carryCapacity)  {
         tasks.setTargetId(creep, undefined);
+        //console.log(creep, "harvet at start RESULT_FINISHED full up")
         return gc.RESULT_FINISHED;
     }
     var source =  Game.getObjectById(tasks.getTargetId(creep));
     if (!source) {
-        console.log(creep,"Trying to harvest with invalid source", source, "id",tasks.getTargetId(creep));
-        if (creep.carry.energy == creep.carryCapacity)
+     //   console.log(creep,"Trying to harvest with invalid source", source, "id",tasks.getTargetId(creep));
+        if (creep.carry.energy == creep.carryCapacity) {
+      //      console.log(creep, "harvet RESULT_FINISHED full up no source");
             return gc.RESULT_FINISHED;
-        else {
-           // task.nextTask = task.lastTask;
-            return gc.RESULT_FAILED;
+        }  else {
+           /// keep trying to get to source
+          //  creep.say("Help source");
+         //   console.log(creep, "harvet RESULT_ROLLBACK no source")
+            return gc.RESULT_ROLLBACK;
         }
     }
 
@@ -44,14 +48,18 @@ TaskHarvest.prototype.doTask = function(creep, task, tasksActions) {
            // tasksActions.done(gc.HARVEST);
             if (creep.carry.energy == creep.carryCapacity) {
                 tasks.setTargetId(creep, undefined);
+            //    console.log(creep, "harvet RESULT_FINISHED ok full up")
                 return gc.RESULT_FINISHED;
-            }  else
-                return gc.RESULT_UNFINSHED;
-
+            }  else {
+             //   console.log(creep, "harvet RESULT_UNFINISHED ok")
+                return gc.RESULT_UNFINISHED;
+            }
         case    ERR_NOT_ENOUGH_RESOURCES:    //	-6	The target source does not contain any harvestable energy.
             if (creep.carry.energy == 0) {
-                return gc.RESULT_UNFINSHED;
+            //    console.log(creep, "harvet RESULT_UNFINISHED not eough resouces")
+                return gc.RESULT_UNFINISHED;
             }  else {
+             //   console.log(creep, "harvet RESULT_FINISHED full up not eough resouces")
                 tasks.setTargetId(creep, undefined);
                 return gc.RESULT_FINISHED;
             }
@@ -65,7 +73,9 @@ TaskHarvest.prototype.doTask = function(creep, task, tasksActions) {
         case    ERR_INVALID_TARGET:         //	-7	The target is not a valid source object.
         case    ERR_NO_BODYPART:	        // -12	There are no WORK body parts in this creep’s body.
                                           //   console.log("failed harvest with some other error");
-            return gc.RESULT_FAILED;
+        default:
+           // console.log("Something wrong harvest error");
+            return gc.RESULT_UNFINISHED;
     }
     console.log("End of taskharves do not sue how got here");
 };

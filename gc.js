@@ -1,4 +1,4 @@
-
+"use strict";
 
 var gc = {
     //Creep Actions
@@ -33,6 +33,7 @@ var gc = {
     ROLE_SPAWN_BUILDER: "spawn.builder",
     ROLE_MINER: "miner",
     ROLE_TRAVELLER: "traveller",
+    ROLE_ENERGY_PORTER: "energy.porter",
     
     //Tasks
     TASK_MOVE_FIND: "move.find",
@@ -40,6 +41,8 @@ var gc = {
     TASK_HARVEST:  "harvest",//this.HARVEST,
     TASK_MOVE_POS: "move.pos",
     TASK_MOVE_XY: "move.xy",
+    TASK_HARVEST_LINK: "harvest.link",
+    TASK_LOADUP: "loadup",
     
     //TaskMoveFind.prototype.FindMethod
     FIND_ID : "find.id",
@@ -59,13 +62,27 @@ var gc = {
     RANGE_BUILD: 3,
     RANGE_REPAIR: 3,
     RANGE_UPGRADE: 3,
-    RANGE_TRANSGER: 1,
+    RANGE_TRANSFER: 1,
     
     //task results
     RESULT_FINISHED: "finished",
-    RESULT_UNFINSHED: "unfinished",
+    RESULT_UNFINISHED: "unfinished",
     RESULT_FAILED: "failed",
-    RESULT_ROLLBACK: "rollback"
+    RESULT_ROLLBACK: "rollback",
+    
+    //policies
+    POLICY_POLICY_THE_POOL: "the.pool",
+    POLICY_PEACE: "peace",
+    POLICY_CONSTRUCTION: "construction",
+    POLICY_DEFEND: "defence",
+    POLICY_RESCUE: "rescue",
+    POLICY_FOREIGN_HARVEST: "foreign.harvest",
+    POLICY_FOREIGN_ROAD: "neutral.road",
+    POLICY_NEUTRAL_ROOM: "neutral.room",
+    POLICY_CLAIM: "claim",
+    POLICY_BUILD_SPAWN: "buildspawn",
+    POLICY_GIFT_WORKERS: "gift.workers",
+    POLICY_MANY2ONE_LINKERS: "setup.linkers"
 
 };
 

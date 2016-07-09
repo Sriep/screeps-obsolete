@@ -10,8 +10,27 @@ var roleBase = require("role.base");
  * related to owned rooms.
  * @module roomOwned
  */
-var roomOwned = {  
-     
+var roomOwned = {
+
+    calaculateSuplly: function (room){
+        // OptimisticSupply = TotalEnergyHarvested * ( 1 - w/a)
+        // a/w = Harvesters / TotalProductionUnits
+        var genStats = room.memory.stats.generations
+        var supply = 0;
+        var lastGen = genStats.length -1;
+        for (var g in genStats) {
+            var TotalEnergyHarvested = genStats[g].energyHarvested;
+            var TotalCreepProduction = genStats[g].creeps;
+            var TotalHarvester = genStats[g].harvester;
+            supply = supply +  TotalEnergyHarvested * (1 - TotalHarvester / TotalCreepProduction);
+            //console.log("Loop",g,"TEH",TotalEnergyHarvested,"TCP",TotalCreepProduction,"TH",TotalHarvester);
+        }
+        supply = supply / lastGen;
+        if (!supply)
+            supply = 0;
+        return supply;
+    },
+
     avDistanceBetween: function (room, obj1, obj2) {
         console.log("In avDistanceBetween");
         var distance = 0;
@@ -98,6 +117,8 @@ var roomOwned = {
                 return this.getBuilderRondTripLength(room, force);
             case roleBase.Type.REPAIRER:
                 return this.getRepairerRondTripLength(room, force);
+            case roleBase.Type.ENERGY_PORTER:
+                return this.getUpgradeRondTripLength(room, force);
         }
     },
     
@@ -167,6 +188,7 @@ var roomOwned = {
         var loadTime = roleBase.LoadTime[role];
         var offloadTime = roleBase.OffloadTime[role];
         var roundTripTime = this.roundTripLength(room, role);
+      //  console.log("loadtime",loadTime,"offloadTime",offloadTime,"roundTripTime",roundTripTime);
         
         var timePerTrip = loadTime + offloadTime + roundTripTime;
         var tripsPerLife = CREEP_LIFE_TIME / timePerTrip;
@@ -249,7 +271,7 @@ var roomOwned = {
         if (room.memory.peaceHavesters === undefined || force == true) {
             workerCost = raceWorker.BLOCKSIZE * workerSize;
             var havestRate = 2 * workerSize;
-            hELT = this.energyLifeTime(room, workerSize, roleBase.Type.HARVESTER);
+            var hELT = this.energyLifeTime(room, workerSize, roleBase.Type.HARVESTER);
             var uELT = this.energyLifeTime(room, workerSize, roleBase.Type.UPGRADER);
             var sELT = this.allSourcsEnergyLT(room, workerSize);
             var wCost = workerCost;

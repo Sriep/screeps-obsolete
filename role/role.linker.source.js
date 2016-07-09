@@ -1,36 +1,24 @@
-
+/**
+ * Created by Piers on 07/07/2016.
+ */
 var gc = require("gc");
-var roleBase = require("role.base");
-var TaskMoveFind = require("task.move.find");
-var TaskHarvest = require("task.harvest");
-var TaskOffload = require("task.offload");
-var _ = require('lodash');
+var TaskMoveXY = require("task.move.find");
+var TaskHarvestLinker = require("task.harvest.linker");
+
 
 var roleLinkerSource = {
 
-    getTaskList: function() {
-        var tasks = [];
-        var moveToSource = new TaskMoveFind(gc.FIND_FUNCTION ,gc.RANGE_HARVEST
-            , "findTargetSource","role.base");
-        var harvest = new TaskHarvest();
-        var moveToSourceContainer = new TaskMoveFind(gc.FIND_FUNCTION,gc.RANGE_TRANSGER
-            , "findTarget","role.harvester");
-        var offload = new TaskOffload(gc.TRANSFER, RESOURCE_ENERGY);
-        moveToSource.loop = true;
-        harvest.loop = true;
-        moveToSourceContainer.loop = true;
-        offload.loop = true;
-        tasks.push(moveToSource);
-        tasks.push(harvest);
-        tasks.push(moveToSourceContainer);
-        tasks.push(offload);
-        return tasks;
+    moveTaskList: function(creep, x,y,sourceId, homeLinkId, targetLinkId) {
+        var taskList = [];
+        var moveToSource = new TaskMoveXY(x,y);
+        var harvestLink = new TaskHarvestLinker(sourceId, homeLinkId, targetLinkId)
+        taskList.push(moveToSource);
+        taskList.push(harvestLink);
+        return taskList;
     },
 
 };
 
-
+//function TaskHarvestLinker (sourceId, homeLinkId, targetLinkId) {
 module.exports = roleLinkerSource;
-/**
- * Created by Piers on 07/07/2016.
- */
+

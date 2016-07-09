@@ -32,10 +32,10 @@ TaskMoveXY.prototype.doTask = function(creep, task, actions) {
                 return gc.RESULT_FINISHED;
             } else {
                 task.loop = true;
-                return gc.RESULT_UNFINSHED;
+                return gc.RESULT_UNFINISHED;
             }
         case ERR_TIRED:             //-11	The fatigue indicator of the creep is non-zero.
-            return gc.RESULT_UNFINSHED;
+            return gc.RESULT_UNFINISHED;
         case ERR_NOT_OWNER:	        //-1	You are not the owner of this creep.
         case ERR_BUSY:	            //-4	The creep is still being spawned.
         case ERR_NO_BODYPART:	    //-12	There are no MOVE body parts in this creep’s body.

@@ -50,12 +50,12 @@ TaskMoveFind.prototype.doTask = function(creep, task, actions) {
         if (tasks.getTargetId(creep)) {
             target = Game.getObjectById(tasks.getTargetId(creep));
         } else {
-            console.log("In move find removing cashed id",tasks.getTargetId(creep))
+        //    console.log("In move find removing cashed id",tasks.getTargetId(creep))
             tasks.setTargetId(creep, undefined);
         }
     }
     if (!target) {
-        console.log(creep,"no target look for one method",task.method);
+  //      console.log(creep,"no target look for one method",task.method);
         switch (task.method) {
             case this.FindMethod.FindId:
                 target = Game.getObjectById(task.findId);
@@ -85,28 +85,34 @@ TaskMoveFind.prototype.doTask = function(creep, task, actions) {
                 console.log(creep,"Invalid find method");
             //Unreachable
         }
-        console.log(creep,"TAskMoveFind do target is", target, "method is", task.method);
+     //   console.log(creep,"TAskMoveFind do target is", target, "method is", task.method);
         if (target)
             tasks.setTargetId(creep, target.id);
     }
+    if (!target) {
+     //   console.log(creep,"find CRESULT_FINISHED ant find target finished")
+        creep.say("No target");
+        return gc.RESULT_FINISHED;
+    }
+    //console.log(creep,"movefind target", target);
 
     var distanceToGo = creep.pos.getRangeTo(target);
     if (distanceToGo <= task.range) {
-        console.log(creep,"before move",task.method," return finsihed")
-        creep.say("there");
+        console.log(creep,"find RESULT_FINISHED before move");
+       // creep.say("there");
         return gc.RESULT_FINISHED;
     }
 
     creep.moveTo(target);
-    var distanceToGo = creep.pos.getRangeTo(target);
+    distanceToGo = creep.pos.getRangeTo(target);
     if (distanceToGo <= task.range) {
-       // console.log(creep,"after move range <= abut to return finished");
-        creep.say("There");
+       // console.log(creep,"find RESULT_FINISHED; after move range <= abut ");
+      //  creep.say("There");
         return gc.RESULT_FINISHED;
     }  else {
-      //  console.log(creep,"after move range <= abut to return unfished");
-        creep.say("Moving");
-        return gc.RESULT_UNFINSHED;
+      // console.log(creep,"find RESULT_UNFINISHED after move range <= abut to");
+      //  creep.say("Moving");
+        return gc.RESULT_UNFINISHED;
     }
 };
 

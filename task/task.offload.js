@@ -44,14 +44,14 @@ TaskOffload.prototype.offloadMethod = {
 TaskOffload.prototype.doTask = function(creep, task, actions) {
     var tasks = require("tasks");
     if (creep.carry[task.resource] == 0) {
-        console.log("tried Offloading witih no enrgy");
+      //  console.log("tried Offloading witih no enrgy");
         tasks.setTargetId(creep, undefined);
         return tasks.Result.Finished;
     }
 
     var target = Game.getObjectById(tasks.getTargetId(creep));
     if (!target) {
-        console.log(creep,"Offload, No target Id found");
+    //    console.log(creep,"Offload, No target Id found");
         tasks.setTargetId(creep, undefined);
         if (creep.carry.energy == 0)
             return gc.RESULT_FINISHED;
@@ -61,7 +61,7 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
                 case gc.REPAIR:
                 case gc.TRANSFER:
                 //    console.log(creep, "rolllback first switch");
-                    creep.say("no target");
+                //    creep.say("no target");
                     return gc.RESULT_ROLLBACK;
                 case gc.UPGRADE_CONTROLLER:
                 case gc.DROP:
@@ -76,7 +76,7 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
             if (creep.carry.energy == 0
                 || task.offlaodType == gc.DROP
                 || task.offlaodType == gc.TRANSFER ) {
-                console.log(creep,"offloaded all energy - FINSIHED");
+         //       console.log(creep,"offloaded all energy - FINSIHED");
                 tasks.setTargetId(creep, undefined);
                 return gc.RESULT_FINISHED;
             }
@@ -85,18 +85,18 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
                     case gc.BUILD:
                         if (Game.getObjectById(target.id)) {
                          //   creep.say("build same")
-                            console.log("Build object still three, result unfinished");
-                            creep.say("empty");
-                            return gc.RESULT_UNFINSHED;                          
+                         //   console.log("Build object still three, result unfinished");
+                          //  creep.say("empty");
+                            return gc.RESULT_UNFINISHED;                          
                         }
                     case gc.REPAIR:
                     case gc.TRANSFER:
                         tasks.setTargetId(creep, undefined);
-                        creep.say("next target")
-                        console.log("Built object need rollback for nest siet");
+                      //  creep.say("next target")
+                      ///  console.log("Built object need rollback for nest siet");
                         return gc.RESULT_ROLLBACK;
                     case gc.UPGRADE_CONTROLLER:
-                        return gc.RESULT_UNFINSHED;
+                        return gc.RESULT_UNFINISHED;
                     case gc.DROP:
                     default:
                         tasks.setTargetId(creep, undefined);
@@ -107,11 +107,11 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
         case ERR_FULL:
             tasks.setTargetId(creep, undefined);
             if (creep.carry.energy == 0)     {
-                console.log(creep,"offloaded all energy - FINSIHED");
+            //    console.log(creep,"offloaded all energy - FINSIHED");
                 return gc.RESULT_FINISHED;
             } else {
-                creep.say("full")
-                console.log("transfer full go somewher else");
+            //    creep.say("full")
+            //    console.log("transfer full go somewher else");
                 return gc.RESULT_ROLLBACK;
             }
         case ERR_NOT_IN_RANGE:
@@ -122,9 +122,9 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
         case ERR_NO_BODYPART:
         case ERR_RCL_NOT_ENOUGH:
         case ERR_INVALID_ARGS:
-            console.log(creep,"Offload, some other error unfinished");
+         //   console.log(creep,"Offload, some other error unfinished");
             tasks.setTargetId(creep, undefined);
-            return gc.RESULT_UNFINSHED;
+            return gc.RESULT_UNFINISHED;
     }
 };
 
