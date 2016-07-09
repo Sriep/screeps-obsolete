@@ -325,8 +325,10 @@ var stats = {
             var room = spawn.room;
             var index = room.memory.stats["ticks"].length-1;
             var energyThisCreep = raceBase.getEnergyFromBody(body);
-            room.memory.stats["ticks"][index].creepProduction =
-                room.memory.stats["ticks"][index].creepProduction + energyThisCreep;
+            if (undefined !== room.memory.stats["ticks"][index]) {
+                room.memory.stats["ticks"][index].creepProduction =
+                    room.memory.stats["ticks"][index].creepProduction + energyThisCreep;
+            }
         }
         return rtv;
     },

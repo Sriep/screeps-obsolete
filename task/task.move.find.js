@@ -79,7 +79,7 @@ TaskMoveFind.prototype.doTask = function(creep, task, actions) {
             case this.FindMethod.FindFunction:
                 var module = require(task.findModule);
                 target = module[task.findFunction](creep);
-                console.log(creep,"find function returned",target);
+               // console.log(creep,"find function returned",target);
                 break;
             default:
                 console.log(creep,"Invalid find method");
@@ -98,7 +98,7 @@ TaskMoveFind.prototype.doTask = function(creep, task, actions) {
 
     var distanceToGo = creep.pos.getRangeTo(target);
     if (distanceToGo <= task.range) {
-        console.log(creep,"find RESULT_FINISHED before move");
+   //     console.log(creep,"find RESULT_FINISHED before move");
        // creep.say("there");
         return gc.RESULT_FINISHED;
     }

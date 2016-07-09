@@ -40,7 +40,7 @@ function getNextRequisitionId() {
     var latestId = Memory.nextRequisitionId;
     Memory.nextRequisitionId = Memory.nextRequisitionId +1;
     return latestId;   
-};
+}
 
 Requisition.prototype.paceRequisition = function(order) {
     order.tick = Game.tick;

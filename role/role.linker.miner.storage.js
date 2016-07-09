@@ -1,6 +1,6 @@
 
 var gc = require("gc");
-var TaskMoveXY = require("task.move.find");
+var TaskMoveXY = require("task.move.xy");
 var TaskStorageLinkerMiner = require("task.storage,linker.miner");
  
 
@@ -10,6 +10,7 @@ var roleLinkerMinerStorage = {
         var taskList = [];
         var moveToPosition = new TaskMoveXY(x,y);
         var linking = new TaskStorageLinkerMiner(storageId, storageLinkId, mineralId, resourceMined);
+                                 
         taskList.push(moveToPosition);
         taskList.push(linking);
         return taskList;
@@ -17,7 +18,6 @@ var roleLinkerMinerStorage = {
 
 };
 
-//(storageId, storageLinkId, mineralId, resourceMined)
 module.exports = roleLinkerMinerStorage;
 /**
  * Created by Piers on 07/07/2016.

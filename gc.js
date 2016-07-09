@@ -41,7 +41,8 @@ var gc = {
     TASK_HARVEST:  "harvest",//this.HARVEST,
     TASK_MOVE_POS: "move.pos",
     TASK_MOVE_XY: "move.xy",
-    TASK_HARVEST_LINK: "harvest.link",
+    TASK_HARVEST_LINK: "harvest.linker",
+    TASK_HARVEST_STORAGE_LINK_MINER: "storage,linker.miner",
     TASK_LOADUP: "loadup",
     
     //TaskMoveFind.prototype.FindMethod
@@ -82,7 +83,11 @@ var gc = {
     POLICY_CLAIM: "claim",
     POLICY_BUILD_SPAWN: "buildspawn",
     POLICY_GIFT_WORKERS: "gift.workers",
-    POLICY_MANY2ONE_LINKERS: "setup.linkers"
+    POLICY_MANY2ONE_LINKERS: "setup.linkers",
+    
+    //misc
+    LINKING_WORKER_SIZE: 5,
+    BLOCKSIZE_COST_WORKER: 200
 
 };
 

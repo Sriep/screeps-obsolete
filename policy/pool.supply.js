@@ -88,9 +88,13 @@ var supplyCenter = {
        //     && this.getsupplyCentres()[centreId].yardCapacity > order.energyRequested;
     },
 
-    completeOrder: function(centreId, order) {
+    attachOrder: function(centreId, order) {
         this.getsupplyCentres()[centreId].buildqueue.push(order);
         return true;
+    },
+
+    completedOrder: function (centerId, order) {
+        // Remove order from
     },
 
     newSupplyCenter: function(roomName, energy, yardCapacity) {

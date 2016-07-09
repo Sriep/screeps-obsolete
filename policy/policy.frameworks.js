@@ -72,6 +72,7 @@ var policyFrameworks = {
             ,room : roomName
             ,fromLinks: fromLinks
             ,toLink: toLink
+            ,linkCreeps : undefined
         }
         if (start) {
             var module = policy.getModuleFromPolicy(newPolicy);

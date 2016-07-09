@@ -2,7 +2,7 @@
  * Created by Piers on 07/07/2016.
  */
 var gc = require("gc");
-var TaskMoveXY = require("task.move.find");
+var TaskMoveXY = require("task.move.xy");
 var TaskHarvestLinker = require("task.harvest.linker");
 
 

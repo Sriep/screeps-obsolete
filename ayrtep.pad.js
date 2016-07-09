@@ -47,8 +47,8 @@ var ayrtepPad = {
 
 
 
-        console.log("size 1 upgader",roomOwned.energyLifeTime(myroom, 1, "upgrader")
-            ,"porter",roomOwned.energyLifeTime(myroom, 1,  gc.ROLE_ENERGY_PORTER));
+       // console.log("size 1 upgader",roomOwned.energyLifeTime(myroom, 1, "upgrader")
+        //    ,"porter",roomOwned.energyLifeTime(myroom, 1,  gc.ROLE_ENERGY_PORTER));
 
         //console.log("size 5 upgader",roomOwned.energyLifeTime(myroom, 5, "upgrader")
         //    ,"porter",roomOwned.energyLifeTime(myroom, 5, gc.ENERGY_PORTER));

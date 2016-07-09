@@ -24,7 +24,7 @@ var thePool = {
         for ( var index in orders) {
             var centerId = poolSupply.findMatchFor(orders[index]);
             if (null !== centerId) {
-                if (poolSupply.completeOrder(centerId, orders[index]))
+                if (poolSupply.attachOrder(centerId, orders[index]))
                     delete orders[index];
             }
         }

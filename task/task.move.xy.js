@@ -25,13 +25,21 @@ function TaskMoveXY (x, y) {
 }
 
 TaskMoveXY.prototype.doTask = function(creep, task, actions) {
-    switch (creep.moveTo(task.x,task.y)) {
+    task.loop = true;
+  //  console.log(creep,"In taskmovexy xpos",creep.pos.x , task.x , "ypos" ,creep.pos.y , task.y);
+    var result = creep.moveTo(task.x,task.y);
+    creep.say(result);
+    switch (result) {
         case OK:    	            //0	The operation has been scheduled successfully.
+           // task.loop = false;
+            console.log(creep, "In after move xpos",creep.pos.x , task.x , "ypos" ,creep.pos.y , task.y);
             if (creep.pos.x == task.x &&  creep.pos.y == task.y) {
+                console.log(creep,"About to set task.loop to false");
                 task.loop = false;
+
+                console.log(creep,"Move to x y got there");
                 return gc.RESULT_FINISHED;
             } else {
-                task.loop = true;
                 return gc.RESULT_UNFINISHED;
             }
         case ERR_TIRED:             //-11	The fatigue indicator of the creep is non-zero.
@@ -42,7 +50,7 @@ TaskMoveXY.prototype.doTask = function(creep, task, actions) {
         case ERR_INVALID_TARGET:	//-7	The target provided is invalid.
         case ERR_NO_PATH:	        //-2	No path to the target could be found.
         default:
-            return gc.RESULT_FAILED;
+            return gc.RESULT_UNFINISHED;
     }
 };
 
