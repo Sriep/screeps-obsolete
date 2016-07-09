@@ -4,14 +4,14 @@
  * @author Piers Shepperson
  */
 "use strict";
-var    policy = require("policy");
-var   stats = require("stats");
-var    policyConstruction = require("policy.construction");
-var    policyDefence = require("policy.defence");
+var policy = require("policy");
+var stats = require("stats");
+var policyConstruction = require("policy.construction");
+var policyDefence = require("policy.defence");
 var policyFrameworks = require("policy.frameworks");
-var   raceBase = require("race.base");
-var   raceWorker = require("race.worker");
-var   roomOwned = require("room.owned");
+var raceBase = require("race.base");
+var raceWorker = require("race.worker");
+var roomOwned = require("room.owned");
 var _ = require('lodash');
 var policyBuildspawn = require("policy.buildspawn");
 var roleBase = require("role.base");
@@ -22,6 +22,7 @@ var roleLinkerMinerStorage = require("role.linker.miner.storage");
 var tasks = require("tasks");
 var roleEnergyPorter = require("role.energy.porter");
 var npcInvaderBattle = require("npc.invader.battle");
+var roleStorageRepairer = require("role.storage.repairer");
 
 /**
  * Abstract base object for deceison when at peace decisions. Peace is
@@ -45,20 +46,21 @@ var policyPeace = {
         if (!policyBuildspawn.spawnFound(oldPolicy))      {
             return policyFrameworks.createBuildspawn(room.name);
         }
-        //if (room.memory.linkState = "linkEconomy") {
+        //if (room.memory.linkState = "linkEconomy"
+        // || room.memory.linkState = "linkForming") {
        //     return policyFrameworks.createMany2OneLinkersPolicy(room.name);
        // }
 
-        if (policyDefence.beingAttaced(room)) {
-            return policyFrameworks.createDefendPolicy(room.name);
-        }
+     //   if (policyDefence.beingAttaced(room)) {
+ //           return policyFrameworks.createDefendPolicy(room.name);
+   //     }
         var policyRescue = require("policy.rescue");
         if (policyRescue.needsRescue(room)) {
             return policyFrameworks.createRescuePolicy(room.name);
         }
-        if (policyConstruction.startConstruction(room)) {
-            return policyFrameworks.createConstructionPolicy(room.name);
-        }
+  //      if (policyConstruction.startConstruction(room)) {
+  //          return policyFrameworks.createConstructionPolicy(room.name);
+   //     }
         return oldPolicy;
     },
     
@@ -95,38 +97,26 @@ var policyPeace = {
     */
     enactPolicy: function(currentPolicy) {
         var room = Game.rooms[currentPolicy.room];
-
+        poolSupply.updateSupplyLevel(room.name,roomOwned.calaculateSuplly(room)
+            ,room.energyCapacityAvailable);
         console.log(room, "Start enact policy ");
         //room.memory.links.linkCreeps = undefined;
-
         if (room.name == "W27S21"){
             room.memory.linkState = undefined;
-
-        }   else {
-         //   room.memory.linkState = "linkForming";
-        }
-
-
+        }  
+        
         if ( "linkForming" == room.memory.linkState ) {
-         //  this.noLinksEconomy(currentPolicy,0 );
-       //     console.log("enactPolicy About to call linkForming");
               this.linkForming(currentPolicy);
               this.linkActive(currentPolicy)
-          //  this.noLinksEconomy(currentPolicy,0 )
         } else if ("linkEconomy" == room.memory.linkState ) {
-   //         console.log("enactPolicy About to call linkActive");
-        //  this.noLinksEconomy(currentPolicy,0 );
               this.linkActive(currentPolicy);
-           // this.noLinksEconomy(currentPolicy,3)
         } else {
-
             console.log("noLinksEconomy");
             this.noLinksEconomy(currentPolicy,0 )
         }
     },
 
     linkForming: function (currentPolicy) {
-     //   console.log("IIIIIIIIIIIIIIIIIIIIIIIIIN lineForming");
         var room = Game.rooms[currentPolicy.room];
         if (room.name == "W27S21"){
            console.log(room,"Game.rooms[currentPolicy.room].memory.linkState"
@@ -296,50 +286,21 @@ var policyPeace = {
                 || creep.memory.role == gc.ROLE_UPGRADER
                 || creep.memory.role == gc.ROLE_ENERGY_PORTER );
         });
+        var  madeRepaier = false;
+        var  madePorter = false;
         for (var i in creeps) {
             if (creeps[i].memory.role != gc.ROLE_ENERGY_PORTER) {
-                this.convertPorter(creeps[i]);
-                console.log(creeps[i], "converted to porter");
+                if (madePorter && !madeRepaier) {
+                    this.convertStorageRepairer(creeps[i]);
+                    madeRepaier = true;
+                } else {
+                    this.convertPorter(creeps[i]);
+                    madePorter = true;
+                    console.log(creeps[i], "converted to porter");
+                }
             }
         }
-/*
-        var energyCost = 0;
-        var porters = _.filter(Game.creeps, function (creep) {
-                return (creep.memory.policyId == currentPolicy.id
-                    &&  creep.memory.role == gc.ROLE_ENERGY_PORTER );
-        });
-        for (var i in porters) {
-            var energyI = raceBase.getEnergyFromBody(porters[i].body);
-            energyCost = energyCost + energyI;
-       //     console.log(porters[i],"cost", energyI);
-        }
-        console.log(room,"energyCost",energyCost)
-      //  console.log("total energy is", energyCost);
 
-        //Build if necessary
-        // 200 = getEnergyFromBody([MOVE, WORE, CARRY]) a minimum sized worker.
-        //var porterSize = Math.min(11, raceWorker.maxSizeRoom(room)); // well why not?
-
-        var existingPorterParts = energyCost / 200;
-        var externalCommitments = 0//poolSupply.getEnergyInBuildQueue();
-        console.log("In main",room,gc.ROLE_ENERGY_PORTER);
-        var portersNoCommitmentsEnergyLT = roomOwned.energyLifeTime(room, 1,  gc.ROLE_ENERGY_PORTER);
-        var sourceEnergyLT  = roomOwned.allSourcesEnergy(room) *5;
-        var energyBuildLinkersAndRepairer = 4*1000;
-
-        var energyForUpgrading = sourceEnergyLT - energyBuildLinkersAndRepairer - externalCommitments;
-        var numPortersPartsNeeded = Math.max(5,energyForUpgrading / portersNoCommitmentsEnergyLT);
-        var porterShortfall = numPortersPartsNeeded - existingPorterParts;
-
-        var spawns = room.find(FIND_MY_SPAWNS);
-console.log("porterSize",porterSize,"existingPorterParts",existingPorterParts
-  ,"externalCommitments",externalCommitments);
-console.log("portersNoCommitmentsEnergyLT",portersNoCommitmentsEnergyLT,"sourceEnergyLT",sourceEnergyLT
-  ,"energyBuildLinkersAndRepairer",energyBuildLinkersAndRepairer);
-console.log("energyForUpgrading",energyForUpgrading,"numPortersPartsNeeded",numPortersPartsNeeded,
-"porterShortfall",porterShortfall);
-        console.log("spawning porter", porterSize, "calculatePorterShortfall "
-            , this.porterShortfall(room,currentPolicy));*/
         var externalCommitments = 0//poolSupply.getEnergyInBuildQueue();
         var porterSize = Math.min(5, raceWorker.maxSizeRoom(room));
         var spawns = room.find(FIND_MY_SPAWNS);
@@ -347,13 +308,19 @@ console.log("energyForUpgrading",energyForUpgrading,"numPortersPartsNeeded",numP
             console.log("replacing dead porter");
             this.spawnLinkerCreep(spawns, currentPolicy);
             this.findNewLinkers(currentPolicy);
-        } else  if(  porterSize <= this.porterShortfall(room,currentPolicy)) {
+        //} else  if(  porterSize <= this.porterShortfall(room,currentPolicy)) {
+        } else  if(  0 < this.porterShortfall(room,currentPolicy)) {
             console.log("tryingToSpawn");
             var body = raceWorker.body(porterSize * 200);
             var name = stats.createCreep(spawns[0], body, undefined, currentPolicy.id);
             if(_.isString(name)) {
-                console.log("spawning porter");
-                this.convertPorter(Game.creeps[name]);
+              //  if (this.doWeNeedRepairer(currentPolicy)) {
+               //     console.log("spawning repairer");
+               //     this.convertStorageRepairer(Game.creeps[name]);
+             //   } else {
+                    console.log("spawning porter");
+                    this.convertPorter(Game.creeps[name]);
+              //  }
             }
         } else if (externalCommitments) {
            // var nextBuildItem  = room.memory.nextRequisition(room);
@@ -365,11 +332,32 @@ console.log("energyForUpgrading",energyForUpgrading,"numPortersPartsNeeded",numP
         console.log("LEAVING LINKS ACTIVE LEAVING LINKS ACTIVE");
     },
 
+    doWeNeedRepairer: function (currentPolicy) {
+
+        var creeps = _.filter(Game.creeps, function (creep) {
+            return creep.memory.policyId == currentPolicy.id
+                && ( creep.memory.role == gc.ROLE_STORAGE_REPAIRER
+                || creep.memory.role == gc.ROLE_ENERGY_PORTER );
+        });
+        console.log(room,"doWeNeedRepairer", creeps.length);
+        if (creeps.length <2) return false;
+        for (var i = 0 ; i < creeps.length ; i++ ) {
+            if (creeps[i].memory.role != gc.ROLE_STORAGE_REPAIRER) {
+                return false;
+            }
+        }
+        return true;
+    },
+
     porterShortfall: function (room,currentPolicy) {
         var energyCost = 0;
         var porters = _.filter(Game.creeps, function (creep) {
             return (creep.memory.policyId == currentPolicy.id
-            &&  creep.memory.role == gc.ROLE_ENERGY_PORTER );
+            &&  (creep.memory.role == gc.ROLE_ENERGY_PORTER
+                ||creep.memory.role == gc.ROLE_HARVESTER
+            || creep.memory.role == gc.ROLE_BUILDER
+            || creep.memory.role == gc.ROLE_UPGRADER
+            || creep.memory.role == gc.ROLE_ENERGY_PORTER ));
         });
         for (var i in porters) {
             var energyI = raceBase.getEnergyFromBody(porters[i].body);
@@ -379,7 +367,8 @@ console.log("energyForUpgrading",energyForUpgrading,"numPortersPartsNeeded",numP
 
         var porterSize = Math.min(5, raceWorker.maxSizeRoom(room));
         var existingPorterParts = energyCost / 200;
-        var externalCommitments = 0//poolSupply.getEnergyInBuildQueue();
+        var externalCommitments = poolSupply.getEnergyInBuildQueue(room.name);
+        console.log(room, "Energy in build queue", externalCommitments);
 
         var portersNoCommitmentsEnergyLT = roomOwned.energyLifeTime(room, 1,  gc.ROLE_ENERGY_PORTER);
 
@@ -389,13 +378,13 @@ console.log("energyForUpgrading",energyForUpgrading,"numPortersPartsNeeded",numP
         var energyForUpgrading = sourceEnergyLT - energyBuildLinkersAndRepairer - externalCommitments;
         var numPortersPartsNeeded = Math.max(5,energyForUpgrading / portersNoCommitmentsEnergyLT);
         var porterShortfall = numPortersPartsNeeded - existingPorterParts;
-/*
+
         console.log("porterSize",porterSize,"existingPorterParts",existingPorterParts
             ,"externalCommitments",externalCommitments);
         console.log("portersNoCommitmentsEnergyLT",portersNoCommitmentsEnergyLT,"sourceEnergyLT",sourceEnergyLT
             ,"energyBuildLinkersAndRepairer",energyBuildLinkersAndRepairer);
         console.log("energyForUpgrading",energyForUpgrading,"numPortersPartsNeeded",numPortersPartsNeeded,
-            "porterShortfall",porterShortfall);*/
+            "porterShortfall",porterShortfall);
         console.log(room,"porterShortfall",porterShortfall);
         return porterShortfall;
     },
@@ -408,6 +397,17 @@ console.log("energyForUpgrading",energyForUpgrading,"numPortersPartsNeeded",numP
             tasks.setTargetId(creep,undefined);
         }
     },
+
+    convertStorageRepairer: function(creep) {
+        if (undefined !== creep) {
+            creep.memory.role = gc.ROLE_STORAGE_REPAIRER;
+            creep.memory.tasks.tasklist = roleStorageRepairer.moveTaskList(creep);
+            //   console.log("New Energy Porter tsetlisg", JSON.stringify(creep.memory.tasks.tasklist) );
+            tasks.setTargetId(creep,undefined);
+        }
+    },
+
+    
 
     //this.makeFromLinker(creeps[i] ,fromLinks[1], toLink);
   //  this.makeToLinker(creeps[i], toLink);
@@ -438,7 +438,7 @@ console.log("energyForUpgrading",energyForUpgrading,"numPortersPartsNeeded",numP
 
     noLinksEconomy: function (currentPolicy, numlinkers) {
         var room = Game.rooms[currentPolicy.room];
-        console.log(room,"In no linkkkkkkkkkkkkkkkkkkkkkkkkk ecinebt");
+        console.log(room,"In noLinksEconomy");
         room.memory.policyId = currentPolicy.id;
         var energy  = roomOwned.allSourcesEnergy(room) *5;
        // energy -= 15000*linksEnabled;

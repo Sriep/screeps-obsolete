@@ -30,8 +30,16 @@ var supplyCenter = {
     },
 
     getEnergyInBuildQueue: function (room) {
-        var buildQueue = this.getCentre().buildqueue;
-        var energy = 0
+        if (room === undefined) {
+            console.log(room, "in getEnergyInBuildQueue")
+            return 0;
+        }
+        var centre = this.getCentre(room);
+        if (centre === undefined) {
+            return 0;
+        }
+        var buildQueue = centre.buildqueue;
+        var energy = 0;
         for (var i in buildQueue) {
             energy = energy + buildQueue[i].energy;
         }
@@ -39,9 +47,15 @@ var supplyCenter = {
     },
 
     getCentre: function (room) {
+        if (room === undefined) {
+            console.log(room, "in getCentre")
+            return 0;
+        }
         if (room in this.getsupplyCentres()) {
+            console.log(room, "is in ", this.getsupplyCentres())
             return this.getsupplyCentres()[room];
         } else {
+            console.log(room ,"is not in",this.getsupplyCentres(),"returning undefeind");
             return undefined;
         }
     },

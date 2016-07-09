@@ -14,6 +14,7 @@ var roadBuilder = require("road.builder");
 var cpuUsage = require("cpu.usage");
 var roomOwned = require("room.owned");
 var policy = require("policy");
+var policyPeace = require("policy.peace");
 var stats = require("stats");
 var roleBase = require("role.base");
 var gc = require("gc");
@@ -43,6 +44,10 @@ var ayrtepPad = {
         console.log("average cpu usage is", cpuUsage.averageCpuLoad());
         var roomName = "W26S21";
         var room = Game.rooms[roomName];
+
+        // var creep = Game.creeps["Levi"];
+        //  policyPeace.convertStorageRepairer(creep);
+
 
 
 

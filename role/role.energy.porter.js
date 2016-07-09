@@ -23,29 +23,22 @@ var roleEnergyPorter = {
     nextEnergyContainer: function(creep) {
         //Defence first!
    //     console.log(creep,"looking for energy contaier");
-        var towers = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+        var tower = creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: function(structure)  {
                 return (structure.structureType == STRUCTURE_TOWER
                     && structure.energy < structure.energyCapacity);
             }
         });
-        if (towers.length >0) {
-            return towers[0];
+        console.log(creep,"nextEnergyContainer towers",tower);
+        if (tower) {
+            return tower;
         }
-        console.log(creep,"nextEnergyContainer towers",towers[0]);
-        /*
-        var extensions = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-            filter: function(structure)  {
-                return (structure.structureType == STRUCTURE_EXTENSION ||
-                    structure.structureType == STRUCTURE_SPAWN)
-                    && structure.energy < structure.energyCapacity;
-            }
-        });
-        */
+
         var extension = creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: function(structure)  {
                 return (structure.structureType == STRUCTURE_EXTENSION ||
-                    structure.structureType == STRUCTURE_SPAWN)
+                    structure.structureType == STRUCTURE_SPAWN ||
+                    structure.structureType == STRUCTURE_TOWER)
                     && structure.energy < structure.energyCapacity;
             }
         });
@@ -53,20 +46,6 @@ var roleEnergyPorter = {
         if (extension) {
             return extension;
         }
-/*
-        var extensions = creep.room.find(FIND_STRUCTURES, {
-                    filter: (structure) => {
-                    return (structure.structureType == STRUCTURE_EXTENSION
-                || structure.structureType == STRUCTURE_SPAWN) &&
-              structure.energy < structure.energyCapacity;
-        }
-        });
-        console.log(creep,"nextEnergyContainer second extension",extensions[0]);
-    //    console.log(creep,"has found extension or spawn", extensions[0]);
-        if (extensions.length >0) {
-            return extensions[0];
-        }*/
-   //     console.log(creep,"not found anything");
         return undefined;
     },
 
@@ -86,11 +65,19 @@ var roleEnergyPorter = {
         } 
         var moveToStorage = new TaskMoveFind(gc.FIND_ID,gc.RANGE_TRANSFER,storages[0].id);
         var louadupEnergy = new TaskLoadup(RESOURCE_ENERGY);
+
+        var moveToConstructionSite = new TaskMoveFind(gc.FIND_ROOM_OBJECT,gc.RANGE_BUILD
+            ,FIND_MY_CONSTRUCTION_SITES);
+        var offloadBuild = new TaskOffload(gc.BUILD);
         
         taskList.push(moveToStorage);
         taskList.push(louadupEnergy);
         taskList.push(moveToEnergyContainer);
         taskList.push(offloadEnergy);
+
+        taskList.push(moveToConstructionSite);
+        taskList.push(offloadBuild);
+
         taskList.push(moveToController);
         taskList.push(upgradeContoller);
         return taskList;

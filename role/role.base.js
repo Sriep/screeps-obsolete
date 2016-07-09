@@ -377,9 +377,9 @@ var roleBase = {
 
 
             //  var tasks = require("tasks");
-            if (creep.name == "Sophie"){
-               this.resetTasks(creep);
-            }
+          //  if (creep.name == "Skyler"){
+          //     this.resetTasks(creep);
+         //   }
                 //creep.memory.tasks = undefined;
           //   console.log("-------------------", creep,"-------------------------------");
                  // tasks.showTasks(creep);

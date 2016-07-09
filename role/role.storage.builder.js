@@ -2,7 +2,6 @@
  * Created by Piers on 08/07/2016.
  */
 var gc = require("gc");
-var stats = require("stats");
 var TaskMoveFind = require("task.move.find");
 var TaskLoadup = require("task.loadup");
 var TaskOffload = require("task.offload");

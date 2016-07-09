@@ -51,7 +51,7 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
 
     var target = Game.getObjectById(tasks.getTargetId(creep));
     if (!target) {
-        console.log(creep,"Offload, No target Id found");
+       // console.log(creep,"Offload, No target Id found");
         tasks.setTargetId(creep, undefined);
         if (creep.carry.energy == 0)
             return gc.RESULT_FINISHED;
@@ -77,7 +77,7 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
             if (creep.carry.energy == 0
                 || task.offlaodType == gc.DROP
                 || task.offlaodType == gc.TRANSFER ) {
-                console.log(creep,"offloaded all energy - FINSIHED");
+               // console.log(creep,"offloaded all energy - FINSIHED");
                 tasks.setTargetId(creep, undefined);
                 return gc.RESULT_FINISHED;
             }

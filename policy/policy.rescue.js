@@ -102,6 +102,7 @@ var policyRescue = {
             break;
         case policyFrameworks.Type.PEACE:
             policy.breakUpLinks(Game.rooms[oldPolicy.room]);
+                break;
         default:
         }
         policy.reassignCreeps(oldPolicy, newPolicy);
