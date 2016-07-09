@@ -79,13 +79,13 @@ TaskMoveFind.prototype.doTask = function(creep, task, actions) {
             case this.FindMethod.FindFunction:
                 var module = require(task.findModule);
                 target = module[task.findFunction](creep);
-               // console.log(creep,"find function returned",target);
+                console.log(creep,"find function returned",target);
                 break;
             default:
                 console.log(creep,"Invalid find method");
             //Unreachable
         }
-     //   console.log(creep,"TAskMoveFind do target is", target, "method is", task.method);
+        //console.log(creep,"TaskMoveFind do target is", target, "method is", task.method);
         if (target)
             tasks.setTargetId(creep, target.id);
     }

@@ -6,7 +6,7 @@
  * @author Piers Shepperson
  */
 var gc = require("gc");
-
+var tasks = require("tasks");
 /**
  * Abstract  Race of creeps that transport energy around.
  * units.
@@ -33,6 +33,7 @@ TaskLoadup.prototype.doTask = function(creep, task) {
         if (creep.carry.energy == 0) {
             return gc.RESULT_UNFINISHED;
         } else {
+            tasks.setTargetId(creep, undefined);
             return gc.RESULT_FINISHED;
         }
     }

@@ -34,6 +34,8 @@ var gc = {
     ROLE_MINER: "miner",
     ROLE_TRAVELLER: "traveller",
     ROLE_ENERGY_PORTER: "energy.porter",
+    ROLE_LINKER_SOURCE: "inker.source",
+    ROLE_LINKER_MINER_STORAGE:  "linker.miner.storage",
     
     //Tasks
     TASK_MOVE_FIND: "move.find",

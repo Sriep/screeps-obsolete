@@ -22,16 +22,18 @@ var roleEnergyPorter = {
 
     nextEnergyContainer: function(creep) {
         //Defence first!
+   //     console.log(creep,"looking for energy contaier");
         var towers = creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: function(structure)  {
-                return (structure.structureType == STRUCTURE_TOWER)
-                    && structure.energy < structure.energyCapacity;
+                return (structure.structureType == STRUCTURE_TOWER
+                    && structure.energy < structure.energyCapacity);
             }
         });
         if (towers.length >0) {
             return towers[0];
         }
-        
+        console.log(creep,"nextEnergyContainer towers",towers[0]);
+        /*
         var extensions = creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: function(structure)  {
                 return (structure.structureType == STRUCTURE_EXTENSION ||
@@ -39,9 +41,32 @@ var roleEnergyPorter = {
                     && structure.energy < structure.energyCapacity;
             }
         });
+        */
+        var extension = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+            filter: function(structure)  {
+                return (structure.structureType == STRUCTURE_EXTENSION ||
+                    structure.structureType == STRUCTURE_SPAWN)
+                    && structure.energy < structure.energyCapacity;
+            }
+        });
+        console.log(creep,"nextEnergyContainer first extension",extension);
+        if (extension) {
+            return extension;
+        }
+/*
+        var extensions = creep.room.find(FIND_STRUCTURES, {
+                    filter: (structure) => {
+                    return (structure.structureType == STRUCTURE_EXTENSION
+                || structure.structureType == STRUCTURE_SPAWN) &&
+              structure.energy < structure.energyCapacity;
+        }
+        });
+        console.log(creep,"nextEnergyContainer second extension",extensions[0]);
+    //    console.log(creep,"has found extension or spawn", extensions[0]);
         if (extensions.length >0) {
             return extensions[0];
-        }
+        }*/
+   //     console.log(creep,"not found anything");
         return undefined;
     },
 

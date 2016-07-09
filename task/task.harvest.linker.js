@@ -28,7 +28,7 @@ function TaskHarvestLinker (sourceId, homeLinkId, targetLinkId) {
 }
 
 TaskHarvestLinker.prototype.doTask = function(creep, task) {
-    console.log(creep,"TaskHarvestLinker")
+    //console.log(creep,"TaskHarvestLinker")
     var source =  Game.getObjectById(task.sourceId);
     if (!source) {
         console.log(creep,"no source")
@@ -36,7 +36,7 @@ TaskHarvestLinker.prototype.doTask = function(creep, task) {
         return gc.RESULT_FINISHED;
     }
     var hrtv = creep.harvest(source)
-    console.log(creep,"harvest result",hrtv);
+ //   console.log(creep,"harvest result",hrtv);
     var sourceLink = Game.getObjectById(task.homeLinkId);
     if (!sourceLink) {
         console.log(creep,"no from link")
@@ -51,7 +51,7 @@ TaskHarvestLinker.prototype.doTask = function(creep, task) {
         return gc.RESULT_FINISHED;
     }
     var result = sourceLink.transferEnergy(targetLink);
-    console.log(creep,"trasfer result",result);
+    console.log(creep,"transfer result",result);
     return gc.RESULT_UNFINISHED;
 };
 
