@@ -58,9 +58,15 @@ var raceWorker = {
     spawnWorkerSize: function(room, euilibEnergy) {
         var roomOwned = require("room.owned");
         var accesPoints = roomOwned.countSiteAccess(room,FIND_SOURCES);
-        var minSizeDesirable = Math.ceil(Math.max(euilibEnergy / (400*accesPoints), 5));//policy.LINKING_WORKER_SIZE));
-        var maxSizePossable = room.energyCapacityAvailable/this.BLOCKSIZE
-        return Math.floor(Math.min(maxSizePossable,minSizeDesirable));
+        var minSizeDesirable;
+
+        minSizeDesirable = Math.ceil(Math.max(euilibEnergy / (400*accesPoints), gc.LINKING_WORKER_SIZE));
+        var maxSizePossable = room.energyCapacityAvailable/this.BLOCKSIZE;
+        if (accesPoints == 1) {
+            minSizeDesirable = Math.max(minSizeDesirable,maxSizePossable);
+        }
+    //    console.log(room,"equlibenergy",euilibEnergy ,"minSizeDesirable",minSizeDesirable,"maxSizePossable",maxSizePossable);
+        return Math.floor(Math.min(minSizeDesirable,minSizeDesirable));
     },
 	
 	switchRoles: function(delta1, delta2, role1, role2, currentPolicy) {
@@ -121,7 +127,7 @@ console.log("assignRoles havester", havesters_needed, "upgraders",upgraders_need
         var dBuilders = builders_needed - builders.length;
         var dRepairers = repairers_needed - repairers.length;
         var dUpgraders = upgraders_needed - upgraders.length;
-
+/*
         //console.log("Linkers: " + linkers.length);
         if (nLinkers > 0){
             if (repairers.length  +  dRepairers > 0) {
@@ -137,7 +143,7 @@ console.log("assignRoles havester", havesters_needed, "upgraders",upgraders_need
                 nLinkers -= Math.min(upgraders.length +  dUpgraders,nLinkers);
             }
 
-        }
+        }*/
 
         console.log("Harvesters: " + harvesters.length + " delta " + dHavesters
             ,"Upgraders: " + upgraders.length + " delta " + dUpgraders

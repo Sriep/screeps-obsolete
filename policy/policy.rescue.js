@@ -15,6 +15,7 @@ var   roleBase = require("role.base");
 var policyBuildspawn = require("policy.buildspawn");
 var roomController = require("room.controller");
 var   stats = require("stats");
+var roomOwned = require("room.owned");
 
 /**
  * Abstract object for handling  decisions when the room needs rescuing.
@@ -42,13 +43,14 @@ var policyRescue = {
         if (this.needsRescue(room)) {
             return oldPolicy;
         }
-        if (policyConstruction.startConstruction(room)) {
-            return policyFrameworks.createConstructionPolicy(room.name);
-        }
+
+     //   if (policyConstruction.startConstruction(room)) {
+    //        return policyFrameworks.createConstructionPolicy(room.name);
+   //     }
         return  policyFrameworks.createPeacePolicy(room.name);
     },
 
-    initilisePolicy: function (newPolicy) {
+    initialisePolicy: function (newPolicy) {
         return true;
     },
 
@@ -65,22 +67,36 @@ var policyRescue = {
         var room = Game.rooms[currentPolicy.room];
         room.memory.policyId = currentPolicy.id;
        // stats.updateStats(room);
-        var creeps = room.find(FIND_MY_CREEPS);
+        //var creeps = room.find(FIND_MY_CREEPS);
+        var creeps = _.filter(Game.creeps,
+            function (creep) {return creep.memory.policyId == currentPolicy.id;});
+
         var workerSize = 0;
         if (creeps.length = 0) {
             console.log("Rescue build first worker size", raceWorker.maxSizeFromEnergy(room));
             workerSize = raceWorker.maxSizeFromEnergy(room);
         } else {
             var workparts = 0;
-            for (var i in creeps) {
-                var workparts = workparts + creeps[i].getActiveBodyparts(WORK);
+
+            if (1 < roomOwned.countSiteAccess(room, FIND_SOURCES) ){
+                for (var i in creeps) {
+                    console.log(room, "acces sites >1",roomOwned.countSiteAccess(room, FIND_SOURCES));
+                    workparts = workparts + creeps[i].getActiveBodyparts(WORK);
+                }
+                workerSize = Math.min(raceWorker.maxSizeRoom(room), workparts+1);              
+            } else {
+                console.log(room,"worker size", raceWorker.spawnWorkerSize(room,creeps.length*1000)
+                ,"energy num creeps x1000",creeps.length*1000)
+               workerSize = raceWorker.spawnWorkerSize(room,creeps.length*1000)
             }
-            workerSize = Math.min(raceWorker.maxSizeRoom(room), workparts+1);
+
         }
 
         var spawns = room.find(FIND_MY_SPAWNS);
         if (spawns == undefined || spawns == []) {return;}
-        raceBase.spawn(raceWorker, currentPolicy, spawns[0], workerSize);
+       // if () {
+            raceBase.spawn(raceWorker, currentPolicy, spawns[0], workerSize);
+      //  }
 
         var nHavesters = room.find(FIND_MY_CREEPS).length;
         var nBuilders = 0;
@@ -94,21 +110,21 @@ var policyRescue = {
     switchPolicy: function(oldPolicy, newPolicy)
     {
         switch(oldPolicy.type) {
-        case policyFrameworks.Type.RESCUE:
-            break;
-        case policyFrameworks.Type.CONSTRUCTION:
-            break;
-        case policyFrameworks.Type.DEFEND:
-            break;
-        case policyFrameworks.Type.PEACE:
-            policy.breakUpLinks(Game.rooms[oldPolicy.room]);
+            case policyFrameworks.Type.RESCUE:
                 break;
-        default:
+            case policyFrameworks.Type.CONSTRUCTION:
+                break;
+            case policyFrameworks.Type.DEFEND:
+                break;
+            case policyFrameworks.Type.POLICY_MANY2ONE_LINKERS:
+                policy.breakUpLinks(oldPolicy);
+                break;
+            default:
         }
         policy.reassignCreeps(oldPolicy, newPolicy);
     },
 
-    /**
+     /**
      * Determins if the production capacity has fallen to such an unexpectedly
      * low level that rescue measures are necessary. 
      * The number of WORK parts are used

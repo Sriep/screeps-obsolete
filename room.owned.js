@@ -3,6 +3,7 @@
  * related to owned rooms.
  * @author Piers Shepperson
  */
+"use strict";
 var raceWorker = require("race.worker");
 var roleBase = require("role.base");
 /**
@@ -34,9 +35,9 @@ var roomOwned = {
     avDistanceBetween: function (room, obj1, obj2) {
         console.log("In avDistanceBetween");
         var distance = 0;
-        obj1s = room.find(obj1);
+        var obj1s = room.find(obj1);
         if (obj1s.length > 0) {
-            obj2s  = room.find(obj2);
+            var obj2s  = room.find(obj2);
             if (obj2s.length > 0) {
                 var distance = 0;
                 var journies = 0;
@@ -61,7 +62,7 @@ var roomOwned = {
     
     avDistanceForm: function (room, obj1, pos2) {
         var distance = 0;
-        objs = room.find(obj1);
+        var objs = room.find(obj1);
         if (objs.length > 0) {
             var distance = 0;
             var journies = 0;
@@ -106,6 +107,16 @@ var roomOwned = {
         return this.getUpgradeRondTripLength(room, force);       
     },
 
+    getConstructionLeft: function (room) {
+        var constructionSites = room.find(FIND_CONSTRUCTION_SITES);
+        var toGo = 0;
+        for ( var site = 0 ; site < constructionSites.length ; site++ ) {
+            toGo = toGo + constructionSites[site].progressTotal - constructionSites[site].progress;
+          //  console.log("construciton left site", constructionSites[site],"progress",constructionSites[site].progress
+         //   ,"total",constructionSites[site].progressTotal)
+        }
+        return toGo;
+    },
 
     roundTripLength: function(room,role,force) {
         switch (role) {
@@ -232,7 +243,7 @@ var roomOwned = {
     allSourcsEnergyLT: function(room, workerSize)
     {
         var havestableSourcEnergyLT = 0;
-        sources = room.find(FIND_SOURCES);
+        var sources = room.find(FIND_SOURCES);
         for (var i in sources) {                
             havestableSourcEnergyLT = havestableSourcEnergyLT 
                 + this.sourceEnergyLT(room, sources[i], 2 * workerSize);
@@ -256,7 +267,7 @@ var roomOwned = {
         var workerSize = room.memory.workerSize;
         if (room.memory.warTimeHavesters === undefined || force == true)
         {   
-            warTimeHavesters =  this.allSourcsEnergyLT(room, workerSize) 
+            var warTimeHavesters =  this.allSourcsEnergyLT(room, workerSize)
                 / this.energyLifeTime(room, workerSize, roleBase.Type.HARVESTER);
             room.memory.warTimeHavesters = warTimeHavesters;  
         }
@@ -269,7 +280,7 @@ var roomOwned = {
         var workerSize = room.memory.workerSize;
         
         if (room.memory.peaceHavesters === undefined || force == true) {
-            workerCost = raceWorker.BLOCKSIZE * workerSize;
+            var workerCost = raceWorker.BLOCKSIZE * workerSize;
             var havestRate = 2 * workerSize;
             var hELT = this.energyLifeTime(room, workerSize, roleBase.Type.HARVESTER);
             var uELT = this.energyLifeTime(room, workerSize, roleBase.Type.UPGRADER);
@@ -292,7 +303,7 @@ var roomOwned = {
             if (workerSize == undefined) {               
                 workerSize = raceWorker.maxSize(room.controller.level);
             }
-            workerCost = raceWorker.BLOCKSIZE * workerSize;    
+            var workerCost = raceWorker.BLOCKSIZE * workerSize;
             var hELT = this.energyLifeTime(room, workerSize, roleBase.Type.HARVESTER);  
             var havesters = this.peaceHavesters(room, workerSize, force);
             room.memory.peaceUpgraders = (( hELT / workerCost)-1 ) * havesters; 
@@ -308,7 +319,7 @@ var roomOwned = {
             if (workerSize == undefined) {               
                 workerSize = raceWorker.maxSize(room.controller.level);
             }
-            workerCost = raceWorker.BLOCKSIZE * workerSize;    
+            var workerCost = raceWorker.BLOCKSIZE * workerSize;
             var hELT = this.energyLifeTime(room, workerSize, roleBase.Type.HARVESTER);  
             var havesters = this.supportHavesters(room, exrtraWorkers, sourceEnerghLT, workerSize, force);
             room.memory.supportUpgraders = (( hELT / workerCost)-1 ) * havesters - exrtraWorkers; 
@@ -322,9 +333,9 @@ var roomOwned = {
         
         if (room.memory.supportHavesters === undefined || force == true)
         {        
-            workerCost = raceWorker.BLOCKSIZE * workerSize;
+            var workerCost = raceWorker.BLOCKSIZE * workerSize;
             var havestRate = 2 * workerSize;                      
-            hELT = this.energyLifeTime(room, workerSize, roleBase.Type.HARVESTER);
+            var hELT = this.energyLifeTime(room, workerSize, roleBase.Type.HARVESTER);
             var uELT = this.energyLifeTime(room, workerSize, roleBase.Type.UPGRADER);
             //var sELT = this.allSourcsEnergyLT(room, workerSize);
             var wCost = workerCost;
@@ -355,7 +366,7 @@ var roomOwned = {
         
         if (room.memory.constructHavesters === undefined || force == true)
         {        
-            workerCost = raceWorker.BLOCKSIZE * workerSize;
+            var workerCost = raceWorker.BLOCKSIZE * workerSize;
             var havestRate = 2 * workerSize;           
             var hELT = this.energyLifeTime(room, workerSize, roleBase.Type.HARVESTER);
             var bELT = this.energyLifeTime(room, workerSize, roleBase.Type.BUILDER);
@@ -376,7 +387,7 @@ var roomOwned = {
             if (workerSize == undefined) {               
                 workerSize = raceWorker.maxSize(room.controller.level);
             }
-            workerCost = raceWorker.BLOCKSIZE * workerSize;    
+            var workerCost = raceWorker.BLOCKSIZE * workerSize;
             var hELT = this.energyLifeTime(room, workerSize, roleBase.Type.HARVESTER); 
             var havesters = this.constructHavesters(room, workerSize, force);      
             room.memory.consructBuilders = (( hELT / workerCost)-1 ) * havesters; 

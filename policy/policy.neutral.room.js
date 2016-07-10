@@ -29,7 +29,7 @@ var policyNeutralRoom = {
         return oldPolicy;
     },
 
-    initilisePolicy: function (newPolicy) {
+    initialisePolicy: function (newPolicy) {
         return true;
     },
 
@@ -39,6 +39,8 @@ var policyNeutralRoom = {
      * @returns {none}
      */
     enactPolicy: function(currentPolicy) {
+        "use strict";
+       // console.log(currentPolicy.room,"In neutral room");
     },
 
     switchPolicy: function(oldPolicyId, newPolicy)

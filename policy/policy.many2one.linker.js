@@ -27,26 +27,43 @@ var tasks = require("tasks");
 var roleEnergyPorter = require("role.energy.porter");
 var npcInvaderBattle = require("npc.invader.battle");
 var roleStorageRepairer = require("role.storage.repairer");
+var policySupply = require("pool.supply");
 /**
  * Abstract Policy
- * @module policyRescue
+ * @module policyMany2oneLinker
  */
-var policyGiftWorkers = {
+var policyMany2oneLinker = {
+    NUMBER_OF_LINKERS:  3,
+    REPAIRER_THREASHOLD:  5,
 
-    initilisePolicy: function (newPolicy) {
-        var room = Game.rooms[currentPolicy.room];
+    initialisePolicy: function (newPolicy) {
+        console.log("initialisePolicy policyMany2oneLinker");
+        var room = Game.rooms[newPolicy.room];
+
+        var fromLinks = newPolicy.fromLinks;
+        var toLink = newPolicy.toLink;
+        room.memory.links.fromLinks = fromLinks;
+        room.memory.links.toLink = toLink;
         room.memory.links.linkCreeps = undefined;
+        if (undefined === room.memory.links.linkCreeps) {
+            room.memory.links.linkCreeps = [];
+            room.memory.links.linkCreeps.push({creepName: undefined, linkInfo: fromLinks[0], toInfo: toLink});
+            room.memory.links.linkCreeps.push({creepName: undefined, linkInfo: fromLinks[1], toInfo: toLink});
+            room.memory.links.linkCreeps.push({creepName: undefined, linkInfo: toLink});
+        }
+
         return true;
     },
 
     draftNewPolicyId: function(oldPolicy) {
-        var room = Game.rooms[currentPolicy.room];
+        var room = Game.rooms[oldPolicy.room];
         if (policyRescue.needsRescue(room)) {
             return policyFrameworks.createRescuePolicy(room.name);
         }
         var creeps = _.filter(Game.creeps, function (creep)
-            {return creep.memory.policyId == currentPolicy.id});
-        if (2 <= creeps.length) {
+            {return creep.memory.policyId == oldPolicy.id});
+        if (3 >= creeps.length) {
+            console.log("CHANGE POLICY Not enough creeps to maintain all links", creeps.length)
             return  policyFrameworks.createPeacePolicy(room.name);
         }
 
@@ -57,15 +74,14 @@ var policyGiftWorkers = {
             }
         });
         if (4 < linkStructures.length) {
+            console.log("CHANGE POLICY Less then thee links and one storage ")
             return  policyFrameworks.createPeacePolicy(room.name);
         }
-
         return oldPolicy;
     },
 
     switchPolicy: function(oldPolicy, newPolicy)
     {
-        "use strict";
         switch(oldPolicy.type) {
             case policyFrameworks.Type.RESCUE:
                 break;
@@ -81,98 +97,92 @@ var policyGiftWorkers = {
 
     enactPolicy: function(currentPolicy) {
         var room = Game.rooms[currentPolicy.room];
-        poolSupply.updateSupplyLevel(room.name,roomOwned.calaculateSuplly(room)
+        console.log("ENACT POLICY MANY2ONE LINKERS",room);//,"contruction left",roomOwned.getConstructionLeft(room));
+        poolSupply.updateSupplyLevel(room.name
+            ,roomOwned.calaculateSuplly(room)
             ,room.energyCapacityAvailable);
-        if ("linkEconomy" == room.memory.linkState ) {
-            this.linkActive(currentPolicy);
-        } else {
-            this.linkForming(currentPolicy);
-            this.linkActive(currentPolicy);
-        }
-    },
 
-    linkForming: function (currentPolicy) {
-        var room = Game.rooms[currentPolicy.room];
-        if (room.name == "W27S21"){
-            console.log(room,"Game.rooms[currentPolicy.room].memory.linkState"
-                ,room.memory.linkState);
-            room.memory.linkState = undefined;
-            return;
-        }
-        var numberOfLinkers = 3;
-        var fromLinks = room.memory.links.fromLinks;
-        var toLink = room.memory.links.toLink;
-
-
-        if (undefined === room.memory.links.linkCreeps) {
-            room.memory.links.linkCreeps = [];
-            room.memory.links.linkCreeps.push({creepName: undefined, linkInfo : fromLinks[0], toInfo : toLink});
-            room.memory.links.linkCreeps.push({creepName: undefined, linkInfo : fromLinks[1], toInfo : toLink});
-            room.memory.links.linkCreeps.push({creepName: undefined, linkInfo : toLink});
-        }
-        var creeps = _.filter(Game.creeps, function (creep) {return creep.memory.policyId == currentPolicy.id});
-        var linkCreeps = room.memory.links.linkCreeps;
-        this.checkCreepsStillAlive(currentPolicy, numberOfLinkers);
-        this.findNewLinkers(currentPolicy);
-
-        if (this.linkersInPosition(currentPolicy)) {
-            room.memory.linkState = "linkEconomy";
-        }
-    },
-
-     linkActive: function (currentPolicy) {
-        var room = Game.rooms[currentPolicy.room];
-        if (!this.checkCreepsStillAlive(currentPolicy, 3)) {
+       // this.initialisePolicy(currentPolicy);
+        if (!this.checkCreepsStillAlive(currentPolicy, this.NUMBER_OF_LINKERS)) {
             this.findNewLinkers(currentPolicy);
         }
-        
-        var numberOfLinkers =3;
-        var creeps = _.filter(Game.creeps, function (creep) {
-            return creep.memory.policyId == currentPolicy.id
-                && ( creep.memory.role == gc.ROLE_HARVESTER
-                || creep.memory.role == gc.ROLE_BUILDER
-                || creep.memory.role == gc.ROLE_UPGRADER
-                || creep.memory.role == gc.ROLE_ENERGY_PORTER );
-        });
-        var  madeRepaier = false;
-        var  madePorter = false;
-        for (var i in creeps) {
-            if (creeps[i].memory.role != gc.ROLE_ENERGY_PORTER) {
-                if (madePorter && !madeRepaier) {
-                    this.convertStorageRepairer(creeps[i]);
-                    madeRepaier = true;
-                } else {
-                    this.convertPorter(creeps[i]);
-                    madePorter = true;
-                    console.log(creeps[i], "converted to porter");
-                }
-            }
-        }
-        var externalCommitments = 0//poolSupply.getEnergyInBuildQueue();
-        var porterSize = Math.min(5, raceWorker.maxSizeRoom(room));
+
+        this.checkRoles(room, currentPolicy);
+        var externalCommitments = poolSupply.getEnergyInBuildQueue(room);
+        //var porterSize = Math.min(5, raceWorker.maxSizeRoom(room));
         
         var spawns = room.find(FIND_MY_SPAWNS);
-        if (!this.checkCreepsStillAlive(currentPolicy, numberOfLinkers)) {
+        if (!this.checkCreepsStillAlive(currentPolicy, 3)) {
             console.log("replacing dead porter");
             this.spawnLinkerCreep(spawns, currentPolicy);
             this.findNewLinkers(currentPolicy);
             //} else  if(  porterSize <= this.porterShortfall(room,currentPolicy)) {
-        } else  if(  0 < this.porterShortfall(room,currentPolicy)) {
-            console.log("tryingToSpawn");
-            var body = raceWorker.body(porterSize * 200);
+        } else  if ( this.extraPorters(room) < this.porterShortfall(room,currentPolicy)) {
+            console.log("tryingToSpawn extraPorters",this.extraPorters(room)
+                ,"shortfall", this.porterShortfall(room,currentPolicy) );
+            var body = raceWorker.body(this.porterSize(room) * 200);
             var name = stats.createCreep(spawns[0], body, undefined, currentPolicy.id);
             if(_.isString(name)) {
                 console.log("spawning porter");
-                this.convertPorter(Game.creeps[name]);
+                this.convertPorter(Game.creeps[name, currentPolicy]);
             }
         } else if (externalCommitments) {
-            // var nextBuildItem  = room.memory.nextRequisition(room);
-            //   console.log(room,"about to build contract creep", JSON.stringify(nextBuildItem));
-            //   name = stats.createCreep(spawns[0], nextBuildItem.body, undefined, currentPolicy.id);
+             var build = room.memory.nextRequisition(room);
+             console.log(room,"about to build contract creep energy cost", build.energy);
+             var buildName = stats.createCreep(spawns[0], build.body, undefined, currentPolicy.id);
+            if(_.isString(name)) {
+                console.log(room,"Built contract creep energy cost", build.energy);
+                policySupply.completedOrder(currentPolicy.id, build, buildName);
+            }
         }
 
         npcInvaderBattle.defendRoom(room);
-        console.log("LEAVING LINKS ACTIVE LEAVING LINKS ACTIVE");
+    },
+
+    checkRoles: function (room, currentPolicy) {
+        var creeps = _.filter(Game.creeps, function (creep) {
+                return creep.memory.policyId == currentPolicy.id})
+        var fromLinker1 = room.memory.links.linkCreeps[0].creepName;
+        var fromLinker2 = room.memory.links.linkCreeps[1].creepName;
+        var toLinker = room.memory.links.linkCreeps[2].creepName;
+        for (var i = 0 ; i < creeps.length ; i++ ) {
+         //   console.log(room,"in checkRoles",creeps[i],"role",creeps[i].memory.role);
+            if ( creeps[i].memory.role == gc.ROLE_LINKER_SOURCE) {
+                if (creeps[i].name !=  fromLinker1 && creeps[i].name !=  fromLinker2) {
+           //         console.log(room,"iconverting",creeps[i],"to porter");
+                    this.convertPorter(creeps[i], currentPolicy);
+                } else {
+                  //  console.log(room,"found linker",creeps[i])
+                }
+            } else  if ( creeps[i].memory.role == gc.ROLE_LINKER_MINER_STORAGE) {
+                if (creeps[i].name !=  toLinker) {
+               //     console.log(room,"iconverting",creeps[i],"to porter");
+                    this.convertPorter(creeps[i], currentPolicy);
+                } else {
+                  //  console.log(room,"found linker",creeps[i])
+                }
+            } else if ( creeps[i].memory.role != gc.ROLE_ENERGY_PORTER
+                        && creeps[i].memory.role != gc.ROLE_STORAGE_REPAIRER ) {
+           //     console.log(room,"iconverting",creeps[i],"to porter");
+                this.convertPorter(creeps[i], currentPolicy);
+            }
+        }
+    },
+
+    porterSize: function (room) {
+        return Math.min(5, raceWorker.maxSizeRoom(room));
+    },
+    
+    extraPorters: function (room) {
+        var storage = room.find(FIND_STRUCTURES, {
+            filter: { structureType : STRUCTURE_STORAGE }
+        })
+        if (storage[0].store[RESOURCE_ENERGY] < 10000) {
+           // console.log("porter size",this.porterSize(room))
+            return this.porterSize(room);
+        } else {
+            return 0;
+        }
     },
 
 
@@ -190,7 +200,8 @@ var policyGiftWorkers = {
 
         var porterSize = Math.min(5, raceWorker.maxSizeRoom(room));
         var existingPorterParts = energyCost / 200;
-        var externalCommitments = 0//poolSupply.getEnergyInBuildQueue();
+        var externalCommitments = poolSupply.getEnergyInBuildQueue();
+        
 
         var portersNoCommitmentsEnergyLT = roomOwned.energyLifeTime(room, 1,  gc.ROLE_ENERGY_PORTER);
 
@@ -199,7 +210,7 @@ var policyGiftWorkers = {
 
         var energyForUpgrading = sourceEnergyLT - energyBuildLinkersAndRepairer - externalCommitments;
         var numPortersPartsNeeded = Math.max(5,energyForUpgrading / portersNoCommitmentsEnergyLT);
-        var porterShortfall = numPortersPartsNeeded - existingPorterParts;
+        var porterShortfall = numPortersPartsNeeded - existingPorterParts;//*policy.creepsAgeFactor(currentPolicy);
         /*
          console.log("porterSize",porterSize,"existingPorterParts",existingPorterParts
          ,"externalCommitments",externalCommitments);
@@ -207,20 +218,44 @@ var policyGiftWorkers = {
          ,"energyBuildLinkersAndRepairer",energyBuildLinkersAndRepairer);
          console.log("energyForUpgrading",energyForUpgrading,"numPortersPartsNeeded",numPortersPartsNeeded,
          "porterShortfall",porterShortfall);*/
-        console.log(room,"porterShortfall",porterShortfall);
+        console.log(room,"porterShortfall",porterShortfall,"needed",numPortersPartsNeeded,"existing"
+                    ,existingPorterParts,"age factor",policy.creepsAgeFactor(currentPolicy));
         return porterShortfall;
     },
 
-    convertPorter: function(creep) {
+    convertPorter: function(creep,currentPolicy ) {
+     //   console.log("in converporter",creep);
         if (undefined !== creep) {
-            creep.memory.role = gc.ROLE_ENERGY_PORTER;
-            creep.memory.tasks.tasklist = roleEnergyPorter.moveTaskList(creep);
-            //   console.log("New Energy Porter tsetlisg", JSON.stringify(creep.memory.tasks.tasklist) );
-            tasks.setTargetId(creep,undefined);
+            var creeps = _.filter(Game.creeps, function (creep) {
+                return creep.memory.policyId == currentPolicy.id
+            });
+            var foundRepaier = false;
+            if ( creeps.length > this.REPAIRER_THREASHOLD ) {
+                foundRepaier = false;
+                var i = 0;
+                while (i < creeps.length && !foundRepaier) {
+                //    console.log("convertPorter while loop i",i,"lenght",creeps.length);
+                    if ( creeps[i].memory.role == gc.ROLE_STORAGE_REPAIRER ) {
+                        foundRepaier = true;
+                    }
+                    i++;
+                }
+            }
+            if (foundRepaier || creeps.length <= this.REPAIRER_THREASHOLD ) {
+                creep.memory.role = gc.ROLE_ENERGY_PORTER;
+                if (undefined === creep.memory.tasks)
+                    creep.memory.tasks = {};
+                creep.memory.tasks.tasklist = roleEnergyPorter.moveTaskList(creep);
+                //   console.log("New Energy Porter tsetlisg", JSON.stringify(creep.memory.tasks.tasklist) );
+                tasks.setTargetId(creep,undefined);
+            } else {
+                this.convertStorageRepairer(creep);
+            }
         }
     },
 
     convertStorageRepairer: function(creep) {
+       // console.log("in convertStorageRepairer",creep);
         if (undefined !== creep) {
             creep.memory.role = gc.ROLE_STORAGE_REPAIRER;
             creep.memory.tasks.tasklist = roleStorageRepairer.moveTaskList(creep);
@@ -229,10 +264,14 @@ var policyGiftWorkers = {
         }
     },
 
-    spawnLinkerCreep: function (spawn, currectPolicy) {
+    spawnLinkerCreep: function (spawn, currentPolicy) {
         var body = raceWorker.body(gc.LINKING_WORKER_SIZE*gc.BLOCKSIZE_COST_WORKER);
-        var name = stats.createCreep(spawn, body, undefined, currectPolicy.id);
-        if (_.isString(result)) {
+        var room = Game.rooms[currentPolicy.room];
+        var spawns = room.find(FIND_MY_SPAWNS);
+
+        //var name = spawns[0].createCreep( body, undefined);//, currentPolicy.id);
+        var name = spawns[0].createCreep(body, name, {policyId: currentPolicy.id});
+        if (_.isString(name)) {
             var linkCreeps = room.memory.links.linkCreeps;
             for ( var i = 0 ; i < linkCreeps.length ; i++ )
             {
@@ -253,13 +292,14 @@ var policyGiftWorkers = {
     },
 
     findNewLinkers: function (currentPolicy) {
+     //   console.log("In findNewLiners loop counter");
         var room = Game.rooms[currentPolicy.room];
         var linkCreeps = room.memory.links.linkCreeps;
         var fromLinks = room.memory.links.fromLinks;
         var toLink = room.memory.links.toLink;
         var creeps = _.filter(Game.creeps, function (creep) {return creep.memory.policyId == currentPolicy.id});
         for (var i = creeps.length-1 ; i >=0 ; i-- ) {
-            //   console.log(creeps[i].creepName,"In findNewLiners loop counter",i)
+              // console.log(creeps[i].creepName,"In findNewLiners loop counter",i)
             if ( (gc.ROLE_HARVESTER != creeps[i].memory.role
                 && gc.ROLE_LINKER_SOURCE != creeps[i].memory.role
                 && gc.ROLE_LINKER_MINER_STORAGE != creeps[i].memory.role)
@@ -267,6 +307,7 @@ var policyGiftWorkers = {
             //        == raceBase.getEnergyFromBody(creeps[i].body())
             )
             {
+              //  if (linkCreeps)
                 if (undefined === linkCreeps[0].creepName){
                     linkCreeps[0].creepName = creeps[i].name;
                     this.makeFromLinker(creeps[i] ,fromLinks[0], toLink);
@@ -316,6 +357,51 @@ var policyGiftWorkers = {
         return true;
     },
 
+
+
+    makeFromLinker: function (creep, fromLink, toLink) {
+        if (undefined === creep.memory.tasks)
+            creep.memory.tasks = {};
+        // moveTaskList: function(creep, x,y,sourceId, homeLinkId, targetLinkId)
+        creep.memory.tasks.tasklist = roleLinkerSource.moveTaskList(creep,fromLink.x, fromLink.y
+            , fromLink.fromId, fromLink.fromLinkId, toLink.toLinkId );
+        creep.memory.role = gc.ROLE_LINKER_SOURCE;
+        tasks.setTargetId(creep,undefined);
+    },
+
+    makeToLinker: function (creep, toLink) {
+        if (undefined === creep.memory.tasks)
+            creep.memory.tasks = {};
+        creep.memory.tasks.tasklist = roleLinkerMinerStorage.moveTaskList(creep, toLink.x, toLink.y
+            , toLink.storageId, toLink.toLinkId , toLink.mineId, toLink.mineResource );
+        creep.memory.role = gc.ROLE_LINKER_MINER_STORAGE;
+        tasks.setTargetId(creep,undefined);
+    },
+
+
+/*
+    linkForming: function (currentPolicy) {
+        var room = Game.rooms[currentPolicy.room];
+        var numberOfLinkers = 3;
+        var fromLinks = room.memory.links.fromLinks;
+        var toLink = room.memory.links.toLink;
+
+        if (undefined === room.memory.links.linkCreeps) {
+            room.memory.links.linkCreeps = [];
+            room.memory.links.linkCreeps.push({creepName: undefined, linkInfo : fromLinks[0], toInfo : toLink});
+            room.memory.links.linkCreeps.push({creepName: undefined, linkInfo : fromLinks[1], toInfo : toLink});
+            room.memory.links.linkCreeps.push({creepName: undefined, linkInfo : toLink});
+        }
+
+        var creeps = _.filter(Game.creeps, function (creep) {return creep.memory.policyId == currentPolicy.id});
+        var linkCreeps = room.memory.links.linkCreeps;
+        this.checkCreepsStillAlive(currentPolicy, numberOfLinkers);
+        this.findNewLinkers(currentPolicy);
+        if (this.linkersInPosition(currentPolicy)) {
+            room.memory.linkState = "linkEconomy";
+        }
+    },
+
     linkersInPosition: function (currentPolicy) {
         console.log("In linkersInPosition");
         var room = Game.rooms[currentPolicy.room];
@@ -345,28 +431,14 @@ var policyGiftWorkers = {
         }
         console.log(true,"linkersInPosition");
         return true;
-    },
-
-    makeFromLinker: function (creep, fromLink, toLink) {
-
-        // moveTaskList: function(creep, x,y,sourceId, homeLinkId, targetLinkId)
-        creep.memory.tasks.tasklist = roleLinkerSource.moveTaskList(creep,fromLink.x, fromLink.y
-            , fromLink.fromId, fromLink.fromLinkId, toLink.toLinkId );
-        creep.memory.role = gc.ROLE_LINKER_SOURCE;
-        tasks.setTargetId(creep,undefined);
-    },
-
-    makeToLinker: function (creep, toLink) {
-
-        creep.memory.tasks.tasklist = roleLinkerMinerStorage.moveTaskList(creep, toLink.x, toLink.y
-            , toLink.storageId, toLink.toLinkId , toLink.mineId, toLink.mineResource );
-        creep.memory.role = gc.ROLE_LINKER_MINER_STORAGE;
-        tasks.setTargetId(creep,undefined);
-    },
+    },*/
 
 };
 
-module.exports = policyGiftWorkers;
+
+
+
+module.exports = policyMany2oneLinker;
 
 
 

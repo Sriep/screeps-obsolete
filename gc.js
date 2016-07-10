@@ -47,6 +47,7 @@ var gc = {
     TASK_HARVEST_LINK: "harvest.linker",
     TASK_HARVEST_STORAGE_LINK_MINER: "storage,linker.miner",
     TASK_LOADUP: "loadup",
+    TASK_MOVE_ROOM: "move.room",
     
     //TaskMoveFind.prototype.FindMethod
     FIND_ID : "find.id",
@@ -86,7 +87,7 @@ var gc = {
     POLICY_CLAIM: "claim",
     POLICY_BUILD_SPAWN: "buildspawn",
     POLICY_GIFT_WORKERS: "gift.workers",
-    POLICY_MANY2ONE_LINKERS: "setup.linkers",
+    POLICY_MANY2ONE_LINKERS: "many2one.linker",
     
     //misc
     LINKING_WORKER_SIZE: 5,

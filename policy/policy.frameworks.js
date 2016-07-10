@@ -65,7 +65,7 @@ var policyFrameworks = {
      *                  , mineId : 56e14bf41f7d4167346e0a76, mineResource, RESOURCE_OXYGEN }
      *   createMany2OneLinkersPolicy([fromLink1,fromLink2],toLink)
      */
-    createMany2OneLinkersPolicy: function(roomName, fromLinks ,toLink)
+    createMany2OneLinkersPolicy: function(roomName, fromLinks ,toLink, start)
     {
         var newPolicy = {id : policy.getNextPolicyId()
             ,type : this.Type.POLICY_MANY2ONE_LINKERS
@@ -73,10 +73,10 @@ var policyFrameworks = {
             ,fromLinks: fromLinks
             ,toLink: toLink
             ,linkCreeps : undefined
-        }
-        if (start) {
+        };
+        if (true) {
             var module = policy.getModuleFromPolicy(newPolicy);
-            module.initilisePolicy(newPolicy)
+            module.initialisePolicy(newPolicy)
             policy.activatePolicy(newPolicy);
         }
         return newPolicy;
@@ -100,7 +100,7 @@ var policyFrameworks = {
             shuttingDown : false};
         if (start) {
             var module = policy.getModuleFromPolicy(newPolicy);
-            module.initilisePolicy(newPolicy)
+            module.initialisePolicy(newPolicy)
             if (0 < policy.activatePolicy(newPolicy)) {
             } else {
             }
@@ -119,7 +119,7 @@ var policyFrameworks = {
             shuttingDown : false};
         if (start) {
             var module = policy.getModuleFromPolicy(newPolicy);
-            module.initilisePolicy(newPolicy)
+            module.initialisePolicy(newPolicy)
             if (0 < policy.activatePolicy(newPolicy)) {
             } else {
             }
@@ -137,7 +137,7 @@ var policyFrameworks = {
             workersDelivered : 0};
         if (start) {
             var module = policy.getModuleFromPolicy(newPolicy);
-            module.initilisePolicy(newPolicy)
+            module.initialisePolicy(newPolicy)
             if (0 < policy.activatePolicy(newPolicy)) {
             } else {
             }

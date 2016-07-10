@@ -45,13 +45,20 @@ var ayrtepPad = {
         var roomName = "W26S21";
         var room = Game.rooms[roomName];
 
+
         // var creep = Game.creeps["Levi"];
         //  policyPeace.convertStorageRepairer(creep);
+        var myroom = Game.rooms["W26S21"];
+        var room1 = "W26S21";
+        var room2 = "W27S21"
+        var route = Game.map.findRoute(room1,room2);
+        console.log("route between",room1,"and",room2,"is", JSON.stringify(route));
 
+        //var roleBase = require("role.base");; var creep = Game.creeps["Abigail"]; roleBase.resetTasks(creep);
 
-
-
-
+       // var creep = Game.creeps["Arianna"];
+       // var   policyMany2OneLinker=require("policy.many2one.linker");
+      //  policyMany2OneLinker.convertPorter(creep);
        // console.log("size 1 upgader",roomOwned.energyLifeTime(myroom, 1, "upgrader")
         //    ,"porter",roomOwned.energyLifeTime(myroom, 1,  gc.ROLE_ENERGY_PORTER));
 
@@ -91,7 +98,12 @@ var ayrtepPad = {
 
 
 
-
+        /*
+         var creeps = room.find(FIND_MY_CREEPS);
+         for ( var i = 0 ; i < creeps.length ; i++ ) {
+         creeps[i].memory.policyId = currentPolicy.id
+         }
+         */
 
 
 

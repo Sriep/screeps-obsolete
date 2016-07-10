@@ -26,7 +26,7 @@ roleBase = require("role.base");
  */
 var policyNeutralRoad = {
 
-    initilisePolicy: function (newPolicy) {
+    initialisePolicy: function (newPolicy) {
         if (undefined == newPolicy) {
             return false;
         }

@@ -15,7 +15,7 @@
  */
 var policyTemplate = {
 
-    initilisePolicy: function (newPolicy) {
+    initialisePolicy: function (newPolicy) {
         return true;
     },
 

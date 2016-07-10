@@ -36,14 +36,14 @@ var policyDefence = {
         if (policyRescue.needsRescue(room)) {
             return policyFrameworks.createRescuePolicy(room.name);
         }
-        var policyConstruction = require("policy.construction");
-        if (policyConstruction.startConstruction(room)) {
-            return policyFrameworks.createConstructionPolicy(room.name);
-        }
+     //   var policyConstruction = require("policy.construction");
+     //   if (policyConstruction.startConstruction(room)) {
+    //        return policyFrameworks.createConstructionPolicy(room.name);
+    //    }
         return policyFrameworks.createPeacePolicy(room.name);
     },
 
-    initilisePolicy: function (newPolicy) {
+    initialisePolicy: function (newPolicy) {
         return true;
     },
     

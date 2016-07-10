@@ -20,24 +20,19 @@ function TaskMoveXY (x, y) {
     this.conflicts = gc.MOVE;
     this.x = x;
     this.y = y;
-    this.loop = true;
+    this.loop = false;
     this.pickup = true;
 }
 
-TaskMoveXY.prototype.doTask = function(creep, task, actions) {
-    task.loop = true;
+TaskMoveXY.prototype.doTask = function(creep, task) {
+   // task.loop = true;
   //  console.log(creep,"In taskmovexy xpos",creep.pos.x , task.x , "ypos" ,creep.pos.y , task.y);
     var result = creep.moveTo(task.x,task.y);
-    creep.say(result);
+    //creep.say(result);
     switch (result) {
         case OK:    	            //0	The operation has been scheduled successfully.
-           // task.loop = false;
-            console.log(creep, "In after move xpos",creep.pos.x , task.x , "ypos" ,creep.pos.y , task.y);
             if (creep.pos.x == task.x &&  creep.pos.y == task.y) {
-                console.log(creep,"About to set task.loop to false");
                 task.loop = false;
-
-                console.log(creep,"Move to x y got there");
                 return gc.RESULT_FINISHED;
             } else {
                 return gc.RESULT_UNFINISHED;
@@ -53,7 +48,6 @@ TaskMoveXY.prototype.doTask = function(creep, task, actions) {
             return gc.RESULT_UNFINISHED;
     }
 };
-
 
 module.exports = TaskMoveXY;
 

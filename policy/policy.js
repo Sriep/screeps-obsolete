@@ -32,7 +32,7 @@ var policy = {
         for (var i in Memory.policies) {
             var oldPolicyModule = this.getModuleFromPolicy(Memory.policies[i]);
             var newPolicyDetails = oldPolicyModule.draftNewPolicyId(Memory.policies[i]);
-         //   console.log("newPolicyDetails",newPolicyDetails,"i =",i);
+           // console.log(JSON.stringify(oldPolicyModule) ,"newPolicyDetails",newPolicyDetails,"i =",i);
             if (newPolicyDetails === null) {
                 console.log("Terminate policy",Memory.policies[i].type,Memory.policies[i].id);
                 delete Memory.policies[i];
@@ -156,7 +156,10 @@ var policy = {
     activatePolicy: function(policyDetails) {
         var policyFrameworks = require("policy.frameworks");
         if (undefined === policyDetails.id ) {
-            policyDetails.id = this.getNextPolicyId();
+            var nextId = this.getNextPolicyId();
+           // console.log(policyDetails,"policyDetails.id "
+          //      ,policyDetails.id ,"next polisy",nextId)
+            policyDetails.id = nextId;
         }
         if (undefined === Memory.policies){
             Memory.policies = {};
@@ -173,8 +176,8 @@ var policy = {
         console.log("making policy", policyDetails.id);
         Memory.policies[policyDetails.id] = policyDetails;
 
-        if (undefined  !== module.initilisePolicy) {
-            module.initilisePolicy(policyDetails)
+        if (undefined  !== module.initialisePolicy) {
+            module.initialisePolicy(policyDetails)
         }
         return true;
     },
@@ -187,7 +190,7 @@ var policy = {
                 room.memory.dependantPolicies = [];
             }
             room.memory.dependantPolicies.push(dPolicy.id);
-            console.log("InpushDependantPolicy about to return ture",room,dPolicy );
+            console.log("In push Dependant Policy about to return ture",room,dPolicy );
             return true;
         } else {
             return false;
@@ -198,22 +201,17 @@ var policy = {
         return Memory.policies[id];
     },
 
-    breakUpLinks: function (room)
+    breakUpLinks: function (policyId)
     {
-        var creeps = room.find(FIND_MY_CREEPS);
-      //  console.log("breakup links",creeps.lengt)
-        for (var i in creeps)
-        {
-            if (undefined == creeps[i].memory.role
-                || "linker" == creeps[i].memory.role )  {
-                 //   console.log(creeps[i] ,"ssssshould be a linker role",creeps[i].memory.role);
-                    creeps[i].memory.role = roleBase.Type.HARVESTER;
-                  //  console.log(creeps[i],"should be a linker role",creeps[i].memory.role);
-                }
+       
+        var creeps = _.filter(Game.creeps, function (creep) {
+            return creep.memory.policyId == policyId.id
+                && ( creep.memory.role == gc.ROLE_LINKER_SOURCE
+                || creep.memory.role == gc.ROLE_LINKER_MINER_STORAGE);
+        });
+        for (var i = 0 ; i < creeps.length ; i++ ) {
+            roleBase.resetTasks(creep);
         }
-     //   console.log(room ,"has reseved sources",room.memory.reservedSources );
-        room.memory.reservedSources = undefined;
-    //    console.log(room ,"has reseved sources",room.memory.reservedSources );
     } ,
 
     energyStorageAtCapacity: function (room) {
@@ -280,10 +278,10 @@ var policy = {
         //console.log(workersAllotted,"Workers assigned to external contracts");
     },
 
-    initilisePolicy: function(newPolicy) {
-        var module = this.getModuleFromPolicy(newPolicy)
+    initialisePolicy: function(newPolicy) {
+        var module = this.getModuleFromPolicy(newPolicy);
         if (undefined !== module) {
-            if (!module.initilisePolicy(newPolicy)) {
+            if (!module.initialisePolicy(newPolicy)) {
                 return false;
             }
         } else {
@@ -305,10 +303,35 @@ var policy = {
 
     getModuleFromPolicy: function(p) {
         var name = "policy." + p.type;
-        var modulePtr = require(name);
-        return modulePtr;
+        if (p.type) {
+            var modulePtr = require(name);
+            return modulePtr;
+        } else {
+            return undefined;
+        }
+    },
+
+    creepLifeTicks: function (policy) {
+        var creeps = _.filter(Game.creeps, function (creep) {
+            return creep.memory.policyId == policy.id})
+        var life = 0;
+        for ( var i = 0 ; i < creeps.length ; i++ ) {
+            life = life + creeps[i].ticksToLive;
+        }
+        return life;
+    },
+    
+    creepsAgeFactor: function (policy) {
+        var creeps = _.filter(Game.creeps, function (creep) {
+            return creep.memory.policyId == policy.id})
+        var life = 0;
+        for ( var i = 0 ; i < creeps.length ; i++ ) {
+            life = life + creeps[i].ticksToLive;
+        }
+        return life/(creeps.length * 1500);       
     }
-}
+
+};
 
 module.exports = policy;
 

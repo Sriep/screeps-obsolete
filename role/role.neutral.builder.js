@@ -4,59 +4,51 @@
  * @author Piers Shepperson
  */
 var roleBase = require("role.base");
+var TaskMoveRoom = require("task.move.room");
 var policy = require("policy");
+var gc = require("gc");
 /**
  * Abstract role object for creeps building in a neutral room
  * @module policy
  */
 var roleNeutralBuilder = {
 
+    getTaskList: function(buildRoom, sourceRoom) {
+        var tasks = [];
+        var moveToSourceRoom = new TaskMoveRoom(sourceRoom);
 
-    findTarget: function(creep, room) {
-        console.log(creep, "in role natural builder find task" );
-        var site = creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES)
-        if (null !== site) {
-            return site;
-        } else {
-            creep.memory.task = roleBase.Task.MOVE;
-            console.log("roleNeutralBuilder.findTarget site",null, "cree.pos",creep.pos);
-            //creep.memory.targetRoom = creep.memory.endRoom;
-            //var contract = policy.getPolicyFromId(creep.memory.policyId);
-            //contract.shuttingDown = true;
-            return null;
-        }
+        var moveToSource = new TaskMoveFind(gc.FIND_ROOM_OBJECT,gc.RANGE_HARVEST
+                                             , FIND_MY_STRUCTURES);
+
+        var moveToBuildRooom = new TaskMoveRoom(buildRoom);
+        
+        var harvest = new TaskHarvest();
+        
+        var moveToConstructionSite = new TaskMoveFind(gc.FIND_ROOM_OBJECT,gc.RANGE_BUILD
+                                             ,FIND_MY_CONSTRUCTION_SITES);
+        
+        var offload = new TaskOffload(gc.BUILD);
+
+        tasks.push(moveToSourceRoom);
+        tasks.push(moveToSource);
+        tasks.push(harvest);
+        tasks.push(moveToBuildRooom);
+        tasks.push(moveToConstructionSite);
+        tasks.push(offload);
+
+        return tasks;
+    },
+    
+
+    findTarget: function(creep) {
+        //console.log("getting construction site");
+        return creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
     },
 
     action: function(creep, target) {
-        return creep.build(target);
+        return stats.build(creep, target);
     },
-
-    /** @param {Creep} creep **/
-    run: function(creep) {
-        var newTask = roleBase.checkTask(creep);
-        creep.memory.task = newTask;
-        console.log("New task",newTask," for neurtal bulder creep", creep);
-
-        // moving towards construction site
-        switch (creep.memory.task) {
-            case roleBase.Task.MOVE:
-                roleBase.move(creep);
-                break;
-            case roleBase.Task.CARRY:
-                var target = this.findTarget(creep);
-                if (0 != target) {
-                    if (creep.build(target) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(target);
-                    }
-                }
-                break;
-            case roleBase.Task.HARVEST:
-                roleBase.fillUpEnergy(creep);
-                break;
-            default:
-        }
-    }
-}
+};
 
 
 module.exports = roleNeutralBuilder;

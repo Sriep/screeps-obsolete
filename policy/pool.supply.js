@@ -31,7 +31,7 @@ var supplyCenter = {
 
     getEnergyInBuildQueue: function (room) {
         if (room === undefined) {
-            console.log(room, "in getEnergyInBuildQueue")
+           // console.log(room, "in getEnergyInBuildQueue")
             return 0;
         }
         var centre = this.getCentre(room);
@@ -98,7 +98,7 @@ var supplyCenter = {
 
     canSupply: function (centreId, order) {
         return false;
-      //  return this.getsupplyCentres()[centreId].energyToTrade > order.energyRequested
+       //  return this.getsupplyCentres()[centreId].energyToTrade > order.energyRequested
        //     && this.getsupplyCentres()[centreId].yardCapacity > order.energyRequested;
     },
 
@@ -107,8 +107,20 @@ var supplyCenter = {
         return true;
     },
 
-    completedOrder: function (centerId, order) {
-        // Remove order from
+    completedOrder: function (centerId, order, creepName) {
+        var creep = Game.creeps[creepName];
+        if (undefined === creep) {
+            return false;
+        }
+        var policyThePool = require("policy.the.pool");
+        var queue = this.getsupplyCentres()[centreId].buildqueue;
+        var index = queue.indexOf(order);
+        if (index > -1) {
+            order = queue.splice(index,1);
+            completedOrder(order, creepName);
+        }
+        policyThePool.returnToPool(creepName);
+        return false;
     },
 
     newSupplyCenter: function(roomName, energy, yardCapacity) {
@@ -121,7 +133,7 @@ var supplyCenter = {
         this.getCentre(roomName).buildQueue = [];
     }
 
-}
+};
 
 
 

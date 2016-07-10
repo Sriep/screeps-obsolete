@@ -248,8 +248,7 @@ var roleBase = {
             var exit = creep.pos.findClosestByRange(route[0].exit);
             if (exit != null) {
                 if (creep.pos.x == exit.x && creep.pos.y == exit.y) {
-                    var nextStep = this.nextStepIntoRoom(creep.pos, creep.memory.targetRoom);
-                    return;
+                    nextStep = this.nextStepIntoRoom(creep.pos, creep.memory.targetRoom);
                     if (undefined != path[0]){
                         creep.move(path[0].direction);
                     }
@@ -258,9 +257,9 @@ var roleBase = {
                 }
             }
         } else {
-      //      console.log(creep,"botom of move.length > 0");
-            var nextStep = this.nextStepIntoRoom(creep.pos, creep.memory.targetRoom);
-            var path = creep.pos.findPathTo(nextStep);
+            // console.log(creep,"botom of move.length > 0");
+            nextStep = this.nextStepIntoRoom(creep.pos, creep.memory.targetRoom);
+            path = creep.pos.findPathTo(nextStep);
             if (undefined != path[0]){
                 creep.move(path[0].direction);
                 return this.Task.MOVE;
@@ -376,17 +375,18 @@ var roleBase = {
 
 
 
-            //  var tasks = require("tasks");
+             var tasks = require("tasks");
+               
           //  if (creep.name == "Skyler"){
-          //     this.resetTasks(creep);
+           //  this.resetTasks(creep);
          //   }
                 //creep.memory.tasks = undefined;
           //   console.log("-------------------", creep,"-------------------------------");
-                 // tasks.showTasks(creep);
+              //    tasks.showTasks(creep);
              //   tasks.setTargetId(creep,undefined);
               // console.log(creep,creep.memory.role);
-         //   creep.say(creep.memory.role);
-            tasks.doTasks(creep);
+                creep.say(creep.memory.role);
+                tasks.doTasks(creep);
             //  console.log("---------------------------------------------------");
                 return;
           // }
@@ -434,7 +434,7 @@ var roleBase = {
                         || creep.memory.role == this.Type.NEUTRAL_BUILDER) {
                         creep.memory.role = this.Type.UPGRADER;
                       //  console.log(creep,"ijust changed role to",creep.memory.role);
-                        var target = module.findTarget(creep);
+                        target = module.findTarget(creep);
                         if (0 != target) {
                             if(module.action(creep, target) == ERR_NOT_IN_RANGE) {
                                 creep.moveTo(target);

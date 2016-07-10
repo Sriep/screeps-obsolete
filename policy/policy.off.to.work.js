@@ -28,7 +28,7 @@ roleBase = require("role.base");
  */
 var policyOffToWork = {
 
-    initilisePolicy: function (newPolicy) {
+    initialisePolicy: function (newPolicy) {
         return true;
     },
 

@@ -2,6 +2,7 @@
  * @fileOverview Requisition object for using the pool
  * @author Piers Shepperson
  */
+"use strict";
 var policyThePool = require("policy.the.pool");
 var raceBase = require("raceBase");
 /**
@@ -9,25 +10,23 @@ var raceBase = require("raceBase");
  * @module policy
  */
 
-function Requisition (requesterId
+function PoolRequisition (requesterId
                         ,creepBody
+                        ,taskList
+                        ,locationToDeliver
+                        ,role
                         ,priorityLevel
-                        ,locationToDeliver) {
-    this.energy = getEnergyFromBody(creepBody);
-    this.location = Game.rooms[locationToDeliver];
-    if (energy == 0 || undefined === location) {
-        this.id = undefined;
-        this.requester = undefined;
-        this.body = undefined
-        this.energy = undefined;
-        this.priority = undefined;
-        this.location = undefined;
-        this.tick = undefined;
-    }
+) {
     this.id = getNextRequisitionId();
     this.requester = requesterId;
     this.body = creepBody;
+    this.taskList = taskList;
+    this.role = role;
     this.energy = raceBase.getEnergyFromBody(creepBody);
+    if (energy == 0) {
+        this.body = undefined;
+        this.energy = undefined;
+    }    
     this.priority = priorityLevel;
     this.location = locationToDeliver;
     this.tick = undefined;
@@ -42,27 +41,41 @@ function getNextRequisitionId() {
     return latestId;   
 }
 
-Requisition.prototype.paceRequisition = function(order) {
+PoolRequisition.prototype.getMyRequisition = function (policyId) {
+    var orders = _.filter(policyThePool.getRequisitions(), function (order) {
+        return order.id == policyId.id
+    });
+    return orders;
+};
+
+PoolRequisition.prototype.returnToPool = function (creepName) {
+    return policyThePool.returnToPool(creepName);
+};
+
+PoolRequisition.prototype.placeRequisition = function(order) {
     order.tick = Game.tick;
     if (order.isValid())
         policyThePool.getRequisitions()[order.id] = order;
 };
 
-Requisition.prototype.isValid = function() {
-    return id !== undefined;
+PoolRequisition.prototype.isValid = function(requisition) {
+    return requisition.id !== undefined;
 };
 
-Requisition.ptototype.createCopy = function(requisition) {
-    id = requisition.id;
-    requester = requisition.requester;
-    creepRequested = requisition.creepRequested;
-    energyRequested = requisition.energyRequested;
-    priority = requisition.priority;
-    location = requisition.location;
-    tick = requisition.tick;
+PoolRequisition.ptototype.createCopy = function(requisition) {
+    var newCopy = new PoolRequisition();
+    newCopy.id = requisition.id;
+    newCopy.requester = requisition.requester;
+    newCopy.body = requisition.body;
+    newCopy.energyRequested = requisition.energyRequested;
+    newCopy.taskList = requisition.taskList;
+    newCopy.priority = requisition.priority;
+    newCopy.location = requisition.location;
+    newCopy.tick = requisition.tick;
+    return newCopy;
 };
 
-module.exports = Requisition;
+module.exports = PoolRequisition;
 
 
 

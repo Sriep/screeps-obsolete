@@ -1,4 +1,7 @@
 /**
+ * Created by Piers on 10/07/2016.
+ */
+/**
  * Created by Piers on 06/07/2016.
  */
 /**
@@ -11,52 +14,33 @@
 "use strict";
 var gc = require("gc");
 var tasks = require("tasks");
-var TaskMoveXY = require("task.move.xy");
-var TaskMoveRoom = require("task.move.room");
+var TaskMoveXY = require("task.move.xy")
+
 /**
  * Task move object. Used when we need to find the object to move to.
  * @module tasksHarvest
  */
 
-function TaskMovePos (roomPos, pathOps) {
-    this.taskType = gc.TASK_MOVE_POS;
+function TaskMoveRoom (roomName, pathOps) {
+    this.taskType = gc.TASK_MOVE_ROOM;
     this.conflicts = gc.MOVE;
-    this.roomPos = roomPos;
+    this.roomName = roomName;
     this.pathOps = pathOps;
     this.loop = false;
     this.pickup = true;
 }
 
-TaskMovePos.prototype.doTask = function(creep, task) {
+TaskMoveRoom.prototype.doTask = function(creep, task) {
+    console.log(creep,"In TaskMoveRoom");
     if (task.startRoom === undefined) { //First call to function. Initialise data.
         task.startRoom = creep.room.name;
-        task.endRoom = task.roomPos.roomName;
-        task.x = task.pos.x;
-        task.y = task.pos.y;
-        task.roomsToVisit = Game.map.findRoute(task.startRoom, task.roomPos.room, task.pathOps);
-        task.pathIndex = 0;
-    }
-    console.log(creep,"In TaskMovePos");
-    if (creep.room.name == task.roomPos.roomName
-        && !TaskMoveRoom.prototype.atBorder(creep.pos.x,creep.pos.y)) {
-        return TaskMoveXY.prototype.doTask(creep, task);
-    }
-    TaskMoveRoom.prototype.doTask(creep, task);
-    return  gc.RESULT_UNFINISHED;
-}
-
-/*
-    if (task.startRoom === undefined) { //First call to function. Initialise data.
-        task.startRoom = creep.room.name;
-        task.endRoom = task.roomPos.roomName;
-        task.x = task.pos.x;
-        task.y = task.pos.y;
+        task.endRoom = roomName;
         task.roomsToVisit = Game.map.findRoute(task.startRoom, task.roomPos.room, task.pathOps);
         task.pathIndex = 0;
     }
 
-    if (creep.room.name == task.roomPos.roomName) { //In target room use TaskMoveXY
-        return TaskMoveXY.prototype.doTask(creep, task);
+    if (creep.room.name == task.roomPos.roomName && !atBorder(creep.pos.x,creep.pos.y)) { 
+        return gc.RESULT_FINISHED;
     }
 
     if (task.pathIndex >= task.path.length) { // We are lost. Recalculate route.
@@ -90,11 +74,11 @@ TaskMovePos.prototype.doTask = function(creep, task) {
 
 };
 
-var atBorder = function(x,y) {
+TaskMoveRoom.prototype.atBorder = function(x,y) {
     return ( x == 0 || x == 49 || y == 0 || y == 49 )
 };
 
-var nextStepIntoRoom = function(pos, nextRoom) {
+TaskMoveRoom.prototype.nextStepIntoRoom = function(pos, nextRoom) {
     var x  = pos.x;
     var y= pos.y;
     if (pos.x == 0) {
@@ -115,9 +99,9 @@ var nextStepIntoRoom = function(pos, nextRoom) {
     } else {
         return undefined;
     }
-};*/
+};
 
-module.exports = TaskMovePos;
+module.exports = TaskMoveRoom;
 
 
 

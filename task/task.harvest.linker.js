@@ -51,7 +51,7 @@ TaskHarvestLinker.prototype.doTask = function(creep, task) {
         return gc.RESULT_FINISHED;
     }
     var result = sourceLink.transferEnergy(targetLink);
-    console.log(creep,"transfer result",result);
+ //   console.log(creep,"transfer result",result);
     return gc.RESULT_UNFINISHED;
 };
 

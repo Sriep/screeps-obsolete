@@ -35,7 +35,7 @@ var policyBuildspawn = {
         return oldPolicy;
     },
 
-    initilisePolicy: function (newPolicy) {
+    initialisePolicy: function (newPolicy) {
         return true;
     },
 

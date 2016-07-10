@@ -14,7 +14,7 @@ var policyFrameworks = require("policy.frameworks");
 var policyClaim = {
 
     
-    initilisePolicy: function (newPolicy) {
+    initialisePolicy: function (newPolicy) {
         if (undefined == newPolicy) {
             return false;
         }

@@ -63,6 +63,7 @@ TaskMoveFind.prototype.doTask = function(creep, task, actions) {
             case this.FindMethod.FindRoomObject:
                 //target = creep.pos.findClosestByPath(task.findObject);
                 target = creep.pos.findClosestByRange(task.findObject);
+                console.log(creep,"movefind find room objet", target);
                 break;
             case this.FindMethod.FindStructure:
                // target = creep.pos.findClosestByPath(FIND_MY_STRUCTURES
@@ -79,7 +80,7 @@ TaskMoveFind.prototype.doTask = function(creep, task, actions) {
             case this.FindMethod.FindFunction:
                 var module = require(task.findModule);
                 target = module[task.findFunction](creep);
-                console.log(creep,"find function returned",target);
+              //  console.log(creep,"find function returned",target);
                 break;
             default:
                 console.log(creep,"Invalid find method");
@@ -91,7 +92,7 @@ TaskMoveFind.prototype.doTask = function(creep, task, actions) {
     }
     if (!target) {
      //   console.log(creep,"find CRESULT_FINISHED ant find target finished")
-        creep.say("No target");
+       // creep.say("No target");
         return gc.RESULT_FINISHED;
     }
     //console.log(creep,"movefind target", target);

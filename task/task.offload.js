@@ -51,7 +51,7 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
 
     var target = Game.getObjectById(tasks.getTargetId(creep));
     if (!target) {
-       // console.log(creep,"Offload, No target Id found");
+        console.log(creep,"Offload, No target Id found",task.offloadMethod);
         tasks.setTargetId(creep, undefined);
         if (creep.carry.energy == 0)
             return gc.RESULT_FINISHED;
@@ -77,7 +77,9 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
             if (creep.carry.energy == 0
                 || task.offlaodType == gc.DROP
                 || task.offlaodType == gc.TRANSFER ) {
-               // console.log(creep,"offloaded all energy - FINSIHED");
+
+               // console.log(creep,"offloaded all energy - FINSIHED",task.offloadMethod);
+                creep.say("empty");
                 tasks.setTargetId(creep, undefined);
                 return gc.RESULT_FINISHED;
             }
@@ -85,18 +87,18 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
                 switch (task.offloadMethod) {
                     case gc.BUILD:
                         if (Game.getObjectById(target.id)) {
-                         //   creep.say("build same")
-                         //   console.log("Build object still three, result unfinished");
-                          //  creep.say("empty");
+                            creep.say("build same");
+                           // console.log(creep, "Build object still three, result unfinished");
                             return gc.RESULT_UNFINISHED;                          
                         }
                     case gc.REPAIR:
                     case gc.TRANSFER:
                         tasks.setTargetId(creep, undefined);
-                      //  creep.say("next target")
-                      ///  console.log("Built object need rollback for nest siet");
+                        creep.say("next target");
+                        ///  console.log("Built object need rollback for nest siet");
                         return gc.RESULT_ROLLBACK;
                     case gc.UPGRADE_CONTROLLER:
+                        creep.say("upgrade");
                         return gc.RESULT_UNFINISHED;
                     case gc.DROP:
                     default:
@@ -109,9 +111,10 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
             tasks.setTargetId(creep, undefined);
             if (creep.carry.energy == 0)     {
             //    console.log(creep,"offloaded all energy - FINSIHED");
+                creep.say("empty");
                 return gc.RESULT_FINISHED;
             } else {
-            //    creep.say("full")
+                   creep.say("built");
             //    console.log("transfer full go somewere else");
                 return gc.RESULT_ROLLBACK;
             }

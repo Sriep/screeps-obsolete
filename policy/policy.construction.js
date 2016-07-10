@@ -11,6 +11,8 @@ var    raceBase = require("race.base");
 var    raceWorker = require("race.worker");
 var    roleBase = require("role.base");
 var   stats = require("stats");
+var policyPeace = require("policy.peace");
+var poolSupply = require("pool.supply");
 
 /**
  * Abstract base object for deceison when there are construction projects.
@@ -29,6 +31,7 @@ var policyConstruction = {
      */   
     draftNewPolicyId: function(oldPolicy) {
         var room =  Game.rooms[oldPolicy.room];
+        
         if (policyDefend.beingAttaced(room)) {
             return policyFrameworks.createDefendPolicy(room.name);
         }
@@ -36,13 +39,25 @@ var policyConstruction = {
         if (policyRescue.needsRescue(room)) {
             return policyFrameworks.createRescuePolicy(room.name);
         }
-        if (this.startConstruction(room)) {
-            return oldPolicy;
+
+        var creeps = _.filter(Game.creeps, function (creep)
+        {return creep.memory.policyId == oldPolicy.id});
+        if ( (room.memory.linkState == "linkEconomy"
+            || room.memory.linkState == "linkForming")
+            && 3 < creeps.length ) {
+            return policyFrameworks.createMany2OneLinkersPolicy(room.name
+                , room.memory.links.fromLinks
+                , room.memory.links.toLink
+                ,true);
         }
+
+       // if (this.startConstruction(room)) {
+        //    return oldPolicy;
+       // }
         return policyFrameworks.createPeacePolicy(room.name);
     },
 
-    initilisePolicy: function (newPolicy) {
+    initialisePolicy: function (newPolicy) {
         return true;
     },
 
@@ -57,28 +72,22 @@ var policyConstruction = {
     enactPolicy: function(currentPolicy) {
         room = Game.rooms[currentPolicy.room];
         room.memory.policyId = currentPolicy.id;
-
-
-        
-        this.assingWorkers(room, currentPolicy);
-    },
-
-    assingWorkers: function(room, currentPolicy) {
-        room = Game.rooms[currentPolicy.room];
+        poolSupply.updateSupplyLevel(room.name
+            ,roomOwned.calaculateSuplly(room)
+            ,room.energyCapacityAvailable);
+        var constructionLeft = roomOwned.getConstructionLeft(room);
+        console.log(room,"constructoin left", constructionLeft);
      //   stats.updateStats(room);
         var nBuilders = 0;
         var nRepairers = 0;
         var nUpgraders =0;
-        //var nHavesters = roomOwned.constructHavesters(room, undefined, true);
-        //var nBuilders = roomOwned.constructBuilders(room, undefined, true);
+
 
         var energy = roomOwned.allSourcesEnergy(room)  *5;
-        var toSupply = policy.supportBurden(room);
+        var toSupply = poolSupply.getEnergyInBuildQueue(room);
         var supportable = roomOwned.workersSupportable(room, energy, raceWorker.LINKING_WORKERSIZE, true);
         var toSupply = Math.floor(Math.min(toSupply, supportable));
-        
-        console.log("Room can support", supportable,"workers for ",supportable*1000
-            ,"energy and",supportable*5,"parts. Support burder is",toSupply,"workers.");         
+
         if (toSupply > 0)
         {
             var nHavesters = roomOwned.supportHavesters(room,  toSupply, energy, policy.LINKING_WORKER_SIZE, true);
@@ -87,52 +96,44 @@ var policyConstruction = {
             var nHavesters = roomOwned.constructHavesters(room, policy.LINKING_WORKER_SIZE,  true);
             var nBuilders = roomOwned.constructBuilders(room, policy.LINKING_WORKER_SIZE,  true);
         }
-        var nEqHavesters= nHavesters;
-        console.log("Support havesters",nHavesters,"Builders",nBuilders );
-        var creeps = _.filter(Game.creeps, (creep) => creep.memory.policyId == currentPolicy.id);
-      //  console.log("creeps",creeps.length,Game.creeps.length,"creeps",creeps.length,"room", room);
 
+        var equilbriumCreeps = nHavesters + nUpgraders + nBuilders + toSupply;
+        var creeps = _.filter(Game.creeps, (creep) => creep.memory.policyId == currentPolicy.id);
         var nCreeps = creeps.length;
         var nWorkParts = raceBase.countBodyParts(creeps, WORK);
-
-        console.log("Number of creeeps",nCreeps,"with a total of ",nWorkParts,"parts looking for ",
-            (nHavesters + nBuilders) * policy.LINKING_WORKER_SIZE ,"parts" );
-
-        if ( (nHavesters + nBuilders) * policy.LINKING_WORKER_SIZE < nWorkParts )
+        if ( equilbriumCreeps * policy.LINKING_WORKER_SIZE < nWorkParts )
         {           
             if (policy.energyStorageAtCapacity(room))
             {
-                //nHavesters = Math.floor(nHavesters);
                 nHavesters = 0;
             } else {
                 nHavesters = Math.ceil(nHavesters);
             }
         } else {
-            console.log("Count source acces ponts", roomOwned.countSiteAccess(room,FIND_SOURCES));
-            if (nCreeps < 3* roomOwned.countSiteAccess(room,FIND_SOURCES)) {
-          //  if (roomOwned.countSiteAccess(room,FIND_SOURCES) > 1) {
-                var spawns = room.find(FIND_MY_SPAWNS);
-                raceBase.spawn(raceWorker
-                    , currentPolicy
-                    , spawns[0]
-                    , raceWorker.spawnWorkerSize(room,(nHavesters + nBuilders)*1000));
-           }
-            nHavesters = Math.max(Math.ceil(nEqHavesters),2);
+            nHavesters = Math.max(Math.ceil(nHavesters),2);
         }
-        console.log("workers size to spawn", raceWorker.spawnWorkerSize(room,(nHavesters + nBuilders)*1000));
-        if (nCreeps - nHavesters > this.REPAIR_THRESHOLD) {
-            nRepairers = 1;
-        }
+        policyPeace.spawnCreep(room,currentPolicy, equilbriumCreeps );
+
         //Has not spawned but energy at capacty no need for havesters
         if (policy.energyStorageAtCapacity(room)){
             nHavesters = 0;
         }
-        var nBuilders = nCreeps - nHavesters - nRepairers - nUpgraders;
-        console.log("enact const roles havesters", nHavesters, "builders", nBuilders,
-            "upgraders", nUpgraders, "and repairers", nRepairers,
-            "total creeps", nCreeps);
+        //Limit to one harvester if only one acces point
+        if (1 == roomOwned.countSiteAccess(room, FIND_SOURCES)) {
+            nHavesters = Math.min(1, nHavesters);
+        }
+        if (nCreeps - nHavesters > this.REPAIR_THRESHOLD) {
+            nRepairers = 1;
+        }
+        
+
+        nBuilders = nCreeps - nHavesters - nRepairers - nUpgraders;
+        
+        console.log("Enact construction with links roles havesters", nHavesters, "builders", nBuilders,
+            "upgraders", nUpgraders, "and repairers", nRepairers
+            , "total creeps", nCreeps);
         raceWorker.assignWorkerRoles(currentPolicy, nHavesters, nUpgraders, nBuilders , nRepairers);
-        policy.convertContractWorkers(room, currentPolicy, roleBase.Type.BUILDER);
+       // policy.convertContractWorkers(room, currentPolicy, roleBase.Type.BUILDER);
 
     },
 
@@ -159,16 +160,17 @@ var policyConstruction = {
        //     return;
        // }
         switch(oldPolicy.type) {
-        case policyFrameworks.Type.RESCUE:
-            break;
-        case policyFrameworks.Type.CONSTRUCTION:
-            break;
-        case policyFrameworks.Type.DEFEND:
-            break;
-        case policyFrameworks.Type.PEACE: 
-            console.log("switch from peace to construction");
-            policy.breakUpLinks(Game.rooms[oldPolicy.room]);
-        default:
+            case policyFrameworks.Type.RESCUE:
+                break;
+            case policyFrameworks.Type.CONSTRUCTION:
+                break;
+            case policyFrameworks.Type.DEFEND:
+                break;
+            case policyFrameworks.Type.POLICY_MANY2ONE_LINKERS:
+                policy.breakUpLinks(oldPolicy);
+                break;
+            case policyFrameworks.Type.PEACE: 
+                console.log("switch from peace to construction");
         }
         policy.reassignCreeps(oldPolicy, newPolicy);
     },

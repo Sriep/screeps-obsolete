@@ -25,8 +25,8 @@ function TaskLoadup (resourceId) {
 TaskLoadup.prototype.doTask = function(creep, task) {
     var storage =  Game.getObjectById(tasks.getTargetId(creep));
     if (!storage) {
-        console.log(creep,"Cant find storage");
-        creep.say("help storage");
+      //  console.log(creep,"Cant find storage");
+      //  creep.say("help storage");
         return gc.RESULT_ROLLBACK;
     } else {
         storage.transfer(creep, task.resourceId);
