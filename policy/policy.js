@@ -5,6 +5,7 @@
  * @author Piers Shepperson
  */
 var roleBase = require("role.base");
+var gc = require("gc");
 //var policyFrameworks = require("policy.declarations");
 /**
  * Abstract base object for policy decisions.
@@ -210,7 +211,7 @@ var policy = {
                 || creep.memory.role == gc.ROLE_LINKER_MINER_STORAGE);
         });
         for (var i = 0 ; i < creeps.length ; i++ ) {
-            roleBase.resetTasks(creep);
+            roleBase.resetTasks(creeps[i]);
         }
     } ,
 

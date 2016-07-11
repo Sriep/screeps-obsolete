@@ -49,7 +49,7 @@ var roleEnergyPorter = {
         return undefined;
     },
 
-    moveTaskList: function(creep) {
+    getTaskList: function(creep) {
         var taskList = [];
         var moveToEnergyContainer = new TaskMoveFind(gc.FIND_FUNCTION,gc.RANGE_TRANSFER
                                                 , "nextEnergyContainer","role.energy.porter");

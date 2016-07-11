@@ -29,7 +29,8 @@ var roleBase = {
         SPAWN_BUILDER: gc.ROLE_SPAWN_BUILDER,
         MINER: gc.ROLE_MINER,
         TRAVELLER: gc.ROLE_TRAVELLER,
-        ENERGY_PORTER: gc.ROLE_ENERGY_PORTER
+        ENERGY_PORTER: gc.ROLE_ENERGY_PORTER,
+        ROLE_FLEXI_STORAGE_PORTER: gc.ROLE_FLEXI_STORAGE_PORTER
     },
 
     Task: {
@@ -38,8 +39,10 @@ var roleBase = {
         MOVE: "move"
     },
 
-    LoadTime: {"harvester": 25, "upgrader": 25, "builder":25, "repairer": 25, "energy.porter" : 0},
-    OffloadTime: {"harvester": 1, "upgrader": 50, "builder":5, "repairer": 50, "energy.porter" : 40 },
+    LoadTime: {"harvester": 25, "upgrader": 25, "builder":25, "repairer": 25
+        , "energy.porter" : 0, "flexi.storage.porter" : 0},
+    OffloadTime: {"harvester": 1, "upgrader": 50, "builder":5, "repairer": 50
+        , "energy.porter" : 40 , "flexi.storage.porter" : 40},
 
     sourceClinetThreshold: 1,
 
@@ -378,14 +381,14 @@ var roleBase = {
              var tasks = require("tasks");
                
           //  if (creep.name == "Skyler"){
-           //  this.resetTasks(creep);
+         //    this.resetTasks(creep);
          //   }
                 //creep.memory.tasks = undefined;
           //   console.log("-------------------", creep,"-------------------------------");
               //    tasks.showTasks(creep);
              //   tasks.setTargetId(creep,undefined);
               // console.log(creep,creep.memory.role);
-                creep.say(creep.memory.role);
+              //  creep.say(creep.memory.role);
                 tasks.doTasks(creep);
             //  console.log("---------------------------------------------------");
                 return;
@@ -453,10 +456,30 @@ var roleBase = {
     convert: function (creep, role) {
         if (undefined === creep.memory.tasks)
             creep.memory.tasks = {};
-        module = this.getModuleFromRole(role);  
+        module = this.getModuleFromRole(role);
         creep.memory.tasks.tasklist = module.getTaskList(creep);
         creep.memory.role = role;
         tasks.setTargetId(creep,undefined);
+        return true;
+    },
+
+    switchRoles: function (creep, role, para1, para2, para3, para4, para5,
+                                         para6, para7, para8, para9, para10) {
+        if (undefined === creep) {
+            return false;
+        }
+        module = this.getModuleFromRole(role);
+        if (undefined === module) {
+            return false;
+        }
+        console.log(creep,"role",role,"module",module)
+        if (undefined === creep.memory.tasks)
+            creep.memory.tasks = {};
+        tasks.setTargetId(creep,undefined);
+        creep.memory.tasks.state = undefined;
+        creep.memory.tasks.tasklist = module.getTaskList(creep, para1, para2, para3, para4, para5,
+                                                                para6, para7, para8, para9, para10 );
+        creep.memory.role = role;
         return true;
     },
 
@@ -464,10 +487,10 @@ var roleBase = {
         if (undefined !== role) {
             var name = "role." + role;
             var modulePtr = require(name);
+            console.log("role",role,"name",name,"module",modulePtr);
             return modulePtr;
-        } else {
-            var roleHarvester = require("role.harvester");
-            return roleHarvester;
+        }  else {
+            return undefined;
         }
     }
 };

@@ -6,7 +6,7 @@ var TaskStorageLinkerMiner = require("task.storage,linker.miner");
 
 var roleLinkerMinerStorage = {
 
-    moveTaskList: function(creep, x,y,storageId, storageLinkId, mineralId, resourceMined) {
+    getTaskList: function(creep, x,y,storageId, storageLinkId, mineralId, resourceMined) {
         var taskList = [];
         var moveToPosition = new TaskMoveXY(x,y);
         var linking = new TaskStorageLinkerMiner(storageId, storageLinkId, mineralId, resourceMined);

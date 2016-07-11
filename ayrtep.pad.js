@@ -48,11 +48,11 @@ var ayrtepPad = {
 
         // var creep = Game.creeps["Levi"];
         //  policyPeace.convertStorageRepairer(creep);
-        var myroom = Game.rooms["W26S21"];
-        var room1 = "W26S21";
-        var room2 = "W27S21"
-        var route = Game.map.findRoute(room1,room2);
-        console.log("route between",room1,"and",room2,"is", JSON.stringify(route));
+      //  var myroom = Game.rooms["W26S21"];
+      //  var room1 = "W26S21";
+      //  var room2 = "W27S21"
+       // var route = Game.map.findRoute(room1,room2);
+       // console.log("route between",room1,"and",room2,"is", JSON.stringify(route));
 
         //var roleBase = require("role.base");; var creep = Game.creeps["Abigail"]; roleBase.resetTasks(creep);
 

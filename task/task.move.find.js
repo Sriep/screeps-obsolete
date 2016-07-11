@@ -43,27 +43,30 @@ TaskMoveFind.prototype.FindMethod = {
 };
 
 TaskMoveFind.prototype.doTask = function(creep, task, actions) {
-    //console.log(creep,"In TaskMoveFind");
+   // console.log(creep,"In TaskMoveFind method", task.method, "task.findid"
+  //      , task.findId,"target id",tasks.getTargetId(creep) );
     //tasks.setTargetId(creep, undefined);
     var target = undefined;
     if (task.method != this.FindMethod.FindId)  {
         if (tasks.getTargetId(creep)) {
             target = Game.getObjectById(tasks.getTargetId(creep));
         } else {
-        //    console.log("In move find removing cashed id",tasks.getTargetId(creep))
+       //     console.log("In move find removing cashed id",tasks.getTargetId(creep))
             tasks.setTargetId(creep, undefined);
         }
     }
+
     if (!target) {
-  //      console.log(creep,"no target look for one method",task.method);
+     //   console.log(creep,"no target look for one method",task.method);
         switch (task.method) {
             case this.FindMethod.FindId:
                 target = Game.getObjectById(task.findId);
+          //      console.log(creep,"case this.FindMethod.FindId",task.findId,"target",target);
                 break;
             case this.FindMethod.FindRoomObject:
                 //target = creep.pos.findClosestByPath(task.findObject);
                 target = creep.pos.findClosestByRange(task.findObject);
-                console.log(creep,"movefind find room objet", target);
+           //     console.log(creep,"movefind find room objet", target);
                 break;
             case this.FindMethod.FindStructure:
                // target = creep.pos.findClosestByPath(FIND_MY_STRUCTURES
@@ -80,39 +83,40 @@ TaskMoveFind.prototype.doTask = function(creep, task, actions) {
             case this.FindMethod.FindFunction:
                 var module = require(task.findModule);
                 target = module[task.findFunction](creep);
-              //  console.log(creep,"find function returned",target);
+            //    console.log(creep,"find function returned",target);
                 break;
             default:
                 console.log(creep,"Invalid find method");
             //Unreachable
         }
-        //console.log(creep,"TaskMoveFind do target is", target, "method is", task.method);
+       // console.log(creep,"TaskMoveFind do target is", target, "method is", task.method);
         if (target)
             tasks.setTargetId(creep, target.id);
     }
     if (!target) {
-     //   console.log(creep,"find CRESULT_FINISHED ant find target finished")
-       // creep.say("No target");
+      //  console.log(creep,"find RESULT_FINISHED and cound not find any target")
+      //  creep.say("No target");
         return gc.RESULT_FINISHED;
     }
-    //console.log(creep,"movefind target", target);
+  //  console.log(creep,"movefind target", target);
 
     var distanceToGo = creep.pos.getRangeTo(target);
     if (distanceToGo <= task.range) {
-   //     console.log(creep,"find RESULT_FINISHED before move");
-       // creep.say("there");
+     //   console.log(creep,"find RESULT_FINISHED before move");
+     //   console.log(creep,"distanceToGo",distanceToGo,"<= range",task.range)
+      //  creep.say("there");
         return gc.RESULT_FINISHED;
     }
 
     creep.moveTo(target);
     distanceToGo = creep.pos.getRangeTo(target);
     if (distanceToGo <= task.range) {
-       // console.log(creep,"find RESULT_FINISHED; after move range <= abut ");
+     //   console.log(creep,"find RESULT_FINISHED; after move range <= abut ");
       //  creep.say("There");
         return gc.RESULT_FINISHED;
     }  else {
-      // console.log(creep,"find RESULT_UNFINISHED after move range <= abut to");
-      //  creep.say("Moving");
+     //  console.log(creep,"find RESULT_UNFINISHED after move range <= abut to");
+     //   creep.say("Moving");
         return gc.RESULT_UNFINISHED;
     }
 };

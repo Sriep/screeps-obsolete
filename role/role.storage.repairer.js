@@ -23,7 +23,7 @@ var TaskLoadup = require("task.loadup");
 
 var roleStorageRepairer = {
 
-    moveTaskList: function(creep) {
+    getTaskList: function(creep) {
         var taskList = [];
 
         var storages = creep.room.find(FIND_MY_STRUCTURES, {

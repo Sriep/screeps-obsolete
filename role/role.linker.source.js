@@ -8,7 +8,7 @@ var TaskHarvestLinker = require("task.harvest.linker");
 
 var roleLinkerSource = {
 
-    moveTaskList: function(creep, x,y,sourceId, homeLinkId, targetLinkId) {
+    getTaskList: function(creep, x,y,sourceId, homeLinkId, targetLinkId) {
         var taskList = [];
         var moveToSource = new TaskMoveXY(x,y);
         var harvestLink = new TaskHarvestLinker(sourceId, homeLinkId, targetLinkId)

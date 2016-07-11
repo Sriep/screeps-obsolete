@@ -51,12 +51,12 @@ TaskMoveRoom.prototype.doTask = function(creep, task) {
     }
 
     var exit;
-    if ( atBorder(creep.pos.x,creep.pos.y ) ) {
+    if ( this.atBorder(creep.pos.x,creep.pos.y ) ) {
         creep.say("moving");
         var currentRoom = creep.room;
         var targetRoom = roomsToVisit[pathIndex].room;
         if (targetRoom == currentRoom) {
-            var nextStep =  nextStepIntoRoom(creep.pos, targetRoom)
+            var nextStep =  this.nextStepIntoRoom(creep.pos, targetRoom)
             var nextStepPath = creep.pos.findPathTo(nextStep);
             if (OK == creep.move(nextStepPath[0].direction)) {
                 pathIndex++

@@ -130,6 +130,10 @@ var roomOwned = {
                 return this.getRepairerRondTripLength(room, force);
             case roleBase.Type.ENERGY_PORTER:
                 return this.getUpgradeRondTripLength(room, force);
+            case roleBase.Type.ROLE_FLEXI_STORAGE_PORTER:
+                return this.getUpgradeRondTripLength(room, force);
+            default:
+                return this.getUpgradeRondTripLength(room, force);
         }
     },
     
@@ -199,7 +203,7 @@ var roomOwned = {
         var loadTime = roleBase.LoadTime[role];
         var offloadTime = roleBase.OffloadTime[role];
         var roundTripTime = this.roundTripLength(room, role);
-      //  console.log("loadtime",loadTime,"offloadTime",offloadTime,"roundTripTime",roundTripTime);
+       // console.log("energyLifeTime loadtime",loadTime,"offloadTime",offloadTime,"roundTripTime",roundTripTime);
         
         var timePerTrip = loadTime + offloadTime + roundTripTime;
         var tripsPerLife = CREEP_LIFE_TIME / timePerTrip;

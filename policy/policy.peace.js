@@ -47,13 +47,10 @@ var policyPeace = {
         if (!policyBuildspawn.spawnFound(oldPolicy))      {
             return policyFrameworks.createBuildspawn(room.name);
         }
-        var constructionLeft = roomOwned.getConstructionLeft(room); 
+
         
-        var creeps = _.filter(Game.creeps, function (creep)
-        {return creep.memory.policyId == oldPolicy.id});
-        if ( (room.memory.linkState == "linkEconomy"
-            || room.memory.linkState == "linkForming")
-                && 3 < creeps.length ) {
+        var policyMany2OneLinker = require("policy.many2one.linker");
+        if ( policyMany2OneLinker.readyForMAny2OneLinker(oldPolicy)) {
             return policyFrameworks.createMany2OneLinkersPolicy(room.name
                 , room.memory.links.fromLinks
                 , room.memory.links.toLink
@@ -192,8 +189,10 @@ var policyPeace = {
         
         var workerSizeToSpawn = raceWorker.spawnWorkerSize(room, (equilbriumCreeps) * 1000);
         
-     //   console.log(room,"woreker size to spawn", workerSizeToSpawn);
-        if (equilbriumCreeps * workerSizeToSpawn <= nWorkParts || nCreeps < 2)
+        console.log(room,"woreker size to spawn", workerSizeToSpawn);
+        console.log(room,"equilbriumCreeps", equilbriumCreeps,"w size", workerSizeToSpawn
+            , "<= nWorkePArts",nWorkParts, " || ncreeps"  ,nCreeps);
+        if (equilbriumCreeps * workerSizeToSpawn >= nWorkParts || nCreeps < 2 )//|| room.name == "W26S21")
         {
             if (nCreeps < 3 * roomOwned.countSiteAccess(room, FIND_SOURCES)) {
                 var spawns = room.find(FIND_MY_SPAWNS);
@@ -202,9 +201,7 @@ var policyPeace = {
                     , spawns[0]
                     , workerSizeToSpawn);
             }
-        }   
-       // var energyInBuildQueue = poolSupply.getEnergyInBuildQueue();
-      //  console.log(room,"Energy in build queue",energyInBuildQueue );
+        }
     },
     
 

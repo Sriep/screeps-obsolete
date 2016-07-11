@@ -37,6 +37,7 @@ var gc = {
     ROLE_LINKER_SOURCE: "linker.source",
     ROLE_LINKER_MINER_STORAGE:  "linker.miner.storage",
     ROLE_STORAGE_REPAIRER: "storage.repairer",
+    ROLE_FLEXI_STORAGE_PORTER: "flexi.storage.porter",
     
     //Tasks
     TASK_MOVE_FIND: "move.find",
@@ -48,6 +49,13 @@ var gc = {
     TASK_HARVEST_STORAGE_LINK_MINER: "storage,linker.miner",
     TASK_LOADUP: "loadup",
     TASK_MOVE_ROOM: "move.room",
+    TASK_OFFLOAD_SWITCH: "offload.switch",
+    
+    //Offload switch task's states
+    SWITCH_STATE_PRODUCTION:  "production",
+    SWITCH_STATE_CONSTRUCTION:  "construction",
+    SWITCH_STATE_FILLUP:  "fillup",
+    SWITCH_STATE_UPGRADE:  "upgrade",
     
     //TaskMoveFind.prototype.FindMethod
     FIND_ID : "find.id",
@@ -74,6 +82,7 @@ var gc = {
     RESULT_UNFINISHED: "unfinished",
     RESULT_FAILED: "failed",
     RESULT_ROLLBACK: "rollback",
+    RESULT_RESET: "reset",
     
     //policies
     POLICY_POLICY_THE_POOL: "the.pool",
@@ -91,7 +100,9 @@ var gc = {
     
     //misc
     LINKING_WORKER_SIZE: 5,
-    BLOCKSIZE_COST_WORKER: 200
+    BLOCKSIZE_COST_WORKER: 200,
+    EMERGENCY_DOWNGRADING_THRESHOLD: 5000,
+    MANY2ONE_REQUIRED_LIFE: 5400
 
 };
 

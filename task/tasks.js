@@ -25,7 +25,8 @@ var tasks = {
         Finished: gc.RESULT_FINISHED,
         Unfinished: gc.RESULT_UNFINISHED,
         Failed: gc.RESULT_FAILED,
-        Rollback: gc.RESULT_ROLLBACK
+        Rollback: gc.RESULT_ROLLBACK,
+        Reset: gc.RESULT_RESET
     },
     
     MAX_TASK_ACTIONS: 5,
@@ -36,7 +37,8 @@ var tasks = {
         result = this.Result.Finished;
         var doneActions = new TaskActions(gc.CREEP);
         var actionCount = 0;
-        while ((result == this.Result.Finished || result == this.Result.Failed  || result == this.Result.Rollback)
+        while ((result == this.Result.Finished || result == this.Result.Failed //|| result == this.Result.Rollback
+                    || result == this.Result.Rollback)
                             && taskList.length > 0 && actionCount++ < this.MAX_TASK_ACTIONS) {
             var task = taskList[0];
             var moduleName = "task." + task.taskType;
@@ -45,20 +47,23 @@ var tasks = {
                 this.pickUpLooseEnergy(creep);
                 doneActions.actions.add(gc.PICKUP);
             }
-         //   console.log(creep ,"about to do task", task.taskType,"Length of task list is", taskList.length);
+            console.log(creep ,"about to do task", task.taskType,"Length of task list is", taskList.length);
            // creep.say(task.taskType);
             var result;
             if (!TaskActions.prototype.isConflict(doneActions, task.conflicts)) {
 
                 result = taskModule.prototype.doTask(creep, task, doneActions);
 
-                //console.log(creep, "done", task.taskType,"Task, return", result);
+            //    console.log(creep, "done", task.taskType,"Task, return", result);
                 if (this.Result.Finished == result) {
                     doneActions.actions.add(task.conflicts);
                 }
             } else {
           //      console.log(creep,"conflict found",task.conflicts);
                 result = this.Result.Unfinished;
+            }
+            if (this.Result.RESULT_RESET == result) {
+                taskList = creep.memory.tasks.tasklist;
             }
 
             if (this.Result.Rollback == result && task.loop) {
@@ -73,7 +78,8 @@ var tasks = {
             }  else  {
              //   console.log(creep,"check finresult", result,"this.Result.Finished"
              //       ,this.Result.Finished,"this.Result.Finished" ,this.Result.Failed);
-                if (result == this.Result.Finished || result == this.Result.Finished) {
+                if (result == this.Result.Finished
+                    || result == this.Result.Reset) {
                    // console.log(creep,"In finsihed or failed");
                     if (taskList.length > 0){
                         var doneTask = taskList.shift();

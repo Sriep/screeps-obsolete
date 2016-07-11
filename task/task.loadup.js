@@ -10,7 +10,7 @@ var tasks = require("tasks");
 /**
  * Abstract  Race of creeps that transport energy around.
  * units.
- * @module policy
+ * @module TaskLoadup
  */
 
 

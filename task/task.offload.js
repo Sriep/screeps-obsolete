@@ -43,6 +43,8 @@ TaskOffload.prototype.offloadMethod = {
 
 TaskOffload.prototype.doTask = function(creep, task, actions) {
     var tasks = require("tasks");
+  //  console.log(creep,"In task Offload target id", tasks.getTargetId(creep));
+
     if (creep.carry[task.resource] == 0) {
       //  console.log("tried Offloading witih no enrgy");
         tasks.setTargetId(creep, undefined);
@@ -78,8 +80,8 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
                 || task.offlaodType == gc.DROP
                 || task.offlaodType == gc.TRANSFER ) {
 
-               // console.log(creep,"offloaded all energy - FINSIHED",task.offloadMethod);
-                creep.say("empty");
+           //     console.log(creep,"offloaded all energy - FINSIHED",task.offloadMethod);
+           //     creep.say("empty");
                 tasks.setTargetId(creep, undefined);
                 return gc.RESULT_FINISHED;
             }
@@ -87,18 +89,18 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
                 switch (task.offloadMethod) {
                     case gc.BUILD:
                         if (Game.getObjectById(target.id)) {
-                            creep.say("build same");
+                   //         creep.say("build same");
                            // console.log(creep, "Build object still three, result unfinished");
                             return gc.RESULT_UNFINISHED;                          
                         }
                     case gc.REPAIR:
                     case gc.TRANSFER:
                         tasks.setTargetId(creep, undefined);
-                        creep.say("next target");
+                  //      creep.say("next target");
                         ///  console.log("Built object need rollback for nest siet");
                         return gc.RESULT_ROLLBACK;
                     case gc.UPGRADE_CONTROLLER:
-                        creep.say("upgrade");
+                   //     creep.say("upgrade");
                         return gc.RESULT_UNFINISHED;
                     case gc.DROP:
                     default:
@@ -111,10 +113,10 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
             tasks.setTargetId(creep, undefined);
             if (creep.carry.energy == 0)     {
             //    console.log(creep,"offloaded all energy - FINSIHED");
-                creep.say("empty");
+             //  creep.say("empty");
                 return gc.RESULT_FINISHED;
             } else {
-                   creep.say("built");
+              //     creep.say("built");
             //    console.log("transfer full go somewere else");
                 return gc.RESULT_ROLLBACK;
             }

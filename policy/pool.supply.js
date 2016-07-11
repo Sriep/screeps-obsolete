@@ -55,7 +55,7 @@ var supplyCenter = {
             console.log(room, "is in ", this.getsupplyCentres())
             return this.getsupplyCentres()[room];
         } else {
-            console.log(room ,"is not in",this.getsupplyCentres(),"returning undefeind");
+        //    console.log(room ,"is not in",this.getsupplyCentres(),"returning undefeind");
             return undefined;
         }
     },
