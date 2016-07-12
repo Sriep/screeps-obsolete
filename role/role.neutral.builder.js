@@ -5,6 +5,9 @@
  */
 var roleBase = require("role.base");
 var TaskMoveRoom = require("task.move.room");
+var TaskMoveFind = require("task.move.find");
+var TaskHarvest = require("task.harvest");
+var TaskOffload = require("task.offload");
 var policy = require("policy");
 var gc = require("gc");
 /**
@@ -18,7 +21,9 @@ var roleNeutralBuilder = {
         var moveToSourceRoom = new TaskMoveRoom(sourceRoom);
 
         var moveToSource = new TaskMoveFind(gc.FIND_ROOM_OBJECT,gc.RANGE_HARVEST
-                                             , FIND_MY_STRUCTURES);
+                                             , FIND_SOURCES);
+        //var moveToSource = new TaskMoveFind(gc.FIND_FUNCTION ,gc.RANGE_HARVEST
+       //     , "findTargetSource","role.base");
 
         var moveToBuildRooom = new TaskMoveRoom(buildRoom);
         

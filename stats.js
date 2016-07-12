@@ -11,6 +11,8 @@
 
 var updateThisTicksStats = function (room) {
     //console.log(room,"strange error");
+    if (undefined === room.memory.stats)
+        return;
     var index = room.memory.stats["ticks"].length-1;
     room.memory.stats["ticks"][index].controllerProgress = room.controller.progress;
     room.memory.stats["ticks"][index].energyCapacityAvailable = room.energyCapacityAvailable;
@@ -228,6 +230,9 @@ var stats = {
     },
 
     rememberThisTicksResouceCounts: function(room) {
+        if (undefined === room.memory.stats)
+            return;
+
         var energyAvalibale = 0;
         var sources = room.find(FIND_SOURCES);
         for (var source in sources) {
@@ -252,6 +257,8 @@ var stats = {
     },
 
     updateAggregateStats: function(room)  {
+        if (undefined === room.memory.stats)
+            return;
         if ((room.memory.stats["ticks"]).length >= this.TICKS_PER_TENTICKS) {
             var tenTicksStats = new SumStatsArray(room, "ticks");
             room.memory.stats["tenTicks"].push(tenTicksStats);
@@ -272,6 +279,8 @@ var stats = {
     },
 
     updateCreepAction: function (room, action, power) {
+        if (undefined === room.memory.stats)
+            return;
         var index = room.memory.stats["ticks"].length-1;
         room.memory.stats["ticks"][index].creepActions[action] =
             room.memory.stats["ticks"][index].creepActions[action] + power

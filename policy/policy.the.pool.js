@@ -7,6 +7,7 @@ var policy = require("policy");
 var gc = require("gc");
 var poolSupply = require("pool.supply");
 var TaskMoveRoom = require("task.move.room");
+var TaskMovePos = require("task.move.pos");
 
 /**
  * Pool of workers.
@@ -15,16 +16,18 @@ var TaskMoveRoom = require("task.move.room");
 var policyThePool = {
     
     enactPolicy: function (currentPolicy) {
+      //  console.log("In pool requsionts", JSON.stringify(this.getRequisitions()));
         var orders = poolSupply.getValuesFromHash(this.getRequisitions());
+      //  this.cleanupRequisionts(orders);
         orders.sort(function (a, b) { return b.priority - a.priority ; });
-
         for ( var index in orders) {
             var centerId = poolSupply.findMatchFor(orders[index]);
             if (null !== centerId) {
-                if (poolSupply.attachOrder(centerId, orders[index]))
-                    delete orders[index];
+                if (poolSupply.attachOrder(centerId, orders[index])) {
+                    this.getRequisitions()[orders[index].id] = undefined;
+                }
             }
-        }
+        } // for
     },
 
     getRequisitions: function() {
@@ -45,16 +48,20 @@ var policyThePool = {
     
     completedOrder: function (order, creepName) {
         var creep = Game.creeps[creepName];
-        var tasks = [];
-        if (order.locationToDeliver !== undefined &&
-            undefined !== Game.rooms[order.locationToDeliver]) {
-            var deliverTo = new TaskMoveRoom(order.locationToDeliver);
-            tasks.push(deliverTo);
+
+        if (undefined === creep.memory.tasks)
+            creep.memory.tasks = {};
+        creep.memory.tasks.tasklist = order[0].taskList;
+        creep.memory.policyId = order[0].requester;
+        creep.memory.role = order[0].role;
+        if (order[0].locationToDeliver !== undefined &&
+            undefined !== Game.rooms[order[0].locationToDeliver]) {
+            var deliverTo = new TaskMoveRoom(order[0].locationToDeliver);
+            creep.memory.tasks.tasklist.unshift(deliverTo);
         }
-        tasks.concat(order.taskList);
-        creep.memory.tasks.tasklist = tasks;
-        creep.memory.policyId = order.requesterId;
-        creep.memory.policyId = order.role;
+        console.log("pool completedorder[0] creep",creep,"role"
+            ,creep.memory.role,"policy id", creep.memory.policyId );
+        console.log("completedorder[0] new tasklist"  ,JSON.stringify(creep.memory.tasks.tasklist));
     },
 
     returnToPool: function (name) {
@@ -87,12 +94,12 @@ var policyThePool = {
         return true;
     },
 };
-
-var completeOrder = function(orders, supply) {
+/*
+var completeOrders = function(orders, supply) {
     for (var i in orders) {
         Memory.policies[supply[i]].buildqueue.push(orders[i]);
     }
-};
+};*/
 
 
 

@@ -47,7 +47,7 @@ var tasks = {
                 this.pickUpLooseEnergy(creep);
                 doneActions.actions.add(gc.PICKUP);
             }
-            console.log(creep ,"about to do task", task.taskType,"Length of task list is", taskList.length);
+         //   console.log(creep ,"about to do task", task.taskType,"Length of task list is", taskList.length);
            // creep.say(task.taskType);
             var result;
             if (!TaskActions.prototype.isConflict(doneActions, task.conflicts)) {

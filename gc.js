@@ -96,6 +96,7 @@ var gc = {
     POLICY_CLAIM: "claim",
     POLICY_BUILD_SPAWN: "buildspawn",
     POLICY_GIFT_WORKERS: "gift.workers",
+    POLICY_NEUTRAL_BUILDER: "neutral.builder",
     POLICY_MANY2ONE_LINKERS: "many2one.linker",
     
     //misc

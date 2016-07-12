@@ -23,7 +23,7 @@ function TaskMovePos (roomPos, pathOps) {
     this.conflicts = gc.MOVE;
     this.roomPos = roomPos;
     this.pathOps = pathOps;
-    this.loop = false;
+    this.loop = true;
     this.pickup = true;
 }
 

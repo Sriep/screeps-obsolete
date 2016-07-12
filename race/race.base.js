@@ -58,8 +58,14 @@ var raceBase = {
     getEnergyFromBody: function (body) {
      //   console.log("getEnergyFromBody boidy length",body.length);
         var energy = 0;
-        for (var part = 0 ; part < body.length ; part++ ) {
-            switch (body[part].type) {
+        for (var i = 0 ; i < body.length ; i++ ) {
+           // console.log("getEnergyFromBody body[part].type",body[part].type, "body[part]",body[part]);
+           var part = body[i].type;
+            if (undefined === part) {
+                part = body[i];
+             //   console.log("getEnergyFromBody part",part,"body[i]",body[i],"body[i].type",body[i].type);
+            }
+            switch (part) {
                 case MOVE:
                     energy += 50; break;
                 case WORK:
@@ -77,11 +83,11 @@ var raceBase = {
                 case TOUGH:
                     energy += 10; break;
                 default:
+                    console.log("getEnergyFromBody Invalid body part", part);
                     //Invalid body part
-                    console.log("invalid part",part, JSON.stringify(body));
                     return 0;
-            }
-        }
+            } //switch
+        } //for
        // console.log("getEnergyFromBody boidy energy",energy);
         return energy;
     },

@@ -30,6 +30,7 @@ var supplyCenter = {
     },
 
     getEnergyInBuildQueue: function (room) {
+      //  console.log("start of getEnergyInBuildQueue",room);
         if (room === undefined) {
            // console.log(room, "in getEnergyInBuildQueue")
             return 0;
@@ -40,6 +41,7 @@ var supplyCenter = {
         }
         var buildQueue = centre.buildqueue;
         var energy = 0;
+       // console.log("getEnergyInBuildQueue build queue",buildQueue);
         for (var i in buildQueue) {
             energy = energy + buildQueue[i].energy;
         }
@@ -48,14 +50,14 @@ var supplyCenter = {
 
     getCentre: function (room) {
         if (room === undefined) {
-            console.log(room, "in getCentre")
+      //      console.log(room, "in getCentre")
             return 0;
         }
         if (room in this.getsupplyCentres()) {
-            console.log(room, "is in ", this.getsupplyCentres())
+      //      console.log(room, "is in ", this.getsupplyCentres())
             return this.getsupplyCentres()[room];
         } else {
-        //    console.log(room ,"is not in",this.getsupplyCentres(),"returning undefeind");
+      //      console.log(room ,"is not in",this.getsupplyCentres(),"returning undefeind");
             return undefined;
         }
     },
@@ -77,37 +79,39 @@ var supplyCenter = {
     },
 
     findMatchFor: function (order) {
-        console.log("waht is orde find mat for ",JSON.stringify(order));
         var orderedCentres = this.getValuesFromHash(this.getsupplyCentres());
-    //    console.log("poolsupply, orderedCentres", JSON.stringify(orderedCentres));
-        orderedCentres.sort(function (a, b) {
-            return Game.map.getRoomLinearDistance(a.roomName, order.roomName)
-                    - Game.map.getRoomLinearDistance(b.roomName, order.roomName) ;
-        });
+        //console.log("the order", order.id);
+        if (undefined !== order.roomName){
+             orderedCentres.sort(function (a, b) {
+                 return Game.map.getRoomLinearDistance(a.roomName, order.roomName)
+                         - Game.map.getRoomLinearDistance(b.roomName, order.roomName) ;
+            });
+        }
 
         for (var i in orderedCentres) {
-            if (this.canSupply(orderedCentres[i].room, order))
-                return orderedCentres[i].room;
+        //    console.log("findMathchFor loop centers i",i ,orderedCentres[i].roomName )
+            if (this.canSupply(orderedCentres[i].roomName, order))
+                return orderedCentres[i].roomName;
         }
         return null;
     },
 
-    nextRequisition: function (room) {
-        return getCentre(room).buildqueue[0];
+    nextRequisition: function (roomName) {
+        return this.getCentre(roomName).buildqueue[0];
     },
 
     canSupply: function (centreId, order) {
-        return false;
-       //  return this.getsupplyCentres()[centreId].energyToTrade > order.energyRequested
-       //     && this.getsupplyCentres()[centreId].yardCapacity > order.energyRequested;
+       return (this.getsupplyCentres()[centreId].energyToTrade > order.energy
+                 && this.getsupplyCentres()[centreId].yardCapacity > order.energy);
     },
 
     attachOrder: function(centreId, order) {
         this.getsupplyCentres()[centreId].buildqueue.push(order);
         return true;
     },
-
-    completedOrder: function (centerId, order, creepName) {
+    
+   // policySupply.completedOrder(currentPolicy.id, build, buildName);
+    completedOrder: function (centreId, order, creepName) {
         var creep = Game.creeps[creepName];
         if (undefined === creep) {
             return false;
@@ -115,10 +119,13 @@ var supplyCenter = {
         var policyThePool = require("policy.the.pool");
         var queue = this.getsupplyCentres()[centreId].buildqueue;
         var index = queue.indexOf(order);
+       // console.log("completedOrder",index, "queue",queue);
         if (index > -1) {
             order = queue.splice(index,1);
-            completedOrder(order, creepName);
+            policyThePool.completedOrder(order, creepName);
+            return true;
         }
+        //console.log("completedOrder Failed");
         policyThePool.returnToPool(creepName);
         return false;
     },

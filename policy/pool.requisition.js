@@ -4,7 +4,7 @@
  */
 "use strict";
 var policyThePool = require("policy.the.pool");
-var raceBase = require("raceBase");
+var raceBase = require("race.base");
 /**
  * Requisition object for using the pool
  * @module policy
@@ -23,14 +23,24 @@ function PoolRequisition (requesterId
     this.taskList = taskList;
     this.role = role;
     this.energy = raceBase.getEnergyFromBody(creepBody);
-    if (energy == 0) {
+  //  console.log("In requisition constuctor energy", this.energy, "body",this.body);
+    if (this.energy == 0) {
         this.body = undefined;
         this.energy = undefined;
     }    
     this.priority = priorityLevel;
-    this.location = locationToDeliver;
+    this.roomName = locationToDeliver;
     this.tick = undefined;
 }
+
+PoolRequisition.prototype.isValid = function() {
+    if (!this.body) return false;
+    if (!this.energy || this.energy == 0) return false;
+    if (!this.id) return false;
+    if (!this.requester) return false;
+
+    return true;
+};
 
 function getNextRequisitionId() {
     if (Memory.nextRequisitionId === undefined) {
@@ -43,8 +53,9 @@ function getNextRequisitionId() {
 
 PoolRequisition.prototype.getMyRequisition = function (policyId) {
     var orders = _.filter(policyThePool.getRequisitions(), function (order) {
-        return order.id == policyId.id
+        return (order !== undefined && order.id == policyId.id);
     });
+    console.log("PoolRequisition policyid",policyId);
     return orders;
 };
 
@@ -53,16 +64,14 @@ PoolRequisition.prototype.returnToPool = function (creepName) {
 };
 
 PoolRequisition.prototype.placeRequisition = function(order) {
-    order.tick = Game.tick;
+    order.tick = Game.time;
     if (order.isValid())
         policyThePool.getRequisitions()[order.id] = order;
 };
 
-PoolRequisition.prototype.isValid = function(requisition) {
-    return requisition.id !== undefined;
-};
 
-PoolRequisition.ptototype.createCopy = function(requisition) {
+/*
+PoolRequisition.prototype.createCopy = function(requisition) {
     var newCopy = new PoolRequisition();
     newCopy.id = requisition.id;
     newCopy.requester = requisition.requester;
@@ -73,7 +82,7 @@ PoolRequisition.ptototype.createCopy = function(requisition) {
     newCopy.location = requisition.location;
     newCopy.tick = requisition.tick;
     return newCopy;
-};
+};*/
 
 module.exports = PoolRequisition;
 

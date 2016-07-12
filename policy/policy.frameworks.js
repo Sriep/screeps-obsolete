@@ -25,6 +25,7 @@ var policyFrameworks = {
         CLAIM: "claim",
         BUILD_SPAWN: "buildspawn",
         GIFT_WORKERS: "gift.workers",
+        NEUTRAL_BUILDER: gc.POLICY_NEUTRAL_BUILDER,
         POLICY_MANY2ONE_LINKERS: gc.POLICY_MANY2ONE_LINKERS
     },
 
@@ -76,50 +77,44 @@ var policyFrameworks = {
         };
         if (true) {
             var module = policy.getModuleFromPolicy(newPolicy);
-            module.initialisePolicy(newPolicy)
+            //module.initialisePolicy(newPolicy)
             policy.activatePolicy(newPolicy);
         }
         return newPolicy;
     },
 
 
-    createNeutralBuilderPolicy: function(startRoom
-        , workRoom
-        , sourceRoom
-        , endRoom
-        , workersContracted
-        , start) {
-        var newPolicy = { id : policy.getNextPolicyId(),
-            type : this.Type.FOREIGN_ROAD,
-            startRoom : startRoom,
+    createNeutralBuilderPolicy: function(workRoom, sourceRoom, workerSize, start)
+    {
+        var newPolicy = {
+            id : policy.getNextPolicyId(),
+            type : gc.POLICY_NEUTRAL_BUILDER,
             workRoom : workRoom,
             sourceRoom : sourceRoom,
-            endRoom : endRoom,
-            workersContractedFor : workersContracted,
-            workersAssigned : 0,
-            shuttingDown : false};
+            workerSize : workerSize
+        };
         if (start) {
             var module = policy.getModuleFromPolicy(newPolicy);
-            module.initialisePolicy(newPolicy)
-            if (0 < policy.activatePolicy(newPolicy)) {
-            } else {
-            }
+            //module.initialisePolicy(newPolicy);
+            policy.activatePolicy(newPolicy);
         }
         return newPolicy;
     },
 
     createClaimPolicy: function(startRoom, controllerId, endRoom, start) {
-        var newPolicy = { id : policy.getNextPolicyId(),
+        var newPolicy = {
+            id : policy.getNextPolicyId(),
             type : this.Type.CLAIM,
             startRoom : startRoom,
             controllerId : controllerId,
             endRoom : endRoom,
             workersContractedFor : 0,
             workersAssigned : 0,
-            shuttingDown : false};
+            shuttingDown : false
+        };
         if (start) {
             var module = policy.getModuleFromPolicy(newPolicy);
-            module.initialisePolicy(newPolicy)
+            //module.initialisePolicy(newPolicy)
             if (0 < policy.activatePolicy(newPolicy)) {
             } else {
             }
@@ -137,7 +132,7 @@ var policyFrameworks = {
             workersDelivered : 0};
         if (start) {
             var module = policy.getModuleFromPolicy(newPolicy);
-            module.initialisePolicy(newPolicy)
+            //module.initialisePolicy(newPolicy)
             if (0 < policy.activatePolicy(newPolicy)) {
             } else {
             }

@@ -20,7 +20,7 @@ function TaskMoveXY (x, y) {
     this.conflicts = gc.MOVE;
     this.x = x;
     this.y = y;
-    this.loop = false;
+    this.loop = true;
     this.pickup = true;
 }
 
