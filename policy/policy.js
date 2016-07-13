@@ -77,7 +77,6 @@ var policy = {
            //         console.log("found polcy for room", room);
                     if (!foundPolicy) {
                         foundPolicy = true;
-                //        console.log("setting policy for romm, foundPolicy is now",foundPolicy);
                         room.policyId = policy.id;
                         room.currentPolicy = policy.type;
               //          console.log("first");
@@ -107,7 +106,7 @@ var policy = {
         }// for(var roomIndex in Game.rooms)
 
     },
-
+    
     shutDownPolicy: function (poicy) {
         policy.shuttingDown = true;
     },

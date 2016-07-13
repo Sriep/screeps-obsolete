@@ -3,45 +3,60 @@
  * harvest policy. 
  * @author Piers Shepperson
  */
- policy = require("policy");
+var _ = require('lodash');
+var raceWorker = require("race.worker");
+var PoolRequisition = require("pool.requisition");
+var gc = require("gc");
+var roleNeutralBuilder = require("role.neutral.harvester");
 
 /**
  * Abstract object to support the policy of minig a source in an unoccumpied 
  * room
- * @module policy
+ * @module policyForeignHarvest
  */
 var policyForeignHarvest = {
 
-    adaptPolicy: function (room, foreignRoom, supportLevel) {
-        if (room.memory.policy === undefined) {
-            room.memory.policy = [];
-        }
-        var newPolicy = {   policy: policy.Type.FOREIGN_HARVEST,
-                            foriegnRoom: foreignRoom.name,
-                            workerSupport: supportLevel,
-                            buldRoad: true,
-                        } 
-        room.memory.policy.push(newPolicy);
-    },
+    initialisePolicy: function (newPolicy) {
+        var body =  raceWorker.body(newPolicy.workerSize);
+        var taskList = roleNeutralBuilder.getTaskList(
+            newPolicy.harvestRoom,
+            newPolicy.storageRoom,
+            newPolicy.sourceId,
+            newPolicy.offLoadId);
+        console.log("policyNeutralBuilder newPolicy.buildRoomy", newPolicy.buildRoom, newPolicy.sourceRoom)
 
-        
+        var order = new PoolRequisition(
+            newPolicy.id
+            , body
+            , taskList
+            , undefined
+            , undefined
+        );
+        console.log("initialisePolicy policyForeignHarvest", JSON.stringify(order));
+        PoolRequisition.prototype.placeRequisition(order);
+    },
     
     draftNewPolicyId: function(currentPolicy)
     {
-        console.log("ipolicyForeignHarvestn draftNewPolicyId")
+       // return null;
         return currentPolicy;
-        /*policyPeace = require("policy.peace");
-        if (undefined === room.controller   || false != room.controller.my)
-        {
-            return policy.Type.FOREIGN_HARVEST;
-        } else {
+    },
 
-            return policyPeace.draftNewPolicyId(room);
+    cleanUp: function(oldPolicy)
+    {
+      /*  var creeps = _.filter(Game.creeps, function (creep) {
+            return creep.memory.policyId == oldPolicy.id
+        });
+        for ( var i = 0 ;  i < creeps.length ; i++ ) {
+            PoolRequisition.prototype.returnToPool(creeps[i].name);
         }*/
     },
 
-    enactPolicy: function(room) {
-        raceBase.moveCreeps(room);
+    switchPolicy: function(oldPolicy, newPolicy)
+    {
+    },
+
+    enactPolicy: function(currentPolicy) {
     }
 
 }

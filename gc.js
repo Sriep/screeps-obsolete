@@ -21,6 +21,10 @@ var gc = {
     MOVE: "move",
     SUICIDE: "suicide",
     
+    //Races
+    RACE_WORKER:  "worker",
+    RACE_SWORDSMAN: "swordsman",
+    
     //Roles
     ROLE_HARVESTER: "harvester",
     ROLE_UPGRADER: "upgrader",
@@ -29,6 +33,7 @@ var gc = {
     ROLE_LINKER: "linker",
     ROLE_CLAIMER: "claimer",
     ROLE_NEUTRAL_BUILDER: "neutral.builder",
+    ROLE_NEUTRAL_HARVESTER: "neutral.harvester",
     ROLE_UNASSIGNED: "unassigned",
     ROLE_SPAWN_BUILDER: "spawn.builder",
     ROLE_MINER: "miner",
@@ -50,6 +55,9 @@ var gc = {
     TASK_LOADUP: "loadup",
     TASK_MOVE_ROOM: "move.room",
     TASK_OFFLOAD_SWITCH: "offload.switch",
+    TASK_ATTACK_ID: "attack.id",
+    TASK_ATTACK_TARGET: "attack.target",
+    TASK_WAIT: "wait",
     
     //Offload switch task's states
     SWITCH_STATE_PRODUCTION:  "production",
@@ -76,6 +84,7 @@ var gc = {
     RANGE_REPAIR: 3,
     RANGE_UPGRADE: 3,
     RANGE_TRANSFER: 1,
+    RANGE_ATTACK: 1,
     
     //task results
     RESULT_FINISHED: "finished",
@@ -98,6 +107,9 @@ var gc = {
     POLICY_GIFT_WORKERS: "gift.workers",
     POLICY_NEUTRAL_BUILDER: "neutral.builder",
     POLICY_MANY2ONE_LINKERS: "many2one.linker",
+    POLICY_ATTACK_STRUCTURES: "attack.structures",
+    POLICY_PATROL_ROOM: "patrol.room",
+    POLICY_HARVEST_NEUTRAL_ROOM: "harvest.neutral.room",
     
     //misc
     LINKING_WORKER_SIZE: 5,

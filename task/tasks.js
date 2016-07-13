@@ -41,6 +41,12 @@ var tasks = {
                     || result == this.Result.Rollback)
                             && taskList.length > 0 && actionCount++ < this.MAX_TASK_ACTIONS) {
             var task = taskList[0];
+            //console.log(creep,"tasks.doTasks",JSON.stringify(task));
+            while (task !== undefined && task === null) {
+                taskList.shift();
+                task = taskList[0];
+            }
+
             var moduleName = "task." + task.taskType;
             var taskModule = require(moduleName);
             if (task.pickup) {
@@ -80,11 +86,9 @@ var tasks = {
              //       ,this.Result.Finished,"this.Result.Finished" ,this.Result.Failed);
                 if (result == this.Result.Finished
                     || result == this.Result.Reset) {
-                   // console.log(creep,"In finsihed or failed");
                     if (taskList.length > 0){
                         var doneTask = taskList.shift();
                         if (task.loop) {
-                        //    console.log(creep,"pusshing task",doneTask,taskList)
                             taskList.push(doneTask);
                         }
                     }

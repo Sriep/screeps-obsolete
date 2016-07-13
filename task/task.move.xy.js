@@ -7,7 +7,6 @@
  */
 "use strict";
 var gc = require("gc");
-var TaskActions = require("task.actions")
 var tasks = require("tasks");
 
 /**
@@ -15,11 +14,16 @@ var tasks = require("tasks");
  * @module tasksHarvest
  */
 
-function TaskMoveXY (x, y) {
+function TaskMoveXY (x, y, range) {
     this.taskType = gc.TASK_MOVE_XY;
     this.conflicts = gc.MOVE;
     this.x = x;
     this.y = y;
+    if (range === undefined) {
+        this.range = 0;
+    } else {
+        this.range =range;
+    }
     this.loop = true;
     this.pickup = true;
 }
@@ -28,10 +32,11 @@ TaskMoveXY.prototype.doTask = function(creep, task) {
    // task.loop = true;
   //  console.log(creep,"In taskmovexy xpos",creep.pos.x , task.x , "ypos" ,creep.pos.y , task.y);
     var result = creep.moveTo(task.x,task.y);
-    //creep.say(result);
+   // console.log(creep,"In taskmovexy creep.moveTo(task.x,task.y); task.x", task.x,"task.y",task.y)
+    creep.say(result);
     switch (result) {
         case OK:    	            //0	The operation has been scheduled successfully.
-            if (creep.pos.x == task.x &&  creep.pos.y == task.y) {
+            if (creep.pos.inRangeTo(task.x,task.y,task.range)) {
                 task.loop = false;
                 return gc.RESULT_FINISHED;
             } else {

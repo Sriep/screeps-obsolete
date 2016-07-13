@@ -83,7 +83,41 @@ var policyFrameworks = {
         return newPolicy;
     },
 
+    createAttackStructuresPolicy: function(structureIds, roomIds, creepSize, attackGroupSize
+                                             , marshallingPoint, start)
+    {
+        var newPolicy = {
+            id : policy.getNextPolicyId(),
+            type : gc.POLICY_ATTACK_STRUCTURES,
+            structureIds : structureIds,
+            roomIds : roomIds,
+            creepSize : creepSize,
+            attackGroupSize : attackGroupSize,
+            marshallingPoint : marshallingPoint
+        };
+        if (start) {
+            var module = policy.getModuleFromPolicy(newPolicy);
+            policy.activatePolicy(newPolicy);
+        }
+        return newPolicy;
+    },
 
+    createPotrolRoomPolicy: function(roomPos, creepSize, start)
+    {
+        var newPolicy = {
+            id : policy.getNextPolicyId(),
+            type : gc.POLICY_PATROL_ROOM,
+            roomPos : roomPos,
+            creepSize : creepSize
+        };
+        if (start) {
+            var module = policy.getModuleFromPolicy(newPolicy);
+            policy.activatePolicy(newPolicy);
+        }
+        return newPolicy;
+    },
+
+    
     createNeutralBuilderPolicy: function(workRoom, sourceRoom, workerSize, start)
     {
         var newPolicy = {
@@ -96,6 +130,23 @@ var policyFrameworks = {
         if (start) {
             var module = policy.getModuleFromPolicy(newPolicy);
             //module.initialisePolicy(newPolicy);
+            policy.activatePolicy(newPolicy);
+        }
+        return newPolicy;
+    },
+
+    createForeignHarvest: function(harvestRoom, storageRoom, workerSize, sourceId, offoadId, start)
+    {
+        var newPolicy = {
+            id : policy.getNextPolicyId(),
+            type : gc.POLICY_FOREIGN_HARVEST,
+            harvestRoom : harvestRoom,
+            storageRoom : storageRoom,
+            workerSize : workerSize,
+            sourceId : sourceId,
+            offLoadId : offoadId
+        };
+        if (start) {
             policy.activatePolicy(newPolicy);
         }
         return newPolicy;
@@ -132,10 +183,7 @@ var policyFrameworks = {
             workersDelivered : 0};
         if (start) {
             var module = policy.getModuleFromPolicy(newPolicy);
-            //module.initialisePolicy(newPolicy)
-            if (0 < policy.activatePolicy(newPolicy)) {
-            } else {
-            }
+            policy.activatePolicy(newPolicy)
         }
         return newPolicy;
     },

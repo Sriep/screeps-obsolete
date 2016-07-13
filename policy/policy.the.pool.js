@@ -21,9 +21,10 @@ var policyThePool = {
       //  this.cleanupRequisionts(orders);
         orders.sort(function (a, b) { return b.priority - a.priority ; });
         for ( var index in orders) {
-            var centerId = poolSupply.findMatchFor(orders[index]);
-            if (null !== centerId) {
-                if (poolSupply.attachOrder(centerId, orders[index])) {
+            var centreId = poolSupply.findMatchFor(orders[index]);
+            console.log("enact the pool lookingfor match",orders[index].id,"found",centreId);
+            if (null !== centreId) {
+                if (poolSupply.attachOrder(centreId, orders[index])) {
                     this.getRequisitions()[orders[index].id] = undefined;
                 }
             }
@@ -48,15 +49,18 @@ var policyThePool = {
     
     completedOrder: function (order, creepName) {
         var creep = Game.creeps[creepName];
-
         if (undefined === creep.memory.tasks)
             creep.memory.tasks = {};
+        console.log(creep,"pool completedOrder here is the order", JSON.stringify(order[0]) );
         creep.memory.tasks.tasklist = order[0].taskList;
         creep.memory.policyId = order[0].requester;
         creep.memory.role = order[0].role;
-        if (order[0].locationToDeliver !== undefined &&
-            undefined !== Game.rooms[order[0].locationToDeliver]) {
-            var deliverTo = new TaskMoveRoom(order[0].locationToDeliver);
+        console.log(creep,"pool complteedOrder requester", order[0].requester);
+        if (order[0].posDeliver !== undefined &&
+            undefined !== Game.rooms[order[0].posDeliver]) {
+            var deliverTo = new TaskMovePos(order[0].posDeliver,1);
+            deliverTo.loop = false;
+            deliverTo.pickup =false;
             creep.memory.tasks.tasklist.unshift(deliverTo);
         }
         console.log("pool completedorder[0] creep",creep,"role"
@@ -75,11 +79,16 @@ var policyThePool = {
             });
             creep.memory.policyId = 0;
             var tasks = [];
-            var moveToSpawn = new TaskMovePos(spawns[0].pos);
+            var moveToSpawn = new TaskMovePos(spawns[0].pos,1);
             tasks.push(moveToSpawn);
             creep.memory.tasks.tasklist  = tasks;
             creep.memory.role = gc.ROLE_UNASSIGNED;
         }
+    },
+
+    getMaxYardSize: function () {
+        //console.log("getMaxYardSize in pool maxYardSize",poolSupply.getMaxYardSize());
+        return poolSupply.getMaxYardSize();
     },
 
     draftNewPolicyId: function (oldPolicy) {
@@ -87,10 +96,11 @@ var policyThePool = {
     },
 
     initialisePolicy: function (newPolicy) {
-        //Memory.policies[THE_POOL].requisitions = {};
-        //Memory.policies[THE_POOL].supplyCenters = {};
-        //Memory.nextRequisitionsId = 0;
-        //Memory.nextSupplyCenterId = 0;
+        Memory.policies[THE_POOL].requisitions = {};
+       // Memory.policies[THE_POOL].requisitions = {};
+        Memory.policies[THE_POOL].supplyCenters = {};
+        Memory.nextRequisitionsId = 0;
+        Memory.nextSupplyCenterId = 0;
         return true;
     },
 };

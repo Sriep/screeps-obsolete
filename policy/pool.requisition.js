@@ -13,7 +13,7 @@ var raceBase = require("race.base");
 function PoolRequisition (requesterId
                         ,creepBody
                         ,taskList
-                        ,locationToDeliver
+                        ,posDeliver
                         ,role
                         ,priorityLevel
 ) {
@@ -29,7 +29,7 @@ function PoolRequisition (requesterId
         this.energy = undefined;
     }    
     this.priority = priorityLevel;
-    this.roomName = locationToDeliver;
+    this.posDeliver = posDeliver;
     this.tick = undefined;
 }
 
@@ -68,6 +68,10 @@ PoolRequisition.prototype.placeRequisition = function(order) {
     if (order.isValid())
         policyThePool.getRequisitions()[order.id] = order;
 };
+
+PoolRequisition.prototype.getMaxYardSize = function () {
+    return policyThePool.getMaxYardSize();
+},
 
 
 /*

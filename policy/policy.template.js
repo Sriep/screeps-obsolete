@@ -16,11 +16,17 @@
 var policyTemplate = {
 
     initialisePolicy: function (newPolicy) {
+        if ()
+
+
         return true;
     },
 
     draftNewPolicyId: function(oldPolicy) {
         //return null;
+        if (undefined === Game.rooms[oldPolicy.id]) {
+            return null;
+        }
         return oldPolicy;
     },
 

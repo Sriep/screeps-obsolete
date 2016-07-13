@@ -3,7 +3,7 @@
  * for use by worker creeps. 
  * @author Piers Shepperson
  */
- 
+"use strict";
 
 var _ = require('lodash');
 var roleBase = require("role.base");
@@ -47,6 +47,37 @@ var raceWorker = {
 	    return  Math.floor(roomController.maxProduction[contolerLevel] / this.BLOCKSIZE);       
     },
 */
+    isWorker: function(body) {
+        if (body === undefined || 0 != body.length % 3)
+            return false;
+        var size = body.length / 3;
+        var numWorkParts = 0;
+        var numMoveParts = 0;
+        var numCarryParts = 0;
+        for (var i = 0 ; i < body.length ; i++) {
+            switch (body[i]) {
+                case WORK:
+                    numWorkParts++;
+                    break;
+                case MOVE:
+                    numMoveParts++;
+                    break;
+                case CARRY:
+                    numCarryParts++;
+                    break;
+                default:
+                    return false;
+            }
+        }
+        return numWorkParts == size && numMoveParts == size && numCarryParts == size;
+    },
+
+    creepSize: function(body) {
+        if (body === undefined || 0 != body.length % 3)
+            return 0;
+        return body.length / 3;
+    },
+
     maxSizeRoom: function(room) {
         return Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE);
     },
@@ -61,12 +92,13 @@ var raceWorker = {
         var minSizeDesirable;
 
         minSizeDesirable = Math.ceil(Math.max(euilibEnergy / (400*accesPoints), gc.LINKING_WORKER_SIZE));
-        var maxSizePossable = room.energyCapacityAvailable/this.BLOCKSIZE;
+        var maxSizePossible = room.energyCapacityAvailable/this.BLOCKSIZE;
         if (accesPoints == 1) {
-            minSizeDesirable = Math.max(minSizeDesirable,maxSizePossable);
+            minSizeDesirable = Math.max(minSizeDesirable,maxSizePossible);
         }
-    //    console.log(room,"equlibenergy",euilibEnergy ,"minSizeDesirable",minSizeDesirable,"maxSizePossable",maxSizePossable);
-        return Math.floor(Math.min(minSizeDesirable,minSizeDesirable));
+        console.log(room,"equlibenergy",euilibEnergy ,"minSizeDesirable",minSizeDesirable
+            ,"maxSizePossible",maxSizePossible);
+        return Math.floor(Math.min(minSizeDesirable,maxSizePossible));
     },
 	
 	switchRoles: function(delta1, delta2, role1, role2, currentPolicy) {
@@ -150,7 +182,7 @@ console.log("assignRoles havester", havesters_needed, "upgraders",upgraders_need
             ,"Builders: " + builders.length + " delta " + dBuilders
             ,"Repairers: " + repairers.length + " delta " + dRepairers);
     //    console.log("Linkers: " + linkers.length);
-
+        var delta
         if (dHavesters != 0)
         {        
             delta = this.switchRoles(dHavesters, dUpgraders, this.ROLE_HARVESTER, this.ROLE_UPGRADER, currentPolicy);
@@ -220,10 +252,9 @@ console.log("assignRoles havester", havesters_needed, "upgraders",upgraders_need
     },
     
 
-    body: function (cost) {
-        var numBlocks = Math.ceil(cost/this.BLOCKSIZE);
+    body: function (size) {
         var body = [];
-        for (i = 0; i < numBlocks; i++) {
+        for (var i = 0; i < size; i++) {
             body.push(WORK);
             body.push(CARRY);
             body.push(MOVE);
@@ -232,13 +263,13 @@ console.log("assignRoles havester", havesters_needed, "upgraders",upgraders_need
     },
 
     biggistSpawnable: function(room) {
-        cost = room.energyCapacityAvailable;  
+        var cost = room.energyCapacityAvailable;
         cost = Math.floor(cost/this.blockSize) * this.blockSize;	     
         return cost;
     },
 
     spawnFromName: function(roomName, spawnName, wokerSize) {
-        spawns = currentRoom.find(FIND_MY_SPAWNS);
+        var spawns = currentRoom.find(FIND_MY_SPAWNS);
         spawn(Game.rooms[roomName], spawns[spawnName], workerSize);
     },
     //var raceWorker = require("race.worker");   raceWorker.spawnFromName("W26S21", "Spawn1");  

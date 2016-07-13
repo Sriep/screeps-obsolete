@@ -21,15 +21,16 @@ var roleNeutralBuilder = require("role.neutral.builder");
 var policyNeutralBuilder = {
 
     initialisePolicy: function (newPolicy) {
-        var body =  raceWorker.body(newPolicy.workerSize*gc.BLOCKSIZE_COST_WORKER);
+        var body =  raceWorker.body(newPolicy.workerSize);
         var taskList = roleNeutralBuilder.getTaskList(newPolicy.workRoom, newPolicy.sourceRoom);
         console.log("policyNeutralBuilder newPolicy.buildRoomy", newPolicy.buildRoom, newPolicy.sourceRoom)
 
-        var order = new PoolRequisition(newPolicy.id
-                                                , body
-                                                , taskList
-                                                , undefined
-                                                , undefined
+        var order = new PoolRequisition(
+                                newPolicy.id
+                                , body
+                                , taskList
+                                , undefined
+                                , undefined
         );
         //console.log("initialisePolicy myrequisitio", JSON.stringify(order));
         PoolRequisition.prototype.placeRequisition(order);
@@ -37,6 +38,7 @@ var policyNeutralBuilder = {
 
     draftNewPolicyId: function(oldPolicy) {
         // No sites to build left in rooom
+        //return null;
         var room = Game.rooms[oldPolicy.workRoom]
 
         if (undefined !== room) {
@@ -46,24 +48,18 @@ var policyNeutralBuilder = {
                 return null;
             }
         }
-        /*
-        // Still waiting for worker
 
-        if (0 == PoolRequisition.prototype.getMyRequisition(oldPolicy.id).length) {
-            console.log("draftNewPolicyId oldpoicyid", oldPolicy.id,oldPolicy)
-            this.cleanUp(oldPolicy);
-            return null;
+        var numToBeBuilt = PoolRequisition.prototype.getMyRequisition(oldPolicy.id).length;
+        console.log("neutral bulder numerb to be buiult",numToBeBuilt);
+        if  (0 == numToBeBuilt){
+            var creeps = _.filter(Game.creeps, function (creep) {
+                return creep.memory.policyId == oldPolicy.id
+            });
+            if (0 == creeps.length) {
+              //  return null;
+            }
         }
 
-        // Worker died
-        var creeps = _.filter(Game.creeps, function (creep) {
-            return creep.memory.policyId == oldPolicy.id
-        });
-        if (0 == creeps.length) {
-            this.cleanUp(oldPolicy);
-            return null;
-        }
-*/
         return oldPolicy;
 
     },

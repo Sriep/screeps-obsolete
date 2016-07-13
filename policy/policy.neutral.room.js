@@ -2,6 +2,7 @@
  * @fileOverview Screeps module. Apolicy object for neutral rooms. Kind of empty wrapper.
  * @author Piers Shepperson
  */
+"use strict";
 //Bace object
 var policy = require("policy");
 var policyFrameworks = require("policy.frameworks");
@@ -39,8 +40,27 @@ var policyNeutralRoom = {
      * @returns {none}
      */
     enactPolicy: function(currentPolicy) {
-        "use strict";
-       // console.log(currentPolicy.room,"In neutral room");
+       // console.log("neutral room", JSON.stringify(currentPolicy));
+        var room = Game.rooms[currentPolicy.room];
+        var roomMem = Memory.rooms[currentPolicy.room];
+        var roomNeam  = currentPolicy.room;
+        var storageRoom = "W26S21";
+      //  var storageId = "577a8dd4b973e61c594592dc";
+        if (room) {
+            var sources = room.find(FIND_SOURCES);
+            // if (currentPolicy.routeToStorageRoom === undefined){
+                var mapTo = Game.map.findRoute(currentPolicy.room, storageRoom);
+                var mapFrom = Game.map.findRoute(storageRoom, currentPolicy.room);
+                currentPolicy.routeToStorageRoom = mapTo;
+                 currentPolicy.routeFromStorageRoom = mapFrom;
+               // for (var i = 0; i < map ; i++) {
+                    //var nextRoom = map[i].room;
+
+
+              //  }
+          //  }
+        }
+
     },
 
     switchPolicy: function(oldPolicyId, newPolicy)

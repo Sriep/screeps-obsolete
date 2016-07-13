@@ -14,6 +14,7 @@ var roleEnergyPorter = require("role.energy.porter");
 var TaskMoveFind = require("task.move.find");
 var TaskLoadup = require("task.loadup");
 var TaskOffload = require("task.offload");
+var TaskHarvest = require("task.harvest");
 /**
  * Abstract  Race of creeps that transport energy around.
  * units.
@@ -87,8 +88,19 @@ TaskOffloadSwitch.prototype.changeState = function (creep, state) {
 TaskOffloadSwitch.prototype.switchToFillUp = function (creep) {
     
     var storage = creep.room.storage;
-    var moveToStorage = new TaskMoveFind(gc.FIND_ID,gc.RANGE_TRANSFER,storage.id);
-    var louadupEnergy = new TaskLoadup(RESOURCE_ENERGY);
+    var moveToStorage, louadupEnergy;
+    if (undefined !== storage && storage.store[RESOURCE_ENERGY] > 0) {
+        moveToStorage = new TaskMoveFind(gc.FIND_ID,gc.RANGE_TRANSFER,storage.id);
+        louadupEnergy = new TaskLoadup(RESOURCE_ENERGY);
+    } else {
+        //moveToStorage = new TaskMoveFind(gc.FIND_ID,gc.RANGE_TRANSFER,storage.id);
+        //louadupEnergy = new TaskLoadup(RESOURCE_ENERGY);
+
+        moveToStorage = new TaskMoveFind(gc.FIND_FUNCTION ,gc.RANGE_HARVEST
+            , "findTargetSource","role.base");
+        louadupEnergy = new TaskHarvest();
+    }
+
     var switchTaskLists = new TaskOffloadSwitch();
     var newTaskList = [];
     newTaskList.push(moveToStorage);

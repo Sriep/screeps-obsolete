@@ -8,7 +8,7 @@ var roleLinkerMinerStorage = {
 
     getTaskList: function(creep, x,y,storageId, storageLinkId, mineralId, resourceMined) {
         var taskList = [];
-        var moveToPosition = new TaskMoveXY(x,y);
+        var moveToPosition = new TaskMoveXY(x,y,0);
         var linking = new TaskStorageLinkerMiner(storageId, storageLinkId, mineralId, resourceMined);
                                  
         taskList.push(moveToPosition);

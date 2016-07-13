@@ -381,7 +381,7 @@ var roleBase = {
              var tasks = require("tasks");
                
           //  if (creep.name == "Skyler"){
-         //    this.resetTasks(creep);
+           //  this.resetTasks(creep);
          //   }
                 //creep.memory.tasks = undefined;
           //   console.log("-------------------", creep,"-------------------------------");

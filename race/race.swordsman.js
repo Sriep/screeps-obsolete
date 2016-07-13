@@ -9,14 +9,12 @@
  * creeps. Infantry contain mainly "ATTACK" and "MOVE" parts.
  * @module raceInfantry
  */
-var raceInfantry = {
+var raceSwordsman = {
     BLOCKSIZE: 80 + 50,
-    ROLE_DEFULT: "infantry",
 
-    body: function (cost) {
-        var numBlocks = Math.ceil(cost/this.blockSize);
+    body: function (size) {
         var body = [];
-        for (i = 0; i < numBlocks; i++) {
+        for (var i = 0 ; i < size ; i++) {
             body.push(ATTACK);
             body.push(MOVE);
         } // for
@@ -24,4 +22,4 @@ var raceInfantry = {
     },
 }
 
-module.exports = raceInfantry;
+module.exports = raceSwordsman;

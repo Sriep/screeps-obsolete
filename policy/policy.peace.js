@@ -64,10 +64,10 @@ var policyPeace = {
         if (policyRescue.needsRescue(room)) {
             return policyFrameworks.createRescuePolicy(room.name);
         }
-       // var policyConstruction = require("policy.construction");
-        //if (policyConstruction.startConstruction(room)) {
-       //     return policyFrameworks.createConstructionPolicy(room.name);
-      //  }
+        var policyConstruction = require("policy.construction");
+        if (policyConstruction.startConstruction(room)) {
+            return policyFrameworks.createConstructionPolicy(room.name);
+        }
         return oldPolicy;
     },
     
@@ -192,9 +192,9 @@ var policyPeace = {
         console.log(room,"woreker size to spawn", workerSizeToSpawn);
         console.log(room,"equilbriumCreeps", equilbriumCreeps,"w size", workerSizeToSpawn
             , "<= nWorkePArts",nWorkParts, " || ncreeps"  ,nCreeps);
-        if (equilbriumCreeps * workerSizeToSpawn >= nWorkParts || nCreeps < 2 )//|| room.name == "W26S21")
+        if (equilbriumCreeps * 5 >= nWorkParts || nCreeps < 3 )//|| room.name == "W26S21")
         {
-            if (nCreeps < 3 * roomOwned.countSiteAccess(room, FIND_SOURCES)) {
+            if (nCreeps <= 3 * roomOwned.countSiteAccess(room, FIND_SOURCES)) {
                 var spawns = room.find(FIND_MY_SPAWNS);
                 raceBase.spawn(raceWorker
                     , currentPolicy

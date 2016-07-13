@@ -15,7 +15,6 @@ roleBase = require("role.base");
 var _ = require('lodash');
 raceBase = require("race.base");
 raceWorker = require("race.worker");
-raceInfantry = require("race.infantry");
 roleBase = require("role.base");
 
 

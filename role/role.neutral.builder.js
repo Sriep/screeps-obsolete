@@ -25,13 +25,10 @@ var roleNeutralBuilder = {
         //var moveToSource = new TaskMoveFind(gc.FIND_FUNCTION ,gc.RANGE_HARVEST
        //     , "findTargetSource","role.base");
 
-        var moveToBuildRooom = new TaskMoveRoom(buildRoom);
-        
         var harvest = new TaskHarvest();
-        
+        var moveToBuildRooom = new TaskMoveRoom(buildRoom);
         var moveToConstructionSite = new TaskMoveFind(gc.FIND_ROOM_OBJECT,gc.RANGE_BUILD
                                              ,FIND_MY_CONSTRUCTION_SITES);
-        
         var offload = new TaskOffload(gc.BUILD);
 
         tasks.push(moveToSourceRoom);

@@ -81,10 +81,10 @@ var supplyCenter = {
     findMatchFor: function (order) {
         var orderedCentres = this.getValuesFromHash(this.getsupplyCentres());
         //console.log("the order", order.id);
-        if (undefined !== order.roomName){
+        if (undefined !== order.posDeliver && undefined !== order.posDeliver.roomName){
              orderedCentres.sort(function (a, b) {
-                 return Game.map.getRoomLinearDistance(a.roomName, order.roomName)
-                         - Game.map.getRoomLinearDistance(b.roomName, order.roomName) ;
+                 return Game.map.getRoomLinearDistance(a.roomName, order.posDeliver.roomName)
+                         - Game.map.getRoomLinearDistance(b.roomName, order.posDeliver.roomName) ;
             });
         }
 
@@ -128,6 +128,15 @@ var supplyCenter = {
         //console.log("completedOrder Failed");
         policyThePool.returnToPool(creepName);
         return false;
+    },
+
+    getMaxYardSize: function () {
+        var maxYardSize = 0;
+        for ( var i in Memory.policies[0].supplyCentres) {
+            maxYardSize = Math.max(maxYardSize,Memory.policies[0].supplyCentres[i].yardCapacity);
+        }
+       // console.log("getMaxYardSize in pool supply maxYardSize",maxYardSize);
+        return maxYardSize;
     },
 
     newSupplyCenter: function(roomName, energy, yardCapacity) {

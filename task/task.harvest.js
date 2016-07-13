@@ -23,7 +23,7 @@ function TaskHarvest () {
     this.loop = true;
 }
 
-TaskHarvest.prototype.doTask = function(creep, task, tasksActions) {
+TaskHarvest.prototype.doTask = function(creep, task) {
     if (creep.carry.energy == creep.carryCapacity)  {
         tasks.setTargetId(creep, undefined);
         //console.log(creep, "harvet at start RESULT_FINISHED full up")
@@ -42,8 +42,9 @@ TaskHarvest.prototype.doTask = function(creep, task, tasksActions) {
             return gc.RESULT_ROLLBACK;
         }
     }
-
-    switch (creep.harvest(source)) {
+    var rtv = creep.harvest(source);
+    console.log(creep,"TaskHarvest result",rtv);
+    switch (rtv) {
         case    OK:                         // 0	The operation has been scheduled successfully.;
            // tasksActions.done(gc.HARVEST);
             if (creep.carry.energy == creep.carryCapacity) {

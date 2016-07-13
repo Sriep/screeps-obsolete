@@ -10,7 +10,6 @@ var  policyDefence = require("policy.defence");
 var policyFrameworks = require("policy.frameworks");
 var   raceBase = require("race.base");
 var   raceWorker = require("race.worker");
-var   raceInfantry = require("race.infantry");
 var   roleBase = require("role.base");
 var policyBuildspawn = require("policy.buildspawn");
 var roomController = require("room.controller");
@@ -72,7 +71,7 @@ var policyRescue = {
             function (creep) {return creep.memory.policyId == currentPolicy.id;});
 
         var workerSize = 0;
-        if (creeps.length = 0) {
+        if (creeps.length == 0) {
             console.log("Rescue build first worker size", raceWorker.maxSizeFromEnergy(room));
             workerSize = raceWorker.maxSizeFromEnergy(room);
         } else {
@@ -95,7 +94,8 @@ var policyRescue = {
         var spawns = room.find(FIND_MY_SPAWNS);
         if (spawns == undefined || spawns == []) {return;}
        // if () {
-            raceBase.spawn(raceWorker, currentPolicy, spawns[0], workerSize);
+       // console.log(room,"about to spawn",raceWorker,currentPolicy,spawns[0],workerSize);
+        raceBase.spawn(raceWorker, currentPolicy, spawns[0], workerSize);
       //  }
 
         var nHavesters = room.find(FIND_MY_CREEPS).length;
