@@ -82,19 +82,20 @@ var raceBase = {
         return (isSize);
     },
 
-    getRaceFromBody: function (body) {
-        if (undefined === body || undefined == body[0]) return false;
-        var bodyArray;
+    convertBodyToArray: function (body){
+        if (!Array.isArray(body)) return undefined;
         if (undefined == body[0].type) {
-            bodyArray = body;
+            return body;
         } else {
-            bodyArray = Array.from(body, function(part) {return part.type})
+            return Array.from(body, function(part) {return part.type});
         }
-        if (raceWorker.isWorker(bodyArray)) {
+    },
+
+    getRaceFromBody: function (body) {
+        if (raceWorker.isWorker(body)) {
             return gc.RACE_WORKER;
         }
         return undefined;
-
     },
 
     getModuleFromRace: function (race){

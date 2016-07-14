@@ -115,28 +115,24 @@ var policyMany2oneLinker = {
             ,room.energyCapacityAvailable);
 
         //this.initialisePolicy(currentPolicy);
+      //  if (!this.checkCreepsStillAlive(currentPolicy, this.NUMBER_OF_LINKERS)) {
+      //      console.log("checkCreepsStillAlive gave false aboutto findNewLinkers");
+      //      this.findNewLinkers(currentPolicy);
+      //  }
         if (!this.checkCreepsStillAlive(currentPolicy, this.NUMBER_OF_LINKERS)) {
-            this.findNewLinkers(currentPolicy);
-        }
-        this.checkRoles(room, currentPolicy);
-
-        //var porterSize = Math.min(5, raceWorker.maxSizeRoom(room));
-
-        var spawns = room.find(FIND_MY_SPAWNS);
-
-
-        console.log("extraPorters", this.extraPorters(room), " < porterShortfall"
-            , this.porterShortfall(room,currentPolicy));
-
-        var externalCommitments = poolSupply.getEnergyInBuildQueue(room.name);
-        console.log("Many2one about to look into spawning, external commitmnets", externalCommitments);
-        if (!this.checkCreepsStillAlive(currentPolicy, 3)) {
             console.log("replacing dead porter");
             this.spawnLinkerCreep(spawns, currentPolicy);
             this.findNewLinkers(currentPolicy);
-            //} else  if(  porterSize <= this.porterShortfall(room,currentPolicy)) {
+        }
 
-        } else  if ( this.extraPorters(room) < this.porterShortfall(room,currentPolicy)) {
+
+        this.checkRoles(room, currentPolicy);
+        var spawns = room.find(FIND_MY_SPAWNS);
+        console.log("extraPorters", this.extraPorters(room), " < porterShortfall"
+            , this.porterShortfall(room,currentPolicy));
+        var externalCommitments = poolSupply.getEnergyInBuildQueue(room.name);
+        console.log("Many2one about to look into spawning, external commitmnets", externalCommitments);
+        if ( this.extraPorters(room) < this.porterShortfall(room,currentPolicy)) {
             console.log("tryingToSpawn extraPorters",this.extraPorters(room)
                 ,"shortfall", this.porterShortfall(room,currentPolicy) );
             var body = raceWorker.body(this.porterSize(room));
@@ -263,7 +259,7 @@ var policyMany2oneLinker = {
             }
             if (foundRepaier || creeps.length <= this.REPAIRER_THREASHOLD ) {
                 roleBase.switchRoles(creep, gc.ROLE_FLEXI_STORAGE_PORTER);
-                roleBase.switchRoles(creep, gc.ROLE_FLEXI_STORAGE_PORTER);
+               // roleBase.switchRoles(creep, gc.ROLE_FLEXI_STORAGE_PORTER);
                 // creep.memory.role = gc.ROLE_ENERGY_PORTER;
                 // if (undefined === creep.memory.tasks)
                 //     creep.memory.tasks = {};
@@ -276,17 +272,7 @@ var policyMany2oneLinker = {
             }
         }
     },
-    /*
-     convertStorageRepairer: function(creep) {
-     // console.log("in convertStorageRepairer",creep);
-     if (undefined !== creep) {
-     creep.memory.role = gc.ROLE_STORAGE_REPAIRER;
-     creep.memory.tasks.tasklist = roleStorageRepairer.moveTaskList(creep);
-     //   console.log("New Energy Porter tsetlisg", JSON.stringify(creep.memory.tasks.tasklist) );
-     tasks.setTargetId(creep,undefined);
-     }
-     },
-     */
+
     spawnLinkerCreep: function (spawn, currentPolicy) {
         var body = raceWorker.body(gc.LINKING_WORKER_SIZE);
         var room = Game.rooms[currentPolicy.room];
@@ -322,25 +308,32 @@ var policyMany2oneLinker = {
         var toLink = room.memory.links.toLink;
         var creeps = _.filter(Game.creeps, function (creep) {return creep.memory.policyId == currentPolicy.id});
         for (var i = creeps.length-1 ; i >=0 ; i-- ) {
-            // console.log(creeps[i].creepName,"In findNewLiners loop counter",i)
-            if ( (gc.ROLE_HARVESTER != creeps[i].memory.role
-                && gc.ROLE_LINKER_SOURCE != creeps[i].memory.role
+           //  console.log(creeps[i].name,"In findNewLiners loop counter",i)
+           // console.log(creeps[i],"energy ",raceBase.getEnergyFromBody(creeps[i].body), "divided by block size",
+           //     raceBase.getEnergyFromBody(creeps[i].body)/gc.BLOCKSIZE_COST_WORKER, "blocksize",gc.BLOCKSIZE_COST_WORKER);
+
+            if ( ( gc.ROLE_LINKER_SOURCE != creeps[i].memory.role
                 && gc.ROLE_LINKER_MINER_STORAGE != creeps[i].memory.role)
-            // && gc.LINKING_WORKER_SIZE * gc.BLOCKSIZE_COST_WORKER
-            //        == raceBase.getEnergyFromBody(creeps[i].body())
+                && this.bodySuitableForLinker(creeps[i])
             )
             {
+            //    console.log("linkCreeps[0].creepName",linkCreeps[0].creepName,this.doesLinkerExist(room,0),"linkCreeps[1].creepName"
+           //         ,linkCreeps[1].creepName,this.doesLinkerExist(room,1),"linkCreeps[2].creepName"
+           //         ,linkCreeps[2].creepName,this.doesLinkerExist(room,2));
+
                 //  if (linkCreeps)
-                if (undefined === linkCreeps[0].creepName){
+                if (!this.doesLinkerExist(room,0) ) {
+                    console.log("in 0 ");
                     linkCreeps[0].creepName = creeps[i].name;
                     this.makeFromLinker(creeps[i] ,fromLinks[0], toLink);
-
-                } else  if (undefined === linkCreeps[1].creepName) {
+                } else  if (!this.doesLinkerExist(room,1)) {
+                    console.log("in 1 ");
                     linkCreeps[1].creepName = creeps[i].name;
                     this.makeFromLinker(creeps[i] ,fromLinks[1], toLink);
 
                 } else {
-                    if (undefined === linkCreeps[2].creepName) {
+                    if (!this.doesLinkerExist(room,2)) {
+                        console.log("in 2 ");
                         linkCreeps[2].creepName = creeps[i].name;
                         this.makeToLinker(creeps[i], toLink);
                     }
@@ -348,6 +341,10 @@ var policyMany2oneLinker = {
 
             }  // harvester
         }//for
+    },
+
+    bodySuitableForLinker: function (creep) {
+        return raceBase.isCreep(creep, "worker", gc.LINKING_WORKER_SIZE);
     },
 
     checkCreepsStillAlive: function (currentPolicy, numberOfLinkers) {
@@ -362,21 +359,9 @@ var policyMany2oneLinker = {
         }
         for ( var i = 0 ; i < linkCreeps.length ; i++ )
         {
-           // console.log("checkCreepsalive doesLinkerExist",this.doesLinkerExist(room,i));
-            if (undefined !== linkCreeps[i].creepName) {
-                var creepName = linkCreeps[i].creepName;
-                if (undefined === Game.creeps[creepName]) {
-                    //      console.log("checkCreepsStillAlive", linkCreeps[i].creepName ,"just died" );
-                    linkCreeps[i].creepName = undefined;
-                    return false;
-                } else  {
-                    //        console.log("in checkCreepsStillAlive foud liveone ", creepName);
-                    numLinkersFound++
-                }
-            } else {
-                //       console.log("link", i,"creep procbably died");
-                return false;
-            }
+           if (!this.doesLinkerExist(room,i)) {
+               return false;
+           }
         }
         return true;
     },
@@ -384,23 +369,19 @@ var policyMany2oneLinker = {
     doesLinkerExist: function (room,index) {
         var linkCreeps = room.memory.links.linkCreeps;
         if (undefined === linkCreeps[index]) {
-        //    console.log(index,"doesLinkerExist no link ");
+         //   console.log(index,"doesLinkerExist no link ");
             return false;
         }
         if (undefined == linkCreeps[index].creepName){
-        ///    console.log(index,"doesLinkerExist no creep name in link data ");
+         //   console.log(index,"doesLinkerExist no creep name in link data ");
             return false;
         }
         if (undefined === Game.creeps[linkCreeps[index].creepName]) {
-        //    console.log(index,"doesLinkerExist no creep in game ");
+           // console.log(index,"doesLinkerExist no creep in game "); <<<<<<<<<<<
             return false;
         }
         if (Game.creeps[linkCreeps[index].creepName].memory.role != linkCreeps[index].role){
-
-    //        console.log("linkCreeps[index].creepName",linkCreeps[index].creepName
-    ///            ,"Game.creeps[linkCreeps[index].creepName]",Game.creeps[linkCreeps[index].creepName])
-    //        console.log(index,"wrong role - real role",Game.creeps[linkCreeps[index].creepName].memory.role
-    //            ,"role in link data",linkCreeps[index].role);
+           //  console.log(index,"doesLinkerExist creep has wrong role");
             return false;
         }
         return true;
@@ -424,61 +405,6 @@ var policyMany2oneLinker = {
         creep.memory.role = gc.ROLE_LINKER_MINER_STORAGE;
         tasks.setTargetId(creep,undefined);
     },
-
-
-    /*
-     linkForming: function (currentPolicy) {
-     var room = Game.rooms[currentPolicy.room];
-     var numberOfLinkers = 3;
-     var fromLinks = room.memory.links.fromLinks;
-     var toLink = room.memory.links.toLink;
-
-     if (undefined === room.memory.links.linkCreeps) {
-     room.memory.links.linkCreeps = [];
-     room.memory.links.linkCreeps.push({creepName: undefined, linkInfo : fromLinks[0], toInfo : toLink});
-     room.memory.links.linkCreeps.push({creepName: undefined, linkInfo : fromLinks[1], toInfo : toLink});
-     room.memory.links.linkCreeps.push({creepName: undefined, linkInfo : toLink});
-     }
-
-     var creeps = _.filter(Game.creeps, function (creep) {return creep.memory.policyId == currentPolicy.id});
-     var linkCreeps = room.memory.links.linkCreeps;
-     this.checkCreepsStillAlive(currentPolicy, numberOfLinkers);
-     this.findNewLinkers(currentPolicy);
-     if (this.linkersInPosition(currentPolicy)) {
-     room.memory.linkState = "linkEconomy";
-     }
-     },
-
-     linkersInPosition: function (currentPolicy) {
-     console.log("In linkersInPosition");
-     var room = Game.rooms[currentPolicy.room];
-     if (undefined === room.memory.links.linkCreeps) {
-     return false;
-     }
-     var linkCreeps = room.memory.links.linkCreeps;
-     for ( var i = 0 ; i < linkCreeps.length ; i++ )
-     {
-     if (undefined === linkCreeps[i] || undefined === linkCreeps[i].creepName) {
-     console.log(false, "undefined === linkCreeps[i].creepName) i",i);
-     return false;
-     } else {
-
-     var creep = Game.creeps[linkCreeps[i].creepName];
-     if  (creep === undefined) {
-     console.log(false, "probably dead", creep);
-     return false;
-     }
-     if (!(creep.pos.x == linkCreeps[i].linkInfo.x)
-     || !(creep.pos.y == linkCreeps[i].linkInfo.y)) {
-     console.log(false, creep, "not in postion x", creep.pos.x,linkCreeps[i].linkInfo.x
-     ,"y",creep.pos.y , linkCreeps[i].linkInfo.y);
-     return false;
-     }
-     }
-     }
-     console.log(true,"linkersInPosition");
-     return true;
-     },*/
 
 };
 

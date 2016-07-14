@@ -17,7 +17,7 @@ var roleNeutralBuilder = require("role.neutral.harvester");
 var policyForeignHarvest = {
 
     initialisePolicy: function (newPolicy) {
-        var body =  raceWorker.body(newPolicy.workerSize);
+        var body =  raceWorker.body(newPolicy.workerSize, true);
         var taskList = roleNeutralBuilder.getTaskList(
             newPolicy.harvestRoom,
             newPolicy.storageRoom,
@@ -38,8 +38,8 @@ var policyForeignHarvest = {
     
     draftNewPolicyId: function(currentPolicy)
     {
-       // return null;
-        return currentPolicy;
+       return null;
+       // return currentPolicy;
     },
 
     cleanUp: function(oldPolicy)

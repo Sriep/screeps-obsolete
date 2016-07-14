@@ -27,6 +27,7 @@ var stats = require("stats");
 var roleBase = require("role.base");
 var gc = require("gc");
 var PoolRequisition = require("pool.requisition");
+var policyMany2oneLinker = require("policy.many2one.linker");
 
 
 var ayrtepPad = {
@@ -59,12 +60,18 @@ var ayrtepPad = {
             policyFrameworks.createPotrolRoomPolicy( { roomName : "W26S22" , x : 28 , y : 14 }, 8, true);
         }*/
         if ( Game.time % 750 == 0 ) {
-            policyFrameworks.createForeignHarvest("W26S23", "W26S21", 11, "55db3176efa8e3fe66e04a58", undefined, true);
+           policyFrameworks.createForeignHarvest("W26S23", "W26S21", 9, "55db3176efa8e3fe66e04a58", undefined, true);
         }
 
         if ( Game.time % 1000 == 0 ) {
-          //  policyFrameworks.createPotrolRoomPolicy( { roomName : "W26S22" , x : 28 , y : 14 }, 8, true);
+            policyFrameworks.createPotrolRoomPolicy( { roomName : "W26S22" , x : 28 , y : 14 }, 8, true);
         }
+
+
+      //  for (var i in Game.creeps) {
+       //     console.log( Game.creeps[i],"is suitable for linker"
+      //          ,policyMany2oneLinker.bodySuitableForLinker(Game.creeps[i]));
+      //  }
 
         //if (Game.rooms["W26S23"] !== undefined) {
        ///     console.log("Owner of W26S23s controller", Game.rooms["W26S23"].controller.owner);

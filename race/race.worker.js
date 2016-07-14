@@ -25,6 +25,7 @@ var raceWorker = {
     */
     blockSize: 100 + 50 + 50,
     BLOCKSIZE: 100 + 50 + 50,
+    BLOCKSIZE_FAST: 100 + 50 + 50 + 50,
 	
     buildRatio: 1.0,
 	repairerRatio: 0.08,
@@ -47,29 +48,30 @@ var raceWorker = {
 	    return  Math.floor(roomController.maxProduction[contolerLevel] / this.BLOCKSIZE);       
     },
 */
+    // Weak from. Assumes body is an array not a object.
     isWorker: function(body) {
-        if (body === undefined || 0 != body.length % 3)
+        body = raceBase.convertBodyToArray(body);
+        if (body === undefined || 3 > body.length)
             return false;
-        var size = body.length / 3;
-        var numWorkParts = 0;
-        var numMoveParts = 0;
-        var numCarryParts = 0;
+        var foundWork = false, foundCarry = false, foundMove = false;
         for (var i = 0 ; i < body.length ; i++) {
             switch (body[i]) {
                 case WORK:
-                    numWorkParts++;
+                    foundWork = true;
                     break;
                 case MOVE:
-                    numMoveParts++;
+                    foundMove = true;
                     break;
                 case CARRY:
-                    numCarryParts++;
+                    foundCarry = true;
                     break;
                 default:
-                    return false;
+            } //switch
+            if (foundCarry && foundMove && foundWork) {
+                return true;
             }
-        }
-        return numWorkParts == size && numMoveParts == size && numCarryParts == size;
+        }// for
+        return false;
     },
 
     creepSize: function(body) {
@@ -252,14 +254,27 @@ console.log("assignRoles havester", havesters_needed, "upgraders",upgraders_need
     },
     
 
-    body: function (size) {
+    body: function (size, fast) {
         var body = [];
-        for (var i = 0; i < size; i++) {
-            body.push(WORK);
-            body.push(CARRY);
-            body.push(MOVE);
-        } // for
-        return body;	    
+
+        if (undefined === fast || !fast)
+        {
+            for (var i = 0; i < size; i++) {
+                body.push(WORK);
+                body.push(CARRY);
+                body.push(MOVE);
+            } // for
+        } else {
+            for (var i = 0; i < size; i++) {
+                body.push(WORK);
+                body.push(CARRY);
+                body.push(MOVE);
+                body.push(MOVE);
+            } // for
+
+        }
+        return body;
+
     },
 
     biggistSpawnable: function(room) {
