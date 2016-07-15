@@ -97,7 +97,7 @@ var roleBase = {
                 }
             }
         } else {
-            creep.memory.targetRoom == creep.memory.sourceRoom;
+            creep.memory.targetRoom = creep.memory.sourceRoom;
 
             if (creep.memory.sourceRoom == creep.room.name) {
                // console.log("Shotd get here",this.Task.HARVEST,  this.Task.MOVE);
@@ -295,28 +295,40 @@ var roleBase = {
     },
 
 	findTargetSource: function(creep) {
+        var roomOwned = require("room.owned");
 	    var sources = creep.room.find(FIND_SOURCES, {
             filter: function(source) {             
                 return (creep.room.memory.reservedSources === undefined
                         || -1 == creep.room.memory.reservedSources.indexOf(source.id));
             }
         });
-	    sources.sort((a,b) => b.energy - a.energy);    	    
-	    for ( var sIndex in  sources ) {
+        sources = sources.sort((a,b) => b.energy - a.energy);
+
+   //     console.log(creep.room,creep,"findTargetSource",sources);
+
+	     for ( var sIndex in  sources ) {
             sources[sIndex].clients= 0;
+           //  console.log(creep.room,creep,"findTargetSource sIndex",sIndex);
             for(var cIndex in Game.creeps) {
-                if (Game.creeps[cIndex].memory.targetSourceId == sources[sIndex].id)
+                if (undefined !== Game.creeps[cIndex].memory.tasks
+                    && Game.creeps[cIndex].memory.tasks.targetId == sources[sIndex].id)
                 {
                     sources[sIndex].clients = sources[sIndex].clients +1;
+                   // console.log(creep.room,creep,"findTargetSource",sources[sIndex],"clinets",sources[sIndex].clients );
                 }   // if             
             }   //  for(var cIndex in Game.creeps)          
-        } // for ( var sIndex in  sources ) 
+        } // for ( var sIndex in  sources )
+
         var target = sources[0];
         if (sources.length > 1) {
-            if (sources[0].clients > sources[1].clients + this.sourceClinetThreshold) {
+            var accessPoints = roomOwned.countAccessPoints(creep.room, sources[0].pos);
+           // console.log(creep,"source,",sources[0]," access points", accessPoints,"clints",sources[0].clients);
+            if (sources[0].clients >  accessPoints ) {
                 target = sources[1];   
             }
         }
+      //  console.log(creep,"about to return",target);
+        creep.memory.tasks.targtId = target;
         return target;  
 	},
 	
@@ -381,14 +393,14 @@ var roleBase = {
              var tasks = require("tasks");
                
           //  if (creep.name == "Skyler"){
-           //  this.resetTasks(creep);
+         //    this.resetTasks(creep);
          //   }
                 //creep.memory.tasks = undefined;
           //   console.log("-------------------", creep,"-------------------------------");
               //    tasks.showTasks(creep);
              //   tasks.setTargetId(creep,undefined);
               // console.log(creep,creep.memory.role);
-              //  creep.say(creep.memory.role);
+            //    creep.say(creep.memory.role);
                 tasks.doTasks(creep);
             //  console.log("---------------------------------------------------");
                 return;
@@ -487,7 +499,7 @@ var roleBase = {
         if (undefined !== role) {
             var name = "role." + role;
             var modulePtr = require(name);
-            console.log("role",role,"name",name,"module",modulePtr);
+           // console.log("role",role,"name",name,"module",modulePtr);
             return modulePtr;
         }  else {
             return undefined;

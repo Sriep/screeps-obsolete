@@ -37,10 +37,11 @@ var roleUpgrader = {
         harvest.loop = true;
         moveToController.loop = true;
         offload.loop = true;
+        tasks.push(moveToController);
+        tasks.push(offload);       
         tasks.push(moveToSource);
         tasks.push(harvest);
-        tasks.push(moveToController);
-        tasks.push(offload);
+
        // console.log("tet upgrader task list", JSON.stringify(tasks));
         return tasks;
     },

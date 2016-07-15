@@ -24,6 +24,7 @@ var roleEnergyPorter = require("role.energy.porter");
 var npcInvaderBattle = require("npc.invader.battle");
 var roleStorageRepairer = require("role.storage.repairer");
 
+
 /**
  * Abstract base object for deceison when at peace decisions. Peace is
  * when the main objective is to transfer as much avalible energy to the 
@@ -44,10 +45,13 @@ var policyPeace = {
      */   
     draftNewPolicyId: function(oldPolicy) {
         var room =  Game.rooms[oldPolicy.room];
+        if (!room.controller.my) {
+            return policyFrameworks.createNeutralRoomPolicy(room);
+        }
+
         if (!policyBuildspawn.spawnFound(oldPolicy))      {
             return policyFrameworks.createBuildspawn(room.name);
         }
-
         
         var policyMany2OneLinker = require("policy.many2one.linker");
         if ( policyMany2OneLinker.readyForMAny2OneLinker(oldPolicy)) {
@@ -91,6 +95,9 @@ var policyPeace = {
     },
 
     initialisePolicy: function (newPolicy) {
+        var policyMany2oneLinker = require("policy.many2one.linker");
+       // var room = Game.rooms[newPolicy.room];
+        policyMany2oneLinker.initialiseLinks(newPolicy);
         return true;
     },
 
@@ -107,12 +114,42 @@ var policyPeace = {
     * @returns {none} 
     */
     enactPolicy: function(currentPolicy) {
+        var policyMany2oneLinker = require("policy.many2one.linker");
         var room = Game.rooms[currentPolicy.room];
+        console.log("ENACT POLICY PEACE",room);
         poolSupply.updateSupplyLevel(room.name
             ,roomOwned.calaculateSuplly(room)
             ,room.energyCapacityAvailable);
+
+      //  console.log(room,"room.memory.links"
+        //    , JSON.stringify( room.memory.links));
+       // console.log(room,"room.memory.links.info",room.memory.links.info);
+      //  console.log(room,"room.memory.links.info.length",room.memory.links.info.length);
+        var creeps = _.filter(Game.creeps, function (creep) {return creep.memory.policyId == currentPolicy.id});
+        for (var i = creeps.length-1 ; i >=0 ; i-- ) {
+            if (creeps[i].memory.role == gc.ROLE_FLEXI_STORAGE_PORTER) {
+           //     roleBase.switchRoles(creeps[i], gc.ROLE_FLEXI_STORAGE_PORTER);
+            }
+        }
+
+        if (room.memory.links !== undefined
+           && room.memory.links.info !== undefined
+           && room.memory.links.info.length > 0
+          && policyMany2oneLinker.readyForMAny2OneLinker2(currentPolicy))
+        {
+            console.log(room,"checkLinks and nonLinkBuilds");
+            policyMany2oneLinker.checkLinks(room, currentPolicy);
+            policyMany2oneLinker.nonLinkBuilds(room, currentPolicy);
+        } else {
+            console.log(room,"calculateAndAssignRoles");
+            this.calculateAndAssignRoles(room, currentPolicy);
+        }
+        npcInvaderBattle.defendRoom(room);
+    },
+
+    calculateAndAssignRoles: function (room, currentPolicy) {
         var constructionLeft = roomOwned.getConstructionLeft(room);
-        console.log(room,"constructoin left", constructionLeft);
+    //    console.log(room,"constructoin left", constructionLeft);
         var nBuilders = 0;
         var nRepairers = 0;
         var nUpgraders = 0;
@@ -123,8 +160,8 @@ var policyPeace = {
         var supportable = roomOwned.workersSupportable(room, energy, raceWorker.LINKING_WORKERSIZE, true);
         toSupply = Math.floor(Math.min(toSupply, supportable));
 
-        console.log("Room can support", supportable,"workers for ",supportable*1000
-            ,"energy and",supportable*5,"parts. Support burder is",toSupply,"workers.");
+      //  console.log("Room can support", supportable,"workers for ",supportable*1000
+      //      ,"energy and",supportable*5,"parts. Support burder is",toSupply,"workers.");
         if (toSupply > 0)
         {
             var nLinkers = 2;
@@ -189,10 +226,10 @@ var policyPeace = {
         
         var workerSizeToSpawn = raceWorker.spawnWorkerSize(room, (equilbriumCreeps) * 1000);
         
-        console.log(room,"woreker size to spawn", workerSizeToSpawn);
-        console.log(room,"equilbriumCreeps", equilbriumCreeps,"w size", workerSizeToSpawn
-            , "<= nWorkePArts",nWorkParts, " || ncreeps"  ,nCreeps);
-        if (equilbriumCreeps * 5 >= nWorkParts || nCreeps < 3 )//|| room.name == "W26S21")
+      //  console.log(room,"woreker size to spawn", workerSizeToSpawn);
+       // console.log(room,"equilbriumCreeps", equilbriumCreeps,"w size", workerSizeToSpawn
+      //      , "<= nWorkePArts",nWorkParts, " || ncreeps"  ,nCreeps);
+        if (equilbriumCreeps * 5 >= nWorkParts && nCreeps <= 4 )//|| room.name == "W26S21")
         {
             if (nCreeps <= 3 * roomOwned.countSiteAccess(room, FIND_SOURCES)) {
                 var spawns = room.find(FIND_MY_SPAWNS);

@@ -9,6 +9,7 @@ var policy = require("policy");
 var stats = require("stats");
 var ayrtepPad = require("ayrtep.pad");
 var cpuUsage = require("cpu.usage");
+var recurringPolicies = require("recurring.policies");
 
 // Any modules that you use that modify the game's prototypes should be require'd
 // before you require the profiler.
@@ -29,7 +30,7 @@ module.exports.loop = function () {
         freememory.freeCreeps();
         policy.enactPolicies();
         raceBase.moveCreeps();
-
+        recurringPolicies.run();
         ayrtepPad.bottom();
 
 

@@ -29,7 +29,7 @@ var roleEnergyPorter = {
                     && structure.energy < structure.energyCapacity);
             }
         });
-        console.log(creep,"nextEnergyContainer towers",tower);
+       // console.log(creep,"nextEnergyContainer towers",tower);
         if (tower) {
             return tower;
         }
@@ -42,7 +42,7 @@ var roleEnergyPorter = {
                     && structure.energy < structure.energyCapacity;
             }
         });
-        console.log(creep,"nextEnergyContainer first extension",extension);
+    //    console.log(creep,"nextEnergyContainer first extension",extension);
         if (extension) {
             return extension;
         }

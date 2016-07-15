@@ -9,9 +9,10 @@
 var policy = require("policy");
 var policyFrameworks = require("policy.frameworks");
 var roleBase = require("role.base");
-var   stats = require("stats");
-
-
+var raceBase = require("race.base");
+var stats = require("stats");
+var gc = require("gc");
+var raceWorker = require("race.worker");
 
 
 /**
@@ -30,7 +31,9 @@ var policyBuildspawn = {
     draftNewPolicyId: function(oldPolicy) {
         var room = Game.rooms[oldPolicy.room];
         if (this.spawnFound(oldPolicy)){
-            return policyFrameworks.createPeacePolicy(room.name);
+            return policyFrameworks.createPeacePolicy(room.name                
+                , room.memory.links.fromLinks
+                , room.memory.links.toLink);
         }
         return oldPolicy;
     },
@@ -47,6 +50,7 @@ var policyBuildspawn = {
         }
         return true;
     },
+    
 
     /**
      * Handles defence of the room.
@@ -57,20 +61,31 @@ var policyBuildspawn = {
         console.log("buildspawn enact",currentPolicy,currentPolicy.room);
          var room = Game.rooms[currentPolicy.room];
      //   stats.updateStats(room);
-         var creeps = room.find(FIND_MY_CREEPS);//, {
-         //    filter: function (creep) {
-         //        return creep.memory.policyId != currentPolicy.id;
-       //      }
-       //  });
 
-         console.log("In build spawn",room,"creeps",creeps.length);
 
         var source = room.find(FIND_SOURCES);
         var spawnSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
             filter: { structureType:  STRUCTURE_SPAWN }
         });
+        var role;
+        if (room.controller.level < 2)
+        {
+            role = gc.ROLE_UPGRADER;
+        } else {
+            role = gc.ROLE_BUILDER;
+        }
 
-        for(var i in creeps) {
+        var creeps = room.find(FIND_MY_CREEPS);
+        console.log("In build spawn",room,"creeps",creeps.length);
+        for(var i = 0 ; i < creeps.length ; i++ ) {
+            if (raceWorker.isWorker(creeps[i].body)) {
+                if (creeps[i].memory.role != role) {
+                    roleBase.switchRoles(creeps[i], role);
+                }
+
+            }
+
+            /*
             if (creeps[i].memory.policyId != currentPolicy.id)
             {
                 console.log(creeps[i] in room);
@@ -89,7 +104,7 @@ var policyBuildspawn = {
                     creeps[i].memory.targetSourceId = undefined;
                     creeps[i].memory.offloadTargetId = spawnSites[0].id;
                 }
-            }
+            }*/
         }
     },
 

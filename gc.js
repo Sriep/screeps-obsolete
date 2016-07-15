@@ -58,8 +58,10 @@ var gc = {
     TASK_ATTACK_ID: "attack.id",
     TASK_ATTACK_TARGET: "attack.target",
     TASK_WAIT: "wait",
-    
-    //Offload switch task's states
+    TASK_ACTION_TARGET: "action.target",
+
+
+//Offload switch task's states
     SWITCH_STATE_PRODUCTION:  "production",
     SWITCH_STATE_CONSTRUCTION:  "construction",
     SWITCH_STATE_FILLUP:  "fillup",
@@ -110,12 +112,18 @@ var gc = {
     POLICY_ATTACK_STRUCTURES: "attack.structures",
     POLICY_PATROL_ROOM: "patrol.room",
     POLICY_HARVEST_NEUTRAL_ROOM: "harvest.neutral.room",
+    POLICY_REMOTE_ACTIONS: "remote.actions",
     
     //misc
     LINKING_WORKER_SIZE: 5,
     BLOCKSIZE_COST_WORKER: 200,
     EMERGENCY_DOWNGRADING_THRESHOLD: 5000,
-    MANY2ONE_REQUIRED_LIFE: 5400
+    MANY2ONE_REQUIRED_LIFE: 5000,
+    
+    //Flexi storage mode
+    FLEXIMODE_STORAGE: 0,
+    FLEXIMODE_CONTAINER: 1,
+    FLEXIMODE_HARVEST: 2
 
 };
 

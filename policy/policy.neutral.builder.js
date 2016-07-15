@@ -21,7 +21,7 @@ var roleNeutralBuilder = require("role.neutral.builder");
 var policyNeutralBuilder = {
 
     initialisePolicy: function (newPolicy) {
-        var body =  raceWorker.body(newPolicy.workerSize);
+        var body =  raceWorker.body(newPolicy.workerSize, true);
         var taskList = roleNeutralBuilder.getTaskList(newPolicy.workRoom, newPolicy.sourceRoom);
         console.log("policyNeutralBuilder newPolicy.buildRoomy", newPolicy.buildRoom, newPolicy.sourceRoom)
 

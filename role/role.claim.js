@@ -11,6 +11,8 @@ var policy = require("policy");
 var roleNeutralBuilder = {
 
 
+
+
     findTarget: function(creep) {
         return creep.room.controller;
     },

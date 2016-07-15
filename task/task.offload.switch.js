@@ -29,30 +29,22 @@ TaskOffloadSwitch.prototype.State = {
 };
 
 
-function TaskOffloadSwitch (resourceId) {
+function TaskOffloadSwitch (resourceId, storageIds) {
     this.taskType = gc.TASK_OFFLOAD_SWITCH;
     this.conflicts = gc.TRANSFER;
-   // this.state = this.State.SWITCH_STATE_FILLUP;
     this.resourceId = resourceId;
     this.pickup = true;
     this.loop = true;
 }
 
 TaskOffloadSwitch.prototype.doTask = function(creep) {
-  //  console.log(creep,"0TaskOffloadSwitch");
+  //  console.log(creep,"TaskOffloadSwitch");
     tasks.setTargetId(creep, undefined);
     if (undefined === creep)
-        return gc.RESULT_UNFINISHED
+        return gc.RESULT_UNFINISHED;
     if (creep.carry.energy == 0) {
-        var storage =  creep.room.storage;
-        if (!storage) {
-            //  console.log(creep,"Cant find storage");
-            //  creep.say("help storage");
-            return gc.RESULT_RESET;
-        } else {
-            this.switchToFillUp(creep);
-            return gc.RESULT_RESET
-        }
+        this.switchToFillUp(creep);
+        return gc.RESULT_RESET
     }
     
     if (this.needEmergencyUpgrade(creep)) {
@@ -72,8 +64,8 @@ TaskOffloadSwitch.prototype.doTask = function(creep) {
     }
     
     this.switchToUpgradeing(creep);
-    return gc.RESULT_RESET
-};
+    return gc.RESULT_RESET;
+}
 
 TaskOffloadSwitch.prototype.needEmergencyUpgrade = function (creep) {
     return creep.room.controller.ticksToDowngrade < gc.EMERGENCY_DOWNGRADING_THRESHOLD
@@ -85,26 +77,51 @@ TaskOffloadSwitch.prototype.changeState = function (creep, state) {
     creep.memory.tasks.state = state;
 };
 
-TaskOffloadSwitch.prototype.switchToFillUp = function (creep) {
-    
+TaskOffloadSwitch.prototype.moveToStorage = function (creep)
+{
+    var moveToStorage;
     var storage = creep.room.storage;
-    var moveToStorage, louadupEnergy;
+
     if (undefined !== storage && storage.store[RESOURCE_ENERGY] > 0) {
-        moveToStorage = new TaskMoveFind(gc.FIND_ID,gc.RANGE_TRANSFER,storage.id);
-        louadupEnergy = new TaskLoadup(RESOURCE_ENERGY);
+        moveToStorage = new TaskMoveFind(gc.FIND_ID, gc.RANGE_TRANSFER, storage.id);
+        moveToStorage.mode = gc.FLEXIMODE_STORAGE;
     } else {
-        //moveToStorage = new TaskMoveFind(gc.FIND_ID,gc.RANGE_TRANSFER,storage.id);
-        //louadupEnergy = new TaskLoadup(RESOURCE_ENERGY);
-
-        moveToStorage = new TaskMoveFind(gc.FIND_FUNCTION ,gc.RANGE_HARVEST
-            , "findTargetSource","role.base");
-        louadupEnergy = new TaskHarvest();
+      //  console.log(creep , "TaskOffloadSwitch.prototype.moveToStorage No storage!");
+        var containers = creep.room.find(FIND_STRUCTURES, {
+            filter: {structureType: STRUCTURE_CONTAINER}
+        });
+       // console.log(creep,"containers",containers);
+        if (containers.length > 0) {
+       //     creep.say("container");
+            containers.sort(function (a, b) {
+                return b.store[RESOURCE_ENERGY] - a.store[RESOURCE_ENERGY];
+            });
+       //     console.log(creep,"TaskOffloadSwitch containers",containers);
+            moveToStorage = new TaskMoveFind(gc.FIND_ID, gc.RANGE_TRANSFER, containers[0].id);
+            moveToStorage.mode = gc.FLEXIMODE_CONTAINER;
+        } else {
+       //     creep.say("harvest");
+          //  console.log(creep,"TaskOffloadSwitch harvest");
+            moveToStorage = new TaskMoveFind(gc.FIND_FUNCTION, gc.RANGE_HARVEST
+                , "findTargetSource", "role.base");
+            moveToStorage.mode = gc.FLEXIMODE_HARVEST;
+        }
     }
+    return moveToStorage;
+}
 
+TaskOffloadSwitch.prototype.switchToFillUp = function (creep) {
+    var moveToStorage  = TaskOffloadSwitch.prototype.moveToStorage(creep);
+    var loadupEnergy
+    if (moveToStorage.mode == gc.FLEXIMODE_HARVEST) {
+        loadupEnergy = new TaskHarvest();
+    } else {
+        loadupEnergy = new TaskLoadup(RESOURCE_ENERGY);
+    }
     var switchTaskLists = new TaskOffloadSwitch();
     var newTaskList = [];
     newTaskList.push(moveToStorage);
-    newTaskList.push(louadupEnergy);
+    newTaskList.push(loadupEnergy);
     newTaskList.push(switchTaskLists);
     creep.memory.tasks.tasklist = newTaskList;
     this.changeState(creep,this.State.SWITCH_STATE_FILLUP);
@@ -141,8 +158,11 @@ TaskOffloadSwitch.prototype.switchToConstruction = function (creep) {
 TaskOffloadSwitch.prototype.switchToUpgradeing = function (creep) {
     var moveToController = new TaskMoveFind(gc.FIND_ID,gc.RANGE_UPGRADE, creep.room.controller.id);
     var upgradeController = new TaskOffload(gc.UPGRADE_CONTROLLER);
+
     var storage = creep.room.storage;
-    var moveToStorage = new TaskMoveFind(gc.FIND_ID,gc.RANGE_TRANSFER,storage.id);
+    //var moveToStorage = new TaskMoveFind(gc.FIND_ID,gc.RANGE_TRANSFER,storage.id);
+    var moveToStorage  = TaskOffloadSwitch.prototype.moveToStorage(creep);
+
     var loadupEnergy = new TaskLoadup(RESOURCE_ENERGY);
     var switchTaskLists = new TaskOffloadSwitch();
     
@@ -155,20 +175,6 @@ TaskOffloadSwitch.prototype.switchToUpgradeing = function (creep) {
     creep.memory.tasks.tasklist = newTaskList;
     this.changeState(creep, this.State.SWITCH_STATE_UPGRADE);
 };
-/*
-TaskOffloadSwitch.prototype.switchToConstruction = function (creep) {
-    var moveToConstructionSite = new TaskMoveFind(gc.FIND_ROOM_OBJECT,gc.RANGE_BUILD
-        ,FIND_MY_CONSTRUCTION_SITES);
-    var offloadBuild = new TaskOffload(gc.BUILD);
-    var switchTaskLists = new TaskOffloadSwitch();
-
-    var newTaskList = [];
-    newTaskList.push(moveToConstructionSite);
-    newTaskList.push(offloadBuild);
-    newTaskList.push(switchTaskLists);
-    creep.memory.tasks.tasklist = newTaskList;
-    this.changeState(creep, this.State.SWITCH_STATE_CONSTRUCTION);
-};*/
 
 module.exports = TaskOffloadSwitch;
 

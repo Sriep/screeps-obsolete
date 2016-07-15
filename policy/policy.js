@@ -35,21 +35,21 @@ var policy = {
             var newPolicyDetails = oldPolicyModule.draftNewPolicyId(Memory.policies[i]);
            // console.log(JSON.stringify(oldPolicyModule) ,"newPolicyDetails",newPolicyDetails,"i =",i);
             if (newPolicyDetails === null) {
-                console.log("Terminate policy",Memory.policies[i].type,Memory.policies[i].id);
+              //  console.log("Terminate policy",Memory.policies[i].type,Memory.policies[i].id);
                 delete Memory.policies[i];
                 //Memory.policies.splice(i, 1);
             } else if ( newPolicyDetails.id != Memory.policies[i].id) {
                 var newPolicyModule = this.getModuleFromPolicy(newPolicyDetails);
                 this.activatePolicy(newPolicyDetails);
                 newPolicyModule.switchPolicy(Memory.policies[i], newPolicyDetails);
-                console.log("Removing old policy",Memory.policies[i].type,"id", Memory.policies[i].id );
+               // console.log("Removing old policy",Memory.policies[i].type,"id", Memory.policies[i].id );
                 delete Memory.policies[i];
                 //Memory.policies.splice(i, 1);
-                console.log("Enact new policy",newPolicyDetails.type,newPolicyDetails.id);
+               // console.log("Enact new policy",newPolicyDetails.type,newPolicyDetails.id);
                 newPolicyModule.enactPolicy(newPolicyDetails);
 
             } else {
-                console.log("ENACT POLICY",Memory.policies[i].type, Memory.policies[i].id);
+               // console.log("ENACT POLICY",Memory.policies[i].type, Memory.policies[i].id);
                 oldPolicyModule.enactPolicy(Memory.policies[i]);
                // console.log("FINISHED POLICY");
             } // if(newPolicyDetails !===
@@ -168,6 +168,10 @@ var policy = {
         }
         var module = this.getModuleFromPolicy(policyDetails);
         console.log("activatePolicy id",policyDetails.id,"module",module);
+        if (undefined === module) {
+            console.log("activatePolciy cant make module",JSON.stringify(policyDetails));
+            return false;
+        }
         if (undefined  !== module.validPolicy) {
             if (!module.validPolicy(policyDetails)) {
                 return false;

@@ -54,7 +54,9 @@ var policyConstruction = {
        // if (this.startConstruction(room)) {
         //    return oldPolicy;
        // }
-        return policyFrameworks.createPeacePolicy(room.name);
+        return policyFrameworks.createPeacePolicy(room.name                
+            , room.memory.links.fromLinks
+            , room.memory.links.toLink);
     },
 
     initialisePolicy: function (newPolicy) {
@@ -153,8 +155,8 @@ var policyConstruction = {
 
     switchPolicy: function(oldPolicy, newPolicy)
     {
-        console.log("In switchPolicy oldPolicy", JSON.stringify(oldPolicy)
-            , "newPolcy",JSON.stringify(newPolicy));
+      //  console.log("In switchPolicy oldPolicy", JSON.stringify(oldPolicy)
+        //    , "newPolcy",JSON.stringify(newPolicy));
 
         //if (oldPolicy === undefined) {
        //     return;

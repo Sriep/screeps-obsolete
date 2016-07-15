@@ -32,10 +32,11 @@ var roleBuilder = {
         var moveToConstructionSite = new TaskMoveFind(gc.FIND_ROOM_OBJECT,gc.RANGE_BUILD
                                                         ,FIND_MY_CONSTRUCTION_SITES);
         var offload = new TaskOffload(gc.BUILD);
+        tasks.push(moveToConstructionSite);
+        tasks.push(offload);       
         tasks.push(moveToSource);
         tasks.push(harvest);
-        tasks.push(moveToConstructionSite);
-        tasks.push(offload);
+
         return tasks;
     },
 

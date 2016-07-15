@@ -68,10 +68,11 @@ var roleHarvester = {
         harvest.loop = true;
         moveToEnergyContainer.loop = true;
         offload.loop = true;
-        tasks.push(moveToSource);
-        tasks.push(harvest);
         tasks.push(moveToEnergyContainer);
         tasks.push(offload);
+        tasks.push(moveToSource);
+        tasks.push(harvest);
+
         return tasks;
     },
     

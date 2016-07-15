@@ -23,13 +23,16 @@ function TaskLoadup (resourceId) {
 }
 
 TaskLoadup.prototype.doTask = function(creep, task) {
+ //   console.log(creep,"task loadup")
     var storage =  Game.getObjectById(tasks.getTargetId(creep));
     if (!storage) {
       //  console.log(creep,"Cant find storage");
       //  creep.say("help storage");
         return gc.RESULT_ROLLBACK;
     } else {
-        storage.transfer(creep, task.resourceId);
+        //storage.transfer(creep, task.resourceId);
+        var result = creep.withdraw(storage,task.resourceId);
+    //    console.log(creep, "result of withrewal storage", storage, task.resourceId, "result",result);
         if (creep.carry.energy == 0) {
             return gc.RESULT_UNFINISHED;
         } else {

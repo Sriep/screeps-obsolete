@@ -23,7 +23,7 @@ var policyForeignHarvest = {
             newPolicy.storageRoom,
             newPolicy.sourceId,
             newPolicy.offLoadId);
-        console.log("policyNeutralBuilder newPolicy.buildRoomy", newPolicy.buildRoom, newPolicy.sourceRoom)
+       // console.log("policyNeutralBuilder newPolicy.buildRoomy", newPolicy.buildRoom, newPolicy.sourceRoom)
 
         var order = new PoolRequisition(
             newPolicy.id
@@ -32,24 +32,13 @@ var policyForeignHarvest = {
             , undefined
             , undefined
         );
-        console.log("initialisePolicy policyForeignHarvest", JSON.stringify(order));
+       // console.log("initialisePolicy policyForeignHarvest", JSON.stringify(order));
         PoolRequisition.prototype.placeRequisition(order);
     },
     
     draftNewPolicyId: function(currentPolicy)
     {
        return null;
-       // return currentPolicy;
-    },
-
-    cleanUp: function(oldPolicy)
-    {
-      /*  var creeps = _.filter(Game.creeps, function (creep) {
-            return creep.memory.policyId == oldPolicy.id
-        });
-        for ( var i = 0 ;  i < creeps.length ; i++ ) {
-            PoolRequisition.prototype.returnToPool(creeps[i].name);
-        }*/
     },
 
     switchPolicy: function(oldPolicy, newPolicy)

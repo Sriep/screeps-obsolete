@@ -29,11 +29,8 @@ function TaskMoveXY (x, y, range) {
 }
 
 TaskMoveXY.prototype.doTask = function(creep, task) {
-   // task.loop = true;
-  //  console.log(creep,"In taskmovexy xpos",creep.pos.x , task.x , "ypos" ,creep.pos.y , task.y);
+    console.log(creep,JSON.stringify(task));
     var result = creep.moveTo(task.x,task.y);
-   // console.log(creep,"In taskmovexy creep.moveTo(task.x,task.y); task.x", task.x,"task.y",task.y)
-    creep.say(result);
     switch (result) {
         case OK:    	            //0	The operation has been scheduled successfully.
             if (creep.pos.inRangeTo(task.x,task.y,task.range)) {

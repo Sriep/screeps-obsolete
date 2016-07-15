@@ -29,7 +29,7 @@ var policyNeutralRoad = {
         if (undefined == newPolicy) {
             return false;
         }
-        console.log("In activatePolicy", JSON.stringify( newPolicy));
+      //  console.log("In activatePolicy", JSON.stringify( newPolicy));
         var room = Game.rooms[newPolicy.startRoom];
         if (undefined !== room) {
             policy.pushDependantPolicy(room, newPolicy);

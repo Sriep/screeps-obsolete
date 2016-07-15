@@ -72,18 +72,29 @@ var policyThePool = {
         var creep = Game.creeps[name];
         if (undefined !== creep){
          //  return to nearest spawn
+            var tasks = [];
+            /*
             var spawns = _.filter(Game.spawns);
             spawns.sort(function(a,b){
                 return Game.map.getRoomLinearDistance(a.room.name, creep.room.name)
                     - Game.map.getRoomLinearDistance(b.room.name, creep.room.name);
-            });
-            creep.memory.policyId = 0;
-            var tasks = [];
+            });            
             var moveToSpawn = new TaskMovePos(spawns[0].pos,1);
-            tasks.push(moveToSpawn);
+            */
+            tasks.push(this.returnToPoolTask(creep.room.name));
+            creep.memory.policyId = 0;          
             creep.memory.tasks.tasklist  = tasks;
             creep.memory.role = gc.ROLE_UNASSIGNED;
         }
+    },
+    
+    returnToPoolTask: function (room) {
+        var spawns = _.filter(Game.spawns);
+        spawns.sort(function(a,b){
+            return Game.map.getRoomLinearDistance(a.room.name, room)
+                - Game.map.getRoomLinearDistance(b.room.name, room);
+        });
+        return new TaskMovePos(spawns[0].pos,1);
     },
 
     getMaxYardSize: function () {
@@ -97,7 +108,6 @@ var policyThePool = {
 
     initialisePolicy: function (newPolicy) {
         Memory.policies[THE_POOL].requisitions = {};
-       // Memory.policies[THE_POOL].requisitions = {};
         Memory.policies[THE_POOL].supplyCenters = {};
         Memory.nextRequisitionsId = 0;
         Memory.nextSupplyCenterId = 0;

@@ -26,7 +26,7 @@ var roleStorageRepairer = {
     getTaskList: function(creep) {
         var taskList = [];
 
-        var storages = creep.room.find(FIND_MY_STRUCTURES, {
+        var storages = creep.room.find(FIND_STRUCTURES, {
             filter: { structureType: STRUCTURE_STORAGE }
         });
         if (0 == storages.length) {

@@ -22,12 +22,21 @@ var policyNeutralRoom = {
      */
     draftNewPolicyId: function(oldPolicy) {
         var room = Game.rooms[oldPolicy.room];
+       // console.log(oldPolicy.room,"dratNewPolicy",room);
         if (undefined !== room) {
             if (undefined != room.controller && room.controller.my) {
-                return  policyFrameworks.createBuildspawn(room.name);
+
+                var spawnSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
+                    filter: {structureType: STRUCTURE_SPAWN}
+                });
+            //    console.log("draftNewPolicyId looking for spawn",spawnSites);
+                if (spawnSites.length > 0){
+                    return policyFrameworks.createBuildspawn(oldPolicy.room);
+                }
             }
         }
         return oldPolicy;
+
     },
 
     initialisePolicy: function (newPolicy) {
@@ -40,6 +49,8 @@ var policyNeutralRoom = {
      * @returns {none}
      */
     enactPolicy: function(currentPolicy) {
+
+   /*
        // console.log("neutral room", JSON.stringify(currentPolicy));
         var room = Game.rooms[currentPolicy.room];
         var roomMem = Memory.rooms[currentPolicy.room];
@@ -60,7 +71,7 @@ var policyNeutralRoom = {
               //  }
           //  }
         }
-
+*/
     },
 
     switchPolicy: function(oldPolicyId, newPolicy)

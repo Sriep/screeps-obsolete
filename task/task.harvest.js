@@ -21,6 +21,7 @@ function TaskHarvest () {
     this.conflicts = gc.HARVEST;
     this.pickup = true;
     this.loop = true;
+    this.waitForRespawn = false;
 }
 
 TaskHarvest.prototype.doTask = function(creep, task) {
@@ -43,7 +44,7 @@ TaskHarvest.prototype.doTask = function(creep, task) {
         }
     }
     var rtv = creep.harvest(source);
-    console.log(creep,"TaskHarvest result",rtv);
+  //  console.log(creep,"TaskHarvest result",rtv);
     switch (rtv) {
         case    OK:                         // 0	The operation has been scheduled successfully.;
            // tasksActions.done(gc.HARVEST);
@@ -61,8 +62,13 @@ TaskHarvest.prototype.doTask = function(creep, task) {
                 return gc.RESULT_UNFINISHED;
             }  else {
              //   console.log(creep, "harvet RESULT_FINISHED full up not eough resouces")
-                tasks.setTargetId(creep, undefined);
-                return gc.RESULT_FINISHED;
+                if (creep.carry.energy == creep.carryCapacity || !this.waitForRespawn) {
+                    tasks.setTargetId(creep, undefined);
+                    return gc.RESULT_FINISHED;                
+                } else {
+                    return gc.RESULT_UNFINISHED;
+                }
+
             }
 
         case    ERR_NOT_IN_RANGE:           //	-9	The target is too far away.

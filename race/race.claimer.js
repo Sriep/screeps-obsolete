@@ -13,12 +13,14 @@ var claimer = {
     BLOCKSIZE: 600 + 50 + 50,
     BODY: [CLAIM, MOVE,MOVE],
 
-    body: function (cost) {
-        if (cost >= this.BLOCKSIZE) {
-            return this.BODY;
-        } else {
-            return null;
-        }
+    body: function (size) {
+        var body = [];
+        for (var i = 0 ; i < size ; i++) {
+            body.push(CLAIM);
+            body.push(MOVE);
+            body.push(MOVE);
+        } // for
+        return body;
     }
 }
 

@@ -185,13 +185,13 @@ var stats = {
 
     initilise: function(room) {
         if (undefined === room) {
-            console.log("Initilising stats: room undefiend");
+          //  console.log("Initilising stats: room undefiend");
             return false;
         } else if (undefined === room.controller) {
-            console.log("Initilising stats:",room,"does not have a contoller.");
+         //   console.log("Initilising stats:",room,"does not have a contoller.");
             return false;
         } else if ( !room.controller.my ){
-            console.log("Initilising stats:",room,"does  not belong to me.");
+           // console.log("Initilising stats:",room,"does  not belong to me.");
             return false;
         } else {
             room.memory.stats = this.EMPTY_STATS;
@@ -208,7 +208,7 @@ var stats = {
             if (undefined === room.memory.stats
                 || {} === room.memory.stats
                 || !room.memory.stats ) {
-                console.log("About to initialise stats for ",room);
+               // console.log("About to initialise stats for ",room);
                 if (!this.initilise(room)) {
                     continue;
                 }

@@ -46,7 +46,9 @@ var policyRescue = {
      //   if (policyConstruction.startConstruction(room)) {
     //        return policyFrameworks.createConstructionPolicy(room.name);
    //     }
-        return  policyFrameworks.createPeacePolicy(room.name);
+        return  policyFrameworks.createPeacePolicy(room.name                
+            , room.memory.links.fromLinks
+            , room.memory.links.toLink);
     },
 
     initialisePolicy: function (newPolicy) {

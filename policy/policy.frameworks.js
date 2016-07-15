@@ -66,7 +66,7 @@ var policyFrameworks = {
      *                  , mineId : 56e14bf41f7d4167346e0a76, mineResource, RESOURCE_OXYGEN }
      *   createMany2OneLinkersPolicy([fromLink1,fromLink2],toLink)
      */
-    createMany2OneLinkersPolicy: function(roomName, fromLinks ,toLink, start)
+    createMany2OneLinkersPolicy: function(roomName, fromLinks ,toLink)
     {
         var newPolicy = {id : policy.getNextPolicyId()
             ,type : this.Type.POLICY_MANY2ONE_LINKERS
@@ -81,6 +81,18 @@ var policyFrameworks = {
             policy.activatePolicy(newPolicy);
         }
         return newPolicy;
+    },
+
+    createPeacePolicy: function(room, fromLinks, toLinks)
+    {
+        var p = { id : policy.getNextPolicyId(),
+            type : this.Type.PEACE,
+            room : room
+            ,fromLinks: fromLinks
+            ,toLinks: toLinks
+            ,linkCreeps : undefined
+        };
+        return p;
     },
 
     createAttackStructuresPolicy: function(structureIds, roomIds, creepSize, attackGroupSize
@@ -152,23 +164,18 @@ var policyFrameworks = {
         return newPolicy;
     },
 
-    createClaimPolicy: function(startRoom, controllerId, endRoom, start) {
+    createRemoteActionsPolicy: function(rooms, actions, findFunctions, findFunctionsModules, body, start) {
         var newPolicy = {
             id : policy.getNextPolicyId(),
-            type : this.Type.CLAIM,
-            startRoom : startRoom,
-            controllerId : controllerId,
-            endRoom : endRoom,
-            workersContractedFor : 0,
-            workersAssigned : 0,
-            shuttingDown : false
+            type : gc.POLICY_REMOTE_ACTIONS,
+            rooms  : rooms,
+            actions : actions,
+            findFunctions : findFunctions,
+            findFunctionsModules : findFunctionsModules,
+            body : body
         };
         if (start) {
-            var module = policy.getModuleFromPolicy(newPolicy);
-            //module.initialisePolicy(newPolicy)
-            if (0 < policy.activatePolicy(newPolicy)) {
-            } else {
-            }
+            policy.activatePolicy(newPolicy)
         }
         return newPolicy;
     },
@@ -208,15 +215,6 @@ var policyFrameworks = {
     {
         var p = { id : policy.getNextPolicyId(),
             type : this.Type.BUILD_SPAWN,
-            room : room};
-        return p;
-    },
-
-
-    createPeacePolicy: function(room)
-    {
-        var p = { id : policy.getNextPolicyId(),
-            type : this.Type.PEACE,
             room : room};
         return p;
     },

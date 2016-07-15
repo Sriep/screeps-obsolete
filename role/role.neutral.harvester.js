@@ -28,6 +28,7 @@ var roleNeutralHarvester = {
             moveToSource = new TaskMoveFind(gc.FIND_ID,gc.RANGE_HARVEST, sourceId);
         }
         var harvest = new TaskHarvest();
+        harvest.waitForRespawn = true;
 
         var moveToStorageRoom = new TaskMoveRoom(storageRoom);
         if (undefined === offLoadId) {

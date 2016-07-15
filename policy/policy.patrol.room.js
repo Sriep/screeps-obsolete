@@ -40,13 +40,16 @@ var policyPatrolRoom = {
             , undefined //newPolicy.marshallingPoint
             , undefined
         );
-        console.log(JSON.stringify(order));
+       // console.log(JSON.stringify(order));
         PoolRequisition.prototype.placeRequisition(order);
 
         return true;
     },
     
     findEnemyTarget: function (creep) {
+        var target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+       // console.log(creep, "in find enemy targets",target);
+        return target;
     },
     
 

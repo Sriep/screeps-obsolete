@@ -31,27 +31,32 @@ TaskHarvestLinker.prototype.doTask = function(creep, task) {
     //console.log(creep,"TaskHarvestLinker")
     var source =  Game.getObjectById(task.sourceId);
     if (!source) {
-        console.log(creep,"no source")
-        creep.say("help source");
+      //  console.log(creep,"no source")
+      //  creep.say("help source");
         return gc.RESULT_FINISHED;
     }
-    var hrtv = creep.harvest(source)
- //   console.log(creep,"harvest result",hrtv);
+    creep.harvest(source)
+
     var sourceLink = Game.getObjectById(task.homeLinkId);
     if (!sourceLink) {
-        console.log(creep,"no from link")
-        creep.say("help link");
+    /////    console.log(creep,"no from link")
+     //   creep.say("help link");
         return gc.RESULT_FINISHED;
     }
-    creep.transfer(sourceLink, RESOURCE_ENERGY);
-    var targetLink = Game.getObjectById(task.targetLinkId);
-    if (!targetLink) {
-        console.log(creep,"no to link")
-        creep.say("help link");
-        return gc.RESULT_FINISHED;
+
+    var rtv = creep.transfer(sourceLink, RESOURCE_ENERGY);
+  //  console.log(creep,"TaskHarvestLinker result  to  linkn",rtv);
+    if (undefined !== task.targetLinkId){
+        var targetLink = Game.getObjectById(task.targetLinkId);
+        if (!targetLink) {
+          //  console.log(creep,"no to link")
+          //  creep.say("help link");
+            return gc.RESULT_UNFINISHED;
+        }
+        var result = sourceLink.transferEnergy(targetLink);
+      //  console.log(creep,"TaskHarvestLinker result link to link",result);
     }
-    var result = sourceLink.transferEnergy(targetLink);
- //   console.log(creep,"transfer result",result);
+
     return gc.RESULT_UNFINISHED;
 };
 

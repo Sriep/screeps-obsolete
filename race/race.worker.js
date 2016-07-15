@@ -50,6 +50,7 @@ var raceWorker = {
 */
     // Weak from. Assumes body is an array not a object.
     isWorker: function(body) {
+        var raceBase = require("race.base");
         body = raceBase.convertBodyToArray(body);
         if (body === undefined || 3 > body.length)
             return false;
@@ -94,6 +95,7 @@ var raceWorker = {
         var minSizeDesirable;
 
         minSizeDesirable = Math.ceil(Math.max(euilibEnergy / (400*accesPoints), gc.LINKING_WORKER_SIZE));
+        minSizeDesirable = Math.ceil(euilibEnergy / (400*accesPoints));
         var maxSizePossible = room.energyCapacityAvailable/this.BLOCKSIZE;
         if (accesPoints == 1) {
             minSizeDesirable = Math.max(minSizeDesirable,maxSizePossible);
