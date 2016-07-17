@@ -30,33 +30,7 @@ var policyConstruction = {
      * @returns {enum} Id of policy for comming tick. 
      */   
     draftNewPolicyId: function(oldPolicy) {
-        var room =  Game.rooms[oldPolicy.room];
-        
-        if (policyDefend.beingAttaced(room)) {
-            return policyFrameworks.createDefendPolicy(room.name);
-        }
-        var policyRescue = require("policy.rescue");
-        if (policyRescue.needsRescue(room)) {
-            return policyFrameworks.createRescuePolicy(room.name);
-        }
-
-        var creeps = _.filter(Game.creeps, function (creep)
-        {return creep.memory.policyId == oldPolicy.id});
-        if ( (room.memory.linkState == "linkEconomy"
-            || room.memory.linkState == "linkForming")
-            && 3 < creeps.length ) {
-            return policyFrameworks.createMany2OneLinkersPolicy(room.name
-                , room.memory.links.fromLinks
-                , room.memory.links.toLink
-                ,true);
-        }
-
-       // if (this.startConstruction(room)) {
-        //    return oldPolicy;
-       // }
-        return policyFrameworks.createPeacePolicy(room.name                
-            , room.memory.links.fromLinks
-            , room.memory.links.toLink);
+        return null;
     },
 
     initialisePolicy: function (newPolicy) {

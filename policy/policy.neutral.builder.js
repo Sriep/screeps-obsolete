@@ -22,7 +22,7 @@ var policyNeutralBuilder = {
 
     initialisePolicy: function (newPolicy) {
         var body =  raceWorker.body(newPolicy.workerSize, true);
-        var taskList = roleNeutralBuilder.getTaskList(newPolicy.workRoom, newPolicy.sourceRoom);
+        var taskList = roleNeutralBuilder.getTaskList(undefined, newPolicy.workRoom, newPolicy.sourceRoom);
         console.log("policyNeutralBuilder newPolicy.buildRoomy", newPolicy.buildRoom, newPolicy.sourceRoom)
 
         var order = new PoolRequisition(

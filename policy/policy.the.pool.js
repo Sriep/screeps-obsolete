@@ -22,7 +22,7 @@ var policyThePool = {
         orders.sort(function (a, b) { return b.priority - a.priority ; });
         for ( var index in orders) {
             var centreId = poolSupply.findMatchFor(orders[index]);
-            console.log("enact the pool lookingfor match",orders[index].id,"found",centreId);
+         //   console.log("enact the pool looking for match",orders[index].id,"found",centreId);
             if (null !== centreId) {
                 if (poolSupply.attachOrder(centreId, orders[index])) {
                     this.getRequisitions()[orders[index].id] = undefined;
@@ -56,9 +56,9 @@ var policyThePool = {
         creep.memory.policyId = order[0].requester;
         creep.memory.role = order[0].role;
         console.log(creep,"pool complteedOrder requester", order[0].requester);
-        if (order[0].posDeliver !== undefined &&
-            undefined !== Game.rooms[order[0].posDeliver]) {
-            var deliverTo = new TaskMovePos(order[0].posDeliver,1);
+        if (order[0].orderRoom !== undefined &&
+            undefined !== Game.rooms[order[0].orderRoom]) {
+            var deliverTo = new TaskMovePos(order[0].orderRoom,1);
             deliverTo.loop = false;
             deliverTo.pickup =false;
             creep.memory.tasks.tasklist.unshift(deliverTo);

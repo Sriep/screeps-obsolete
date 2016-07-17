@@ -74,7 +74,8 @@ var roomWar = {
         return towersDm; 
     },
 
-    defendRoom: function(room) {    
+    defendRoom: function(room) {
+        console.log(room,"ok another defend room");
         var hostiles = room.find(FIND_HOSTILE_CREEPS);  
         if(hostiles.length > 0) {
             var username = hostiles[0].owner.username;

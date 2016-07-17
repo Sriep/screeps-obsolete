@@ -7,7 +7,7 @@ var _ = require('lodash');
 var raceWorker = require("race.worker");
 var PoolRequisition = require("pool.requisition");
 var gc = require("gc");
-var roleNeutralBuilder = require("role.neutral.harvester");
+var roleNeutralHarvester = require("role.neutral.harvester");
 
 /**
  * Abstract object to support the policy of minig a source in an unoccumpied 
@@ -18,7 +18,9 @@ var policyForeignHarvest = {
 
     initialisePolicy: function (newPolicy) {
         var body =  raceWorker.body(newPolicy.workerSize, true);
-        var taskList = roleNeutralBuilder.getTaskList(
+       // var taskList = roleNeutralBuilder.getTaskList(
+        var taskList = roleNeutralHarvester.getTaskList(
+            undefined,
             newPolicy.harvestRoom,
             newPolicy.storageRoom,
             newPolicy.sourceId,

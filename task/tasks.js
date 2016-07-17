@@ -41,12 +41,14 @@ var tasks = {
                     || result == this.Result.Rollback)
                             && taskList.length > 0 && actionCount++ < this.MAX_TASK_ACTIONS) {
             var task = taskList[0];
-            //console.log(creep,"tasks.doTasks",JSON.stringify(task));
             while (task !== undefined && task === null) {
                 taskList.shift();
                 task = taskList[0];
             }
-
+            if (undefined ===  task.taskType) {
+                console.log(creep,"tasks.doTasks",JSON.stringify(task));
+                return;
+            }
             var moduleName = "task." + task.taskType;
             var taskModule = require(moduleName);
             if (task.pickup) {
@@ -116,10 +118,12 @@ var tasks = {
 
 
     pickUpLooseEnergy: function(creep){
-        var target = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY);
+        //var target = creep.pos.findClosestByRange(FIND_DROPPED_ENERGY);
+        var target = creep.pos.findInRange(FIND_DROPPED_ENERGY,1)[0];
         if(target) {
-      //      console.log(creep,"about to pick up loose energy");
-            creep.pickup(target)
+         //   console.log(creep,"about ot pick up loose energy",target);
+            var rtv = creep.pickup(target);
+          //  console.log(creep,"result",rtv);
         }
     },
     
@@ -132,7 +136,13 @@ var tasks = {
     },
     
     setTargetId: function (creep, targetId) {
-        creep.memory.tasks.targetId = targetId;
+        if (undefined === targetId)  {
+            creep.memory.tasks.targetId = undefined
+        } else if (undefined === targetId.id) {
+            creep.memory.tasks.targetId = targetId;
+        } else {
+            creep.memory.tasks.targetId = targetId.id;
+        }
     },
 /*
     setHomeLinkId: function (creep, homeLinkId) {

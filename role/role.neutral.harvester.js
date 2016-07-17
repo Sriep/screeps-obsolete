@@ -17,8 +17,10 @@ var gc = require("gc");
  */
 var roleNeutralHarvester = {
 
-    getTaskList: function(sourceRoom, storageRoom, sourceId, offLoadId) {
+    getTaskList: function(creep, sourceRoom, storageRoom, sourceId, offLoadId) {
         var tasks = [];
+        console.log("sourceRoom",sourceRoom,"storageRoom",storageRoom
+            ,"sourceId",sourceId,"offLoadId",offLoadId);
         
         var moveToSourceRoom = new TaskMoveRoom(sourceRoom);
         var moveToSource;
@@ -31,10 +33,13 @@ var roleNeutralHarvester = {
         harvest.waitForRespawn = true;
 
         var moveToStorageRoom = new TaskMoveRoom(storageRoom);
+        var moveToStorage;
         if (undefined === offLoadId) {
             offLoadId = Game.rooms[storageRoom].storage.id;
+            moveToStorage = new TaskMoveFind(gc.FIND_ID,gc.RANGE_HARVEST, offLoadId);
+        } else {
+            moveToStorage = new TaskMoveFind(gc.FIND_ID,gc.RANGE_HARVEST, offLoadId);
         }
-        var moveToStorage = new TaskMoveFind(gc.FIND_ID,gc.RANGE_HARVEST, offLoadId);
         var offload = new TaskOffload(gc.TRANSFER, RESOURCE_ENERGY);
 
         tasks.push(moveToSourceRoom);
@@ -50,3 +55,24 @@ var roleNeutralHarvester = {
 
 
 module.exports = roleNeutralHarvester;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

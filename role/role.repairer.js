@@ -32,7 +32,7 @@ var roleRepairer = {
         return stats.repair(creep,target);
     },
 
-    getTaskList: function() {
+    getTaskList: function(creep) {
         var tasks = [];
         var moveToSource = new TaskMoveFind(gc.FIND_FUNCTION,gc.RANGE_HARVEST,"findTargetSource"
                                             ,"role.base");

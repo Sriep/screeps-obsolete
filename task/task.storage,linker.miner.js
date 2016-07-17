@@ -34,19 +34,22 @@ TaskStorageLinkerMiner.prototype.doTask = function(creep, task) {
         transferEnergy = false
     }
 
+    var storageLink =  Game.getObjectById(task.storageLinkId);
+    if (!storageLink) {
+        console.log(creep,"cant find link", "id",task.storageLinkId,storageLink
+            , "id mineral",task.mineralId, mineral );
+    }
+
     var mineral =  Game.getObjectById(task.mineralId);
     if (!mineral) {
         console.log(creep,"cant find mineral","id", task.mineralId,mineral);
        // creep.say("help source");
        // return gc.RESULT_FAILED;
     }
+
     creep.harvest(mineral);
 
-    var storageLink =  Game.getObjectById(task.storageLinkId);
-    if (!storageLink) {
-        console.log(creep,"cant find link", "id",task.storageLinkId,storageLink
-            , "id mineral",task.mineralId, mineral );
-    }
+
     storageLink.transferEnergy(creep);
 
     var storage = Game.getObjectById(task.storageId);

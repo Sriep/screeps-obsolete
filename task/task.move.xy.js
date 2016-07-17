@@ -29,7 +29,7 @@ function TaskMoveXY (x, y, range) {
 }
 
 TaskMoveXY.prototype.doTask = function(creep, task) {
-    console.log(creep,JSON.stringify(task));
+   // console.log(creep,"TaskMoveXY",JSON.stringify(task));
     var result = creep.moveTo(task.x,task.y);
     switch (result) {
         case OK:    	            //0	The operation has been scheduled successfully.

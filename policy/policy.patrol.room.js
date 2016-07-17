@@ -46,11 +46,7 @@ var policyPatrolRoom = {
         return true;
     },
     
-    findEnemyTarget: function (creep) {
-        var target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-       // console.log(creep, "in find enemy targets",target);
-        return target;
-    },
+
     
 
     getTaskList: function (policy) {
@@ -64,7 +60,7 @@ var policyPatrolRoom = {
             moveToLocation = new TaskMovePos(policy.roomPos,2);
         }
         var moveToTarget = new TaskMoveFind(gc.FIND_FUNCTION, gc.RANGE_ATTACK, 
-            "findEnemyTarget","policy.patrol.room");
+            "findEnemyTarget","role.patrol.room");
         var attackTarget = new  TaskAttackId({roomName : policy.room, })
 
         taskList.push(moveToLocation);

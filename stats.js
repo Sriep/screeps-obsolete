@@ -11,9 +11,13 @@
 
 var updateThisTicksStats = function (room) {
     //console.log(room,"strange error");
-    if (undefined === room.memory.stats)
+    if (undefined === room.memory.stats
+        || room.memory.stats === null
+        || !Array.isArray(room.memory.stats) )
         return;
     var index = room.memory.stats["ticks"].length-1;
+    if (undefined === room.memory.stats["ticks"])
+        return;
     room.memory.stats["ticks"][index].controllerProgress = room.controller.progress;
     room.memory.stats["ticks"][index].energyCapacityAvailable = room.energyCapacityAvailable;
     room.memory.stats["ticks"][index].energyAvailable = room.energyAvailable;

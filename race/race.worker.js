@@ -81,11 +81,18 @@ var raceWorker = {
         return body.length / 3;
     },
 
-    maxSizeRoom: function(room) {
-        return Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE);
+    maxSizeRoom: function(room, fast) {
+        if (fast) {
+            return Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE_FAST);
+        } else {
+            return Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE);
+        }
+
     },
 
     maxSizeFromEnergy: function(room)  {
+        console.log(room,"room.energyAvailable",room.energyAvailable,"blocksize",this.BLOCKSIZE,
+        "result",Math.floor(room.energyAvailable / this.BLOCKSIZE));
         return Math.floor(room.energyAvailable / this.BLOCKSIZE);
     },
 
@@ -94,7 +101,7 @@ var raceWorker = {
         var accesPoints = roomOwned.countSiteAccess(room,FIND_SOURCES);
         var minSizeDesirable;
 
-        minSizeDesirable = Math.ceil(Math.max(euilibEnergy / (400*accesPoints), gc.LINKING_WORKER_SIZE));
+        //minSizeDesirable = Math.ceil(Math.max(euilibEnergy / (400*accesPoints), gc.LINKING_WORKER_SIZE));
         minSizeDesirable = Math.ceil(euilibEnergy / (400*accesPoints));
         var maxSizePossible = room.energyCapacityAvailable/this.BLOCKSIZE;
         if (accesPoints == 1) {

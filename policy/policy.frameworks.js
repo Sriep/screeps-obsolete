@@ -24,7 +24,7 @@ var policyFrameworks = {
         NEUTRAL_ROOM: "neutral.room",
         CLAIM: "claim",
         BUILD_SPAWN: "buildspawn",
-        GIFT_WORKERS: "gift.workers",
+        GIFT_CREEP: "gift.cree[",
         NEUTRAL_BUILDER: gc.POLICY_NEUTRAL_BUILDER,
         POLICY_MANY2ONE_LINKERS: gc.POLICY_MANY2ONE_LINKERS
     },
@@ -66,14 +66,12 @@ var policyFrameworks = {
      *                  , mineId : 56e14bf41f7d4167346e0a76, mineResource, RESOURCE_OXYGEN }
      *   createMany2OneLinkersPolicy([fromLink1,fromLink2],toLink)
      */
-    createMany2OneLinkersPolicy: function(roomName, fromLinks ,toLink)
+    /*createMany2OneLinkersPolicy: function(roomName, linksInfo)
     {
         var newPolicy = {id : policy.getNextPolicyId()
             ,type : this.Type.POLICY_MANY2ONE_LINKERS
             ,room : roomName
-            ,fromLinks: fromLinks
-            ,toLink: toLink
-            ,linkCreeps : undefined
+            ,linksInfo: linksInfo
         };
         if (true) {
             var module = policy.getModuleFromPolicy(newPolicy);
@@ -81,16 +79,14 @@ var policyFrameworks = {
             policy.activatePolicy(newPolicy);
         }
         return newPolicy;
-    },
+    },*/
 
-    createPeacePolicy: function(room, fromLinks, toLinks)
+    createPeacePolicy: function(room, linksInfo)
     {
         var p = { id : policy.getNextPolicyId(),
             type : this.Type.PEACE,
             room : room
-            ,fromLinks: fromLinks
-            ,toLinks: toLinks
-            ,linkCreeps : undefined
+            ,linksInfo: linksInfo
         };
         return p;
     },
@@ -180,16 +176,13 @@ var policyFrameworks = {
         return newPolicy;
     },
 
-    createGiftWorkersPolicy: function(startRoom, endRoom, numberGifted, start) {
+    createGiftCreepPolicy: function(room, giveId, body, start) {
         var newPolicy = { id : policy.getNextPolicyId(),
-            type : this.Type.GIFT_WORKERS,
-            startRoom : startRoom,
-            endRoom : endRoom,
-            workersContractedFor : numberGifted,
-            workersAssigned : 0,
-            workersDelivered : 0};
+            type : gc.POLICY_GIFT_CREEP,
+            room : room,
+            giveId : giveId,
+            body : body};
         if (start) {
-            var module = policy.getModuleFromPolicy(newPolicy);
             policy.activatePolicy(newPolicy)
         }
         return newPolicy;

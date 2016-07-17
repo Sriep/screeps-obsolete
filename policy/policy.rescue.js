@@ -3,7 +3,7 @@
  * decisions when the room needs rescuing.
  * @author Piers Shepperson
  */
-    //Base object
+"use strict";
 var   policy = require("policy");
 var  policyConstruction = require("policy.construction");
 var  policyDefence = require("policy.defence");
@@ -15,6 +15,8 @@ var policyBuildspawn = require("policy.buildspawn");
 var roomController = require("room.controller");
 var   stats = require("stats");
 var roomOwned = require("room.owned");
+var npcInvaderBattle = require("npc.invader.battle");
+var gc = require("gc");
 
 /**
  * Abstract object for handling  decisions when the room needs rescuing.
@@ -33,6 +35,9 @@ var policyRescue = {
      */   
     draftNewPolicyId: function(oldPolicy) {
         var room =  Game.rooms[oldPolicy.room];
+
+        //if (readyForMAny2OneLinker)
+
         if (!policyBuildspawn.spawnFound(oldPolicy))      {
              return policyFrameworks.createBuildspawn(room.name);
         }
@@ -42,17 +47,24 @@ var policyRescue = {
         if (this.needsRescue(room)) {
             return oldPolicy;
         }
-
-     //   if (policyConstruction.startConstruction(room)) {
-    //        return policyFrameworks.createConstructionPolicy(room.name);
-   //     }
         return  policyFrameworks.createPeacePolicy(room.name                
-            , room.memory.links.fromLinks
-            , room.memory.links.toLink);
+            , room.memory.links.info);
     },
 
     initialisePolicy: function (newPolicy) {
+        this.convertCreepsToHarvester(newPolicy);
         return true;
+    },
+
+    convertCreepsToHarvester: function(newPolicy) {
+        var creeps = _.filter(Game.creeps, function (creep) {
+            return (creep.memory.policyId == newPolicy.id
+                    && raceWorker.isWorker(creep.body));
+        });
+        for (var i = 0 ; i < creeps.length ; i ++ )
+        {
+            roleBase.switchRoles(creeps[i], gc.ROLE_HARVESTER);
+        }
     },
 
 
@@ -66,15 +78,20 @@ var policyRescue = {
      */
     enactPolicy: function(currentPolicy) {
         var room = Game.rooms[currentPolicy.room];
+        console.log("ENACT POLICY RESCUE",room);
         room.memory.policyId = currentPolicy.id;
        // stats.updateStats(room);
         //var creeps = room.find(FIND_MY_CREEPS);
+        console.log(room,"about to callnpcInvaderBattle.defendRoom in rescue");
+        npcInvaderBattle.defendRoom(room);
+        console.log(room,"AftercallnpcInvaderBattle.defendRoom in rescue")
         var creeps = _.filter(Game.creeps,
             function (creep) {return creep.memory.policyId == currentPolicy.id;});
 
         var workerSize = 0;
+        console.log(room,"ccccccccreeplength",creeps.length  );
         if (creeps.length == 0) {
-            console.log("Rescue build first worker size", raceWorker.maxSizeFromEnergy(room));
+            console.log("RRRRRRRRRRRRescue build first worker size", raceWorker.maxSizeFromEnergy(room));
             workerSize = raceWorker.maxSizeFromEnergy(room);
         } else {
             var workparts = 0;
@@ -90,23 +107,26 @@ var policyRescue = {
                 ,"energy num creeps x1000",creeps.length*1000)
                workerSize = raceWorker.spawnWorkerSize(room,creeps.length*1000)
             }
-
         }
 
         var spawns = room.find(FIND_MY_SPAWNS);
         if (spawns == undefined || spawns == []) {return;}
-       // if () {
-       // console.log(room,"about to spawn",raceWorker,currentPolicy,spawns[0],workerSize);
-        raceBase.spawn(raceWorker, currentPolicy, spawns[0], workerSize);
-      //  }
 
+        var name = raceBase.spawn(raceWorker, currentPolicy, spawns[0], workerSize);
+        if (_.isString(name)) {
+            roleBase.switchRoles(Game.creeps[name], gc.ROLE_HARVESTER);
+        }
+        console.log(room,"result of spawn",name,"workerSize",workerSize);
+
+
+/*
         var nHavesters = room.find(FIND_MY_CREEPS).length;
         var nBuilders = 0;
         var nRepairers = 0;
         var nUpgraders = 0;
         console.log("enact rescue roles havesters", nHavesters, "builders", nBuilders,
             "upgraders", nUpgraders, "and repairers", nRepairers);
-        raceWorker.assignWorkerRoles(currentPolicy, nHavesters, nUpgraders, nBuilders , nRepairers);
+        raceWorker.assignWorkerRoles(currentPolicy, nHavesters, nUpgraders, nBuilders , nRepairers);*/
     },
 
     switchPolicy: function(oldPolicy, newPolicy)
@@ -119,7 +139,7 @@ var policyRescue = {
             case policyFrameworks.Type.DEFEND:
                 break;
             case policyFrameworks.Type.POLICY_MANY2ONE_LINKERS:
-                policy.breakUpLinks(oldPolicy);
+                //policy.breakUpLinks(oldPolicy);
                 break;
             default:
         }
@@ -140,24 +160,26 @@ var policyRescue = {
         if (room === undefined) {
             return false;
         }
-        creeps = room.find(FIND_MY_CREEPS);
-        workParts = raceBase.countBodyParts(creeps, WORK);
-        //console.log("In neeeeds rescue work parts",workParts,"compare number"
-        //    , raceWorker.maxSize(room.controller.level));
-        //maxWorkerSize = Math.floor(roomController.maxProduction[room.roomcontroller.level]
-        //                /raceWorkers.BLOCKSIZE);
-        //console.log("Needs rescue, max worker size", raceWorker.MaxWorkerControllerLevel[room.controller.level])
+        var creeps = room.find(FIND_MY_CREEPS);
+        var youngCreeps = [];
+        for (var i = 0 ; i < creeps.length ; i++ ) {
+            if (creeps[i].ticksToLive > gc.OLD_CREEP_LIFETOLIVE) {
+                youngCreeps.push(creeps[i]);
+            }
+        }
+        //var workParts = raceBase.countBodyParts(creeps, WORK);
+        var numLinks;
+        if (undefined === room.memory.links || undefined === room.memory.links.info) {
+            numLinks = 0;
+        } else {
+            numLinks = room.memory.links.info.length;
+        }
 
-
-        return workParts < Math.min(raceWorker.MaxWorkerControllerLevel[room.controller.level]
-                                        ,policy.LINKING_WORKER_SIZE);
-    },
-
-
-
-
-
-}
+        var needsRescue = youngCreeps.length < 2 && youngCreeps.length < numLinks + 1;
+        console.log(room,"Needs rescue",needsRescue,",yongCreeps lenght",  youngCreeps.length, "numLinks", numLinks);
+        return needsRescue;
+    }
+};
 
 module.exports = policyRescue;
 

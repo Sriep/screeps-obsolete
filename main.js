@@ -24,13 +24,13 @@ module.exports.loop = function () {
             ayrtepPad.top();
         }
         catch(exp) {
-            conole.log("ops",exp);
+            console.log("ops",exp);
         }
         
         freememory.freeCreeps();
         policy.enactPolicies();
         raceBase.moveCreeps();
-        recurringPolicies.run();
+       // recurringPolicies.run();
         ayrtepPad.bottom();
 
 

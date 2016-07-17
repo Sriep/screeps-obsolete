@@ -79,17 +79,22 @@ var supplyCenter = {
     },
 
     findMatchFor: function (order) {
-        var orderedCentres = this.getValuesFromHash(this.getsupplyCentres());
-        //console.log("the order", order.id);
-        if (undefined !== order.posDeliver && undefined !== order.posDeliver.roomName){
-             orderedCentres.sort(function (a, b) {
-                 return Game.map.getRoomLinearDistance(a.roomName, order.posDeliver.roomName)
-                         - Game.map.getRoomLinearDistance(b.roomName, order.posDeliver.roomName) ;
-            });
+        if (undefined !== order.orderRoom && order.forceBuildRoom) {
+           if (this.canSupply(order.orderRoom, order)) {
+               return order.orderRoom;
+           } else {
+               return null;
+           }
         }
 
+        var orderedCentres = this.getValuesFromHash(this.getsupplyCentres());
+        if (undefined !== order.orderRoom && undefined !== order.orderRoom.roomName){
+             orderedCentres.sort(function (a, b) {
+                 return Game.map.getRoomLinearDistance(a.roomName, order.orderRoom.roomName)
+                         - Game.map.getRoomLinearDistance(b.roomName, order.orderRoom.roomName) ;
+            });
+        }
         for (var i in orderedCentres) {
-        //    console.log("findMathchFor loop centers i",i ,orderedCentres[i].roomName )
             if (this.canSupply(orderedCentres[i].roomName, order))
                 return orderedCentres[i].roomName;
         }

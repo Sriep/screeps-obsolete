@@ -36,6 +36,8 @@ var TaskMoveRoom = require("task.move.room");
 var TaskActionTarget = require("task.action.target");
 var policyThePool = require("policy.the.pool");
 var gc = require("gc");
+var routeNeutralHarvest  = require("route.neutral.harvest");
+var routeBase = require("route.base");
 
 var ayrtepPad = {
     top: function () {
@@ -60,19 +62,41 @@ var ayrtepPad = {
         cpuUsage.updateCpuUsage();
         //  console.log("average cpu usage is", cpuUsage.averageCpuLoad());
         var roomName = "W26S21";
-        var room = Game.rooms["W26S21"];
+       // var room = Game.rooms["W26S21"];
+       // room.memory.routes.details[713] = undefined;
         //Memory.policies[0].supplyCentres["W26S21"].buildqueue = [];
 
         var room = Game.rooms["W25S22"];
+       // console.log("test occurancesInBody",raceBase.occurancesInBody([WORK,MOVE,MOVE,WORK,CARRY], WORK));
         //room.memory.links = {};
+        //ion(buildRoom, sourceRoom)
+       var creep = Game.creeps["Mila"];
+  //    roleBase.switchRoles(creep, gc.ROLE_HARVESTER);
+       // creep.memory.PolicyId = 72804
+       // creep.memory.PolicyId = 3;
+        var creep2 = Game.creeps["Aiden"];
+    //   roleBase.switchRoles(creep2, gc.ROLE_HARVESTER);//,"W25S22","W25S22");
+      //  creep2.memory.PolicyId = 3;
+        var creep3 = Game.creeps["Maria"];
+     //  roleBase.switchRoles(creep3, gc.ROLE_HARVESTER);//,"W25S22","W25S22");
+     //   creep3.memory.PolicyId = 3;
+     // var creep = Game.creeps["Caden"];
 
-        //var creep = Game.creeps["Emma"];
-       // roleBase.switchRoles(creep, gc.ROLE_HARVESTER);
+     // roleBase.switchRoles(creep, gc.ROLE_FLEXI_STORAGE_PORTER)//,"55db3189efa8e3fe66e04b7d","5788fd5ed480c0fe5bb3adb7",undefined);
+      //  var creep2= Game.creeps["Aria"];
+      //  roleBase.switchRoles(creep2, gc.ROLE_FLEXI_STORAGE_PORTER);//,"55db3189efa8e3fe66e04b7c","5788110778680d884032594a",undefined);
 
-      // var creep = Game.creeps[" Callie"];
-      //  roleBase.switchRoles(creep, gc.ROLE_HARVESTER)//,"55db3189efa8e3fe66e04b7d","5788fd5ed480c0fe5bb3adb7",undefined);
-      //  var creep2= Game.creeps["Emma"];
-      //  roleBase.switchRoles(creep2, gc.ROLE_HARVESTER);//,"55db3189efa8e3fe66e04b7c","5788110778680d884032594a",undefined);
+       // var RouteNeutralHarvest  = require("route.neutral.harvest");
+      ///  var routeBase = require("route.base");
+      //  var gc = require("gc");
+     //   var order = new RouteNeutralHarvest("W26S21","W26S21", "55db3189efa8e3fe66e04b78", "577a8dd4b973e61c594592dc",750);
+
+
+        //routeBase.attachRoute("W26S21", gc.ROUTE_NEUTRAL_HARVEST,order);
+
+        routeBase.showRoutes("W26S21");
+        routeBase.showRoutes("W25S22");
+
     }
 
 };

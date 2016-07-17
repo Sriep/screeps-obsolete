@@ -16,7 +16,7 @@ var gc = require("gc");
  */
 var roleNeutralBuilder = {
 
-    getTaskList: function(buildRoom, sourceRoom) {
+    getTaskList: function(creep, buildRoom, sourceRoom) {
         var tasks = [];
         var moveToSourceRoom = new TaskMoveRoom(sourceRoom);
 

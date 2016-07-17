@@ -75,7 +75,7 @@ var policyAttackStructures = {
         }
 
         var moveToTarget, attackTarget, moveToRoom
-        console.log(policy.structureIds.length,"policy.structureIds ", JSON.stringify(policy.structureIds) );
+      //  console.log(policy.structureIds.length,"policy.structureIds ", JSON.stringify(policy.structureIds) );
         for ( var i = 0 ; i < policy.structureIds.length ; i++ ){
             moveToRoom = new TaskMoveRoom(policy.roomIds[i]);
             moveToTarget = new TaskMoveFind(gc.FIND_ID, gc.RANGE_ATTACK, policy.structureIds[i]);

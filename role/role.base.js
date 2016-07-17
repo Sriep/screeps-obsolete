@@ -295,6 +295,7 @@ var roleBase = {
     },
 
 	findTargetSource: function(creep) {
+        console.log(creep,"IN find target source");
         var roomOwned = require("room.owned");
 	    var sources = creep.room.find(FIND_SOURCES, {
             filter: function(source) {             
@@ -304,7 +305,7 @@ var roleBase = {
         });
         sources = sources.sort((a,b) => b.energy - a.energy);
 
-   //     console.log(creep.room,creep,"findTargetSource",sources);
+        console.log(creep.room,creep,"findTargetSource",sources);
 
 	     for ( var sIndex in  sources ) {
             sources[sIndex].clients= 0;
@@ -322,12 +323,12 @@ var roleBase = {
         var target = sources[0];
         if (sources.length > 1) {
             var accessPoints = roomOwned.countAccessPoints(creep.room, sources[0].pos);
-           // console.log(creep,"source,",sources[0]," access points", accessPoints,"clints",sources[0].clients);
+            console.log(creep,"source,",sources[0]," access points", accessPoints,"clints",sources[0].clients);
             if (sources[0].clients >  accessPoints ) {
                 target = sources[1];   
             }
         }
-      //  console.log(creep,"about to return",target);
+        console.log(creep,"about to return",target);
         creep.memory.tasks.targtId = target;
         return target;  
 	},
@@ -400,7 +401,7 @@ var roleBase = {
               //    tasks.showTasks(creep);
              //   tasks.setTargetId(creep,undefined);
               // console.log(creep,creep.memory.role);
-            //    creep.say(creep.memory.role);
+          //  creep.say(creep.memory.role);
                 tasks.doTasks(creep);
             //  console.log("---------------------------------------------------");
                 return;

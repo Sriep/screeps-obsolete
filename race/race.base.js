@@ -91,6 +91,16 @@ var raceBase = {
         }
     },
 
+    occurancesInBody: function(body, bodyPart) {
+        body = this.convertBodyToArray(body);
+        if (undefined === body) return 0;
+        var count = 0;
+        for ( var i = 0 ; i < body.length ; i++ ) {
+            if (bodyPart == body[i]) count++;
+        }
+        return count;
+    },
+
     getRaceFromBody: function (body) {
         if (raceWorker.isWorker(body)) {
             return gc.RACE_WORKER;

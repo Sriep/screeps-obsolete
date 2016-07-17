@@ -43,6 +43,7 @@ var gc = {
     ROLE_LINKER_MINER_STORAGE:  "linker.miner.storage",
     ROLE_STORAGE_REPAIRER: "storage.repairer",
     ROLE_FLEXI_STORAGE_PORTER: "flexi.storage.porter",
+    ROLE_PATROL_ROOM: "patrol.room",
     
     //Tasks
     TASK_MOVE_FIND: "move.find",
@@ -59,6 +60,7 @@ var gc = {
     TASK_ATTACK_TARGET: "attack.target",
     TASK_WAIT: "wait",
     TASK_ACTION_TARGET: "action.target",
+    TASK_SWITCH_OWNER: "switch.owner",
 
 
 //Offload switch task's states
@@ -106,22 +108,31 @@ var gc = {
     POLICY_NEUTRAL_ROOM: "neutral.room",
     POLICY_CLAIM: "claim",
     POLICY_BUILD_SPAWN: "buildspawn",
-    POLICY_GIFT_WORKERS: "gift.workers",
+    POLICY_GIFT_CREEP: "gift.creep",
     POLICY_NEUTRAL_BUILDER: "neutral.builder",
     POLICY_MANY2ONE_LINKERS: "many2one.linker",
     POLICY_ATTACK_STRUCTURES: "attack.structures",
     POLICY_PATROL_ROOM: "patrol.room",
     POLICY_HARVEST_NEUTRAL_ROOM: "harvest.neutral.room",
     POLICY_REMOTE_ACTIONS: "remote.actions",
+
+    //Recurring orders
+    ROUTE_NEUTRAL_HARVEST: "neutral.harvest",
+    ROUTE_PATROL_ROOM: "patrol.room",
+    ROUTE_REMOTE_ACTIONS: "remote.actions",
     
     //misc
     LINKING_WORKER_SIZE: 5,
+    REPAIRER_WORKER_SIZE: 5,
+    REPAIRER_THRESHOLD: 2,
     BLOCKSIZE_COST_WORKER: 200,
     EMERGENCY_DOWNGRADING_THRESHOLD: 5000,
     MANY2ONE_REQUIRED_LIFE: 5000,
+    STORAGE_STOCKPILE: 30000,
+    OLD_CREEP_LIFETOLIVE: 200,
     
     //Flexi storage mode
-    FLEXIMODE_STORAGE: 0,
+   // FLEXIMODE_STORAGE: 0,
     FLEXIMODE_CONTAINER: 1,
     FLEXIMODE_HARVEST: 2
 

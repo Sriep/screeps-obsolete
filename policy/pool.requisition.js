@@ -11,11 +11,13 @@ var raceBase = require("race.base");
  */
 
 function PoolRequisition (requesterId
-                        ,creepBody
-                        ,taskList
-                        ,posDeliver
-                        ,role
-                        ,priorityLevel
+                            ,creepBody
+                            ,taskList
+                            ,orderRoom
+                            ,role
+                            ,expires
+                            ,forceBuildRoom
+                            ,priorityLevel
 ) {
     this.id = getNextRequisitionId();
     this.requester = requesterId;
@@ -29,7 +31,9 @@ function PoolRequisition (requesterId
         this.energy = undefined;
     }    
     this.priority = priorityLevel;
-    this.posDeliver = posDeliver;
+    this.orderRoom = orderRoom;
+    this.expires = expires;
+    this.forceBuildRoom = forceBuildRoom;
     this.tick = undefined;
 }
 

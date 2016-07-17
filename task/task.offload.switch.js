@@ -38,7 +38,7 @@ function TaskOffloadSwitch (resourceId, storageIds) {
 }
 
 TaskOffloadSwitch.prototype.doTask = function(creep) {
-  //  console.log(creep,"TaskOffloadSwitch");
+    console.log(creep,"TaskOffloadSwitch");
     tasks.setTargetId(creep, undefined);
     if (undefined === creep)
         return gc.RESULT_UNFINISHED;
@@ -77,36 +77,39 @@ TaskOffloadSwitch.prototype.changeState = function (creep, state) {
     creep.memory.tasks.state = state;
 };
 
+TaskOffloadSwitch.prototype.fullistContainer = function (creep) {
+
+}
+
 TaskOffloadSwitch.prototype.moveToStorage = function (creep)
 {
     var moveToStorage;
     var storage = creep.room.storage;
 
-    if (undefined !== storage && storage.store[RESOURCE_ENERGY] > 0) {
-        moveToStorage = new TaskMoveFind(gc.FIND_ID, gc.RANGE_TRANSFER, storage.id);
-        moveToStorage.mode = gc.FLEXIMODE_STORAGE;
-    } else {
-      //  console.log(creep , "TaskOffloadSwitch.prototype.moveToStorage No storage!");
-        var containers = creep.room.find(FIND_STRUCTURES, {
-            filter: {structureType: STRUCTURE_CONTAINER}
-        });
-       // console.log(creep,"containers",containers);
-        if (containers.length > 0) {
-       //     creep.say("container");
-            containers.sort(function (a, b) {
-                return b.store[RESOURCE_ENERGY] - a.store[RESOURCE_ENERGY];
-            });
-       //     console.log(creep,"TaskOffloadSwitch containers",containers);
-            moveToStorage = new TaskMoveFind(gc.FIND_ID, gc.RANGE_TRANSFER, containers[0].id);
-            moveToStorage.mode = gc.FLEXIMODE_CONTAINER;
-        } else {
-       //     creep.say("harvest");
-          //  console.log(creep,"TaskOffloadSwitch harvest");
-            moveToStorage = new TaskMoveFind(gc.FIND_FUNCTION, gc.RANGE_HARVEST
-                , "findTargetSource", "role.base");
-            moveToStorage.mode = gc.FLEXIMODE_HARVEST;
-        }
+    var energyDumps = creep.room.find(FIND_STRUCTURES, {
+                        filter: function(object) {
+                            return (object.structureType == STRUCTURE_CONTAINER
+                            || object.structureType == STRUCTURE_STORAGE) ;
+                        }
+    });
+    var energy = 0;
+    for ( var i = 0 ; i < energyDumps ; i++ ) {
+        energy = energy + energyDumps[i].store[RESOURCE_ENERGY]
     }
+  //  console.log(creep,"energy dups",energyDumps.length,energyDumps);
+    if (energyDumps.length > 0 && energy > 0) {
+        energyDumps.sort(function (a, b) {
+            return a.store[RESOURCE_ENERGY] - b.store[RESOURCE_ENERGY];
+        });
+        console.log(creep,"TaskOffloadSwitch moveToStorage sorted energyDumpsabab", JSON.stringify(energyDumps));
+        moveToStorage = new TaskMoveFind(gc.FIND_ID, gc.RANGE_TRANSFER, energyDumps[0].id);
+        moveToStorage.mode = gc.FLEXIMODE_CONTAINER;
+    } else {
+        moveToStorage = new TaskMoveFind(gc.FIND_FUNCTION, gc.RANGE_HARVEST
+            , "findTargetSource", "role.base");
+        moveToStorage.mode = gc.FLEXIMODE_HARVEST;
+    }
+    console.log(creep,"moveToStorage rtv", moveToStorage, JSON.stringify(moveToStorage));
     return moveToStorage;
 }
 
