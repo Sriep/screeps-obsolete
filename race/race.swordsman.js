@@ -3,7 +3,7 @@
  * functions for infantry creeps. 
  * @author Piers Shepperson
  */
- 
+"use strict";
 /**
  * Abstract base object containing data and functions for use by my infantry
  * creeps. Infantry contain mainly "ATTACK" and "MOVE" parts.
@@ -20,6 +20,10 @@ var raceSwordsman = {
         } // for
         return body;	    
     },
+
+    maxSize: function (room) {
+        return Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE);
+    }
 }
 
 module.exports = raceSwordsman;

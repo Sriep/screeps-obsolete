@@ -295,7 +295,7 @@ var roleBase = {
     },
 
 	findTargetSource: function(creep) {
-        console.log(creep,"IN find target source");
+      //  console.log(creep,"IN find target source");
         var roomOwned = require("room.owned");
 	    var sources = creep.room.find(FIND_SOURCES, {
             filter: function(source) {             
@@ -305,7 +305,7 @@ var roleBase = {
         });
         sources = sources.sort((a,b) => b.energy - a.energy);
 
-        console.log(creep.room,creep,"findTargetSource",sources);
+     //   console.log(creep.room,creep,"findTargetSource",sources);
 
 	     for ( var sIndex in  sources ) {
             sources[sIndex].clients= 0;
@@ -323,12 +323,12 @@ var roleBase = {
         var target = sources[0];
         if (sources.length > 1) {
             var accessPoints = roomOwned.countAccessPoints(creep.room, sources[0].pos);
-            console.log(creep,"source,",sources[0]," access points", accessPoints,"clints",sources[0].clients);
+   //         console.log(creep,"source,",sources[0]," access points", accessPoints,"clints",sources[0].clients);
             if (sources[0].clients >  accessPoints ) {
                 target = sources[1];   
             }
         }
-        console.log(creep,"about to return",target);
+      //  console.log(creep,"about to return",target);
         creep.memory.tasks.targtId = target;
         return target;  
 	},
@@ -489,9 +489,15 @@ var roleBase = {
         if (undefined === creep.memory.tasks)
             creep.memory.tasks = {};
         tasks.setTargetId(creep,undefined);
+
         creep.memory.tasks.state = undefined;
         creep.memory.tasks.tasklist = module.getTaskList(creep, para1, para2, para3, para4, para5,
                                                                 para6, para7, para8, para9, para10 );
+
+        console.log(creep,role,"switchRoles rolebase tasklist",
+            module.getTaskList(creep, para1, para2, para3, para4, para5,
+            para6, para7, para8, para9, para10 ));
+
         creep.memory.role = role;
         return true;
     },

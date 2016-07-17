@@ -20,6 +20,7 @@ var tasks = require("tasks");
 
 function TaskActionTarget (action) {
     this.taskType = gc.TASK_ACTION_TARGET;
+    this.action = action;
     this.conflicts = action;
     this.loop = true;
     this.pickup = true;
@@ -31,7 +32,7 @@ TaskActionTarget.prototype.doTask = function(creep, task) {
         return gc.RESULT_FINISHED;
     }
   //  console.log("in TaskActionTarget", task["conflicts"],JSON.stringify(task));
-    var rtv = creep[task.conflicts](target);
+    var rtv = creep[task.action](target);
     console.log
     if (rtv == OK) {
         return gc.RESULT_FINISHED;

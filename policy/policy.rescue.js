@@ -44,7 +44,7 @@ var policyRescue = {
         if (policyDefence.beingAttaced(room)) {
             return policyFrameworks.createDefendPolicy(room.name);
         }
-        if (this.needsRescue(room)) {
+        if (this.needsRescue(room, oldPolicy)) {
             return oldPolicy;
         }
         return  policyFrameworks.createPeacePolicy(room.name                
@@ -156,11 +156,13 @@ var policyRescue = {
      * @param   {Object} room  The room that might need rescuing.
      * @returns {Bool} True inidcates we should use a rescue policy. 
      */
-    needsRescue: function(room) {
+    needsRescue: function(room, policy) {
         if (room === undefined) {
             return false;
         }
-        var creeps = room.find(FIND_MY_CREEPS);
+        var creeps = room.find(FIND_MY_CREEPS, function (creep) {
+             return (creep.memory.policyId == policy.id );
+        });
         var youngCreeps = [];
         for (var i = 0 ; i < creeps.length ; i++ ) {
             if (creeps[i].ticksToLive > gc.OLD_CREEP_LIFETOLIVE) {

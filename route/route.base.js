@@ -26,11 +26,13 @@ var routeBase = {
 
     attachRoute: function (roomName, routeType, order) {
         var room = Game.rooms[roomName];
-        this.checkSetup(room);
+        console.log(room,"attachRoute",routeType);
+        if (!this.checkSetup(room)) return false;
         module = this.moduleFromRoute(routeType);
         order.id = this.getNextRouteId(room);
-        //console.log(room,routeType,"attachRoute",JSON.stringify(order));
+        console.log(room,routeType,"attachRoute",JSON.stringify(order));
         room.memory.routes.details[order.id] = order;
+        return true;
     },
 
     removeRoute: function(roomName, routeId) {
@@ -49,7 +51,7 @@ var routeBase = {
         var room = Game.rooms[roomName];
         this.checkSetup(room);
         for (var i in  room.memory.routes.details) {
-            console.log(JSON.stringify(room.memory.routes.details[i]));
+            console.log(roomName,JSON.stringify(room.memory.routes.details[i]));
         }
     },
 
@@ -84,9 +86,23 @@ var routeBase = {
         if (_.isString(result)) {
             room.memory.routes.details[build.id].due
                 = room.memory.routes.details[build.id].respawnRate;
+            this.addToRegistry(result,room.memory.routes.details[build.id]);
         }
         return result;
     },
+
+    addToRegistry: function (creepName, route) {
+        if (route.creeps == undefined ) {
+            route.creeps = []
+        }
+        route.push( {name : creepName , tick : Game.time} );
+    },
+
+    getDetails: function (roomName, id) {
+        var room = Game.rooms[roomName];
+        return  room.memory.routes.details[id];
+    },
+
 
     moduleFromRoute: function(routeType) {
         if (undefined === routeType)
@@ -104,12 +120,15 @@ var routeBase = {
     },
 
     checkSetup: function(room) {
+        if (undefined === room.memory)
+            return false;
         if (room.memory.routes === undefined) {
             room.memory.routes = {};
         }
         if (room.memory.routes.details === undefined) {
             room.memory.routes.details = {};
         }
+        return true;
     }
 
 };

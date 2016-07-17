@@ -44,7 +44,7 @@ TaskHarvest.prototype.doTask = function(creep, task) {
         }
     }
     var rtv = creep.harvest(source);
-  //  console.log(creep,"TaskHarvest result",rtv);
+   // console.log(creep,"TaskHarvest result",rtv);
     switch (rtv) {
         case    OK:                         // 0	The operation has been scheduled successfully.;
            // tasksActions.done(gc.HARVEST);
@@ -70,19 +70,20 @@ TaskHarvest.prototype.doTask = function(creep, task) {
                 }
 
             }
-
         case    ERR_NOT_IN_RANGE:           //	-9	The target is too far away.
-        case    ERR_NOT_OWNER:              //	-1	You are not the owner of this creep, or the room controller is
-                                            // owned or reserved by another player.
-        case    ERR_BUSY:                    //	-4	The creep is still being spawned.
         case    ERR_NOT_FOUND:               //	-5	Extractor not found. You must build an extractor structure to
                                                 // harvest minerals. Learn more
         case    ERR_INVALID_TARGET:         //	-7	The target is not a valid source object.
+            return gc.RESULT_FINISHED;
+        case    ERR_NOT_OWNER:              //	-1	You are not the owner of this creep, or the room controller is
+                                            // owned or reserved by another player.
+        case    ERR_BUSY:                    //	-4	The creep is still being spawned.
         case    ERR_NO_BODYPART:	        // -12	There are no WORK body parts in this creep’s body.
                                           //   console.log("failed harvest with some other error");
         default:
            // console.log("Something wrong harvest error");
-            return gc.RESULT_UNFINISHED;
+            return gc.RESULT_FINISHED;
+
     }
     console.log("End of taskharves do not sue how got here");
 };

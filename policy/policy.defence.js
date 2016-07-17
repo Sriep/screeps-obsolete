@@ -33,7 +33,7 @@ var policyDefence = {
             return oldPolicy;
         }
         var policyRescue = require("policy.rescue")
-        if (policyRescue.needsRescue(room)) {
+        if (policyRescue.needsRescue(room, oldPolicy)) {
             return policyFrameworks.createRescuePolicy(room.name);
         }
      //   var policyConstruction = require("policy.construction");

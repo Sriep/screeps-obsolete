@@ -56,28 +56,36 @@ var ayrtepPad = {
     
     bottom: function () {
         console.log("START MY  PAD START MY  PAD");
-        var myroom = Game.rooms["W26S21"];
+
         //  var route = Game.map.findRoute("W26S21", "W27S21");
         //   console.log("route between my rooms", JSON.stringify(route));
         cpuUsage.updateCpuUsage();
         //  console.log("average cpu usage is", cpuUsage.averageCpuLoad());
-        var roomName = "W26S21";
-       // var room = Game.rooms["W26S21"];
-       // room.memory.routes.details[713] = undefined;
-        //Memory.policies[0].supplyCentres["W26S21"].buildqueue = [];
+       // var roomName = "W26S21";
+        var w26s21 = Game.rooms["W26S21"];
+        var w25s21 = Game.rooms["W25S22"];
+    //    console.log(w26s21,"slow worker siae",raceWorker.maxSizeRoom(w26s21)
+    //        , "fast", raceWorker.maxSizeRoom(w26s21, true));
+    //    console.log(w25s21,"slow worker siae",raceWorker.maxSizeRoom(w25s21)
+    //        , "fast", raceWorker.maxSizeRoom(w25s21, true));
 
-        var room = Game.rooms["W25S22"];
+
        // console.log("test occurancesInBody",raceBase.occurancesInBody([WORK,MOVE,MOVE,WORK,CARRY], WORK));
         //room.memory.links = {};
         //ion(buildRoom, sourceRoom)
-       var creep = Game.creeps["Mila"];
-  //    roleBase.switchRoles(creep, gc.ROLE_HARVESTER);
+       var creep = Game.creeps["Elizabeth"]; //55db3176efa8e3fe66e04a58
+       // var rtv = creep.move(LEFT);
+     //   console.log("move liz",rtv);
+
+      //roleBase.switchRoles(creep, gc.ROLE_HARVESTER);
        // creep.memory.PolicyId = 72804
        // creep.memory.PolicyId = 3;
-        var creep2 = Game.creeps["Aiden"];
-    //   roleBase.switchRoles(creep2, gc.ROLE_HARVESTER);//,"W25S22","W25S22");
+       // var creep2 = Game.creeps["Luke"];
+      //  creep2.move(TOP);
+   //  roleBase.switchRoles(creep2, gc.ROLE_HARVESTER);//,"W25S22","W25S22");
       //  creep2.memory.PolicyId = 3;
-        var creep3 = Game.creeps["Maria"];
+      //  var creep3 = Game.creeps["Johnathan"];
+
      //  roleBase.switchRoles(creep3, gc.ROLE_HARVESTER);//,"W25S22","W25S22");
      //   creep3.memory.PolicyId = 3;
      // var creep = Game.creeps["Caden"];
@@ -96,7 +104,8 @@ var ayrtepPad = {
 
         routeBase.showRoutes("W26S21");
         routeBase.showRoutes("W25S22");
-
+        //routeBase.removeRoute("W26S21",4)
+        //routeBase.removeRoute("W25S22",4)
     }
 
 };

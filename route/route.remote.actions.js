@@ -41,17 +41,17 @@ function  RouteRemoteActions  (room, remoteActions, body, respawnRate) {
 RouteRemoteActions.prototype.spawn = function (build, spawn) {
     var name = stats.createCreep(spawn, build.body, undefined, undefined);
     if (_.isString(name)) {
-        console.log("Spawning transporter",name);
-        creep.memory.tasks = {};
-        tasks.setTargetId(creep,undefined);
-        creep.memory.tasks.state = undefined;
-        creep.memory.tasks.tasklist
-            = RouteRemoteActions.prototype.getTaskList(build.remoteActions);
+        console.log("Spawning",name);
+        Game.creeps[name].memory.tasks = {};
+        Game.creeps[name].memory.tasks.targetId = undefined;
+        Game.creeps[name].memory.tasks.state = undefined;
+        Game.creeps[name].memory.tasks.tasklist
+            = RouteRemoteActions.prototype.getTaskList(Game.creeps[name], build.remoteActions);
     }
     return name;
 };
 
-RouteRemoteActions.prototype.getTaskList = function(remoteActions) {
+RouteRemoteActions.prototype.getTaskList = function(creep, remoteActions) {
     var taskList = [];
     var moveToRoom, moveFindTarget, actOnTarget;
     for (var i = 0 ; i < remoteActions.length ; i++ ) {

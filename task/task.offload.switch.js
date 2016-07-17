@@ -8,6 +8,7 @@
  * @fileOverview Screeps module. Task to transfer resouce to creep
  * @author Piers Shepperson
  */
+"use strict";
 var gc = require("gc");
 var tasks = require("tasks");
 var roleEnergyPorter = require("role.energy.porter");
@@ -38,7 +39,7 @@ function TaskOffloadSwitch (resourceId, storageIds) {
 }
 
 TaskOffloadSwitch.prototype.doTask = function(creep) {
-    console.log(creep,"TaskOffloadSwitch");
+  //  console.log(creep,"TaskOffloadSwitch");
     tasks.setTargetId(creep, undefined);
     if (undefined === creep)
         return gc.RESULT_UNFINISHED;
@@ -93,15 +94,15 @@ TaskOffloadSwitch.prototype.moveToStorage = function (creep)
                         }
     });
     var energy = 0;
-    for ( var i = 0 ; i < energyDumps ; i++ ) {
-        energy = energy + energyDumps[i].store[RESOURCE_ENERGY]
+    for ( var i = 0 ; i < energyDumps.length ; i++ ) {
+        energy = energy + energyDumps[i].store[RESOURCE_ENERGY];
     }
-  //  console.log(creep,"energy dups",energyDumps.length,energyDumps);
-    if (energyDumps.length > 0 && energy > 0) {
+ //  console.log(creep,creep.room,"energy dumps energy",energy);
+    if (energy > 0) {
         energyDumps.sort(function (a, b) {
-            return a.store[RESOURCE_ENERGY] - b.store[RESOURCE_ENERGY];
+            return b.store[RESOURCE_ENERGY] - a.store[RESOURCE_ENERGY];
         });
-        console.log(creep,"TaskOffloadSwitch moveToStorage sorted energyDumpsabab", JSON.stringify(energyDumps));
+      //console.log(creep,"TaskOffloadSwitch moveToStorage sorted energyDumpsbaba", JSON.stringify(energyDumps));
         moveToStorage = new TaskMoveFind(gc.FIND_ID, gc.RANGE_TRANSFER, energyDumps[0].id);
         moveToStorage.mode = gc.FLEXIMODE_CONTAINER;
     } else {
@@ -109,12 +110,13 @@ TaskOffloadSwitch.prototype.moveToStorage = function (creep)
             , "findTargetSource", "role.base");
         moveToStorage.mode = gc.FLEXIMODE_HARVEST;
     }
-    console.log(creep,"moveToStorage rtv", moveToStorage, JSON.stringify(moveToStorage));
+    //console.log(creep,"moveToStorage rtv", moveToStorage, JSON.stringify(moveToStorage));
     return moveToStorage;
 }
 
 TaskOffloadSwitch.prototype.switchToFillUp = function (creep) {
     var moveToStorage  = TaskOffloadSwitch.prototype.moveToStorage(creep);
+  //  console.log(creep,"switchToFillUp rtv", moveToStorage, JSON.stringify(moveToStorage));
     var loadupEnergy
     if (moveToStorage.mode == gc.FLEXIMODE_HARVEST) {
         loadupEnergy = new TaskHarvest();

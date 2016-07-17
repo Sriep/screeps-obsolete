@@ -71,7 +71,7 @@ var policyPeace = {
         }
         var policyRescue = require("policy.rescue");
         if (policyRescue.needsRescue(room)) {
-            return policyFrameworks.createRescuePolicy(room.name);
+            return policyFrameworks.createRescuePolicy(room.name, oldPolicy);
         }
         //    var policyConstruction = require("policy.construction");
         //    if (policyConstruction.startConstruction(room)) {
@@ -147,8 +147,8 @@ var policyPeace = {
         routeBase.update(room);
 
         //this.initialisePolicy(currentPolicy);
-        var creeps = _.filter(Game.creeps);
-        console.log(room, "policy id", currentPolicy.id,"creeps", creeps.length);
+       // var creeps = _.filter(Game.creeps);
+       // console.log(room, "policy id", currentPolicy.id,"creeps", creeps.length);
 /*
         var creeps = _.filter(Game.creeps, function (creep) {
                 return (creep.memory.policyId == currentPolicy.id );
@@ -173,14 +173,14 @@ var policyPeace = {
             && room.memory.links.info !== undefined
             && room.memory.links.info.length > 0
             && policyMany2oneLinker.readyForMAny2OneLinker(currentPolicy)) {
-            console.log(room, "checkLinks and nonLinkBuilds");
+          //  console.log(room, "checkLinks and nonLinkBuilds");
             policyMany2oneLinker.checkLinks(room, currentPolicy);
             policyMany2oneLinker.checkRepairer(room, currentPolicy);
             policyMany2oneLinker.nonLinkBuilds(room, currentPolicy);
         } else {
-            console.log(room, "calculateAndAssignRoles");
+         //   console.log(room, "calculateAndAssignRoles");
             if (policyMany2oneLinker.notEnoghUnistForLinks(room, currentPolicy)) {
-                console.log("BREAKING UP LINKERS");
+             //   console.log("BREAKING UP LINKERS");
                 policyMany2oneLinker.breakLinks(room, currentPolicy);
                 policyMany2oneLinker.nonLinkBuilds(room, currentPolicy);
                // this.calculateAndAssignRoles(room, currentPolicy);

@@ -44,7 +44,8 @@ TaskMoveFind.prototype.FindMethod = {
 
 TaskMoveFind.prototype.doTask = function(creep, task, actions) {
    // console.log(creep,"In TaskMoveFind method", task.method, "task.findid"
-  //      , task.findId,"target id",tasks.getTargetId(creep) );
+   //     , task.findId,"target id",tasks.getTargetId(creep) );
+   // console.log(creep,"fove find",task.findFunction,"module",task.findModule);
     //tasks.setTargetId(creep, undefined);
     var target = undefined;
     if (task.method != this.FindMethod.FindId)  {
