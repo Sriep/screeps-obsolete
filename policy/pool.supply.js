@@ -13,6 +13,7 @@ var supplyCenter = {
     updateSupplyLevel: function(roomName, energy, yardCapacity)
     {
         if (Game.rooms[roomName] !== undefined) {
+            //console.log("updateSupplyLevel",Memory.policies[0]);
             var supplycenter = Memory.policies[0].supplyCentres;
        //     console.log("updateSupplyLevel supplycenter", supplycenter,Memory.policies[0].supplyCenters );
            // return;
@@ -106,6 +107,9 @@ var supplyCenter = {
     },
 
     canSupply: function (centreId, order) {
+       if (this.getsupplyCentres()[centreId] === undefined)
+           return false;
+
        return (this.getsupplyCentres()[centreId].energyToTrade > order.energy
                  && this.getsupplyCentres()[centreId].yardCapacity > order.energy);
     },

@@ -36,73 +36,9 @@ var raceClaimer = require("race.claimer")
 var recurringPolicies = {
         
     run: function () {
+        //this.linksForW25S23();
         console.log("Run recurring policyies");
         policyFrameworks = require("policy.frameworks");
-      //  this.linksForW26S21();
-      // this.linksForW25S22();
-        // ROOM W26S23
-       if (Game.time % 750 == 0 )   {
-          //  policyFrameworks.createForeignHarvest("W26S23", "W26S21", 9, "55db3176efa8e3fe66e04a58", undefined, true);
-        }
-        
-        // ROOM W25S21
-        if (Game.time % 1500 == 200) {
-            var policyFrameworks = require("policy.frameworks");
-            var raceClaimer = require("race.claimer");
-            var body = raceClaimer.body(3);
-            policyFrameworks.createRemoteActionsPolicy("W25S21", "reserveController"
-                , "findController", "policy.remote.actions", body, true);
-        }
-
-        if (Game.time % 1250 == 0) {
-            var policyFrameworks = require("policy.frameworks");
-            policyFrameworks.createPotrolRoomPolicy({roomName: "W25S21", x: 28, y: 14}, 10, true);
-        }
-
-       // var RouteNeutralHarvest  = require("route.neutral.harvest");
-       // var routeBase = require("route.base");
-       // var order = new RouteNeutralHarvest("W25S21","W26S21", "55db3189efa8e3fe66e04b78", "577a8dd4b973e61c594592dc",750);
-       // routeBase.attachRoute("W26S21", gc.ROUTE_NEUTRAL_HARVEST,order);
-      //  if (Game.time % 750 == 250) {
-      //      policyFrameworks.createForeignHarvest("W26S21", "W25S21", 9, "55db3189efa8e3fe66e04b78", undefined, true);
-      //  }
-        
-        if (Game.time % 750 == 500) {
-            policyFrameworks.createForeignHarvest("W25S21", "W26S21", 9, "55db3189efa8e3fe66e04b79", undefined, true);
-        }
-
-
-
-/*
-        //ROOM W25S22
-        if (Game.time % 1500 == 110) {
-            var policyFrameworks = require("policy.frameworks");
-            var raceWorker = require("race.worker");
-            body = raceWorker.body(11);
-            policyFrameworks.createGiftCreepPolicy("W25S22", undefined, body,true );
-        }
-  */
-        // ROOM W26S22
-        if (Game.time % 1250 == 0) {
-            policyFrameworks.createPotrolRoomPolicy({roomName: "W26S22", x: 28, y: 14}, 8, true);
-        }
-        
-        // ROOM W27S21
-        if (Game.time % 1000 == 650) {
-            policyFrameworks.createForeignHarvest("W27S21", "W26S21", 9, "55db3151efa8e3fe66e0493e", undefined, true);
-        }
-
-        // ROOM "W25S23
-        if (Game.time % 1400 == 777) {
-            // createForeignHarvest: function(harvestRoom, storageRoom, workerSize, sourceId, offoadId, start)
-        //    policyFrameworks.createForeignHarvest("W25S23", "W25S22", 9, "57898028e0bfb44505e57da3"
-    //            , "57898028e0bfb44505e57da3", true);
-        }
-        if (Game.time % 1400 == 1200) {
-      //      policyFrameworks.createForeignHarvest("W25S23", "W25S22", 9, "5789ef633124760827c49c33"
-    //            , "57898028e0bfb44505e57da3", true);
-        }
-
     },
 
     linksForW26S21: function () {
@@ -146,12 +82,6 @@ var recurringPolicies = {
         var room = Game.rooms["W25S22"];
         room.memory.links = {};
         room.memory.links.info = [];
-       // var link1 = {
-       //     "fromId":"55db3189efa8e3fe66e04b7c",
-       //     "resource":"energy",
-       //     "x":17,"y":19,
-       //     "fromLinkId":"578a30a35177ff884ae6ac48"
-      //  };
         var link1 = {
             "fromId":"55db3189efa8e3fe66e04b7d",
             "resource":"energy",
@@ -164,18 +94,49 @@ var recurringPolicies = {
             "x":17,"y":18,
             "fromLinkId":"578a30a35177ff884ae6ac48"
         };
-        //var link4 = {
-         ///   "fromId":"55db3189efa8e3fe66e04b7c",
-        //    "resource":"energy",
-       //     "x":16,"y":18,
-      //      "fromLinkId":"57890d7d35c7023c3b2a8700"
-    //    }
         room.memory.links.info.push(link1);
         room.memory.links.info.push(link2);
        // room.memory.links.info.push(link3);
         //room.memory.links.info.push(link4);
       //  console.log(room,"linksForW26S21", JSON.stringify(room.memory.links));
+    },
+
+    linksForW25S23: function () {
+        var room = Game.rooms["W25S23"];
+        room.memory.links = {};
+        room.memory.links.info = [];
+       /*  var link1 = {
+             "fromId":"55db3189efa8e3fe66e04b80",
+             "resource":"energy",
+             "x":14,"y":13,
+             "fromLinkId":"578c884d6e727db53ab01245"
+          };*/
+        var link2 = {
+            "fromId":"55db3189efa8e3fe66e04b80",
+            "resource":"energy",
+            "x":14,"y":14,
+            "fromLinkId":"578c85d412dd432c326b2890"
+        };
+      //  var link3 = {
+      //      "fromId":"55db3189efa8e3fe66e04b81",
+      //      "resource":"energy",
+      //      "x":32,"y":21,
+      //      "fromLinkId":"578c8bfdc4b92c823d2a137e"
+      //  };
+        var link4 = {
+          "fromId":"55db3189efa8e3fe66e04b81",
+           "resource":"energy",
+           "x":32,"y":20,
+           "fromLinkId":"578c8a800be3c84c033a7f01"
+        };
+      //  room.memory.links.info.push(link1);
+        room.memory.links.info.push(link2);
+       // room.memory.links.info.push(link3);
+        room.memory.links.info.push(link4);
+        console.log(room,"linksForW25S23", JSON.stringify(room.memory.links));
     }
+
+
 }
 
 module.exports = recurringPolicies;

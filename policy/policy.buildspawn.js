@@ -29,11 +29,12 @@ var policyBuildspawn = {
      * @returns {enum} Id of policy for comming tick.
      */
     draftNewPolicyId: function(oldPolicy) {
+        console.log("policy build spawn");
         var room = Game.rooms[oldPolicy.room];
+        if (undefined === room)
+            return oldPolicy;
         if (this.spawnFound(oldPolicy)){
-            return policyFrameworks.createPeacePolicy(room.name                
-                , room.memory.links.fromLinks
-                , room.memory.links.toLink);
+            return policyFrameworks.createPeacePolicy(room.name);
         }
         return oldPolicy;
     },

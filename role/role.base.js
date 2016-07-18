@@ -297,40 +297,68 @@ var roleBase = {
 	findTargetSource: function(creep) {
       //  console.log(creep,"IN find target source");
         var roomOwned = require("room.owned");
-	    var sources = creep.room.find(FIND_SOURCES, {
-            filter: function(source) {             
-                return (creep.room.memory.reservedSources === undefined
-                        || -1 == creep.room.memory.reservedSources.indexOf(source.id));
+	    var sources = creep.room.find(FIND_SOURCES);
+        var target;
+        if (1 >= sources.length)  {
+            target = sources[0];
+        } else {
+            if (sources.length > 2) {
+                sources = sources.sort( function (a,b)  { return b.energy - a.energy; } );
             }
-        });
-        sources = sources.sort((a,b) => b.energy - a.energy);
+            var closest = creep.pos.findClosestByRange(FIND_SOURCES);
+            var iClosest, iFurthest;
+            for (var i = sources.length - 1 ; i >= 0 ; i--) {
+                if (sources[i].id == closest.id)
+                    iClosest = i;
+            }
+            if (0 == iClosest)
+                iFurthest = 1
+            else
+                iFurthest = 0;
 
-     //   console.log(creep.room,creep,"findTargetSource",sources);
+            var access = [];
+            var creepCount = _.filter(Game.creeps).length;
+          //  console.log("number creeps",creepCount );
+            for (var i = 0; i < sources.length; i++) {
+                access.push(0);
+                for (var creepName in Game.creeps) {
+                    //console.log(creep,i,creepName,"creepId",Game.creeps[creepName].memory.tasks.targetId,
+                   //                         "sourceId",sources[i].id);
+                    if (undefined !== Game.creeps[creepName].memory.tasks
+                        && Game.creeps[creepName].memory.tasks.targetId == sources[i].id) {
+                        access[i] = access[i] + 1;
+                        //debugger;
+                    }   // if
+                }   //  for(var cIndex in Game.creeps)
+                var accessPoints = roomOwned.countAccessPoints(creep.room, sources[0].pos);
+                access[i] = access[i] - accessPoints;
+            } // for ( var sIndex in  sources )
 
-	     for ( var sIndex in  sources ) {
-            sources[sIndex].clients= 0;
-           //  console.log(creep.room,creep,"findTargetSource sIndex",sIndex);
-            for(var cIndex in Game.creeps) {
-                if (undefined !== Game.creeps[cIndex].memory.tasks
-                    && Game.creeps[cIndex].memory.tasks.targetId == sources[sIndex].id)
-                {
-                    sources[sIndex].clients = sources[sIndex].clients +1;
-                   // console.log(creep.room,creep,"findTargetSource",sources[sIndex],"clinets",sources[sIndex].clients );
-                }   // if             
-            }   //  for(var cIndex in Game.creeps)          
-        } // for ( var sIndex in  sources )
+           // console.log(creep,"findTargetSources access", JSON.stringify(access),"clostse index",iClosest);
 
-        var target = sources[0];
-        if (sources.length > 1) {
-            var accessPoints = roomOwned.countAccessPoints(creep.room, sources[0].pos);
-   //         console.log(creep,"source,",sources[0]," access points", accessPoints,"clints",sources[0].clients);
-            if (sources[0].clients >  accessPoints ) {
-                target = sources[1];   
+            if (access[iFurthest] > 1) {
+                target = sources[iClosest];
+                console.log("(access[iFurthest] > 1) ",target);
+            } else if (access[iClosest] > 1) {
+                target = sources[iFurthest];
+                console.log("(access[iClosest] > 1) ",target);
+            } else if (closest.energy >= creep.carryCapacity) {
+                target = sources[iClosest];
+                console.log("((closest.energy >= creep.carryCapacity) ",target);
+            } else if (sources[iFurthest].energy > creep.carryCapacity) {
+                target = sources[iFurthest];
+                console.log("(sources[iFurthest].energy > creep.carryCapacity) ) ",target);
+            } else {
+                target = sources[iClosest];
+                console.log("else",target);
             }
         }
-      //  console.log(creep,"about to return",target);
+        debugger;
+        console.log(creep,"findTargetSource target",target,"length sources", sources.length);
+        console.log(creep,"findTargetSources access", JSON.stringify(access),"clostse index",iClosest);
         creep.memory.tasks.targtId = target;
-        return target;  
+
+        return target;
 	},
 	
 	checkCarryState: function (creep) {	

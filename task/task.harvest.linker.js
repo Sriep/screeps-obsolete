@@ -41,7 +41,17 @@ TaskHarvestLinker.prototype.doTask = function(creep, task) {
     if (!sourceLink) {
     /////    console.log(creep,"no from link")
      //   creep.say("help link");
-        return gc.RESULT_FINISHED;
+        var newHomeLink = this.findNewLink(creep, source);
+        if (newHomeLink) {
+            task.homeLinkId = newHomeLink.id;
+            for (var i = 0 ; i < creep.room.memory.links.linkCreeps.length ; i++){
+                if (creep.room.memory.links.linkCreeps[i].creepName == creep.name){
+                    creep.room.memory.links.linkCreeps[i].info.fromLinkId = newHomeLink.id;
+                    creep.room.memory.links.info[j].fromLinkId = newHomeLink.id;
+                }
+            }
+        }
+        return gc.RESULT_RESET;
     }
 
     var rtv = creep.transfer(sourceLink, RESOURCE_ENERGY);
@@ -58,6 +68,26 @@ TaskHarvestLinker.prototype.doTask = function(creep, task) {
     }
 
     return gc.RESULT_UNFINISHED;
+};
+
+TaskHarvestLinker.prototype.findNewLink = function(creep, source) {
+    var energyDumps = creep.room.find(FIND_STRUCTURES, {
+        filter: function(object) {
+            return (object.structureType == STRUCTURE_CONTAINER
+            || object.structureType == STRUCTURE_STORAGE
+            || object.structureType == STRUCTURE_LINK);
+        }
+    });
+    var nextToCreep = creep.pos.findInRange(energyDumps,1);
+    var nestToSource = source.pos.findInRange(energyDumps,1);
+    for ( var i = 0 ; i < nextToCreep.length ; i ++ ) {
+        for (var j = 0 ; i < nextToSource.length ; j++ ){
+            if (nextToCreep[i].pos == nextToSource.pos) {
+                return nextToCreep[i];
+            }
+        }
+    }
+    creep.room.createConstructionSite(creep.pos,STRUCTURE_CONTAINER);
 };
 
 module.exports = TaskHarvestLinker;

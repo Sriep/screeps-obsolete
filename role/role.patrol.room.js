@@ -44,7 +44,7 @@ var rolePatrolRoom = {
 
     findEnemyTarget: function (creep) {
         var target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-         console.log(creep, "in find enemy targets",target);
+      //   console.log(creep, "in find enemy targets",target);
         return target;
     },
 };

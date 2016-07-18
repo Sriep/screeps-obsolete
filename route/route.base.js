@@ -84,18 +84,22 @@ var routeBase = {
         //console.log(spawn,room,"spawn route base, buld.type",build.type,module)
         var result = module.prototype.spawn(build, spawn, room);
         if (_.isString(result)) {
-            room.memory.routes.details[build.id].due
-                = room.memory.routes.details[build.id].respawnRate;
-            this.addToRegistry(result,room.memory.routes.details[build.id]);
+            if (0 == room.memory.routes.details[build.id].respawnRate) {
+                this.removeRoute(room.name, build.id);
+            } else {
+                room.memory.routes.details[build.id].due
+                    = room.memory.routes.details[build.id].respawnRate;
+             //   this.addToRegistry(result,room.memory.routes.details[build.id]);
+            }
         }
         return result;
     },
 
     addToRegistry: function (creepName, route) {
-        if (route.creeps == undefined ) {
-            route.creeps = []
+        if (route.operator == undefined ) {
+            route.operator = []
         }
-        route.push( {name : creepName , tick : Game.time} );
+        route.operator.push( {name : creepName , tick : Game.time} );
     },
 
     getDetails: function (roomName, id) {

@@ -24,42 +24,7 @@ var routesReset = {
         var room = Game.rooms[roomName];
         routeBase.resetRoutes(roomName);
         var order;
-
         var fastWorkerSize = raceWorker.maxSizeRoom(room, true);
-
-        // RouteNeutralHarvest  (room,sourceRoom,sourceId,offloadId,size,fast,respawnRate)
-        order = new RouteNeutralHarvest(
-            "W26S21",  // room
-            "W25S21",  // source room
-            "55db3189efa8e3fe66e04b78", // source id
-            "577a8dd4b973e61c594592dc", // offload id
-            9,
-            true,
-            800
-        );
-        routeBase.attachRoute("W26S21", gc.ROUTE_NEUTRAL_HARVEST,order);
-
-        order = new RouteNeutralHarvest(
-            "W26S21",  // room
-            "W25S21",  // source room
-            "55db3189efa8e3fe66e04b79",
-            "577a8dd4b973e61c594592dc",
-            9,
-            true,
-            600
-        );
-        routeBase.attachRoute("W26S21", gc.ROUTE_NEUTRAL_HARVEST,order);
-
-        order = new RouteNeutralHarvest(
-            "W26S21",
-            "W27S21",
-            "55db3151efa8e3fe66e0493e",
-            "577a8dd4b973e61c594592dc",
-            9,
-            true,
-            700
-        );
-        routeBase.attachRoute("W26S21", gc.ROUTE_NEUTRAL_HARVEST,order);
 
         //var RouteRemoteActions = require("route.remote.actions");
         //var raceClaimer = require("race.claimer");
@@ -73,38 +38,56 @@ var routesReset = {
             findFunctionsModule : "policy.remote.actions"
         };
         order = new RouteRemoteActions(
-            "W26S21",
+            roomName,
             actions,
             body,
-            600
+            400
         );
         routeBase.attachRoute("W26S21", gc.ROUTE_REMOTE_ACTIONS,order);
 
+        // RouteNeutralHarvest  (room,sourceRoom,sourceId,offloadId,size,fast,respawnRate)
+        order = new RouteNeutralHarvest(
+            roomName,  // room
+            "W25S21",  // source room
+            "55db3189efa8e3fe66e04b78", // source id
+            "577a8dd4b973e61c594592dc", // offload id
+            9,
+            true,
+            400
+        );
+        routeBase.attachRoute(roomName, gc.ROUTE_NEUTRAL_HARVEST,order);
 
-        var soldierBody = raceSwordsman.body(5);
+        order = new RouteNeutralHarvest(
+            roomName,  // room
+            "W25S21",  // source room
+            "55db3189efa8e3fe66e04b79",
+            "577a8dd4b973e61c594592dc",
+            9,
+            true,
+            300
+        );
+        routeBase.attachRoute(roomName, gc.ROUTE_NEUTRAL_HARVEST,order);
+/*
+        order = new RouteNeutralHarvest(
+            roomName,
+            "W27S21",
+            "55db3151efa8e3fe66e0493e",
+            "577a8dd4b973e61c594592dc",
+            9,
+            true,
+            700
+        );
+        routeBase.attachRoute(roomName, gc.ROUTE_NEUTRAL_HARVEST,order);
+*/
+        var soldierBody = raceSwordsman.body(6);
         order = new RoutePatrolRoom(
-            "W26S21",
+            roomName,
             "W25S21",
             {roomName: "W25S21", x: 28, y: 14},
             soldierBody,
             1400
         );
-        routeBase.attachRoute("W26S21", gc.ROUTE_PATROL_ROOM,order);
-/*
-        var body = raceClaimer.body(3);
-        var actions = {
-            room : "W25S23",
-            action : "reserveController",
-            findFunction : "findController",
-            findFunctionsModule : "policy.remote.actions"
-        };
-        order = new RouteRemoteActions(
-            "W26S21",
-            actions,
-            body,
-            600
-        );
-        routeBase.attachRoute("W26S21", gc.ROUTE_REMOTE_ACTIONS,order);*/
+        routeBase.attachRoute(roomName, gc.ROUTE_PATROL_ROOM,order);
     },
 
     roomW25S22:  function () {
@@ -116,54 +99,80 @@ var routesReset = {
         var fastWorkerSize = raceWorker.maxSizeRoom(room, true);
         var maxSwordsManSize = raceSwordsman.maxSize(room);
 
-        var order;
-        order = new RouteNeutralHarvest(
-            "W25S22",  // room
-            "W25S23",  // source room
-            "55db3189efa8e3fe66e04b80", // source id
-            "578b0055a0afe21522a4ddc6", // offload id
-            fastWorkerSize,
-            true,
-            800
+        var body = raceClaimer.body(2);
+        var actions = {
+            room : "W26S23",
+            action : "reserveController",
+            findFunction : "findController",
+            findFunctionsModule : "policy.remote.actions"
+        };
+        var order = new RouteRemoteActions(
+            roomName,
+            actions,
+            body,
+            600
         );
-        routeBase.attachRoute("W25S22", gc.ROUTE_NEUTRAL_HARVEST,order);
+        routeBase.attachRoute(roomName, gc.ROUTE_REMOTE_ACTIONS,order);
 
-        var order;
-        order = new RouteNeutralHarvest(
-            "W25S22",  // room
-            "W25S23",  // source room
-            "55db3189efa8e3fe66e04b81", // source id
-            "578b0055a0afe21522a4ddc6", // offload id
-            fastWorkerSize,
-            true,
-            800
+        var soldierBody = raceSwordsman.body(maxSwordsManSize);
+        var order = new RoutePatrolRoom(
+            roomName,
+            "W25S23",
+            {roomName: "W25S23", x: 28, y: 14},
+            soldierBody,
+            1400
         );
-        routeBase.attachRoute("W25S22", gc.ROUTE_NEUTRAL_HARVEST,order);
+        routeBase.attachRoute(roomName, gc.ROUTE_PATROL_ROOM,order);
+    },
 
-        var order;
+    roomW25S23:  function () {
+        // routesReset = require("routes.reset"); routesReset.roomW25S23();
+        var roomName = "W25S23";
+        var room = Game.rooms[roomName];
+        routeBase.resetRoutes(roomName);
+        var fastWorkerSize = raceWorker.maxSizeRoom(room, true);
+        var maxSwordsManSize = raceSwordsman.maxSize(room);
+
+
+        var body = raceClaimer.body(1);
+        var actions = {
+            room : "W26S23",
+            action : "reserveController",
+            findFunction : "findController",
+            findFunctionsModule : "policy.remote.actions"
+        };
+        var order = new RouteRemoteActions(
+            roomName,
+            actions,
+            body,
+            300
+        );
+        routeBase.attachRoute(roomName, gc.ROUTE_REMOTE_ACTIONS,order);
+
         order = new RouteNeutralHarvest(
-            "W25S22",  // room
-            "W25S23",  // source room
+            roomName,  // room
+            "W26S23",  // source room
             "55db3176efa8e3fe66e04a58", // source id
-            "578b0055a0afe21522a4ddc6", // offload id
+            "578c9a347ad3a671035d9ae0", // offload id
             fastWorkerSize,
             true,
-            800
+            200
         );
-        routeBase.attachRoute("W25S22", gc.ROUTE_NEUTRAL_HARVEST,order);
+        routeBase.attachRoute(roomName, gc.ROUTE_NEUTRAL_HARVEST,order);
 
         var soldierBody = raceSwordsman.body(maxSwordsManSize);
         order = new RoutePatrolRoom(
-            "W25S22",
-            "W25S21",
-            {roomName: "W25S21", x: 28, y: 14},
+            roomName,
+            "W26S23",
+            {roomName: "W26S23", x: 28, y: 14},
             soldierBody,
-            900
+            1500
         );
-        routeBase.attachRoute("W25S22", gc.ROUTE_PATROL_ROOM,order);
+        routeBase.attachRoute(roomName, gc.ROUTE_PATROL_ROOM,order);
 
 
     }
+
 }
 
 module.exports = routesReset;

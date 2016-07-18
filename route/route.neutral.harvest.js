@@ -39,22 +39,14 @@ function  RouteNeutralHarvest  (room,sourceRoom,sourceId,offloadId,size,fast,res
 
 RouteNeutralHarvest.prototype.spawn = function (build, spawn, room ) {
     var body = raceWorker.body(build.size, build.fast);
-  //  console.log(room,"RouteNeutralHarvest", JSON.stringify(body),"build",build)
-    console.log(room,"RouteNeutralHArveset body energy", raceBase.getEnergyFromBody(body)
-        , "energy room",room.energyCapacityAvailable);
     var name = stats.createCreep(spawn, body, undefined, undefined);
     if (_.isString(name)) {
-        console.log("Spawning transporter",name," build.sourceRoom", build.sourceRoom,
-                            "build.owner",build.owner);
         roleBase.switchRoles(Game.creeps[name],
             gc.ROLE_NEUTRAL_HARVESTER,
             build.sourceRoom,
             build.owner,
             build.sourceId,
             build.offlaodId);
-
-        Game.creeps[name].polilcyId = build.id;
-        build.due = build.respawnRate;
     }
     return name;
 };

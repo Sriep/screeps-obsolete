@@ -2,6 +2,7 @@
  * @fileOverview Screeps module. Task harvest object.
  * @author Piers Shepperson
  */
+"use strict";
 var gc = require("gc");
 var tasks = require("tasks");
 
@@ -23,6 +24,7 @@ function TaskStorageLinker (storageId, storageLinkId) {
 TaskStorageLinker.prototype.doTask = function(creep, task) {
     var storageLink =  Game.getObjectById(task.storageLinkId);
     if (!storageLink) {
+     //   this.findNewLink(creep);
         creep.say("help link!");
         return gc.RESULT_FAILED;
     }
@@ -35,7 +37,47 @@ TaskStorageLinker.prototype.doTask = function(creep, task) {
     creep.transfer(storage, RESOURCE_ENERGY);
 };
 
+
+
 module.exports = TaskStorageLinker;
 /**
  * Created by Piers on 07/07/2016.
  */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

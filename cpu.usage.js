@@ -30,6 +30,10 @@ var cpuUsage = {
     },
     
     updateCpuUsage: function() {
+        if (undefined === Memory.cpuUsage)  {
+            Memory.cpuUsage = [];
+        }
+
         if (Memory.cpuUsage.length > 0) {
         	Memory.cpuUsage.shift();
         }

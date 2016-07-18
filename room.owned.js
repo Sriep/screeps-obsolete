@@ -24,7 +24,7 @@ var roomOwned = {
             var TotalCreepProduction = genStats[g].creeps;
             var TotalHarvester = genStats[g].harvester;
             supply = supply +  TotalEnergyHarvested * (1 - TotalHarvester / TotalCreepProduction);
-            //console.log("Loop",g,"TEH",TotalEnergyHarvested,"TCP",TotalCreepProduction,"TH",TotalHarvester);
+          //  console.log("Loop",g,"TEH",TotalEnergyHarvested,"TCP",TotalCreepProduction,"TH",TotalHarvester);
         }
         supply = supply / lastGen;
         if (!supply)

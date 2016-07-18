@@ -35,8 +35,8 @@ var routeBase = require("route.base");
  */
 var policyMany2oneLinker = {
     NUMBER_OF_LINKERS:  3,
-    REPAIRER_THRESHOLD:  6,
-    LINKER_AGE_THRESHOLD: 10,
+    REPAIRER_THRESHOLD:  gc.REPAIRER_THRESHOLD,
+    LINKER_AGE_THRESHOLD: gc.LINKER_AGE_THRESHOLD,
 
     buildRequest: function (policyId, body, taskList, role, priority) {
         this.policyId = policyId;
@@ -62,8 +62,14 @@ var policyMany2oneLinker = {
         }
         //console.log(room,"Policy for whtevr" ,JSON.stringify(policy));
         //console.log(room,"room.memory.links.info;" ,JSON.stringify(room.memory.links.info));
+        if (room.memory.links === undefined) {
+            room.memory.links = {};
+        }
+        if (room.memory.links.info === undefined) {
+            room.memory.links.info = [];
+        }
         policy.linksInfo = room.memory.links.info;
-                        // room.memory.links.info
+
         room.memory.links.linkCreeps = [];
         if (undefined !== room.memory.links.info) {
             for (var j = 0; j < room.memory.links.info.length; j++) {
@@ -187,7 +193,7 @@ var policyMany2oneLinker = {
          //   console.log(room,"ready for linkers");
             return true;
         }
-        console.log(room,"Not ready  total ticks",policy.creepLifeTicks(OldPolicy) ,"nulLinks*1500", numLinks);
+       // console.log(room,"Not ready  total ticks",policy.creepLifeTicks(OldPolicy) ,"nulLinks*1500", numLinks);
         return false;
     },
 
@@ -263,7 +269,7 @@ var policyMany2oneLinker = {
         var creeps = _.filter(Game.creeps, function (creep) {
             return (creep.memory.policyId == currentPolicy.id );
         });
-        console.log(room.memory.links.info.length,"number of links nad crep length",creeps.length);
+       // console.log(room.memory.links.info.length,"number of links nad crep length",creeps.length);
         return room.memory.links.info.length + 1 > creeps.length;
     },
 
@@ -276,7 +282,7 @@ var policyMany2oneLinker = {
         console.log("extraPorters", this.extraPorters(room), "0 < porterShortfall"
             , this.porterShortfall(room,currentPolicy));
         var externalCommitments = poolSupply.getEnergyInBuildQueue(room.name);
-        console.log(room,"External commitments", externalCommitments);
+      //  console.log(room,"External commitments", externalCommitments);
         //if ( this.extraPorters(room) < this.porterShortfall(room,currentPolicy)) {
 
         if ( 0 < this.porterShortfall(room,currentPolicy)) {

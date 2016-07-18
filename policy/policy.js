@@ -32,8 +32,10 @@ var policy = {
         var i =  Object.keys(Memory.policies).length;
         for (var i in Memory.policies) {
             var oldPolicyModule = this.getModuleFromPolicy(Memory.policies[i]);
+           // console.log("enactPolicies",JSON.stringify(Memory.policies[i]));
+         //   console.log("oldPolicyModule", JSON.stringify(oldPolicyModule))
             var newPolicyDetails = oldPolicyModule.draftNewPolicyId(Memory.policies[i]);
-           // console.log(JSON.stringify(oldPolicyModule) ,"newPolicyDetails",newPolicyDetails,"i =",i);
+            //console.log(JSON.stringify(oldPolicyModule) ,"newPolicyDetails",newPolicyDetails,"i =",i);
             if (newPolicyDetails === null) {
               //  console.log("Terminate policy",Memory.policies[i].type,Memory.policies[i].id);
                 delete Memory.policies[i];
@@ -62,10 +64,16 @@ var policy = {
      * @var Memory.policies  List of active policies.
      */
     checkRoomPolicies: function() {
+        var policyFrameworks = require("policy.frameworks");
         var policies = Memory.policies;
         if (policies === undefined) {
             policies = {};
         }
+        if (policies[0] === undefined) {
+            var thePoolPolicyDetails = policyFrameworks.createThePool();
+            this.activatePolicy(thePoolPolicyDetails);
+        }
+
         for(var roomIndex in Game.rooms) {
             var room = Game.rooms[roomIndex]
             var foundPolicy = false;
@@ -163,7 +171,7 @@ var policy = {
         }
         if (undefined === Memory.policies){
             Memory.policies = {};
-            var thePoolPolicyDetails = this.createThePool();
+            var thePoolPolicyDetails = policyFrameworks.createThePool();
             this.activatePolicy(thePoolPolicyDetails);
         }
         var module = this.getModuleFromPolicy(policyDetails);

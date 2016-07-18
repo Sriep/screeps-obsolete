@@ -44,6 +44,7 @@ var gc = {
     ROLE_STORAGE_REPAIRER: "storage.repairer",
     ROLE_FLEXI_STORAGE_PORTER: "flexi.storage.porter",
     ROLE_PATROL_ROOM: "patrol.room",
+    ROLE_GIFT: "gift",
     
     //Tasks
     TASK_MOVE_FIND: "move.find",
@@ -120,6 +121,7 @@ var gc = {
     ROUTE_NEUTRAL_HARVEST: "neutral.harvest",
     ROUTE_PATROL_ROOM: "patrol.room",
     ROUTE_REMOTE_ACTIONS: "remote.actions",
+    ROUTE_GIFT_CREEP: "gift.creep",
     
     //misc
     LINKING_WORKER_SIZE: 5,
@@ -130,6 +132,7 @@ var gc = {
     MANY2ONE_REQUIRED_LIFE: 5000,
     STORAGE_STOCKPILE: 30000,
     OLD_CREEP_LIFETOLIVE: 200,
+    LINKER_AGE_THRESHOLD: 10,
     
     //Flexi storage mode
    // FLEXIMODE_STORAGE: 0,

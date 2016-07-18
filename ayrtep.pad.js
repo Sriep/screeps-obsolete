@@ -38,6 +38,7 @@ var policyThePool = require("policy.the.pool");
 var gc = require("gc");
 var routeNeutralHarvest  = require("route.neutral.harvest");
 var routeBase = require("route.base");
+var RouteRemoteActions = require("route.remote.actions");
 
 var ayrtepPad = {
     top: function () {
@@ -59,22 +60,36 @@ var ayrtepPad = {
 
         //  var route = Game.map.findRoute("W26S21", "W27S21");
         //   console.log("route between my rooms", JSON.stringify(route));
-        cpuUsage.updateCpuUsage();
+    //    cpuUsage.updateCpuUsage();
         //  console.log("average cpu usage is", cpuUsage.averageCpuLoad());
        // var roomName = "W26S21";
         var w26s21 = Game.rooms["W26S21"];
-        var w25s21 = Game.rooms["W25S22"];
-    //    console.log(w26s21,"slow worker siae",raceWorker.maxSizeRoom(w26s21)
-    //        , "fast", raceWorker.maxSizeRoom(w26s21, true));
-    //    console.log(w25s21,"slow worker siae",raceWorker.maxSizeRoom(w25s21)
-    //        , "fast", raceWorker.maxSizeRoom(w25s21, true));
+        var w25s22 = Game.rooms["W25S22"];
+        var w25s23 = Game.rooms["W25S23"];
+        var w25s21 = Game.rooms["W25S21"];
+
+        //console.log(w26s21.memory.stats["ticks"]);
+
+        //var storageId = "577a8dd4b973e61c594592dc";
+       // var storage = Game.getObjectById(storageId);
+       // console.log(storageId,"energy",storage.energy,"energy capaciy",storage.energyCapacity);
 
 
-       // console.log("test occurancesInBody",raceBase.occurancesInBody([WORK,MOVE,MOVE,WORK,CARRY], WORK));
-        //room.memory.links = {};
-        //ion(buildRoom, sourceRoom)
-       var creep = Game.creeps["Elizabeth"]; //55db3176efa8e3fe66e04a58
-       // var rtv = creep.move(LEFT);
+    //  var creep = Game.creeps["Liam"]; //55db3176efa8e3fe66e04a58
+     //  var path = creep.pos.findPathTo(Game.getObjectById("55db3189efa8e3fe66e04b82"));
+     //   creep.moveByPath(path);
+       // roleBase.switchRoles(creep, gc.ROLE_FLEXI_STORAGE_PORTER);
+       // roleBase.switchRoles(creep, gc.ROLE_PATROL_ROOM, "W26S24");
+       //creep.move(TOP);
+
+      //  var creep2= Game.creeps["Xavier"]; //55db3176efa8e3fe66e04a58
+      //  creep2.pos.findPathTo(Game.getObjectById(id));
+
+    //    creep2.move(BOTTOM_LEFT);
+
+
+        //   var rtv = creep.move(LEFT);
+      // var rtv = creep.move(BOTTOM);
      //   console.log("move liz",rtv);
 
       //roleBase.switchRoles(creep, gc.ROLE_HARVESTER);
@@ -88,8 +103,8 @@ var ayrtepPad = {
 
      //  roleBase.switchRoles(creep3, gc.ROLE_HARVESTER);//,"W25S22","W25S22");
      //   creep3.memory.PolicyId = 3;
-     // var creep = Game.creeps["Caden"];
-
+    //  var creep3 = Game.creeps["Noah"];
+      //  var rtv = creep3.move(LEFT);
      // roleBase.switchRoles(creep, gc.ROLE_FLEXI_STORAGE_PORTER)//,"55db3189efa8e3fe66e04b7d","5788fd5ed480c0fe5bb3adb7",undefined);
       //  var creep2= Game.creeps["Aria"];
       //  roleBase.switchRoles(creep2, gc.ROLE_FLEXI_STORAGE_PORTER);//,"55db3189efa8e3fe66e04b7c","5788110778680d884032594a",undefined);
@@ -102,10 +117,33 @@ var ayrtepPad = {
 
         //routeBase.attachRoute("W26S21", gc.ROUTE_NEUTRAL_HARVEST,order);
 
-        routeBase.showRoutes("W26S21");
-        routeBase.showRoutes("W25S22");
+     //   routeBase.showRoutes("W26S21");
+     //   routeBase.showRoutes("W25S22");
+     //   routeBase.showRoutes("W25S23");
+
+       // var details = w26s21.memory.routes.details[2]; //55db3189efa8e3fe66e04b78
+       /// details.respawnRate = 700;
+        //var details = w26s21.memory.routes.details[3]; //55db3189efa8e3fe66e04b79
+        //details.respawnRate = 700;
+
+      //  var w26s21 = Game.rooms["W26S21"];
+        //var details = w26s21.memory.routes.details.splice(5);
+        //var details2 = w26s21.memory.routes.details[5] = undefined;
+        //details.respawnRate = 1500;
+
+
+       // var details = w25s22.memory.routes.details[1];
+
+     //   details.operator = undefined;
+
+
         //routeBase.removeRoute("W26S21",4)
         //routeBase.removeRoute("W25S22",4)
+
+
+       // roadBuilder.buildRoadsRoom(w25s23);
+        //roadBuilder.removeSites(w25s21);
+
     }
 
 };

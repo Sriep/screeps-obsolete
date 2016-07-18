@@ -29,7 +29,12 @@ var TaskActionTarget = require("task.action.target");
 function  RouteRemoteActions  (room, remoteActions, body, respawnRate) {
     this.type = gc.ROUTE_REMOTE_ACTIONS;
     this.owner = room;
-    this.remoteActions = remoteActions;
+    if (Array.isArray(remoteActions)) {
+        this.remoteActions = remoteActions;
+    } else {
+        this.remoteActions = [];
+        this.remoteActions.push(remoteActions)
+    }
     this.body = body
     this.respawnRate =respawnRate;
     if (undefined === respawnRate) {
@@ -46,18 +51,18 @@ RouteRemoteActions.prototype.spawn = function (build, spawn) {
         Game.creeps[name].memory.tasks.targetId = undefined;
         Game.creeps[name].memory.tasks.state = undefined;
         Game.creeps[name].memory.tasks.tasklist
-            = RouteRemoteActions.prototype.getTaskList(Game.creeps[name], build.remoteActions);
+            = RouteRemoteActions.prototype.getTaskList(build.remoteActions);
     }
     return name;
 };
 
-RouteRemoteActions.prototype.getTaskList = function(creep, remoteActions) {
+RouteRemoteActions.prototype.getTaskList = function(remoteActions) {
     var taskList = [];
     var moveToRoom, moveFindTarget, actOnTarget;
     for (var i = 0 ; i < remoteActions.length ; i++ ) {
-        moveToRoom = new TaskMoveRoom(remoteActions.room[i]);
+        moveToRoom = new TaskMoveRoom(remoteActions[i].room);
         moveFindTarget =  new TaskMoveFind(gc.FIND_FUNCTION,gc.RANGE_TRANSFER
-            , remoteActions.findFunction[i],remoteActions.findFunctionsModule);
+            , remoteActions[i].findFunction,remoteActions[i].findFunctionsModule);
         actOnTarget = new TaskActionTarget(remoteActions[i].action);
 
         taskList.push(moveToRoom);
@@ -65,7 +70,7 @@ RouteRemoteActions.prototype.getTaskList = function(creep, remoteActions) {
         taskList.push(actOnTarget);
     }
     return taskList;
-}
+};
 
 
 /*

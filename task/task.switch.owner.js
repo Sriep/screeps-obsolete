@@ -11,6 +11,7 @@
 "use strict";
 var gc = require("gc");
 var tasks = require("tasks");
+var roleBase = require("role.base");
 
 /**
  * Task move object. Used when we need to find the object to move to.
@@ -31,6 +32,10 @@ TaskSwitchOwner.prototype.doTask = function(creep, task) {
         }
     }
     creep.policyId = task.newPolicyId;
+    if (undefined === role) {
+        roleBase.switchRoles(creep,role);
+        return gc.RESULT_RESET;
+    }
     return gc.RESULT_FINISHED;
 };
 

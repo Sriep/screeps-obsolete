@@ -51,26 +51,38 @@ TaskMoveRoom.prototype.doTask = function(creep, task) {
     if ( this.atBorder(creep.pos.x,creep.pos.y ) ) {
         var currentRoom = creep.room;
         var targetRoom = task.roomsToVisit[task.pathIndex].room;
-            var nextStepD = this.nextStepIntoRoom(creep.pos, targetRoom)
-            var result = creep.move(nextStepD);
-            if (OK == result) {
-                task.pathIndex++
+        var nextStepD = this.nextStepIntoRoom(creep.pos, targetRoom)
+        var result = creep.move(nextStepD);
+        if (OK == result) {
+            task.pathIndex++
+            if (targetRoom = creep.room) {
+                creep.memory.tasks.newRoom = targetRoom;
             }
-            return gc.RESULT_UNFINISHED;
-    } else {
-        if ( task.roomsToVisit[task.pathIndex] !== undefined) {
-            var exit = creep.pos.findClosestByPath(task.roomsToVisit[task.pathIndex].exit);
-            var result = creep.moveTo(exit);
-        } else {
-            return gc.RESULT_FINISHED;
         }
+        return gc.RESULT_UNFINISHED;
     }
+
+
+    if ( task.roomsToVisit[task.pathIndex] !== undefined) {
+        var exit = creep.pos.findClosestByPath(task.roomsToVisit[task.pathIndex].exit);
+        var result = creep.moveTo(exit, {
+            maxRooms: 1, ignoreDestructibleStructures: true
+        });
+    } else {
+        return gc.RESULT_FINISHED;
+    }
+
     return gc.RESULT_UNFINISHED;
 
 };
 
 TaskMoveRoom.prototype.atBorder = function(x,y) {
     return ( x == 0 || x == 49 || y == 0 || y == 49 )
+};
+
+TaskMoveRoom.prototype.nearBorder = function(x,y) {
+    var r = 2;
+    return ( x <= 0 + r || x >= 49 - r || y <= 0 + r  || y >= 49 - r )
 };
 
 TaskMoveRoom.prototype.nextStepIntoRoom = function(pos, nextRoom) {
@@ -93,49 +105,6 @@ TaskMoveRoom.prototype.nextStepIntoRoom = function(pos, nextRoom) {
 };
 
 
-
-/*
-TaskMoveRoom.prototype.nextStepIntoRoomX = function(pos, nextRoom) {
-    var x  = pos.x;
-    var y= pos.y;S
-    if (pos.x == 0) {
-        x =47;
-    }
-    if (pos.x == 49) {
-        x = 2;
-    }
-    if (pos.y == 0) {
-        y =47;
-    }
-    if (pos.y == 49) {
-        y = 2;
-    }
-    //  console.log("Just before roomposition constoutor: x",x,"y",y,"room",nextRoom);
-    if (undefined !== nextRoom ){
-        return new RoomPosition(x,y,nextRoom);
-    } else {
-        return undefined;
-    }
-};
-
-TaskMoveRoom.prototype.nextStepIntoRoomD = function(pos, nextRoom) {
-    var x  = pos.x;
-    var y= pos.y;
-    var direction;
-    if (pos.x == 0) {
-        direction = LEFT;
-    }
-    if (pos.x == 49) {
-        direction = RIGHT ;
-    }
-    if (pos.y == 0) {
-        direction = TOP;
-    }
-    if (pos.y == 49) {
-        direction = BOTTOM;
-    }
-    return direction
-};*/
 
 
 

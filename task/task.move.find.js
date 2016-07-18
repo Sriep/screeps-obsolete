@@ -48,14 +48,14 @@ TaskMoveFind.prototype.doTask = function(creep, task, actions) {
    // console.log(creep,"fove find",task.findFunction,"module",task.findModule);
     //tasks.setTargetId(creep, undefined);
     var target = undefined;
-    if (task.method != this.FindMethod.FindId)  {
+    //if (task.method != this.FindMethod.FindId)  {
         if (tasks.getTargetId(creep)) {
             target = Game.getObjectById(tasks.getTargetId(creep));
         } else {
        //     console.log("In move find removing cashed id",tasks.getTargetId(creep))
             tasks.setTargetId(creep, undefined);
         }
-    }
+    //}
 
     if (!target) {
      //   console.log(creep,"no target look for one method",task.method);

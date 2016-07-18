@@ -40,7 +40,10 @@ var roleNeutralHarvester = {
         } else {
             moveToStorage = new TaskMoveFind(gc.FIND_ID,gc.RANGE_HARVEST, offLoadId);
         }
+
+
         var offload = new TaskOffload(gc.TRANSFER, RESOURCE_ENERGY);
+        offload.canUseAlternative = true;
 
         tasks.push(moveToSourceRoom);
         tasks.push(moveToSource);

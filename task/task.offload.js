@@ -31,6 +31,7 @@ function TaskOffload (offloadMethod, resource,  amount) {
     }
     this.loop = true;
     this.pickup = true;
+    this.canUseAlternative = undefined;
 }
 
 TaskOffload.prototype.offloadMethod = {
@@ -73,8 +74,9 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
             }
         }
     }
-
-    switch ( stats[task.offloadMethod](creep, target, task.resource, task.amount)) {
+    var result = stats[task.offloadMethod](creep, target, task.resource, task.amount);
+   // console.log(creep,"Task Offload result", result);
+    switch (result ) {
         case OK:
             if (creep.carry.energy == 0
                 || task.offlaodType == gc.DROP
@@ -110,31 +112,57 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
             }
             break;
         case ERR_FULL:
+        case ERR_INVALID_TARGET:
             tasks.setTargetId(creep, undefined);
             if (creep.carry.energy == 0)     {
-            //    console.log(creep,"offloaded all energy - FINSIHED");
-             //  creep.say("empty");
                 return gc.RESULT_FINISHED;
             } else {
-              //     creep.say("built");
-            //    console.log("transfer full go somewere else");
+                if (task.canUseAlternative) {
+                    tasks.setTargetId(creep, this.offloadTargetId(creep));
+                }
                 return gc.RESULT_ROLLBACK;
             }
         case ERR_NOT_IN_RANGE:
         case ERR_NOT_OWNER:
         case ERR_BUSY:
         case ERR_NOT_ENOUGH_RESOURCES:
-        case ERR_INVALID_TARGET:
         case ERR_NO_BODYPART:
         case ERR_RCL_NOT_ENOUGH:
         case ERR_INVALID_ARGS:
-         //   console.log(creep,"Offload, some other error unfinished");
             tasks.setTargetId(creep, undefined);
-            return gc.RESULT_UNFINISHED;
+            return gc.RESULT_FINISHED;
     }
 };
 
-
+TaskOffload.prototype.offloadTargetId = function (creep)
+{
+    var energyDumps = creep.room.find(FIND_STRUCTURES, {
+        filter: function(object) {
+            return (object.structureType == STRUCTURE_CONTAINER
+            || object.structureType == STRUCTURE_STORAGE
+            || object.structureType == STRUCTURE_LINK
+            || object.structureType == STRUCTURE_EXTENSION) ;
+        }
+    });
+    console.log(creep,"offloadTargetId list of possable new offload targets",energyDumps.length)
+    energyDumps.sort(function (a, b) {
+        var spaceA,spaceB;
+        if (a.structureType == STRUCTURE_CONTAINER || a.structureType == STRUCTURE_STORAGE ) {
+            spaceA = a.storeCapacity - _.sum(a.store);
+        } else {
+            spaceA = a.energyCapacity - a.energy;
+        }
+        if (b.structureType == STRUCTURE_CONTAINER || b.structureType == STRUCTURE_STORAGE ) {
+            spaceB = b.storeCapacity - _.sum(b.store);
+        } else {
+            spaceB = b.energyCapacity - b.energy;
+        }
+        return spaceB - spaceA;
+    });
+    creep.say(energyDumps[0].structureType);
+    console.log(creep,"offloadTargetId mover to dump",energyDumps[0].id,energyDumps[0].structureType);
+    return energyDumps[0].id;
+};
 
 
 

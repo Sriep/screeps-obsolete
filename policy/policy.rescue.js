@@ -34,16 +34,19 @@ var policyRescue = {
      * @returns {enum} Id of policy for comming tick. 
      */   
     draftNewPolicyId: function(oldPolicy) {
+        console.log("policy rescue");
         var room =  Game.rooms[oldPolicy.room];
+        if (undefined === room)
+            return oldPolicy;
 
         //if (readyForMAny2OneLinker)
 
         if (!policyBuildspawn.spawnFound(oldPolicy))      {
              return policyFrameworks.createBuildspawn(room.name);
         }
-        if (policyDefence.beingAttaced(room)) {
-            return policyFrameworks.createDefendPolicy(room.name);
-        }
+      //  if (policyDefence.beingAttaced(room)) {
+      //      return policyFrameworks.createDefendPolicy(room.name);
+       // }
         if (this.needsRescue(room, oldPolicy)) {
             return oldPolicy;
         }
@@ -178,7 +181,7 @@ var policyRescue = {
         }
 
         var needsRescue = youngCreeps.length < 2 && youngCreeps.length < numLinks + 1;
-        console.log(room,"Needs rescue",needsRescue,",yongCreeps lenght",  youngCreeps.length, "numLinks", numLinks);
+      //  console.log(room,"Needs rescue",needsRescue,",yongCreeps lenght",  youngCreeps.length, "numLinks", numLinks);
         return needsRescue;
     }
 };

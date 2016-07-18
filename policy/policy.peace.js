@@ -47,7 +47,10 @@ var policyPeace = {
      */
     draftNewPolicyId: function (oldPolicy) {
        // return oldPolicy;
+        //console.log("policy peace");
         var room = Game.rooms[oldPolicy.room];
+        if (undefined === room)
+            return oldPolicy;
         //     console.log("draftNewPolicyId policy", JSON.stringify(oldPolicy))
         //     console.log(room,"room draftNewPolicyId policy id", room.policyId);
 
@@ -66,9 +69,9 @@ var policyPeace = {
         //         ,true);
 
 
-        if (policyDefence.beingAttaced(room)) {
-            return policyFrameworks.createDefendPolicy(room.name);
-        }
+      //  if (policyDefence.beingAttaced(room)) {
+      ////      return policyFrameworks.createDefendPolicy(room.name);
+     //   }
         var policyRescue = require("policy.rescue");
         if (policyRescue.needsRescue(room)) {
             return policyFrameworks.createRescuePolicy(room.name, oldPolicy);
@@ -145,10 +148,11 @@ var policyPeace = {
         console.log(room,"updated supply level", roomOwned.calaculateSuplly(room)
             ,room.energyCapacityAvailable );
         routeBase.update(room);
-
-        //this.initialisePolicy(currentPolicy);
-       // var creeps = _.filter(Game.creeps);
-       // console.log(room, "policy id", currentPolicy.id,"creeps", creeps.length);
+       if (room.name == "W25S23") {
+         // this.initialisePolicy(currentPolicy);
+       }
+        var creeps = _.filter(Game.creeps);
+        console.log(room, "policy id", currentPolicy.id,"creeps", creeps.length);
 /*
         var creeps = _.filter(Game.creeps, function (creep) {
                 return (creep.memory.policyId == currentPolicy.id );
@@ -166,10 +170,7 @@ var policyPeace = {
         }
             return;
         }*/
-
-
-
-        if (room.memory.links !== undefined
+          if (room.memory.links !== undefined
             && room.memory.links.info !== undefined
             && room.memory.links.info.length > 0
             && policyMany2oneLinker.readyForMAny2OneLinker(currentPolicy)) {

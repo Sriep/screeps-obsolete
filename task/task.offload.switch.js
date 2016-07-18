@@ -112,7 +112,7 @@ TaskOffloadSwitch.prototype.moveToStorage = function (creep)
     }
     //console.log(creep,"moveToStorage rtv", moveToStorage, JSON.stringify(moveToStorage));
     return moveToStorage;
-}
+};
 
 TaskOffloadSwitch.prototype.switchToFillUp = function (creep) {
     var moveToStorage  = TaskOffloadSwitch.prototype.moveToStorage(creep);

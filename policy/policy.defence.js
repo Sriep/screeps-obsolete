@@ -29,6 +29,11 @@ var policyDefence = {
      */   
     draftNewPolicyId: function(oldPolicy) {
         var room =  Game.rooms[oldPolicy.room];
+        //console.log("In policy defence");
+        if (undefined == room) {
+            return oldPolicy;
+        }
+
         if (this.beingAttaced(room)) {
             return oldPolicy;
         }

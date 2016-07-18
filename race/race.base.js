@@ -178,7 +178,8 @@ var raceBase = {
             } //  if (Game.creeps[creepName].memory.role = ROLE_UNASSIGNED)
             
         } //  for (var creepName in Game.creeps)
-        stats.upadateTick();
+
+          stats.upadateTick();
     },
 
     recycleCreep: function (creep) {

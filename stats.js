@@ -287,7 +287,7 @@ var stats = {
             return;
         var index = room.memory.stats["ticks"].length-1;
         room.memory.stats["ticks"][index].creepActions[action] =
-            room.memory.stats["ticks"][index].creepActions[action] + power
+             room.memory.stats["ticks"][index].creepActions[action] + power
     },
 
     build: function (creep,target) {
