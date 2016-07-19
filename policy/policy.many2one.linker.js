@@ -393,7 +393,7 @@ var policyMany2oneLinker = {
                   &&  creep.memory.role == gc.ROLE_FLEXI_STORAGE_PORTER );
         });
         for (var i in porters) {
-            parts = parts + raceBase.occurancesInBody(porters[i].body, WORK);
+            parts = parts + raceBase.occurrencesInBody(porters[i].body, WORK);
         }
         return parts;
     },

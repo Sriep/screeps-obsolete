@@ -26,7 +26,8 @@ var policyFrameworks = {
         BUILD_SPAWN: "buildspawn",
         GIFT_CREEP: "gift.cree[",
         NEUTRAL_BUILDER: gc.POLICY_NEUTRAL_BUILDER,
-        POLICY_MANY2ONE_LINKERS: gc.POLICY_MANY2ONE_LINKERS
+        POLICY_MANY2ONE_LINKERS: gc.POLICY_MANY2ONE_LINKERS,
+        POLICY_HARVEST_KEEPER_SECTOR: gc.POLICY_HARVEST_KEEPER_SECTOR
     },
 
 
@@ -89,6 +90,20 @@ var policyFrameworks = {
             ,linksInfo: linksInfo
         };
         return p;
+    },
+
+    policyHarvestKeeperSector: function(keeperRoom, marshallingPoint, start) {
+        var newPolicy = {
+            id : policy.getNextPolicyId(),
+            type : gc.POLICY_HARVEST_KEEPER_SECTOR,
+            keeperRoom : keeperRoom,
+            marshallingPoint : marshallingPoint
+        };
+        if (start) {
+            var module = policy.getModuleFromPolicy(newPolicy);
+            policy.activatePolicy(newPolicy);
+        }
+        return newPolicy;
     },
 
     createAttackStructuresPolicy: function(structureIds, roomIds, creepSize, attackGroupSize

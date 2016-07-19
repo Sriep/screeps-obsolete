@@ -145,6 +145,7 @@ var policyPeace = {
         poolSupply.updateSupplyLevel(room.name
             , roomOwned.calaculateSuplly(room)
             , room.energyCapacityAvailable);
+
         console.log(room,"updated supply level", roomOwned.calaculateSuplly(room)
             ,room.energyCapacityAvailable );
         routeBase.update(room);

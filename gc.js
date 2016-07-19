@@ -116,6 +116,7 @@ var gc = {
     POLICY_PATROL_ROOM: "patrol.room",
     POLICY_HARVEST_NEUTRAL_ROOM: "harvest.neutral.room",
     POLICY_REMOTE_ACTIONS: "remote.actions",
+    POLICY_HARVEST_KEEPER_SECTOR: "harvest.keeper.sector",
 
     //Recurring orders
     ROUTE_NEUTRAL_HARVEST: "neutral.harvest",

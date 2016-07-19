@@ -16,9 +16,10 @@ var roomOwned = {
     calaculateSuplly: function (room){
         // OptimisticSupply = TotalEnergyHarvested * ( 1 - w/a)
         // a/w = Harvesters / TotalProductionUnits
-        var genStats = room.memory.stats.generations
+        var genStats = room.memory.stats.generations;
         var supply = 0;
         var lastGen = genStats.length -1;
+      //  console.log(room,"stats gen length",JSON.stringify(genStats[lastGen]));
         for (var g in genStats) {
             var TotalEnergyHarvested = genStats[g].energyHarvested;
             var TotalCreepProduction = genStats[g].creeps;

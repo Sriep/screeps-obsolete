@@ -91,7 +91,7 @@ var raceBase = {
         }
     },
 
-    occurancesInBody: function(body, bodyPart) {
+    occurrencesInBody: function(body, bodyPart) {
         body = this.convertBodyToArray(body);
         if (undefined === body) return 0;
         var count = 0;
