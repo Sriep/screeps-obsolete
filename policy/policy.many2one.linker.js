@@ -49,7 +49,7 @@ var policyMany2oneLinker = {
     },
 
     initialisePolicy: function (newPolicy) {
-        console.log("initialisePolicy policyMany2oneLinker");
+        console.log(newPolicy.room,"initialisePolicy policyMany2oneLinker");
         //var room = Game.rooms[newPolicy.room];
         this.initialiseLinks(newPolicy);
         return true;
@@ -231,7 +231,7 @@ var policyMany2oneLinker = {
         var size = Math.min(gc.LINKING_WORKER_SIZE, raceWorker.maxSizeRoom(spawn.room, true));
         var body = raceWorker.body(size, true);
         var name = spawn.createCreep(body, name, {policyId: currentPolicy.id});
-      //  console.log(room,"spawnRepairer result",name,"size",size,"body",body);
+        console.log(room,"spawnRepairer result",name,"size",size,"body",body);
         if (_.isString(name)) {
             roleBase.switchRoles(Game.creeps[name], gc.ROLE_STORAGE_REPAIRER);
             console.log(name, "New repairer spawned");
@@ -279,12 +279,11 @@ var policyMany2oneLinker = {
            // this.spawnFromBuildQueue(spawn[0], room.buildQueue[0]);
         }
         this.checkRoles(room, currentPolicy);
-        console.log("extraPorters", this.extraPorters(room), "0 < porterShortfall"
-            , this.porterShortfall(room,currentPolicy));
-        var externalCommitments = poolSupply.getEnergyInBuildQueue(room.name);
-      //  console.log(room,"External commitments", externalCommitments);
-        //if ( this.extraPorters(room) < this.porterShortfall(room,currentPolicy)) {
 
+        var externalCommitments = poolSupply.getEnergyInBuildQueue(room.name);
+       console.log(room,"External commitments", externalCommitments);
+      //  if ( this.extraPorters(room) < this.porterShortfall(room,currentPolicy)) {
+        console.log(room, "0 < porterShortfall", this.porterShortfall(room,currentPolicy));
         if ( 0 < this.porterShortfall(room,currentPolicy)) {
             console.log("tryingToSpawn shortfall", this.porterShortfall(room, currentPolicy));
             var body = raceWorker.body(this.porterSize(room));
@@ -470,15 +469,21 @@ var policyMany2oneLinker = {
             if ( ( gc.ROLE_LINKER_SOURCE != creeps[i].memory.role
                 && gc.ROLE_LINKER_MINER_STORAGE != creeps[i].memory.role)
                 && this.bodySuitableForLinker(creeps[i]) ) {
+              //  console.log(room,"not a linker findNewLinkers",creeps[i],creeps[i].memory.role);
 
                 for ( var j = 0 ; j < linkCreeps.length ; j++ ) {
+                   // console.log("findNewLinkers check link",j)
                     if (!this.linkOk(room,j)) {
                         linkCreeps[j].creepName = creeps[i].name;
-                        console.log(room,"findNewLinkers found new link", JSON.stringify(info[j]));
+                   //     console.log(room,"findNewLinkers found new link", JSON.stringify(info[j]));
                         this.makeLinker(creeps[i] ,info[j]);
                     }
                 }
-            }  /*else if (gc.ROLE_LINKER_SOURCE == creeps[i].memory.role) {
+            } else {
+            //    console.log(room,"findNewLinkers",creeps[i],creeps[i].memory.role);
+            }
+
+            /*else if (gc.ROLE_LINKER_SOURCE == creeps[i].memory.role) {
                 var  assigned = false;
                 for ( var j = 0 ; j < linkCreeps ; j++ ) {
                     if ( undefined === linkCreeps[j].creepName
@@ -546,6 +551,7 @@ var policyMany2oneLinker = {
         var size = Math.min(gc.LINKING_WORKER_SIZE, raceWorker.maxSizeRoom(spawn.room));
         var body = raceWorker.body(size);
         var room = Game.rooms[currentPolicy.room];
+        console.log("trying to spawn spawnLinkerCreep");
         var name = spawn.createCreep(body, name, {policyId: currentPolicy.id});
         if (_.isString(name)) {
             var linkCreeps = room.memory.links.linkCreeps;
@@ -584,25 +590,25 @@ var policyMany2oneLinker = {
     },
 
     linkOk: function(room, index) {
-      //  console.log(room,"linkeOk",index,"data", JSON.stringify(room.memory.links.linkCreeps) );
+       //console.log(room,"linkeOk",index,"data", JSON.stringify(room.memory.links.linkCreeps) );
         var linkCreeps = room.memory.links.linkCreeps;
         if (undefined === linkCreeps)
             return false;
         if (undefined === linkCreeps[index]) {
-          //     console.log(index,"linkOk no link ");
+        //       console.log(index,"linkOk no link ");
             return false;
         }
         if (undefined == linkCreeps[index].creepName){
-         //      console.log(index,"linkOk no creep name in link data ");
+           //    console.log(index,"linkOk no creep name in link data ");
             return false;
         }
         var creep = Game.creeps[linkCreeps[index].creepName];
         if (undefined === Game.creeps[linkCreeps[index].creepName]) {
-       //      console.log(index,"linkOk no creep in game ");
+         //    console.log(index,"linkOk no creep in game ");
            return false;
         }
         if (Game.creeps[linkCreeps[index].creepName].memory.role != linkCreeps[index].role){
-        //     console.log(index,"linkOk creep has wrong role");
+         //    console.log(index,"linkOk creep has wrong role");
             return false;
         } // near retirement
         if (Game.creeps[linkCreeps[index].creepName].ticksToLive < this.LINKER_AGE_THRESHOLD) {
@@ -611,7 +617,7 @@ var policyMany2oneLinker = {
         }
         if (creep.pos.x != linkCreeps[index].info.x || creep.pos.y != linkCreeps[index].info.y)
         {
-        ///    console.log("linkOk meant to handle double booking");
+           // console.log("linkOk meant to handle double booking");
             for ( var i = 0 ; i <  linkCreeps.length ; i++ ){
                 if (i != index && linkCreeps[index].creepName == linkCreeps[i].creepName) {
                     //Creep double booked

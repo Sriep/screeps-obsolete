@@ -31,13 +31,13 @@ var raceBase = {
         }
         var body = race.body(creepSize);
         //console.log("ceeps body", JSON.stringify(body))
-        var canDo = spawn.canCreateCreep(body)
+        var canDo = spawn.canCreateCreep(body);
         if (canDo != OK) {
             return canDo;
         }
-        //console.log("spawning creep, size". creepSize, "body");
+        console.log("spawning creep, size". creepSize, "body");
         var result = stats.createCreep(spawn, body, undefined, policy.id);
-       // var result = spawn.createCreep(body, undefined, {policyId: policy.id});
+        var result = spawn.createCreep(body, undefined, {policyId: policy.id});
         if(_.isString(result)) {
             raceBase.setRole(Game.creeps[result], race.ROLE_DEFULT);
             console.log("New creep produced with name:", result,JSON.stringify(result));

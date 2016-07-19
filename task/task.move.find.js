@@ -15,11 +15,14 @@ var tasks = require("tasks");
  * @module tasksHarvest
  */
 
-function TaskMoveFind (findMethod, range, method , module, moveToOpts) {
+function TaskMoveFind (findMethod, range, method , module, moveToOpts, findId) {
     this.taskType = gc.TASK_MOVE_FIND;
     this.conflicts = gc.MOVE;
     this.method = findMethod;
     this.findId = method;
+    if (undefined !== findId) {
+        this.findId = findId;
+    }
     this.findObject = method;
     this.findStructure = method;
     this.findFilter = method;
@@ -63,6 +66,15 @@ TaskMoveFind.prototype.doTask = function(creep, task, actions) {
             case this.FindMethod.FindId:
                 target = Game.getObjectById(task.findId);
           //      console.log(creep,"case this.FindMethod.FindId",task.findId,"target",target);
+                /// Siwtch to backup plan
+                if (!target && task.findId != task.findFunction) {
+                    var module = require(task.findModule);
+                    target = module[task.findFunction](creep);
+                    if (target) {
+                        tasks.setTargetId(creep, target.id);
+                        creep("switch");
+                    }
+                }
                 break;
             case this.FindMethod.FindRoomObject:
                 //target = creep.pos.findClosestByPath(task.findObject);
@@ -116,8 +128,8 @@ TaskMoveFind.prototype.doTask = function(creep, task, actions) {
        // creep.say("There");
         return gc.RESULT_FINISHED;
     }  else {
-      // console.log(creep,"find RESULT_UNFINISHED after move range <= abut to");
-      //  creep.say("Moving");
+     //  console.log(creep,"find RESULT_UNFINISHED after move range <= abut to",result);
+       // creep.say(result);
         switch (result) {
             case OK:    //	0	The operation has been scheduled successfully.
             case ERR_TIRED: //	-11	The fatigue indicator of the creep is non-zero.

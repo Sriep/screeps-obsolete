@@ -102,6 +102,7 @@ var policyPeace = {
     },
 
     initialisePolicy: function (newPolicy) {
+        console.log("in policyPeace initialisePolicy");
         var room = Game.rooms[newPolicy.room];
         var policyMany2oneLinker = require("policy.many2one.linker");
         // var room = Game.rooms[newPolicy.room];
@@ -150,27 +151,14 @@ var policyPeace = {
             ,room.energyCapacityAvailable );
         routeBase.update(room);
        if (room.name == "W25S23") {
-         // this.initialisePolicy(currentPolicy);
+          //this.initialisePolicy(currentPolicy);
        }
+        if (room.name == "W25S22") {
+           // this.initialisePolicy(currentPolicy);
+        }
         var creeps = _.filter(Game.creeps);
         console.log(room, "policy id", currentPolicy.id,"creeps", creeps.length);
-/*
-        var creeps = _.filter(Game.creeps, function (creep) {
-                return (creep.memory.policyId == currentPolicy.id );
-        });
-        if (creeps.length == 0) {
-            var spawns = room.find(FIND_MY_SPAWNS);
-           console.log("tryingToSpawn shortfall", policyMany2oneLinker.porterShortfall(room, currentPolicy));
-            var workerSize = raceWorker.maxSizeFromEnergy(room);
-            var body = raceWorker.body(workerSize);
 
-            var name = stats.createCreep(spawns[0], body, undefined, currentPolicy.id);
-            if (_.isString(name)) {
-                console.log("spawning porter");
-                roleBase.switchRoles(creeps[i], gc.ROLE_FLEXI_STORAGE_PORTER);
-        }
-            return;
-        }*/
           if (room.memory.links !== undefined
             && room.memory.links.info !== undefined
             && room.memory.links.info.length > 0

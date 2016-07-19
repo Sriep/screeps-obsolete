@@ -38,6 +38,7 @@ function  RouteNeutralHarvest  (room,sourceRoom,sourceId,offloadId,size,fast,res
 }
 
 RouteNeutralHarvest.prototype.spawn = function (build, spawn, room ) {
+    console.log("trying to spawn RouteNeutralHarvest");
     var body = raceWorker.body(build.size, build.fast);
     var name = stats.createCreep(spawn, body, undefined, undefined);
     if (_.isString(name)) {

@@ -189,6 +189,7 @@ var policy = {
         Memory.policies[policyDetails.id] = policyDetails;
 
         if (undefined  !== module.initialisePolicy) {
+            console.log(policyDetails,"in activatePolicy about to call initialisePolicy");
             module.initialisePolicy(policyDetails)
         }
         return true;

@@ -338,24 +338,24 @@ var roleBase = {
 
             if (access[iFurthest] > 1) {
                 target = sources[iClosest];
-                console.log("(access[iFurthest] > 1) ",target);
+              //  console.log("(access[iFurthest] > 1) ",target);
             } else if (access[iClosest] > 1) {
                 target = sources[iFurthest];
-                console.log("(access[iClosest] > 1) ",target);
+           //     console.log("(access[iClosest] > 1) ",target);
             } else if (closest.energy >= creep.carryCapacity) {
                 target = sources[iClosest];
-                console.log("((closest.energy >= creep.carryCapacity) ",target);
+            //    console.log("((closest.energy >= creep.carryCapacity) ",target);
             } else if (sources[iFurthest].energy > creep.carryCapacity) {
                 target = sources[iFurthest];
-                console.log("(sources[iFurthest].energy > creep.carryCapacity) ) ",target);
+             //   console.log("(sources[iFurthest].energy > creep.carryCapacity) ) ",target);
             } else {
                 target = sources[iClosest];
-                console.log("else",target);
+             //   console.log("else",target);
             }
         }
         debugger;
-        console.log(creep,"findTargetSource target",target,"length sources", sources.length);
-        console.log(creep,"findTargetSources access", JSON.stringify(access),"clostse index",iClosest);
+      //  console.log(creep,"findTargetSource target",target,"length sources", sources.length);
+      //  console.log(creep,"findTargetSources access", JSON.stringify(access),"clostse index",iClosest);
         creep.memory.tasks.targtId = target;
 
         return target;

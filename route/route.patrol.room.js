@@ -39,6 +39,7 @@ function  RoutePatrolRoom  (room, patrolRoom, startPos, body, respawnRate) {
 }
 
 RoutePatrolRoom.prototype.spawn = function (build, spawn, room ) {
+    console.log("trying to spawn RoutePatrolRoom");
     var body = raceWorker.body(raceWorker.maxSizeRoom(room));
     var name = stats.createCreep(spawn, build.body, undefined, undefined);
     if (_.isString(name)) {

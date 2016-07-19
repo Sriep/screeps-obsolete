@@ -36,6 +36,7 @@ var TaskMoveRoom = require("task.move.room");
 var TaskActionTarget = require("task.action.target");
 var policyThePool = require("policy.the.pool");
 var gc = require("gc");
+var gf = require("gf");
 var routeNeutralHarvest  = require("route.neutral.harvest");
 var routeBase = require("route.base");
 var RouteRemoteActions = require("route.remote.actions");
@@ -67,6 +68,17 @@ var ayrtepPad = {
         var w25s22 = Game.rooms["W25S22"];
         var w25s23 = Game.rooms["W25S23"];
         var w25s21 = Game.rooms["W25S21"];
+
+      //  var pos = new RoomPosition(33,19,w25s23.name);
+     //   console.log(JSON.stringify(pos),"is it walkable",gf.isWalkable(pos));
+
+
+
+        for ( var i in Game.flags) {
+            console.log(i,"flag ", Game.flags[i].pos);
+        }
+
+
 
         //console.log(w26s21.memory.stats["ticks"]);
 
@@ -117,9 +129,9 @@ var ayrtepPad = {
 
         //routeBase.attachRoute("W26S21", gc.ROUTE_NEUTRAL_HARVEST,order);
 
-     //   routeBase.showRoutes("W26S21");
-     //   routeBase.showRoutes("W25S22");
-     //   routeBase.showRoutes("W25S23");
+      //  routeBase.showRoutes("W26S21");
+      //  routeBase.showRoutes("W25S22");
+      //  routeBase.showRoutes("W25S23");
 
        // var details = w26s21.memory.routes.details[2]; //55db3189efa8e3fe66e04b78
        /// details.respawnRate = 700;

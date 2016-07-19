@@ -34,7 +34,7 @@ function RouteGiftCreep  (room, policyId, bdoy, role, respawnRate) {
     this.due = 0;
 }
 
-RoutePatrolRoom.prototype.spawn = function (build, spawn, room ) {
+RouteGiftCreep.prototype.spawn = function (build, spawn, room ) {
     var name = stats.createCreep(spawn, build.body, undefined, undefined);
     if (_.isString(name)) {
         console.log("Spawning transporter",name);

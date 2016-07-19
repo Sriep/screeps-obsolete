@@ -62,6 +62,7 @@ var gc = {
     TASK_WAIT: "wait",
     TASK_ACTION_TARGET: "action.target",
     TASK_SWITCH_OWNER: "switch.owner",
+    TASK_MOVE_ATTACK_POS: "move.attack.pos",
 
 
 //Offload switch task's states

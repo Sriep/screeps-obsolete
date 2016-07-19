@@ -79,7 +79,7 @@ TaskHarvestLinker.prototype.findNewLink = function(creep, source) {
         }
     });
     var nextToCreep = creep.pos.findInRange(energyDumps,1);
-    var nestToSource = source.pos.findInRange(energyDumps,1);
+    var nextToSource = source.pos.findInRange(energyDumps,1);
     for ( var i = 0 ; i < nextToCreep.length ; i ++ ) {
         for (var j = 0 ; i < nextToSource.length ; j++ ){
             if (nextToCreep[i].pos == nextToSource.pos) {

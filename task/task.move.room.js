@@ -21,13 +21,14 @@ var TaskMoveXY = require("task.move.xy")
  * @module tasksHarvest
  */
 
-function TaskMoveRoom (roomName, pathOps) {
+function TaskMoveRoom (roomName, pathOps, movesTowardsCenter) {
     this.taskType = gc.TASK_MOVE_ROOM;
     this.conflicts = gc.MOVE;
     this.roomName = roomName;
     this.pathOps = pathOps;
     this.loop = true;
     this.pickup = true;
+    this.movesTowardsCenter = movesTowardsCenter;
 }
 
 TaskMoveRoom.prototype.doTask = function(creep, task) {
@@ -103,6 +104,35 @@ TaskMoveRoom.prototype.nextStepIntoRoom = function(pos, nextRoom) {
     }
     return direction
 };
+
+TaskMoveRoom.prototype.moveTowardsCenter = function (pos) {
+    var room = Game.rooms[pos.roomName];
+    var xNextPos, xNextMove,yNextPos,yNextMove;
+    if ( pos.x < 25) {
+        xNextMove = RIGHT;
+        xNextPos = 1;
+    }
+    else {
+        xNextMove = LEFT;
+        xNextPos = -1
+    }
+    if ( pos.y < 25)
+    {
+        yNextMove = BOTTOM;
+        yNextPos = 1
+    }  else {
+        yNextMove = TOP;
+        yNextPos = -1;
+    }
+    var diaganal = new RoomPosition(pos+xNextMove,pos+yNextMove);
+    //if (isdiagonal.look())
+
+
+
+
+
+
+}
 
 
 

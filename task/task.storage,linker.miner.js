@@ -50,7 +50,8 @@ TaskStorageLinkerMiner.prototype.doTask = function(creep, task) {
     creep.harvest(mineral);
 
 
-    storageLink.transferEnergy(creep);
+    //storageLink.transferEnergy(creep);
+    creep.withdraw(storageLink, RESOURCE_ENERGY);
 
     var storage = Game.getObjectById(task.storageId);
     if (!storage) {

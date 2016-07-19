@@ -44,6 +44,7 @@ function  RouteRemoteActions  (room, remoteActions, body, respawnRate) {
 }
 
 RouteRemoteActions.prototype.spawn = function (build, spawn) {
+    console.log("trying to spawn RouteRemoteActions");
     var name = stats.createCreep(spawn, build.body, undefined, undefined);
     if (_.isString(name)) {
         console.log("Spawning",name);

@@ -15,7 +15,7 @@ var stats = require("stats");
  * @module tasksHarvest
  */
 
-function TaskOffload (offloadMethod, resource,  amount) {
+function TaskOffload (offloadMethod, resource,  amount, canUseAlternative) {
     this.taskType = gc.TASK_OFFLOAD;
     this.conflicts = offloadMethod;
     this.offloadMethod = offloadMethod;
@@ -31,7 +31,7 @@ function TaskOffload (offloadMethod, resource,  amount) {
     }
     this.loop = true;
     this.pickup = true;
-    this.canUseAlternative = undefined;
+    this.canUseAlternative = canUseAlternative;
 }
 
 TaskOffload.prototype.offloadMethod = {

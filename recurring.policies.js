@@ -37,7 +37,8 @@ var recurringPolicies = {
         
     run: function () {
         //this.linksForW25S23();
-        console.log("Run recurring policyies");
+        //this.linksForW25S22();
+       // console.log("Run recurring policyies");
         policyFrameworks = require("policy.frameworks");
     },
 
@@ -82,17 +83,26 @@ var recurringPolicies = {
         var room = Game.rooms["W25S22"];
         room.memory.links = {};
         room.memory.links.info = [];
+      //  var link1 = {
+      //      "fromId":"55db3189efa8e3fe66e04b7d",
+      //      "resource":"energy",
+      //      "x":28,"y":27,
+      //      "fromLinkId":"578b0055a0afe21522a4ddc6"
+      //  };
         var link1 = {
-            "fromId":"55db3189efa8e3fe66e04b7d",
+            "toLinkId" : "578deae39176adb836dcffcb",
+            "storageId" : "578b0055a0afe21522a4ddc6",
+            "mineId" : "55db3189efa8e3fe66e04b7d",
             "resource":"energy",
-            "x":28,"y":27,
-            "fromLinkId":"578b0055a0afe21522a4ddc6"
-        };
+            "mineResource": RESOURCE_ENERGY,
+            "x": 28,"y": 27,
+        }
         var link2 = {
             "fromId":"55db3189efa8e3fe66e04b7c",
             "resource":"energy",
             "x":17,"y":18,
-            "fromLinkId":"578a30a35177ff884ae6ac48"
+            "fromLinkId":"578ddc7133513b5270bdc9f8",
+            "toLinkId" : "578deae39176adb836dcffcb"
         };
         room.memory.links.info.push(link1);
         room.memory.links.info.push(link2);
@@ -127,7 +137,7 @@ var recurringPolicies = {
           "fromId":"55db3189efa8e3fe66e04b81",
            "resource":"energy",
            "x":32,"y":20,
-           "fromLinkId":"578c8a800be3c84c033a7f01"
+           "fromLinkId":"578e2b154732415a3bf555d8"
         };
       //  room.memory.links.info.push(link1);
         room.memory.links.info.push(link2);

@@ -316,36 +316,7 @@ console.log("assignRoles havester", havesters_needed, "upgraders",upgraders_need
     *   var raceWorker = require("race.worker");
     *   raceWorker.spawnWorker("W26S21", "Spawn1");        
     */
-	/*spawn: function(policy, spawn, workerSize) {
-        
-	    if (workerSize == undefined) {
-            workerSize = raceWorker.LINKING_WORKERSIZE;
-        }
-        var cost = this.blockSize * workerSize;
 
-		var body = this.body(cost);
-		var canDo = spawn.canCreateCreep(body)
-		if (canDo != OK) {		    
-            return canDo;   
-		}			
-		var result = spawn.createCreep(body, undefined, {policyId: policy.id});
-		if  (_.isString(result)) {
-            var raceBase = require(race.bsae);
-            raceBase.setRole(Game.creeps[result], race.ROLE_DEFULT);
-		    console.log("New creep " + result + " is born");
-		} else {
-		}
-		return result;		
-	} // spawn
-
-	quickSpawn: function(spawn) {
-		//var energy = Game.rooms[roomName].energyAvailable; 
-		//if  (energy > this.blockSize) {
-			var newName = spawn.createCreep(
-				[WORK, CARRY, MOVE] , undefined, {role: this.ROLE_HARVESTER});  
-			console.log("New creep " + newName + " is born");			
-		//}
-	},*/
 };
 
 module.exports = raceWorker;
