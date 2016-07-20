@@ -46,7 +46,7 @@ var tasks = {
                 task = taskList[0];
             }
             if (undefined ===  task.taskType) {
-                console.log(creep,"tasks.doTasks",JSON.stringify(task));
+           //     console.log(creep,"tasks.doTasks",JSON.stringify(task));
                 return;
             }
             var moduleName = "task." + task.taskType;
@@ -55,7 +55,7 @@ var tasks = {
                 this.pickUpLooseEnergy(creep);
                 doneActions.actions.add(gc.PICKUP);
             }
-         //   console.log(creep ,"about to do task", task.taskType,"Length of task list is", taskList.length);
+           // console.log(creep ,"about to do task", task.taskType,"Length of task list is", taskList.length);
            // creep.say(task.taskType);
             var result;
             if (!TaskActions.prototype.isConflict(doneActions, task.conflicts)) {
@@ -106,7 +106,7 @@ var tasks = {
         } else if (0 == taskList.length) {
             this.emptyTaskList(creep);
         }
-       // console.log(creep,"finsihed doTasks tasks left", taskList.length);
+   //     console.log(creep,"finsihed doTasks tasks left", taskList.length);
     },
     
     showTasks: function (creep) {

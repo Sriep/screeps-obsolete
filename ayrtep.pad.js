@@ -78,8 +78,34 @@ var ayrtepPad = {
             console.log(i,"flag ", Game.flags[i].pos);
         }
 
-
-
+        console.log("distance between 2621 and 2721", Game.map.getRoomLinearDistance("W26S21","W27S21"));
+        console.log("route between 2621 and 2721",JSON.stringify(Game.map.findRoute("W26S21","W27S21")));
+        console.log("exit between 2621 and 2721",Game.map.findExit("W26S21","W27S21"));
+        console.log("exit describe 2621",JSON.stringify(Game.map.describeExits("W26S21")));
+        //distance between 2621 and 2721 1
+        //route between 2621 and 2721 [{"exit":1,"room":"W26S20"},{"exit":7,"room":"W27S20"},{"exit":5,"room":"W27S21"}]
+        //exit between 2621 and 2721 1
+        //exit describe 2621 {"1":"W26S20","3":"W25S21","5":"W26S22"}
+     /*   var myrooms = _.filter(Game.rooms, function (room) {
+            return room.controller && room.controller.my
+        });
+        var nearByRooms = new Set();
+        console.log("scoutHarvestSites mine", JSON.stringify(nearByRooms));
+        for ( var i = 0 ; i < myrooms.length ; i++ )
+        {
+            nearByRooms.add(myrooms[i].name);
+            var exits = Game.map.describeExits(myrooms[i].name);
+            for ( var j in exits) {
+                console.log( JSON.stringify(exits[j]), Game.rooms[exits[j]]);
+                nearByRooms.add(exits[j]);
+            }
+        }
+        console.log("scoutHarvestSites mine", JSON.stringify(Array.from(nearByRooms)));
+        nearByRooms.forEach(function(i) {
+            console.log(i);
+        })
+*/
+        // Set [1, 5, "some text"]
         //console.log(w26s21.memory.stats["ticks"]);
 
         //var storageId = "577a8dd4b973e61c594592dc";
@@ -129,12 +155,13 @@ var ayrtepPad = {
 
         //routeBase.attachRoute("W26S21", gc.ROUTE_NEUTRAL_HARVEST,order);
 
-      //  routeBase.showRoutes("W26S21");
-      //  routeBase.showRoutes("W25S22");
-      //  routeBase.showRoutes("W25S23");
-
-       // var details = w26s21.memory.routes.details[2]; //55db3189efa8e3fe66e04b78
-       /// details.respawnRate = 700;
+     //   routeBase.showRoutes("W26S21");
+    //    routeBase.showRoutes("W25S22");
+    //    routeBase.showRoutes("W25S23");
+      //  w25s23
+        //var details = w26s21.memory.routes.details[5]; //55db3189efa8e3fe66e04b78
+        var details = w25s23.memory.routes.details[2]; //55db3189efa8e3fe66e04b78
+      //  details.respawnRate = 350;
         //var details = w26s21.memory.routes.details[3]; //55db3189efa8e3fe66e04b79
         //details.respawnRate = 700;
 

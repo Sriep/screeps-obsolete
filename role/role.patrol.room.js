@@ -15,6 +15,7 @@ var TaskAttackTarget = require("task.attack.target");
 var TaskMoveFind = require("task.move.find");
 var TaskWait = require("task.wait");
 var TaskMoveRoom = require("task.move.room");
+var TaskMoveAttackPos = require("task.move.attack.pos");
 /**
  * Abstract role object for creeps building in a neutral room
  * @module policy
@@ -29,7 +30,8 @@ var rolePatrolRoom = {
         {
             moveToLocation = new TaskMoveRoom(patrolRoom);
         } else {
-            moveToLocation = new TaskMovePos(roomPos);
+            //moveToLocation = new TaskMovePos(roomPos);
+            moveToLocation = new TaskMoveAttackPos;
         }
         var moveToTarget = new TaskMoveFind(gc.FIND_FUNCTION, gc.RANGE_ATTACK,
             "findEnemyTarget","role.patrol.room");

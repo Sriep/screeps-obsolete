@@ -39,18 +39,18 @@ TaskHarvestLinker.prototype.doTask = function(creep, task) {
 
     var sourceLink = Game.getObjectById(task.homeLinkId);
     if (!sourceLink) {
-    /////    console.log(creep,"no from link")
-     //   creep.say("help link");
-        var newHomeLink = this.findNewLink(creep, source);
-        if (newHomeLink) {
-            task.homeLinkId = newHomeLink.id;
-            for (var i = 0 ; i < creep.room.memory.links.linkCreeps.length ; i++){
-                if (creep.room.memory.links.linkCreeps[i].creepName == creep.name){
-                    creep.room.memory.links.linkCreeps[i].info.fromLinkId = newHomeLink.id;
-                    creep.room.memory.links.info[j].fromLinkId = newHomeLink.id;
-                }
-            }
-        }
+        console.log(creep, "no from link")
+        //   creep.say("help link");
+        //   var newHomeLink = this.findNewLink(creep, source);
+        //    if (newHomeLink) {
+        //        task.homeLinkId = newHomeLink.id;
+        //        for (var i = 0 ; i < creep.room.memory.links.linkCreeps.length ; i++){
+        //            if (creep.room.memory.links.linkCreeps[i].creepName == creep.name){
+        //                creep.room.memory.links.linkCreeps[i].info.fromLinkId = newHomeLink.id;
+        //                creep.room.memory.links.info[j].fromLinkId = newHomeLink.id;
+        //            }
+        //        }
+        // }
         return gc.RESULT_RESET;
     }
 
@@ -66,7 +66,6 @@ TaskHarvestLinker.prototype.doTask = function(creep, task) {
         var result = sourceLink.transferEnergy(targetLink);
       //  console.log(creep,"TaskHarvestLinker result link to link",result);
     }
-
     return gc.RESULT_UNFINISHED;
 };
 
@@ -91,6 +90,37 @@ TaskHarvestLinker.prototype.findNewLink = function(creep, source) {
 };
 
 module.exports = TaskHarvestLinker;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -175,7 +175,7 @@ var stats = {
     TENTICKS_PER_HUNDREDTICKS: 10,
     HUNDREDTICKS_PER_GENERATION: 15,
     NOTIFYPERIOD: 120,
-    on: true,
+    on: false,
     Act: {
         HARVEST: "harvest",
         BUILD: "build",
@@ -283,11 +283,11 @@ var stats = {
     },
 
     updateCreepAction: function (room, action, power) {
-        if (undefined === room.memory.stats)
-            return;
-        var index = room.memory.stats["ticks"].length-1;
-        room.memory.stats["ticks"][index].creepActions[action] =
-             room.memory.stats["ticks"][index].creepActions[action] + power
+    //    if (undefined === room.memory.stats)
+     //       return;
+    //    var index = room.memory.stats["ticks"].length-1;
+    //    room.memory.stats["ticks"][index].creepActions[action] =
+        //     room.memory.stats["ticks"][index].creepActions[action] + power
     },
 
     build: function (creep,target) {

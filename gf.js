@@ -6,6 +6,17 @@
 var gf = {
 
     isWalkable: function (pos) {
+        var obstacles = pos.lookFor(LOOK_STRUCTURES, {
+            filter: function (structure) {
+                return structure in OBSTACLE_OBJECT_TYPES
+            }
+        });
+        if (obstacles.length > 0)
+            return false;
+        var creeps = pos.loogFor(LOOK_CREEPS);
+        return 0 == creeps.length;
+    }
+/*
         var atPos = pos.look();
         var SWAMP = "swamp";
         var PLAIN = "plain";
@@ -48,7 +59,7 @@ var gf = {
             }
         }
         return true;
-    }
+    }*/
 
 };
 

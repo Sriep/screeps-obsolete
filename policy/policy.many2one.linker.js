@@ -189,7 +189,7 @@ var policyMany2oneLinker = {
         var room = Game.rooms[OldPolicy.room];
         var numLinks = room.memory.links.info.length;
      //   console.log(room,"readyForMAny2OneLinker numLinks",numLinks);
-        if ( policy.creepLifeTicks(OldPolicy) > numLinks * 1500 ) {
+        if ( policy.creepLifeTicks(OldPolicy) > 2000 ) {
          //   console.log(room,"ready for linkers");
             return true;
         }
@@ -258,9 +258,12 @@ var policyMany2oneLinker = {
      //   } else {
             this.findNewLinkers(currentPolicy);
             var linkToRenew = this.newLinkToBuild(currentPolicy, room.memory.links.info.length);
+        console.log(room,"checkLinks linkToRenew", linkToRenew);
             if (undefined !== linkToRenew) {
                 var spawns = room.find(FIND_MY_SPAWNS);
-                this.spawnLinkerCreep(spawns[0], currentPolicy);
+                if ( this.spawnLinkerCreep(spawns[0], currentPolicy) == ERR_BUSY && spawns[1]) {
+                    this.spawnLinkerCreep(spawns[1], currentPolicy);
+                }
             }
     //    }
     },
@@ -281,16 +284,23 @@ var policyMany2oneLinker = {
         this.checkRoles(room, currentPolicy);
 
         var externalCommitments = poolSupply.getEnergyInBuildQueue(room.name);
-       console.log(room,"External commitments", externalCommitments);
+     //  console.log(room,"External commitments", externalCommitments);
       //  if ( this.extraPorters(room) < this.porterShortfall(room,currentPolicy)) {
         console.log(room, "0 < porterShortfall", this.porterShortfall(room,currentPolicy));
         if ( 0 < this.porterShortfall(room,currentPolicy)) {
-            console.log("tryingToSpawn shortfall", this.porterShortfall(room, currentPolicy));
+          //  console.log("tryingToSpawn shortfall", this.porterShortfall(room, currentPolicy));
             var body = raceWorker.body(this.porterSize(room));
+        //    console.log(room,"about to spawn body",body.length, JSON.stringify(body) );
             var name = stats.createCreep(spawns[0], body, undefined, currentPolicy.id);
+      //      console.log(room,"spawn result",name,"spawn name", spawns[0]);
             if (_.isString(name)) {
                 console.log("spawning porter");
-                this.convertPorter(Game.creeps[name, currentPolicy]);
+                this.convertPorter(Game.creeps[name], currentPolicy);
+            } else if ( name == ERR_BUSY && spawns[1]){
+                name = stats.createCreep(spawns[0], body, undefined, currentPolicy.id);
+                if (_.isString(name)) {
+                    this.convertPorter(Game.creeps[name], currentPolicy);
+                }
             }
             return;
         }
@@ -302,6 +312,7 @@ var policyMany2oneLinker = {
             console.log(room,"routeBase spawn result",result);
            return;
        }
+
 
         if (externalCommitments) {
             var build = poolSupply.nextRequisition(room.name);
@@ -519,12 +530,6 @@ var policyMany2oneLinker = {
      //   console.log("bodySuitableForLinker",size);
         return raceBase.isCreep(creep, "worker", size);
     },
-
- //   creep.memory.tasks.tasklist = roleLinkerSource.getTaskList(fromLink.x, fromLink.y
- //   , fromLink.fromId, fromLink.fromLinkId, toLink.toLinkId );
-
-//   creep.memory.tasks.tasklist = roleLinkerMinerStorage.getTaskList(toLink.x, toLink.y
-//    , toLink.storageId, toLink.toLinkId , toLink.mineId, toLink.mineResource );
 
     addLinkToBuildQueue: function (room, link, policyId) {
         var body = raceWorker.body(gc.LINKING_WORKER_SIZE);

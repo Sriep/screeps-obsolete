@@ -21,7 +21,7 @@ module.exports.loop = function () {
     profiler.wrap(function() {
         PathFinder.use(true);
         try {
-            ayrtepPad.top();
+         //   ayrtepPad.top();
         }
         catch(exp) {
             console.log("ops",exp);

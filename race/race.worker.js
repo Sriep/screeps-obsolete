@@ -268,12 +268,14 @@ console.log("assignRoles havester", havesters_needed, "upgraders",upgraders_need
 
         if (undefined === fast || !fast)
         {
+            size = Math.min(16,size);
             for (var i = 0; i < size; i++) {
                 body.push(WORK);
                 body.push(CARRY);
                 body.push(MOVE);
             } // for
         } else {
+            size = Math.min(12,size);
             for (var i = 0; i < size; i++) {
                 body.push(WORK);
                 body.push(CARRY);

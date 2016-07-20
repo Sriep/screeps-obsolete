@@ -36,6 +36,7 @@ var raceClaimer = require("race.claimer")
 var recurringPolicies = {
         
     run: function () {
+     //   this.linksForW26S21();
         //this.linksForW25S23();
         //this.linksForW25S22();
        // console.log("Run recurring policyies");
@@ -44,7 +45,7 @@ var recurringPolicies = {
 
     linksForW26S21: function () {
         console.log("In linksForW26S21");
-        var room = Game.rooms["W26S21"];
+       var room = Game.rooms["W26S21"];
         //if(!room.memory.links )
             room.memory.links = {};
         if (!room.memory.links.info)

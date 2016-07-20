@@ -20,6 +20,7 @@ var gc = {
     MASS_ATTACK: "mass.attack",
     MOVE: "move",
     SUICIDE: "suicide",
+    WITHDRAW: "withdraw",
     
     //Races
     RACE_WORKER:  "worker",
@@ -91,6 +92,8 @@ var gc = {
     RANGE_UPGRADE: 3,
     RANGE_TRANSFER: 1,
     RANGE_ATTACK: 1,
+    RANGE_RANGED_ATTACK: 3,
+    RANGE_HEAL: 1,
     
     //task results
     RESULT_FINISHED: "finished",

@@ -91,12 +91,13 @@ var raceBase = {
         }
     },
 
-    occurrencesInBody: function(body, bodyPart) {
+    occurrencesInBody: function(body, bodyPart, active) {
         body = this.convertBodyToArray(body);
         if (undefined === body) return 0;
         var count = 0;
         for ( var i = 0 ; i < body.length ; i++ ) {
-            if (bodyPart == body[i]) count++;
+            if (bodyPart == body[i])
+                count++;
         }
         return count;
     },
@@ -176,10 +177,17 @@ var raceBase = {
             if (gc.ROLE_UNASSIGNED == Game.creeps[creepName].memory.role) {
                 this.recycleCreep(Game.creeps[creepName]);
             } //  if (Game.creeps[creepName].memory.role = ROLE_UNASSIGNED)
-            
         } //  for (var creepName in Game.creeps)
 
+        this.moveLinks();
+
           stats.upadateTick();
+    },
+
+    moveLinks: function () {
+        var linkEntrance1 = Game.getObjectById("578fd0a01d5fe373181c40e4");
+        var linkStorage = Game.getObjectById("577ec1375a1c85636f551c4b");
+        linkEntrance1.transferEnergy(linkStorage);
     },
 
     recycleCreep: function (creep) {
@@ -189,15 +197,10 @@ var raceBase = {
             {
                 var liftimeFracLeft = (CREEP_LIFE_TIME - creep.ticksToLive)/ CREEP_LIFE_TIME;
                 var energyCreep = this.getEnergyFromBody(creep.body) * liftimeFracLeft;
-                console.log(creep,"recyle ticks" ,creep.ticksToLive, "frac"
-                    , liftimeFracLeft, "energy",energyCreep);
-
                 var usedCapacity = spawns[spawn].energyCapacity - spawns[spawn].energy;
                 var pctUsed = usedCapacity * 100 / spawns[spawn].energyCapacity;
- console.log(creep,"recyleCreep at spawn ",spawns[spawn], "usedCapacity", usedCapacity, "pctUsed>30", pctUsed);
                 if (pctUsed > this.REFILL_PERCENTAGE || usedCapacity > energyCreep) {
                     var rtv = spawns[spawn].recycleCreep(creep);
-                    console.log("recylce creep rtv",rtv);
                 }
             }
         } //for (var spawn in spawns )

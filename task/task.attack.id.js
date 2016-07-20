@@ -34,6 +34,7 @@ TaskAttackId.prototype.doTask = function(creep, task) {
     } else {
         target = Game.getObjectById(task.targetId);
     }
+    creep.rangedAttack(target);
     var result = creep.attack(target);
    // console.log(creep,"at",creep.pos,"attack",tasks.getTargetId(creep),"result",result);
     switch (result)

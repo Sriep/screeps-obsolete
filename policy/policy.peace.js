@@ -150,6 +150,9 @@ var policyPeace = {
         console.log(room,"updated supply level", roomOwned.calaculateSuplly(room)
             ,room.energyCapacityAvailable );
         routeBase.update(room);
+        if (room.name == "W26S21") {
+         //   this.initialisePolicy(currentPolicy);
+        }
        if (room.name == "W25S23") {
           //this.initialisePolicy(currentPolicy);
        }

@@ -31,10 +31,10 @@ var routesReset = {
             roomName,  // room
             "W25S21",  // source room
             "55db3189efa8e3fe66e04b78", // source id
-            "577a8dd4b973e61c594592dc", // offload id
-            9,
+            "578fd0a01d5fe373181c40e4", // offload id
+            12,
             true,
-            400
+            750
         );
         routeBase.attachRoute(roomName, gc.ROUTE_NEUTRAL_HARVEST,order);
 
@@ -42,10 +42,10 @@ var routesReset = {
             roomName,  // room
             "W25S21",  // source room
             "55db3189efa8e3fe66e04b79",
-            "577a8dd4b973e61c594592dc",
-            9,
+            "578fd0a01d5fe373181c40e4",
+            12,
             true,
-            250
+            350
         );
         routeBase.attachRoute(roomName, gc.ROUTE_NEUTRAL_HARVEST,order);
 
@@ -54,13 +54,13 @@ var routesReset = {
             "W26S22",
             "55db3176efa8e3fe66e04a55",
             "577a8dd4b973e61c594592dc",
-            9,
+            12,
             true,
             300
         );
         routeBase.attachRoute(roomName, gc.ROUTE_NEUTRAL_HARVEST,order);
 
-        var body = raceClaimer.body(3);
+        var body = raceClaimer.body(4);
         var actions = {
             room : "W26S22",
             action : "reserveController",
@@ -71,7 +71,7 @@ var routesReset = {
             roomName,
             actions,
             body,
-            500
+            600
         );
         routeBase.attachRoute("W26S21", gc.ROUTE_REMOTE_ACTIONS,order);
 
@@ -114,7 +114,7 @@ var routesReset = {
             "W26S22",
             "55db3176efa8e3fe66e04a54",
             "578b0055a0afe21522a4ddc6",
-            9,
+            fastWorkerSize,
             true,
             300
         );
@@ -138,7 +138,6 @@ var routesReset = {
         routeBase.resetRoutes(roomName);
         var fastWorkerSize = raceWorker.maxSizeRoom(room, true);
         var maxSwordsManSize = raceSwordsman.maxSize(room);
-
 
         var body = raceClaimer.body(2);
         var actions = {

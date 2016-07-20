@@ -44,7 +44,8 @@ TaskActions.prototype.Creep = {
     Heal: gc.HEAL,
     MassAttack: gc.MASS_ATTACK,
     Move: gc.MOVE,
-    Suicide: gc.SUICIDE
+    Suicide: gc.SUICIDE,
+    Withdraw: gc.WITHDRAW
 };
 
 TaskActions.prototype.isConflict =  function(prevActions, nextAction ) {

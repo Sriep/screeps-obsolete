@@ -415,7 +415,10 @@ var roleBase = {
    
     run: function(creep) {
 
-        if (creep.memory.tasks && creep.memory.tasks.tasklist) {
+        if (!creep.memory.tasks || !creep.memory.tasks.tasklist) {
+            roleBase.switchRoles(creep, gc.ROLE_FLEXI_STORAGE_PORTER);
+        return;
+        }
 
 
 
@@ -434,7 +437,7 @@ var roleBase = {
             //  console.log("---------------------------------------------------");
                 return;
           // }
-        }
+    //    }
         if (creep.memory.role === undefined){
             creep.memory.role = gc.ROLE_BUILDER;
            // console.log(creep , "LLLLLLLLLLLLLOST ROLE")
@@ -513,7 +516,11 @@ var roleBase = {
         if (undefined === module) {
             return false;
         }
-        console.log(creep,"role",role,"module",module)
+        console.log(creep,"role",role,"module",module);
+
+        console.log(creep,"creep.memory",creep.memory);
+       // if (creep.name = "Cameron") creep.suicide();
+
         if (undefined === creep.memory.tasks)
             creep.memory.tasks = {};
         tasks.setTargetId(creep,undefined);

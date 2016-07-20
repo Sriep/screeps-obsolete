@@ -44,6 +44,8 @@ TaskMovePos.prototype.doTask = function(creep, task) {
    // console.log(creep,"In TaskMovePos");
     //task.x = task.roomPos.x;
     //task.y = task.roomPos.y;
+    if (undefined == task.roomPos)
+        return gc.RESULT_FINISHED;
     task.roomName = task.roomPos.roomName;
     if (creep.room.name == task.roomPos.roomName
         && !TaskMoveRoom.prototype.atBorder(creep.pos.x,creep.pos.y)) {

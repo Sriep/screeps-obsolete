@@ -24,31 +24,32 @@ function TaskStorageLinkerMiner (storageId, storageLinkId, mineralId, resourceMi
 
 TaskStorageLinkerMiner.prototype.doTask = function(creep, task) {
 
-  //  console.log(creep,"storageId",task.storageId
-   //                 ,"storageLinkId",task.storageLinkId
-   //                 ,"mineralId",task.mineralId)
+    //  console.log(creep,"storageId",task.storageId
+    //                 ,"storageLinkId",task.storageLinkId
+    //                 ,"mineralId",task.mineralId)
     var transferEnergy;
-    if (creep.carry.energy != 0) {
-        transferEnergy = true
-    } else {
-        transferEnergy = false
-    }
+    transferEnergy = creep.carry.energy != 0;
 
-    var storageLink =  Game.getObjectById(task.storageLinkId);
+    var storageLink = Game.getObjectById(task.storageLinkId);
     if (!storageLink) {
-        console.log(creep,"cant find link", "id",task.storageLinkId,storageLink
-            , "id mineral",task.mineralId, mineral );
+        console.log(creep, "cant find link", "id", task.storageLinkId, storageLink
+            , "id mineral", task.mineralId, mineral);
     }
 
-    var mineral =  Game.getObjectById(task.mineralId);
+    var mineral = Game.getObjectById(task.mineralId);
     if (!mineral) {
-        console.log(creep,"cant find mineral","id", task.mineralId,mineral);
-       // creep.say("help source");
-       // return gc.RESULT_FAILED;
+        console.log(creep, "cant find mineral", "id", task.mineralId, mineral);
+        // creep.say("help source");
+        // return gc.RESULT_FAILED;
     }
+    var storage = Game.getObjectById(task.storageId);
 
-    creep.harvest(mineral);
-
+    if (!storage || storage.structureType != STRUCTURE_STORAGE) {
+        creep.harvest(mineral);
+    } else if (RESOURCE_ENERGY == mineral
+        || _.sum(storage.store) < 0.8 *  storage.storeCapacity ) {
+        creep.harvest(mineral);
+    }
 
     //storageLink.transferEnergy(creep);
     creep.withdraw(storageLink, RESOURCE_ENERGY);
