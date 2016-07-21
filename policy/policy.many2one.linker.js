@@ -205,15 +205,16 @@ var policyMany2oneLinker = {
         });
 
         if (0 == repairers.length) {
-            var porters = _.filter(Game.creeps, function (creep) {
-                return (creep.memory.policyId == currentPolicy.id
-                &&  creep.memory.role == gc.ROLE_FLEXI_STORAGE_PORTER );
-            });
-            if (porters.length > gc.REPAIRER_THRESHOLD) {
+           // var porters = _.filter(Game.creeps, function (creep) {
+          //      return (creep.memory.policyId == currentPolicy.id
+          //      &&  creep.memory.role == gc.ROLE_FLEXI_STORAGE_PORTER );
+           // });
+            if (this.existingPorterParts(room) > gc.REPAIRER_THRESHOLD) {
+            //if (porters.length > gc.REPAIRER_THRESHOLD) {
                 this.spawnRepairer(room, currentPolicy)
             }
         } else if (1 == repairers.length) {
-            porters = _.filter(Game.creeps, function (creep) {
+            var porters = _.filter(Game.creeps, function (creep) {
                 return (creep.memory.policyId == currentPolicy.id
                 &&  creep.memory.role == gc.ROLE_FLEXI_STORAGE_PORTER );
             });
@@ -396,7 +397,7 @@ var policyMany2oneLinker = {
         return 0;
     },
 
-    existingPorterParts: function(currentPolicy) {
+    existingPorterParts: function (currentPolicy) {
         var parts = 0;
         var porters = _.filter(Game.creeps, function (creep) {
             return (creep.memory.policyId == currentPolicy.id

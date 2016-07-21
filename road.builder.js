@@ -34,8 +34,14 @@ var roadBuilder = {
 		var sources = room.find(FIND_SOURCES);
 		var controller = room.controller;
 		var spawns = room.find(FIND_MY_SPAWNS);
-		var structures = sources.concat(spawns);
+		var structures = room.find(FIND_MY_STRUCTURES, { filter: function (structure) {
+											return structure.structureType == STRUCTURE_EXTRACTOR
+												|| structure.structureType ==  STRUCTURE_STORAGE
+												|| structure.structureType ==  STRUCTURE_EXTRACTOR }
+		});
+		sources.concat(spawns);
 		structures.push(controller);
+
 		console.log(room,"buildroads betwen",structures);
 		for (var i = 0 ; i < structures.length ; i++ ){
 			for (var j = 0 ; j < structures.length ; j++ ){
@@ -44,16 +50,35 @@ var roadBuilder = {
 				}
 			}
 		}
-
 	}
-
 };
 
 module.exports = roadBuilder;
+/*
+var sources = room.find(FIND_SOURCES);
+var controller = room.controller;
+var spawns = room.find(FIND_MY_SPAWNS);
+var structures = sources.concat(spawns);
+if (room.storage)
+	structures.push(FIND_MY_STRUCTURES, "");
+
+var extractor = find(FIND_MY_STRUCTURES, {
+	filter: {structureType: STRUCTURE_EXTRACTOR}
+});
+
+structures.push(controller);
+console.log(room,"buildroads betwen",structures);
+for (var i = 0 ; i < structures.length ; i++ ){
+	for (var j = 0 ; j < structures.length ; j++ ){
+		if ( i != j) {
+			this.buildRoad(structures[i], structures[j]);
+		}
+	}
+}
+
 
 //
 //var roadBuilder = require('road.builder');
 //var from = Game.getObjectById("55db3176efa8e3fe66e04a52");  
 //var to =  Game.getObjectById("55db3176efa8e3fe66e04a50");  
-//roadBuilder.run( from, to );
-
+//roadBuilder.run( from, to );*/

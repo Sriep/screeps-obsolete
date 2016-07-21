@@ -405,14 +405,6 @@ var roomOwned = {
 
 module.exports = roomOwned;
 
-// var roomOwned = require("room.owned"); roomOwned.getHavestRoundTripLength(Game.rooms["Spawn1"]);
-
-//                var path = room.findPath(objs[i].pos, pos2, {ignoreCreeps: true, 
-//                    ignoreRoads: true, ignoreDestructibleStructures: true} ); 
-
-//
-
-
 
 
 

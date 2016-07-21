@@ -11,9 +11,12 @@ var gf = {
                 return structure in OBSTACLE_OBJECT_TYPES
             }
         });
+        var terrain = pos.lookFor(LOOK_TERRAIN);
+        obstacles.concat(terrain);
+        console.log(obstacles,"obstacles terrain",terrain);
         if (obstacles.length > 0)
             return false;
-        var creeps = pos.loogFor(LOOK_CREEPS);
+        var creeps = pos.lookFor(LOOK_CREEPS);
         return 0 == creeps.length;
     }
 /*

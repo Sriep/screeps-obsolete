@@ -23,23 +23,15 @@ var linkers = {
 
 
 
-    closeRooms: function (){
-        var myrooms = _.filter(Game.rooms, function (room) {
-            return room.controller && room.controller.my
-        });
-        var nearByRooms = new Set(myrooms);
-        for ( var i = 0 ; i < myrooms.length ; i++ )
-        {
-           var exits = Game.map.describeExits(myrooms[i].name);
-            for ( var j in exits) {
-                console.log( JSON.stringify(exits[j]), Game.rooms[exits[j]]);
-                nearByRooms.add(exits[j]);
-            }
-        }
-        console.log("scoutHarvestSites mine", nearByRooms);
-        return nearByRooms;
-    },
 
+
+
+
+};
+
+module.exports = linkers;
+
+/*
     examinRooms: function () {
         var rooms = this.closeRooms();
         rooms.forEach(function(roomName) {
@@ -53,21 +45,6 @@ var linkers = {
             }
         })
     },
-
-
-    flagMyOwnedRoom: function (room) {
-
-    },
-
-
-
-
-
-
-
-
-
-
 
     buildLinkContainersRoom: function (room) {
         var sources = room.find(FIND_SOURCES);
@@ -127,10 +104,8 @@ var linkers = {
         var centY = Math.round(y/array.length);
         return new RoomPosition(centX, centY, array[0].pos.roomName);
     }
+*/
 
-};
-
-module.exports = linkers;
 
 
 

@@ -158,6 +158,8 @@ var raceBase = {
         return energy;
     },
 
+
+
     countBodyParts: function (creeps, part) {
         var count = 0;
         for (var i in creeps) {

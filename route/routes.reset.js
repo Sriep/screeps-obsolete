@@ -75,6 +75,7 @@ var routesReset = {
         );
         routeBase.attachRoute("W26S21", gc.ROUTE_REMOTE_ACTIONS,order);
 
+       // (room, patrolRoom, startPos, body, respawnRate)
         var soldierBody = raceSwordsman.body(6);
         order = new RoutePatrolRoom(
             roomName,
@@ -164,7 +165,7 @@ var routesReset = {
             200
         );
         routeBase.attachRoute(roomName, gc.ROUTE_NEUTRAL_HARVEST,order);
-
+/*
         var soldierBody = raceSwordsman.body(maxSwordsManSize);
         order = new RoutePatrolRoom(
             roomName,
@@ -173,7 +174,7 @@ var routesReset = {
             soldierBody,
             1500
         );
-        routeBase.attachRoute(roomName, gc.ROUTE_PATROL_ROOM,order);
+        routeBase.attachRoute(roomName, gc.ROUTE_PATROL_ROOM,order);*/
     }
 };
 

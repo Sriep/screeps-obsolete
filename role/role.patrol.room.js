@@ -7,13 +7,8 @@
  * @author Piers Shepperson
  */
 var gc = require("gc");
-var raceSwordsman = require("race.swordsman");
-var PoolRequisition = require("pool.requisition");
-var TaskMovePos = require("task.move.pos");
 var TaskAttackId = require("task.attack.id");
-var TaskAttackTarget = require("task.attack.target");
 var TaskMoveFind = require("task.move.find");
-var TaskWait = require("task.wait");
 var TaskMoveRoom = require("task.move.room");
 var TaskMoveAttackPos = require("task.move.attack.pos");
 /**
@@ -31,7 +26,7 @@ var rolePatrolRoom = {
             moveToLocation = new TaskMoveRoom(patrolRoom);
         } else {
             //moveToLocation = new TaskMovePos(roomPos);
-            moveToLocation = new TaskMoveAttackPos;
+            moveToLocation = new TaskMoveAttackPos(roomPos);
         }
         var moveToTarget = new TaskMoveFind(gc.FIND_FUNCTION, gc.RANGE_ATTACK,
             "findEnemyTarget","role.patrol.room");

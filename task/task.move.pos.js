@@ -35,7 +35,11 @@ function TaskMovePos (roomPos, range, pathOps) {
 TaskMovePos.prototype.doTask = function(creep, task) {
     if (task.startRoom === undefined) { //First call to function. Initialise data.
         task.startRoom = creep.room.name;
-        task.roomName = task.roomPos.roomName;
+        if (undefined === task.roomPos) {
+            console.log(creep,"position undefined in TaskMovePos");
+            return gc.RESULT_FINISHED;
+        }
+        task.roomName = task.roomPos.roomName; // ToDP error
         task.x = task.roomPos.x;
         task.y = task.roomPos.y;
         //task.roomsToVisit = Game.map.findRoute(task.startRoom, task.roomPos.room, task.pathOps);
