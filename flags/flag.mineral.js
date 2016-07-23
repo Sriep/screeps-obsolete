@@ -10,7 +10,6 @@
 var policy = require("policy");
 var roomBase = require("room.base");
 /**
-/**
  * Abstract object to support the policy of minig a source in an unoccumpied
  * room
  * @module flagMineral

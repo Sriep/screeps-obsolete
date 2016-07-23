@@ -61,6 +61,10 @@ var ayrtepPad = {
     bottom: function () {
         console.log("START MY  PAD START MY  PAD");
 
+        console.log(OBSTACLE_OBJECT_TYPES);
+        console.log("length of obsitals",OBSTACLE_OBJECT_TYPES.indexOf("wall"));
+        console.log("Index of wall",OBSTACLE_OBJECT_TYPES.includes("wall"));
+
         //  var route = Game.map.findRoute("W26S21", "W27S21");
         //   console.log("route between my rooms", JSON.stringify(route));
     //    cpuUsage.updateCpuUsage();
@@ -70,8 +74,8 @@ var ayrtepPad = {
         var w25s22 = Game.rooms["W25S22"];
         var w25s23 = Game.rooms["W25S23"];
         var w25s21 = Game.rooms["W25S21"];
-/*
-        var pos = new RoomPosition(33,19,w25s23.name);
+
+       /* var pos = new RoomPosition(33,19,w25s23.name);
         console.log(JSON.stringify(pos),"is it walkable",gf.isWalkable(pos));
         pos = new RoomPosition(25,24,w25s23.name);
         console.log(JSON.stringify(pos),"is it walkable",gf.isWalkable(pos));
@@ -97,7 +101,7 @@ var ayrtepPad = {
         for ( var i in Game.flags) {
           //  console.log(i,"flag ", Game.flags[i].pos);
         //    Game.flags[i].remove();
-           console.log(Game.flags[i].pos,i, JSON.stringify(Game.flags[i].memory));
+         //  console.log(Game.flags[i].pos,i, JSON.stringify(Game.flags[i].memory));
         }
         //roomBase.examineRooms();
        // flagBase.run();

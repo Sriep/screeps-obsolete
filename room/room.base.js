@@ -50,19 +50,26 @@ var roomBase = {
                 flagName = sources[i].id;
                 sources[i].pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_SOURCE_COLOUR);
                 Game.flags[flagName].memory.type = gc.FLAG_SOURCE;
-                Game.flags[flagName].memory.upgrade = (sources.length >= 2);
+                Game.flags[flagName].memory.resourceType = RESOURCE_ENERGY;
+                Game.flags[flagName].memory.energyCapacity = sources[i].energyCapacity;
+                if (room.controller && sources.length >= 2  && !this.isMyRoom(room.name)) {
+                    Game.flags[flagName].memory.upgradeController = true;
+                }
             }
             if (room.controller) {
                 flagName = room.controller.id;
                 room.controller.pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_CONTROLLER_COLOUR);
                 Game.flags[flagName].memory.type = gc.FLAG_CONTROLLER;
-                Game.flags[flagName].memory.reserve = (sources.length >= 2);
+                if (!this.isMyRoom(room.name)) {
+                    Game.flags[flagName].memory.upgradeController = (sources.length >= 2);
+                }
             }
             var minerals = room.find(FIND_MINERALS);
             for ( i in minerals ) {
                 flagName =  minerals[i].id;
                 minerals[i].pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_MINERAL_COLOUR);
                 Game.flags[flagName].memory.type = gc.FLAG_MINERAL;
+                Game.flags[flagName].memory.resourceType = minerals[i].mineralType;
             }
             var keeperLairs = room.find(FIND_MY_STRUCTURES, {
                 filter: { structureType: STRUCTURE_KEEPER_LAIR }

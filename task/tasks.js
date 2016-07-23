@@ -49,8 +49,7 @@ var tasks = {
            //     console.log(creep,"tasks.doTasks",JSON.stringify(task));
                 return;
             }
-            var moduleName = "task." + task.taskType;
-            var taskModule = require(moduleName);
+
             if (task.pickup) {
                 this.pickUpLooseEnergy(creep);
                 doneActions.actions.add(gc.PICKUP);
@@ -59,7 +58,8 @@ var tasks = {
            // creep.say(task.taskType);
             var result;
             if (!TaskActions.prototype.isConflict(doneActions, task.conflicts)) {
-
+                var moduleName = "task." + task.taskType;
+                var taskModule = require(moduleName);
                 result = taskModule.prototype.doTask(creep, task, doneActions);
 
             //    console.log(creep, "done", task.taskType,"Task, return", result);

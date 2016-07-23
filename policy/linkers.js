@@ -16,15 +16,24 @@ var roomOwned = require("room.owned");
 
 var linkers = {
     LINK_TO_SOURCE_RANGE: 2,
-    TWO_MOVES: [{x :2, y:2}, {x:2,y:1},{x :2, y:0}, {x:2,y:-1}, {x :2, y:-2},
-                 {x :1, y:2}, {x:0,y:2},{x :-1, y:2}, {x:-2,y:2},
-                 {x:-2,y:1},{x :-2, y:0}, {x:-2,y:-1}, {x :-2, y:-2},
-                   {x :1, y:-2}, {x:0,y:-2},{x :-1, y:-2} ],
-
-
-
-
-
+   /* TWO_MOVES: [
+        {x :2, y:2},
+        {x:2,y:1},
+        {x :2, y:0},
+        {x:2,y:-1},
+        {x :2, y:-2},
+        {x :1, y:2},
+        {x:0,y:2},
+        {x :-1, y:2},
+        {x:-2,y:2},
+        {x:-2,y:1},
+        {x :-2, y:0},
+        {x:-2,y:-1},
+        {x :-2, y:-2},
+        {x :1, y:-2},
+        {x:0,y:-2},
+        {x :-1, y:-2}
+    ],*/
 
 
 };
@@ -32,20 +41,6 @@ var linkers = {
 module.exports = linkers;
 
 /*
-    examinRooms: function () {
-        var rooms = this.closeRooms();
-        rooms.forEach(function(roomName) {
-            if (!Game.rooms[roomName].controller ||
-                !Game.rooms[roomName].controller.owner) {
-                flagNeutralRooom(Games.rooms[roomName])
-            } else if(Game.rooms[roomName].controller.my) {
-                flagMyOwnedRoom(Games.rooms[roomName]);
-            } else {
-                planInvasion(Games.rooms[roomName]);
-            }
-        })
-    },
-
     buildLinkContainersRoom: function (room) {
         var sources = room.find(FIND_SOURCES);
         var dumps = room.find(FIND_STRUCTURES, function (structure) {

@@ -64,6 +64,8 @@ var gc = {
     TASK_ACTION_TARGET: "action.target",
     TASK_SWITCH_OWNER: "switch.owner",
     TASK_MOVE_ATTACK_POS: "move.attack.pos",
+    TASK_FIND_MOVE_LINKER_POS: "find.move.linker.pos",
+    TASK_FLEXI_LINK:    "task.flexi.link",
 
 
 //Offload switch task's states
@@ -132,6 +134,14 @@ var gc = {
     ROUTE_PATROL_ROOM: "patrol.room",
     ROUTE_REMOTE_ACTIONS: "remote.actions",
     ROUTE_GIFT_CREEP: "gift.creep",
+
+    // Linker types
+    LINKER_DUMP: "linker.dump",
+    LINKER_REPAIR_DUMP: "linker.repair.dump",
+    LINKER_LINK_LINK: "linker.link.link",
+    LINKER_LINK_DUMP: "linker.link.dump",
+    LINKER_DUMP_LINK_DUMP: "linker.dump.link.dump",
+    LINKER_BUILD: "linker.build",
     
     //misc
     LINKING_WORKER_SIZE: 5,
@@ -156,7 +166,46 @@ var gc = {
     //Flexi storage mode
    // FLEXIMODE_STORAGE: 0,
     FLEXIMODE_CONTAINER: 1,
-    FLEXIMODE_HARVEST: 2
+    FLEXIMODE_HARVEST: 2,
+
+    // For find spots to put a linker. B
+    // Between resource node and resource dump
+    ADJACENCIES: {
+        "2" : {
+            "2"  : [ { dx : 1, dy : 1 } ],
+            "1"  : [ { dx : 1, dy : 1 } , { dx : 1, dy : 0 } ],
+            "0"  : [ { dx : 1, dy : 1 } , { dx : 1, dy : 0 }, { dx : 1 , dy : -1 } ],
+            "-1" : [ { dx : 1, dy : 0 } , { dx : 1, dy : -1 } ],
+            "-2" : [ { dx : 1, dy : -1 } ]
+        },
+        "1" : {
+            "2"  : [ { dx : 1, dy : 1 } , { dx : 0 , dy : 1 } ],
+            "1"  : [ { dx : 0, dy : 1 } , { dx : 1, dy : 0 } ],
+            "0"  : [ { dx : 0, dy : 1 } , { dx : 1, dy : 1 }, { dx : 1 , dy : -1 }, { dx : 0 , dy : -1 } ],
+            "-1" : [ { dx : 1, dy : 0 } , { dx : 0, dy : -1 } ],
+            "-2" : [ { dx : 1, dy : -1 }, { dx : 0 , dy : -1 } ]
+        },
+        "0" : {
+            "2"  : [ { dx : -1, dy : 1 } , { dx : 0, dy : 1 }, { dx : 1 , dy : 1 } ],
+            "1"  : [ { dx : -1, dy : 0 } , { dx : -1, dy : 1 }, { dx : 1 , dy : 1 }, { dx : 1 , dy : 0 } ],
+            "-1" : [ { dx : -1, dy : 0 } , { dx : -1, dy : -11 }, { dx : 1 , dy : -1 }, { dx : 1 , dy : 0 } ],
+            "-2" : [ { dx : -1, dy : -1 } , { dx : 0, dy : -1 }, { dx : 1 , dy : -1 } ]
+        },
+        "-1" : {
+            "2"  : [ { dx : -1, dy : 1 } , { dx : 0 , dy : 1 } ],
+            "1"  : [ { dx : -1, dy : 0 } , { dx : 0, dy : 1 } ],
+            "0"  : [ { dx : 0, dy : 1 } , { dx : -1, dy : 1 }, { dx : -1 , dy : -1 }, { dx : 0 , dy : -1 } ],
+            "-1" : [ { dx : -1, dy : 0 } , { dx : 0, dy : -1 } ],
+            "-2" : [ { dx : -1, dy : -1 }, { dx : 0 , dy : -1 } ]
+        },
+        "-2" : {
+            "2"  : [ { dx : -1, dy : 1 } ],
+            "1"  : [ { dx : -1, dy : 1 } , { dx : -1, dy : 0 } ],
+            "0"  : [ { dx : -1, dy : 1 } , { dx : -1, dy : 0 }, { dx : -1 , dy : -1 } ],
+            "-1" : [ { dx : -1, dy : 0 } , { dx : -1, dy : -1 } ],
+            "-2" : [ { dx : -1, dy : -1 } ]
+        }
+    }
 
 };
 

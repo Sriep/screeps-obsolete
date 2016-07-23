@@ -35,7 +35,7 @@ TaskHarvestLinker.prototype.doTask = function(creep, task) {
       //  creep.say("help source");
         return gc.RESULT_FINISHED;
     }
-    creep.harvest(source)
+    creep.harvest(source);
 
     var sourceLink = Game.getObjectById(task.homeLinkId);
     if (!sourceLink) {

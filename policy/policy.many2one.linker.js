@@ -203,14 +203,13 @@ var policyMany2oneLinker = {
             return (creep.memory.policyId == currentPolicy.id
             &&  creep.memory.role == gc.ROLE_STORAGE_REPAIRER );
         });
+     //   console.log(room,"check repairer number", repairers.length);
 
         if (0 == repairers.length) {
-           // var porters = _.filter(Game.creeps, function (creep) {
-          //      return (creep.memory.policyId == currentPolicy.id
-          //      &&  creep.memory.role == gc.ROLE_FLEXI_STORAGE_PORTER );
-           // });
-            if (this.existingPorterParts(room) > gc.REPAIRER_THRESHOLD) {
-            //if (porters.length > gc.REPAIRER_THRESHOLD) {
+           // console.log("checkRepairer fond none existing parts",
+              //  this.existingPorterParts(currentPolicy)," > thershole",gc.REPAIRER_THRESHOLD);
+            if (this.existingPorterParts(currentPolicy) > gc.REPAIRER_THRESHOLD) {
+              //  console.log("checkRepairer Trying to spawn repaiere")
                 this.spawnRepairer(room, currentPolicy)
             }
         } else if (1 == repairers.length) {
@@ -403,9 +402,12 @@ var policyMany2oneLinker = {
             return (creep.memory.policyId == currentPolicy.id
                   &&  creep.memory.role == gc.ROLE_FLEXI_STORAGE_PORTER );
         });
+       // console.log("existingPorterParts number creeps",porters.length);
+        parts = 0;
         for (var i in porters) {
-            parts = parts + raceBase.occurrencesInBody(porters[i].body, WORK);
+            parts = parts + porters[i].getActiveBodyparts(WORK);
         }
+     //   console.log("existingPorterParts  parts",parts);
         return parts;
     },
 

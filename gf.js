@@ -2,58 +2,29 @@
  * Created by Piers on 19/07/2016.
  */
 "use strict";
+var gc = require("gc");
 
 var gf = {
 
-    isWalkable: function (pos) {
-        var obstacles = pos.lookFor(LOOK_STRUCTURES, {
-            filter: function (structure) {
-                return structure in OBSTACLE_OBJECT_TYPES
-            }
-        });
-        var terrain = pos.lookFor(LOOK_TERRAIN);
-        obstacles.concat(terrain);
-        console.log(obstacles,"obstacles terrain",terrain);
-        if (obstacles.length > 0)
-            return false;
-        var creeps = pos.lookFor(LOOK_CREEPS);
-        return 0 == creeps.length;
-    }
-/*
+ isEnterable: function (pos) {
         var atPos = pos.look();
         var SWAMP = "swamp";
         var PLAIN = "plain";
         for ( var i = 0 ; i < atPos.length ; i++ )
         {
             switch (atPos[i].type) {
-                case LOOK_CREEPS:
-                case LOOK_SOURCES:
-                case LOOK_MINERALS:
-                case LOOK_NUKES:
-                    if (atPos[i][atPos[i].type] !== undefined)
-                        return false;
-                    break;
                 case LOOK_TERRAIN:
                     if (atPos[i].terrain != PLAIN && atPos[i].terrain != SWAMP)
                         return false;
                     break;
                 case LOOK_STRUCTURES:
-                    if (atPos[i].structure.structureType == STRUCTURE_SPAWN
-                        || atPos[i].structure.structureType == STRUCTURE_EXTENSION
-                        || atPos[i].structure.structureType == STRUCTURE_WALL
-                        || atPos[i].structure.structureType == STRUCTURE_KEEPER_LAIR
-                        || atPos[i].structure.structureType == STRUCTURE_CONTROLLER
-                        || atPos[i].structure.structureType == STRUCTURE_LINK
-                        || atPos[i].structure.structureType == STRUCTURE_STORAGE
-                        || atPos[i].structure.structureType == STRUCTURE_TOWER
-                        || atPos[i].structure.structureType == STRUCTURE_POWER_BANK
-                        || atPos[i].structure.structureType == STRUCTURE_POWER_SPAWN
-                        || atPos[i].structure.structureType == STRUCTURE_EXTRACTOR
-                        || atPos[i].structure.structureType == STRUCTURE_LAB
-                        || atPos[i].structure.structureType == STRUCTURE_TERMINAL
-                        || atPos[i].structure.structureType == STRUCTURE_NUKER)
+                    if (OBSTACLE_OBJECT_TYPES.includes(atPos[i].structure.structureType))
                         return false;
                     break;
+                case LOOK_CREEPS:
+                case LOOK_SOURCES:
+                case LOOK_MINERALS:
+                case LOOK_NUKES:
                 case LOOK_ENERGY:
                 case LOOK_RESOURCES:
                 case LOOK_FLAGS:
@@ -62,9 +33,75 @@ var gf = {
             }
         }
         return true;
-    }*/
+    },
 
+    structureTypeInRange: function (pos, structureType, range) {
+        if (!range) range = 1;
+        var structures = Game.rooms[pos.roomName].find(FIND_MY_STRUCTURES, {
+            filter: { structureType: structureType }
+        });
+        var inRange = [];
+        for  ( var i = 0 ; i < structures.length ; i++ )  {
+            if ( pos.inRangeTo(structures[i], range) )
+                inRange.push(structures[i]);
+        }
+        return inRange;
+    },
+
+    isStructureTypeAtPos: function (pos, structureType) {
+        var atPos = pos.look();
+        for ( var i = 0 ; i < atPos.length ; i++ ) {
+            if (atPos[i].structure.structureType == structureType)
+                return true;
+        }
+        return false;
+    },
+
+    joinPointsBetween: function (pos1, pos2) {
+        var deltaX = pos1.x - pos2.x;
+        var deltaY = pos1.y - pos2.y;
+        var offsets = gc.ADJACENCIES[deltaX][deltaY];
+        var joinPos = [];
+        for (var i = 0 ; i < offsets.length ; i++ ) {
+            var pos = new RoomPosition( pos2.x + offsets[i].dx,
+                                        pos2.y + offsets[i].dy,
+                                        pos2.roomName );
+            if (gf.isEnterable(pos)) joinPos.push(pos);
+        }
+        return joinPos;
+    }
 };
 
 
 module.exports = gf;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
