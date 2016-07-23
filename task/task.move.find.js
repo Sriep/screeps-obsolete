@@ -45,7 +45,7 @@ TaskMoveFind.prototype.FindMethod = {
     FindFunction: gc.FIND_FUNCTION
 };
 
-TaskMoveFind.prototype.doTask = function(creep, task, actions) {
+TaskMoveFind.prototype.doTask = function(creep, task) {
    // console.log(creep,"In TaskMoveFind method", task.method, "task.findid"
    //     , task.findId,"target id",tasks.getTargetId(creep) );
    // console.log(creep,"fove find",task.findFunction,"module",task.findModule);
@@ -95,7 +95,7 @@ TaskMoveFind.prototype.doTask = function(creep, task, actions) {
                 break;
             case this.FindMethod.FindFunction:
                 var module = require(task.findModule);
-                target = module[task.findFunction](creep);
+                target = module[task.findFunction](creep, task);
             //    console.log(creep,"find function returned",target);
                 break;
             default:

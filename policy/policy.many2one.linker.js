@@ -189,7 +189,7 @@ var policyMany2oneLinker = {
         var room = Game.rooms[OldPolicy.room];
         var numLinks = room.memory.links.info.length;
      //   console.log(room,"readyForMAny2OneLinker numLinks",numLinks);
-        if ( policy.creepLifeTicks(OldPolicy) > 2000 ) {
+        if ( policy.creepLifeTicks(OldPolicy) > 1000 ) {
          //   console.log(room,"ready for linkers");
             return true;
         }
@@ -203,14 +203,15 @@ var policyMany2oneLinker = {
             return (creep.memory.policyId == currentPolicy.id
             &&  creep.memory.role == gc.ROLE_STORAGE_REPAIRER );
         });
-     //   console.log(room,"check repairer number", repairers.length);
+        console.log(room,"check repairer number", repairers.length);
 
         if (0 == repairers.length) {
            // console.log("checkRepairer fond none existing parts",
               //  this.existingPorterParts(currentPolicy)," > thershole",gc.REPAIRER_THRESHOLD);
             if (this.existingPorterParts(currentPolicy) > gc.REPAIRER_THRESHOLD) {
-              //  console.log("checkRepairer Trying to spawn repaiere")
+                console.log("checkRepairer Trying to spawn repairer")
                 this.spawnRepairer(room, currentPolicy)
+
             }
         } else if (1 == repairers.length) {
             var porters = _.filter(Game.creeps, function (creep) {
@@ -313,7 +314,6 @@ var policyMany2oneLinker = {
            return;
        }
 
-
         if (externalCommitments) {
             var build = poolSupply.nextRequisition(room.name);
             console.log(room, "about to build ", build.energy);
@@ -359,23 +359,7 @@ var policyMany2oneLinker = {
                     roleBase.switchRoles(creeps[i], gc.ROLE_FLEXI_STORAGE_PORTER);
                 }
             }
-           // if  ( creeps[i].memory.role != gc.ROLE_LINKER_SOURCE) {
-          //      sourceLink++;
-          //  }
-         //   if  ( creeps[i].memory.role != gc.ROLE_LINKER_MINER_STORAGE)  {
-         //       mineStorageLink++;
-         //   }
         } // for
-        //console.log(room, "checkRoles number sorcelinker",sourceLink,"storagelink", mineStorageLink);
-
-        /*
-         var fromLinks = 0;
-         var toLinks = 0;
-         var linkInfo = room.memory.links.info;
-         var linkCreeps = room.memory.links.linkCreeps;
-         var found = [];
-         for (var i = 0 ; i < linkCreeps) {
-         */
     },
 
     porterSize: function (room) {

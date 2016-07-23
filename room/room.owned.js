@@ -48,11 +48,11 @@ var roomOwned = {
                                 ignoreCreeps: true, 
                                 ignoreRoads: true,
                                 ignoreDestructibleStructures: true});
-                        console.log("two points " + obj1s[i].pos + obj2s[j].pos);
+                     //   console.log("two points " + obj1s[i].pos + obj2s[j].pos);
                         distance = distance + path.length;
                         journies = journies + 1;
-                        console.log("avDistanceBetween path len " + path.length + " distance " 
-                                + distance + " journies " + journies);
+                     //   console.log("avDistanceBetween path len " + path.length + " distance "
+                    //            + distance + " journies " + journies);
                     } //for ( var j in spawns )
                 } //for ( var i in sources ) {
                 distance = distance/journies; 

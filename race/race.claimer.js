@@ -24,7 +24,12 @@ var claimer = {
           //  body.push(MOVE);
         } // for
         return body;
+    },
+
+    maxSizeRoom: function(room) {
+        return Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE);
     }
-}
+
+};
 
 module.exports = claimer;

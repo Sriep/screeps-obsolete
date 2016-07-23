@@ -14,7 +14,7 @@ var TaskMoveRoom = require("task.move.room");
 var roleLinker = {
 
 
-        getTaskList: function(flagName) {
+        getTaskList: function(creep, flagName) {
             var flag = Game.flags[flagName];
             var taskList = [];
             var moveToRoom = new TaskMoveRoom(flag.pos.roomName);

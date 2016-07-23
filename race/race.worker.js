@@ -87,7 +87,6 @@ var raceWorker = {
         } else {
             return Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE);
         }
-
     },
 
     maxSizeFromEnergy: function(room)  {

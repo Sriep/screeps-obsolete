@@ -24,9 +24,9 @@ var roomBase = {
     // STRUCTURE_PORTAL, STRUCTURE_POWER_BANK, STRUCTURE_POWER_SPAWN
 
 
-    examineRooms: function () {
+    examineRooms: function (update) {
         for ( var room in Game.rooms ) {
-            this.flagRoom(Game.rooms[room]);
+            this.flagRoom(Game.rooms[room], force);
         }
         var nearByRooms = this.nearByRooms();
         nearByRooms.forEach( function (roomName) {
@@ -42,13 +42,14 @@ var roomBase = {
         });
     },
 
-    flagRoom: function (room) {
-        if (!room.memory.flagged) {
+    flagRoom: function (room, update) {
+        if (!room.memory.flagged || update) {
             var flagName;
             var sources = room.find(FIND_SOURCES);
             for ( var i in sources ) {
                 flagName = sources[i].id;
-                sources[i].pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_SOURCE_COLOUR);
+                if (!Game.flags[flagname])
+                    sources[i].pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_SOURCE_COLOUR);
                 Game.flags[flagName].memory.type = gc.FLAG_SOURCE;
                 Game.flags[flagName].memory.resourceType = RESOURCE_ENERGY;
                 Game.flags[flagName].memory.energyCapacity = sources[i].energyCapacity;
@@ -58,7 +59,8 @@ var roomBase = {
             }
             if (room.controller) {
                 flagName = room.controller.id;
-                room.controller.pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_CONTROLLER_COLOUR);
+                if (!Game.flags[flagname])
+                    room.controller.pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_CONTROLLER_COLOUR);
                 Game.flags[flagName].memory.type = gc.FLAG_CONTROLLER;
                 if (!this.isMyRoom(room.name)) {
                     Game.flags[flagName].memory.upgradeController = (sources.length >= 2);
@@ -67,16 +69,19 @@ var roomBase = {
             var minerals = room.find(FIND_MINERALS);
             for ( i in minerals ) {
                 flagName =  minerals[i].id;
-                minerals[i].pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_MINERAL_COLOUR);
+                if (!Game.flags[flagname])
+                    minerals[i].pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_MINERAL_COLOUR);
                 Game.flags[flagName].memory.type = gc.FLAG_MINERAL;
                 Game.flags[flagName].memory.resourceType = minerals[i].mineralType;
+                Game.flags[flagName].memory.extractor = gf.isStructureTypeAtPos(minerals[i].pos, STRUCTURE_EXTRACTOR);
             }
             var keeperLairs = room.find(FIND_MY_STRUCTURES, {
                 filter: { structureType: STRUCTURE_KEEPER_LAIR }
             });
             for ( i in keeperLairs ) {
                 flagName = keeperLairs[i].id;
-                keeperLairs[i].pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_KEEPERS_LAIR_COLOUR);
+                if (!Game.flags[flagname])
+                    keeperLairs[i].pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_KEEPERS_LAIR_COLOUR);
                 Game.flags[flagName].memory.type = gc.FLAG_KEEPERS_LAIR_COLOUR;
             }
             room.memory.flagged = true;
@@ -172,9 +177,9 @@ var roomBase = {
                     var entrance = this.exitToEntrance(exit, exits[i]);
                     var target = entrance.findClosestByRange(findType, Opts);
                     if (undefined !== target) {
-                     //   console.log("about to distance betwen pos",JSON.stringify(pos), JSON.stringify(target.pos) );
+                      //  console.log("about to distance betwen pos",JSON.stringify(pos), JSON.stringify(target.pos) );
                         var distance = this.distanceBetween(pos, target.pos);
-                      //  console.log("distance",distance );
+                   //     console.log("distance",distance );
                         if (!distanceClosest || distance < distanceClosest) {
                             distanceClosest = distance;
                             roomClosest = exits[i];

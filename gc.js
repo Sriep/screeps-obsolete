@@ -46,6 +46,7 @@ var gc = {
     ROLE_FLEXI_STORAGE_PORTER: "flexi.storage.porter",
     ROLE_PATROL_ROOM: "patrol.room",
     ROLE_GIFT: "gift",
+    ROLE_NEUTRAL_PORTER: "role.neutral.porter",
     
     //Tasks
     TASK_MOVE_FIND: "move.find",
@@ -134,6 +135,9 @@ var gc = {
     ROUTE_PATROL_ROOM: "patrol.room",
     ROUTE_REMOTE_ACTIONS: "remote.actions",
     ROUTE_GIFT_CREEP: "gift.creep",
+    ROUTE_LINKER: "linker",
+    ROUTE_NEUTRAL_PORTER: "neutral.porter",
+    ROUTE_FLEXI_STORAGE_PORTER: "route.flexi.storage.porter",
 
     // Linker types
     LINKER_DUMP: "linker.dump",
@@ -153,6 +157,16 @@ var gc = {
     STORAGE_STOCKPILE: 30000,
     OLD_CREEP_LIFETOLIVE: 200,
     LINKER_AGE_THRESHOLD: 10,
+    DEFAULT_ROUTE_PRIORITY: 10,
+    REVERSE_CLAIM_SAFETYNET: 100,
+    MIDDLE_AGE_CREEP_LIFE_TO_LIVE: 750,
+
+    //Build priorities
+    PRIORITY_EMERGENCY_HOME_PORTER: 1,
+    PRIORITY_LINKER: 2,
+    PRIORITY_NEUTRAL_PORTER: 5,
+    PRIORITY_HOME_PORTER: 3,
+    PRIORITY_REVERSE_CONTROLLER: 5,
 
     //flag colours
     FLAG_PERMANENT_COLOUR: COLOR_BLUE,
@@ -205,7 +219,27 @@ var gc = {
             "-1" : [ { dx : -1, dy : 0 } , { dx : -1, dy : -1 } ],
             "-2" : [ { dx : -1, dy : -1 } ]
         }
-    }
+    },
+
+    TWO_MOVES: [
+     {x :2, y:2},
+     {x:2,y:1},
+     {x :2, y:0},
+     {x:2,y:-1},
+     {x :2, y:-2},
+     {x :1, y:2},
+     {x:0,y:2},
+     {x :-1, y:2},
+     {x:-2,y:2},
+     {x:-2,y:1},
+     {x :-2, y:0},
+     {x:-2,y:-1},
+     {x :-2, y:-2},
+     {x :1, y:-2},
+     {x:0,y:-2},
+     {x :-1, y:-2}
+     ]
+
 
 };
 

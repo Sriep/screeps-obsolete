@@ -24,12 +24,17 @@ var routeBase = {
         NeutralHarvest : gc.ROUTE_NEUTRAL_HARVEST
     },
 
-    attachRoute: function (roomName, routeType, order) {
+    attachRoute: function (roomName, routeType, order, priority) {
         var room = Game.rooms[roomName];
         console.log(room,"attachRoute",routeType);
         if (!this.checkSetup(room)) return false;
         module = this.moduleFromRoute(routeType);
         order.id = this.getNextRouteId(room);
+        if (priority === undefined) {
+            order.priority = gc.DEFAULT_ROUTE_PRIORITY;
+        } else {
+            order.priority = priority;
+        }
         console.log(room,routeType,"attachRoute",JSON.stringify(order));
         room.memory.routes.details[order.id] = order;
         return true;
@@ -67,15 +72,32 @@ var routeBase = {
         this.checkSetup(room);
         var mostOverdueRoute;
         var details = room.memory.routes.details;
+        var priority;
         for ( var i in details )  {
          //   console.log(room,"routeBase  nextBuild i",i,"details", JSON.stringify(details[i]));
             if (details[i].due <= 0) {
-                if (mostOverdueRoute === undefined
-                    || details[i].due < mostOverdueRoute.due) {
-                    mostOverdueRoute = details[i]
-                }
-            }
-        }
+                if (undefined === priority) {
+                    priority = details[i].priority;
+                    mostOverdueRoute = details[i];
+                } else if (details[i].priority !== undefined) {
+                    if (  details[i].priority < priority ) {
+
+                        priority = details[i].priority;
+                        mostOverdueRoute = details[i];
+                    } else  if ( priority == details[i].priority
+                        && ( mostOverdueRoute === undefined
+                        || details[i].due < mostOverdueRoute.due) ) {
+
+                        mostOverdueRoute = details[i];
+                    }
+                } // else if
+
+             //   if (mostOverdueRoute === undefined
+             //       || details[i].due < mostOverdueRoute.due) {
+             //       mostOverdueRoute = details[i]
+             //   }
+            } // if (details[i].due <= 0)
+        } // for
         return mostOverdueRoute;
     },
 

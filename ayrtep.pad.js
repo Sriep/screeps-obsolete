@@ -101,9 +101,9 @@ var ayrtepPad = {
         for ( var i in Game.flags) {
           //  console.log(i,"flag ", Game.flags[i].pos);
         //    Game.flags[i].remove();
-         //  console.log(Game.flags[i].pos,i, JSON.stringify(Game.flags[i].memory));
+      //     console.log(Game.flags[i].pos,i, JSON.stringify(Game.flags[i].memory));
         }
-        //roomBase.examineRooms();
+       // roomBase.examineRooms();
        // flagBase.run();
 
         //var w25s21 = Game.rooms["W25S21"];
@@ -175,10 +175,10 @@ var ayrtepPad = {
 
 
         //routeBase.attachRoute("W26S21", gc.ROUTE_NEUTRAL_HARVEST,order);
-
-     //   routeBase.showRoutes("W26S21");
-    //    routeBase.showRoutes("W25S22");
-    //    routeBase.showRoutes("W25S23");
+    console.log("---------------------------------------------------------------------");
+      // //routeBase.showRoutes("W26S21");
+      //  routeBase.showRoutes("W25S22");
+      //  routeBase.showRoutes("W25S23");
       //  w25s23
         //var details = w26s21.memory.routes.details[5]; //55db3189efa8e3fe66e04b78
       //  var details = w25s23.memory.routes.details[2]; //55db3189efa8e3fe66e04b78

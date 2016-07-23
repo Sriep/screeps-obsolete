@@ -14,18 +14,23 @@ var tasks = require("tasks");
  */
 
 
-function TaskLoadup (resourceId) {
+function TaskLoadup (resourceId, targetId) {
     this.taskType = gc.TASK_LOADUP;
     this.conflicts = gc.TRANSFER;
     this.resourceId = resourceId;
+    this.targetId = targetId;
     this.pickup = true;
     this.loop = true;
 }
 
 TaskLoadup.prototype.doTask = function(creep, task) {
  //   console.log(creep,"task loadup")
-    var storage =  Game.getObjectById(tasks.getTargetId(creep));
-  //  console.log(creep,"TaskLoadUp, storage",storage,"targetId",tasks.getTargetId(creep));
+    if (!task.targetId) {
+        var storage =  Game.getObjectById(tasks.getTargetId(creep));
+    } else {
+        storage = task.targetId;
+    }
+
     if (!storage) {
       //  console.log(creep,"Cant find storage");
         tasks.setTargetId(creep,undefined);

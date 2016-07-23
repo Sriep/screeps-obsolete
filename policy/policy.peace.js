@@ -162,31 +162,27 @@ var policyPeace = {
         var creeps = _.filter(Game.creeps);
         console.log(room, "policy id", currentPolicy.id,"creeps", creeps.length);
 
-          if (room.memory.links !== undefined
-            && room.memory.links.info !== undefined
-            && room.memory.links.info.length > 0
-            && policyMany2oneLinker.readyForMAny2OneLinker(currentPolicy)) {
-          //  console.log(room, "checkLinks and nonLinkBuilds");
-            policyMany2oneLinker.checkLinks(room, currentPolicy);
+        var testNewCode = false;
+        if (testNewCode) {
+            var linkers = require("linkers");
+            linkers.attachFlaggedRoutes(room, currentPolicy);
+            linkers.attachFlexiStoragePorters(room, currentPolicy);
+            policyMany2oneLinker.checkRepairer(room, currentPolicy);
+            linkers.attachFlaggedReverseController(room, currentPolicy);
+        }
+
+        if (room.memory.links !== undefined
+                && room.memory.links.info !== undefined
+                && room.memory.links.info.length > 0) {
+
+            if (policyMany2oneLinker.readyForMAny2OneLinker(currentPolicy)) {
+                policyMany2oneLinker.checkLinks(room, currentPolicy);
+            }
             policyMany2oneLinker.checkRepairer(room, currentPolicy);
             policyMany2oneLinker.nonLinkBuilds(room, currentPolicy);
-        } else {
-         //   console.log(room, "calculateAndAssignRoles");
-            if (policyMany2oneLinker.notEnoghUnistForLinks(room, currentPolicy)) {
-             //   console.log("BREAKING UP LINKERS");
-                policyMany2oneLinker.breakLinks(room, currentPolicy);
-                policyMany2oneLinker.nonLinkBuilds(room, currentPolicy);
-               // this.calculateAndAssignRoles(room, currentPolicy);
-            } else {
-                 policyMany2oneLinker.checkLinks(room, currentPolicy);
-                 policyMany2oneLinker.checkRepairer(room, currentPolicy);
-                 policyMany2oneLinker.nonLinkBuilds(room, currentPolicy);
-            }
-      //    this.calculateAndAssignRoles(room, currentPolicy);
+
         }
-    //    console.log(room,"about to callnpcInvaderBattle.defendRoom");
         npcInvaderBattle.defendRoom(room);
-     //   console.log(room,"AftercallnpcInvaderBattle.defendRoom in rescue")
     },
 
     calculateAndAssignRoles: function (room, currentPolicy) {

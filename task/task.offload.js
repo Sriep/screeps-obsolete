@@ -118,7 +118,7 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
                 return gc.RESULT_FINISHED;
             } else {
                 if (task.canUseAlternative) {
-                    tasks.setTargetId(creep, this.offloadTargetId(creep));
+                    tasks.setTargetId(creep, undefined);
                 }
                 return gc.RESULT_ROLLBACK;
             }

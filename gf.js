@@ -69,7 +69,23 @@ var gf = {
             if (gf.isEnterable(pos)) joinPos.push(pos);
         }
         return joinPos;
+    },
+
+    isFull: function (dump) {
+        switch (dump.structureType) {
+            case  STRUCTURE_CONTAINER:
+            case  STRUCTURE_STORAGE:
+            case  STRUCTURE_TERMINAL:
+                return dump.storeCapacity == _.sum(dump.store);
+            case STRUCTURE_EXTENSION:
+            case STRUCTURE_SPAWN:
+            case  STRUCTURE_LINK:
+                return dump.energyCapacity == dump.energy;
+            default:
+                return undefined;
+        }
     }
+
 };
 
 
