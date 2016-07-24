@@ -82,6 +82,7 @@ var raceWorker = {
     },
 
     maxSizeRoom: function(room, fast) {
+    //    console.log("race.worker.maxSizeRoom",room.energyCapacityAvailable,this.BLOCKSIZE);
         if (fast) {
             return Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE_FAST);
         } else {
@@ -90,8 +91,8 @@ var raceWorker = {
     },
 
     maxSizeFromEnergy: function(room)  {
-        console.log(room,"room.energyAvailable",room.energyAvailable,"blocksize",this.BLOCKSIZE,
-        "result",Math.floor(room.energyAvailable / this.BLOCKSIZE));
+      //  console.log(room,"room.energyAvailable",room.energyAvailable,"blocksize",this.BLOCKSIZE,
+    //    "result",Math.floor(room.energyAvailable / this.BLOCKSIZE));
         return Math.floor(room.energyAvailable / this.BLOCKSIZE);
     },
 

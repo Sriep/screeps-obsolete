@@ -29,7 +29,7 @@ var tasks = {
         Reset: gc.RESULT_RESET
     },
     
-    MAX_TASK_ACTIONS: 5,
+    //MAX_TASK_ACTIONS: gc.MAX_TASK_ACTIONS,
     
     
     doTasks: function(creep) {
@@ -39,7 +39,7 @@ var tasks = {
         var actionCount = 0;
         while ((result == this.Result.Finished || result == this.Result.Failed //|| result == this.Result.Rollback
                     || result == this.Result.Rollback)
-                            && taskList.length > 0 && actionCount++ < this.MAX_TASK_ACTIONS) {
+                            && taskList.length > 0 && actionCount++ < gc.MAX_TASK_ACTIONS) {
             var task = taskList[0];
             while (task !== undefined && task === null) {
                 taskList.shift();
@@ -62,7 +62,7 @@ var tasks = {
                 var taskModule = require(moduleName);
                 result = taskModule.prototype.doTask(creep, task, doneActions);
 
-            //    console.log(creep, "done", task.taskType,"Task, return", result);
+           //     console.log(creep, "done", task.taskType,"Task, return", result);
                 if (this.Result.Finished == result) {
                     doneActions.actions.add(task.conflicts);
                 }
@@ -134,15 +134,22 @@ var tasks = {
     getTargetId: function (creep) {
         return creep.memory.tasks.targetId;
     },
-    
+
     setTargetId: function (creep, targetId) {
-        if (undefined === targetId)  {
+       // console.log(creep, " setTargetId in task",targetId, JSON.stringify(targetId));
+        if (undefined === targetId) {
             creep.memory.tasks.targetId = undefined
-        } else if (undefined === targetId.id) {
+        } else if (typeof targetId == "string") {
             creep.memory.tasks.targetId = targetId;
         } else {
             creep.memory.tasks.targetId = targetId.id;
         }
+
+     //   } else if (undefined === targetId.id) {
+     //       creep.memory.tasks.targetId = targetId;
+    //    } else {
+    ///        creep.memory.tasks.targetId = targetId.id;
+    //    }
     },
 /*
     setHomeLinkId: function (creep, homeLinkId) {

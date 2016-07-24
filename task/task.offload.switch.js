@@ -85,7 +85,7 @@ TaskOffloadSwitch.prototype.fullistContainer = function (creep) {
 TaskOffloadSwitch.prototype.moveToStorage = function (creep)
 {
     var moveToStorage;
-    var storage = creep.room.storage;
+   // var storage = creep.room.storage;
 
     var energyDumps = creep.room.find(FIND_STRUCTURES, {
                         filter: function(object) {
@@ -164,7 +164,7 @@ TaskOffloadSwitch.prototype.switchToUpgradeing = function (creep) {
     var moveToController = new TaskMoveFind(gc.FIND_ID,gc.RANGE_UPGRADE, creep.room.controller.id);
     var upgradeController = new TaskOffload(gc.UPGRADE_CONTROLLER);
 
-    var storage = creep.room.storage;
+    //var storage = creep.room.storage;
     //var moveToStorage = new TaskMoveFind(gc.FIND_ID,gc.RANGE_TRANSFER,storage.id);
     var moveToStorage  = TaskOffloadSwitch.prototype.moveToStorage(creep);
 

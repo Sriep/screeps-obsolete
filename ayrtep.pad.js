@@ -24,12 +24,11 @@ var roomOwned = require("room.owned");
 var policy = require("policy");
 var policyPeace = require("policy.peace");
 var stats = require("stats");
-var roleBase = require("role.base");
+//var roleBase = require("role.base");
 var gc = require("gc");
 var PoolRequisition = require("pool.requisition");
 var policyMany2oneLinker = require("policy.many2one.linker");
 var raceClaimer = require("race.claimer");
-var policy = require("policy");
 var PoolRequisition = require("pool.requisition");
 var TaskMoveFind = require("task.move.find");
 var TaskMoveRoom = require("task.move.room");
@@ -42,6 +41,7 @@ var routeBase = require("route.base");
 var RouteRemoteActions = require("route.remote.actions");
 var roomBase = require("room.base");
 var flagBase = require("flag.base");
+var roleLinker =  require("role.linker");
 
 var ayrtepPad = {
     top: function () {
@@ -49,21 +49,29 @@ var ayrtepPad = {
         var roomcount = 0, creepcount = 0;
         for (var roomIndex in Game.rooms) {
             var currentRoom = Game.rooms[roomIndex];
-            console.log("Room " + roomIndex + " has " + currentRoom.energyAvailable + " energy and "
-                + currentRoom.energyCapacityAvailable  + " max energy capacity");
+        //    console.log("Room " + roomIndex + " has " + currentRoom.energyAvailable + " energy and "
+        //        + currentRoom.energyCapacityAvailable  + " max energy capacity");
             var spawns = currentRoom.find(FIND_MY_SPAWNS);
             roomcount++;
         }
+       // console.log("------------------------------ flags -------------------------------");
+        for ( var i in Game.flags) {
+            console.log(Game.flags[i].pos,i, JSON.stringify(Game.flags[i].memory));
+        };
+        console.log("------------------------------ routes ---------------------------------------");
+        routeBase.showRoutes("sim");
+        console.log("---------------------------------------------------------------------");
        // for (var i in Game.creeps) { creepcount++  }
-      //  console.log("Have", roomcount, "rooms and", creepcount, "creeps")
+       // console.log("Have", roomcount, "rooms and", creepcount, "creeps")
     },
     
     bottom: function () {
         console.log("START MY  PAD START MY  PAD");
 
-        console.log(OBSTACLE_OBJECT_TYPES);
-        console.log("length of obsitals",OBSTACLE_OBJECT_TYPES.indexOf("wall"));
-        console.log("Index of wall",OBSTACLE_OBJECT_TYPES.includes("wall"));
+     //   var roleLinker = require("role.linker");
+     //   var taskList = roleLinker.getTaskList(undefined,"57589753e1b559579a707197");
+     //   console.log("role.linker get task list", taskList);
+        //var flag = Game.flags[flagName];
 
         //  var route = Game.map.findRoute("W26S21", "W27S21");
         //   console.log("route between my rooms", JSON.stringify(route));
@@ -101,7 +109,7 @@ var ayrtepPad = {
         for ( var i in Game.flags) {
           //  console.log(i,"flag ", Game.flags[i].pos);
         //    Game.flags[i].remove();
-      //     console.log(Game.flags[i].pos,i, JSON.stringify(Game.flags[i].memory));
+       //    console.log(Game.flags[i].pos,i, JSON.stringify(Game.flags[i].memory));
         }
        // roomBase.examineRooms();
        // flagBase.run();
@@ -179,13 +187,14 @@ var ayrtepPad = {
       // //routeBase.showRoutes("W26S21");
       //  routeBase.showRoutes("W25S22");
       //  routeBase.showRoutes("W25S23");
+      //  routeBase.showRoutes("sim");
       //  w25s23
         //var details = w26s21.memory.routes.details[5]; //55db3189efa8e3fe66e04b78
       //  var details = w25s23.memory.routes.details[2]; //55db3189efa8e3fe66e04b78
       //  details.respawnRate = 350;
         //var details = w26s21.memory.routes.details[3]; //55db3189efa8e3fe66e04b79
         //details.respawnRate = 700;
-
+   // console.log(Game.creeps["Nolan"].room.name);
       //  var w26s21 = Game.rooms["W26S21"];
         //var details = w26s21.memory.routes.details.splice(5);
         //var details2 = w26s21.memory.routes.details[5] = undefined;

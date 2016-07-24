@@ -189,7 +189,8 @@ var raceBase = {
     moveLinks: function () {
         var linkEntrance1 = Game.getObjectById("578fd0a01d5fe373181c40e4");
         var linkStorage = Game.getObjectById("577ec1375a1c85636f551c4b");
-        linkEntrance1.transferEnergy(linkStorage);
+        if (linkEntrance1 && linkStorage)
+            linkEntrance1.transferEnergy(linkStorage);
     },
 
     recycleCreep: function (creep) {

@@ -17,6 +17,10 @@ var roomBase = require("room.base");
 var flagSource = {
 
     run: function (flag) {
+      //  console.log(flag,"flagSource run");
+        if (!flag.room)
+            return;
+
         if ( roomBase.isMyRoom(flag.room.name)) {
             flag.memory.linkerFrom = { room : flag.room.name, distance : 0 };
             flag.memory.porterFrom = { room : flag.room.name, distance : 0 };

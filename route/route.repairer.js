@@ -2,9 +2,6 @@
  * Created by Piers on 23/07/2016.
  */
 /**
- * Created by Piers on 23/07/2016.
- */
-/**
  * @fileOverview Screeps module. Task move object.
  * @author Piers Shepperson
  */
@@ -20,59 +17,25 @@ var raceBase = require("race.base");
  * @module RouteFlexiStoragePorter
  */
 
-function  RouteFlexiStoragePorter  (room, respawnRate, policyId) {
-    this.type = gc.ROUTE_FLEXI_STORAGE_PORTER;
+function  RouteRepairer  (room, policyId) {
+    this.type = gc.ROUTE_REPAIRER;
     this.owner = room;
-    this.size = raceWorker.maxSizeRoom(Game.rooms[room]);
+    this.size = Math.min(raceWorker.maxSizeRoom(Game.rooms[room]),gc.REPAIRER_WORKER_SIZE);
     this.policyId = policyId;
-    this.respawnRate = respawnRate;
+    this.respawnRate = CREEP_LIFE_TIME;
     this.due = 0;
 }
 
-RouteFlexiStoragePorter.prototype.spawn = function (build, spawn, room ) {
-    console.log("trying to spawn RouteFlexiStoragePorter");
+RouteRepairer.prototype.spawn = function (build, spawn, room ) {
+    //console.log("trying to spawn RouteFlexiStoragePorter");
     var body = raceWorker.body(build.size);
     var name = stats.createCreep(spawn, body, undefined, undefined);
     if (_.isString(name)) {
         roleBase.switchRoles(Game.creeps[name],
-            gc.ROLE_FLEXI_STORAGE_PORTER);
+            gc.ROLE_REPAIRER);
         Game.creeps[name].memory.policyId = build.policyId;
     }
     return name;
 };
 
-module.exports = RouteFlexiStoragePorter;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+module.exports = RouteRepairer;

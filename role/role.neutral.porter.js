@@ -12,7 +12,6 @@
  */
 var TaskMoveRoom = require("task.move.room");
 var TaskMoveFind = require("task.move.find");
-var TaskHarvest = require("task.harvest");
 var TaskOffload = require("task.offload");
 var TaskLoadup = require("task.loadup");
 var gc = require("gc");
@@ -26,14 +25,17 @@ var roleNeutralPorter = {
     getTaskList: function(creep, homeRoom, flag) {
         var tasks = [];
         var collectionId = flag.name;
-        if (!collectionId) return invalidId(creep, homeRoom);
+        if (!flag || !collectionId) return undefined;
         var collectionObj = Game.getObjectById(collectionId);
 
         // Use ConstructionSite.progress to see if its a construction site
         // as only this structure has a progress field
         if (!collectionObj
-            || collectionObj.progress !== undefined)
-            return invalidId(creep, homeRoom);
+            || collectionObj.progress !== undefined) {
+            console.log(creep, flag, "roleNeutralPorter.getTaskList  cannot find collecton object");
+            return undefined;
+        }
+
 
         var moveToCollectionRoom = new TaskMoveRoom(flag.pos.roomName);
         var moveToCollectonObj = new TaskMoveFind(gc.FIND_ID,gc.RANGE_TRANSFER, collectionId);
@@ -50,6 +52,8 @@ var roleNeutralPorter = {
         tasks.push(offload);
         return tasks;
     },
+
+
 
     findTargetOffload: function(creep) {
         // todo Handle non energy resources, but we might not need this. Wait and see.

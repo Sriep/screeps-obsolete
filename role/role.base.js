@@ -356,7 +356,7 @@ var roleBase = {
         debugger;
       //  console.log(creep,"findTargetSource target",target,"length sources", sources.length);
       //  console.log(creep,"findTargetSources access", JSON.stringify(access),"clostse index",iClosest);
-        creep.memory.tasks.targtId = target;
+        //creep.memory.tasks.targtId = target;
 
         return target;
 	},
@@ -510,26 +510,20 @@ var roleBase = {
         if (undefined === creep) {
             return false;
         }
-        module = this.getModuleFromRole(role);
-        if (undefined === module) {
-            return false;
-        }
-        console.log(creep,"role",role,"module",module);
-
-        console.log(creep,"creep.memory",creep.memory);
-       // if (creep.name = "Cameron") creep.suicide();
 
         if (undefined === creep.memory.tasks)
             creep.memory.tasks = {};
         tasks.setTargetId(creep,undefined);
-
         creep.memory.tasks.state = undefined;
+
+        module = this.getModuleFromRole(role);
+        if (undefined === module) {
+            return false;
+        }
+        //console.log(creep,"roleBase.switchRoles role",role,"module",module,"length",Object.keys(module).length );
         creep.memory.tasks.tasklist = module.getTaskList(creep, para1, para2, para3, para4, para5,
                                                                 para6, para7, para8, para9, para10 );
-
-        console.log(creep,role,"switchRoles rolebase tasklist",
-            module.getTaskList(creep, para1, para2, para3, para4, para5,
-            para6, para7, para8, para9, para10 ));
+        console.log(creep,"basek form module.getTaskList", JSON.stringify(creep.memory.tasks.tasklist));
 
         creep.memory.role = role;
         return true;
@@ -539,7 +533,7 @@ var roleBase = {
         if (undefined !== role) {
             var name = "role." + role;
             var modulePtr = require(name);
-           // console.log("role",role,"name",name,"module",modulePtr);
+            //console.log("rolebase.getModuleFromRole role",role,"name",name,"module", modulePtr);
             return modulePtr;
         }  else {
             return undefined;

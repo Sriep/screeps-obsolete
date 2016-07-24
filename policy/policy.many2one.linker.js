@@ -203,13 +203,13 @@ var policyMany2oneLinker = {
             return (creep.memory.policyId == currentPolicy.id
             &&  creep.memory.role == gc.ROLE_STORAGE_REPAIRER );
         });
-        console.log(room,"check repairer number", repairers.length);
+      //  console.log(room,"check repairer number", repairers.length);
 
         if (0 == repairers.length) {
            // console.log("checkRepairer fond none existing parts",
               //  this.existingPorterParts(currentPolicy)," > thershole",gc.REPAIRER_THRESHOLD);
             if (this.existingPorterParts(currentPolicy) > gc.REPAIRER_THRESHOLD) {
-                console.log("checkRepairer Trying to spawn repairer")
+               console.log(room,"checkRepairer Trying to spawn repairer")
                 this.spawnRepairer(room, currentPolicy)
 
             }
@@ -232,7 +232,7 @@ var policyMany2oneLinker = {
         var size = Math.min(gc.LINKING_WORKER_SIZE, raceWorker.maxSizeRoom(spawn.room, true));
         var body = raceWorker.body(size, true);
         var name = spawn.createCreep(body, name, {policyId: currentPolicy.id});
-        console.log(room,"spawnRepairer result",name,"size",size,"body",body);
+        //console.log(room,"spawnRepairer result",name,"size",size);
         if (_.isString(name)) {
             roleBase.switchRoles(Game.creeps[name], gc.ROLE_STORAGE_REPAIRER);
             console.log(name, "New repairer spawned");
@@ -408,7 +408,7 @@ var policyMany2oneLinker = {
         } else {
             energyInStorage = 0;
         }
-        var portersNoCommitmentsEnergyLT = roomOwned.energyLifeTime(room, 1,  gc.ROLE_FLEXI_STORAGE_PORTER);
+        var portersNoCommitmentsEnergyLT = roomOwned.energyLifeTime(room, 1, gc.ROLE_FLEXI_STORAGE_PORTER);
         var sourceEnergyLT  = roomOwned.allSourcesEnergy(room) *5;
         var energyBuildLinkersAndRepairer = 4*1000;
         var energyForUpgrading = sourceEnergyLT - energyBuildLinkersAndRepairer - externalCommitments;
@@ -424,8 +424,6 @@ var policyMany2oneLinker = {
 
         energyForUpgrading = sourceEnergyLT - energyBuildLinkersAndRepairer - externalCommitments + availableInStorage;
         numPortersPartsNeeded = Math.max(5,energyForUpgrading / portersNoCommitmentsEnergyLT);
-
-
 
         var porterShortfall = numPortersPartsNeeded - existingPorterParts;//*policy.creepsAgeFactor(currentPolicy);
 

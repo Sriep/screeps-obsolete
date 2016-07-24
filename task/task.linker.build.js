@@ -8,6 +8,7 @@
 "use strict";
 var gc = require("gc");
 var tasks = require("tasks");
+var TaskFlexiLink = require("task.flexi.link");
 
 /**
  * Task harvest object.
@@ -16,7 +17,7 @@ var tasks = require("tasks");
 
 
 function TaskLinkerBuild (flagName) {
-    this.taskType = gc.TASK_FLEXI_LINK;
+    this.taskType = gc.TASK_LINKER_BUILD;
     this.conflicts = gc.HARVEST;
     this.flagName = flagName;
     this.pickup = true;
@@ -24,16 +25,18 @@ function TaskLinkerBuild (flagName) {
 }
 
 TaskLinkerBuild.prototype.doTask = function(creep, task) {
+  //  console.log(creep,"TaskLinkerBuild.doTask")
     var flag = Game.flags[task.flagName];
     var source =  Game.getObjectById(task.flagName);
     if (!source) return TaskFlexiLink.prototype.help(creep, task);
     creep.harvest(source);
 
     var site = Game.getObjectById(flag.memory.mainDumpId);
+    console.log(creep,"TaskLinkerBuild site", site);
     if (!site)  {
         return TaskFlexiLink.prototype.resetState(creep, task);
     }
-    creep.build(dump);
+    creep.build(site);
     return gc.RESULT_UNFINISHED;
 };
 

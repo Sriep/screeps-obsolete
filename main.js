@@ -8,6 +8,9 @@ var freememory = require("freememory");
 var policy = require("policy");
 var stats = require("stats");
 var ayrtepPad = require("ayrtep.pad");
+var roomBase = require("room.base");
+var flagBase = require("flag.base");
+var gc = require("gc");
 var cpuUsage = require("cpu.usage");
 var recurringPolicies = require("recurring.policies");
 
@@ -20,13 +23,18 @@ profiler.enable();
 module.exports.loop = function () {
     profiler.wrap(function() {
         PathFinder.use(true);
-        try {
-         //   ayrtepPad.top();
+       // try {
+            ayrtepPad.top();
+       // }
+      //  catch(exp) {
+         // console.log("ops exception from ayrtepPad top",exp);
+      //  }
+        if (Game.time % gc.ROOM_UPDATE_RATE == 0 ){
+             roomBase.examineRooms();
         }
-        catch(exp) {
-            console.log("ops",exp);
+        if (Game.time % gc.FLAG_UPDATE_RATE == 5 ){
+            flagBase.run();
         }
-        
         freememory.freeCreeps();
         policy.enactPolicies();
         raceBase.moveCreeps();

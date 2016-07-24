@@ -46,7 +46,7 @@ var gc = {
     ROLE_FLEXI_STORAGE_PORTER: "flexi.storage.porter",
     ROLE_PATROL_ROOM: "patrol.room",
     ROLE_GIFT: "gift",
-    ROLE_NEUTRAL_PORTER: "role.neutral.porter",
+    ROLE_NEUTRAL_PORTER: "neutral.porter",
     
     //Tasks
     TASK_MOVE_FIND: "move.find",
@@ -66,7 +66,14 @@ var gc = {
     TASK_SWITCH_OWNER: "switch.owner",
     TASK_MOVE_ATTACK_POS: "move.attack.pos",
     TASK_FIND_MOVE_LINKER_POS: "find.move.linker.pos",
-    TASK_FLEXI_LINK:    "task.flexi.link",
+    TASK_FLEXI_LINK: "flexi.link",
+    TASK_HEAL: "heal",
+    TASK_LINKER_BUILD: "linker.build",
+    TASK_LINKER_DUMP: "linker.build",
+    TASK_LINKER_DUMP_LINK_DUMP: "task.linker.dump.link.dump",
+    TASK_LINKER_LINK_DUMP: "task.linker.link.dump",
+    TASK_LINKER_LINK_LINK: "task.linker.link.link",
+    TASK_LINKER_REPAIR_DUMP: "task.linker.repair.dump",
 
 
 //Offload switch task's states
@@ -104,7 +111,7 @@ var gc = {
     RESULT_FAILED: "failed",
     RESULT_ROLLBACK: "rollback",
     RESULT_RESET: "reset",
-    
+
     //policies
     POLICY_POLICY_THE_POOL: "the.pool",
     POLICY_PEACE: "peace",
@@ -137,7 +144,8 @@ var gc = {
     ROUTE_GIFT_CREEP: "gift.creep",
     ROUTE_LINKER: "linker",
     ROUTE_NEUTRAL_PORTER: "neutral.porter",
-    ROUTE_FLEXI_STORAGE_PORTER: "route.flexi.storage.porter",
+    ROUTE_FLEXI_STORAGE_PORTER: "flexi.storage.porter",
+    ROUTE_REPAIRER: "repairer",
 
     // Linker types
     LINKER_DUMP: "linker.dump",
@@ -160,6 +168,11 @@ var gc = {
     DEFAULT_ROUTE_PRIORITY: 10,
     REVERSE_CLAIM_SAFETYNET: 100,
     MIDDLE_AGE_CREEP_LIFE_TO_LIVE: 750,
+    ROOM_UPDATE_RATE: 10,
+    FLAG_UPDATE_RATE: 10,
+    THE_POOL: 0,
+    MAX_TASK_ACTIONS: 5,
+    PORTER_PRIORITY_THRESHOLD: this.MIDDLE_AGE_CREEP_LIFE_TO_LIVE,
 
     //Build priorities
     PRIORITY_EMERGENCY_HOME_PORTER: 1,
@@ -167,6 +180,7 @@ var gc = {
     PRIORITY_NEUTRAL_PORTER: 5,
     PRIORITY_HOME_PORTER: 3,
     PRIORITY_REVERSE_CONTROLLER: 5,
+    PRIORITY_REPAIRER: 10,
 
     //flag colours
     FLAG_PERMANENT_COLOUR: COLOR_BLUE,

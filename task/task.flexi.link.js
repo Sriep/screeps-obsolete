@@ -14,7 +14,7 @@
 "use strict";
 var gc = require("gc");
 var tasks = require("tasks");
-var TaskFindMoveLinkerPos = require("rask.find.move.linker.pos");
+
 /**
  * Task harvest object.
  * @module tasksHarvest
@@ -30,26 +30,44 @@ function TaskFlexiLink (flagName) {
 }
 
 TaskFlexiLink.prototype.doTask = function(creep, task) {
+   // console.log(creep,"in TaskFlexiLink.doTask", JSON.stringify(task));
+   // console.log(creep,"task.flagName", task.flagName,"Game.flags",Game.flags);
     var flag = Game.flags[task.flagName];
-    if (!flag.memory.operator || creep.id != flag.memory.operator.id)
-        initilise(creep.task);
+  //  console.log(creep,"in TaskFlexiLink.doTask flag",flag);
+    if (!flag.memory.operator
+        || creep.id != flag.memory.operator.id
+        || undefined == flag.memory.linkType)
+        initilise(creep,task,flag);
+   // console.log(creep, "In TaskFlexiLink doTask linkType", flag.memory.linkType);
     var moduleName = "task." + flag.memory.linkType;
     var taskModule = require(moduleName);
     return taskModule.prototype.doTask(creep, task);
 };
 
-var initilise = function(creep,task) {
-    flag.memory.operator = {};
-    flag.memory.operator.id = creep.id;
-    flag.memory.operator.arrived = Game.time;
-    flag.memory.operator.ageStarted = CREEP_LIFE_TIME - creep.ticksToLive;
+var initilise = function(creep,task,flag) {
+    if (!flag.memory.operator || creep.id != flag.memory.operator.id) {
+        flag.memory.operator = {};
+        flag.memory.operator.id = creep.id;
+        flag.memory.operator.arrived = Game.time;
+        flag.memory.operator.ageStarted = CREEP_LIFE_TIME - creep.ticksToLive;
+    }
 
-    if (!flag.memory.mainDumpId) {
+    if (!flag.memory.mainDumpId || undefined == flag.memory.linkType) {
         creep.room.createConstructionSite(creep.pos, STRUCTURE_CONTAINER);
+        var sites = creep.room.find(FIND_CONSTRUCTION_SITES, {
+            filter: function(object) {
+                return object.pos == creep.pos
+                    && object.structureType == STRUCTURE_CONTAINER;
+            }
+        });
+        if (undefined !== sites[0])
+            flag.memory.mainDumpId = sites[0].id;
+        flag.memory.linkType = gc.LINKER_BUILD;
     }
 };
 
 TaskFlexiLink.prototype.resetState = function (creep, task) {
+    var TaskFindMoveLinkerPos = require("task.find.move.linker.pos");
     return TaskFindMoveLinkerPos.prototype.doTask(creep, task);
 };
 

@@ -18,9 +18,12 @@ var policyFrameworks = require("policy.frameworks");
 var flagBase = {
 
     run: function () {
+        console.log("In flagBase run");
         for ( var flagName in Game.flags) {
             if (Game.flags[flagName].memory.type) {
-                module = this.getModuleFromType(Game.flags[flagName].memory.type);
+                var module = this.getModuleFromType(Game.flags[flagName].memory.type);
+           //     console.log("flagbase run module name",Game.flags[flagName].memory.type,
+            //        "module",module, Object.keys(module));
                 module.run(Game.flags[flagName]);
             }
         }

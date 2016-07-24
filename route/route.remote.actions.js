@@ -26,7 +26,7 @@ var TaskActionTarget = require("task.action.target");
  * @module NeutralHarvestRoute
  */
 
-function  RouteRemoteActions  (room, remoteActions, body, respawnRate) {
+function  RouteRemoteActions  (room, remoteActions, body, respawnRate, policyId) {
     this.type = gc.ROUTE_REMOTE_ACTIONS;
     this.owner = room;
     if (Array.isArray(remoteActions)) {
@@ -35,7 +35,8 @@ function  RouteRemoteActions  (room, remoteActions, body, respawnRate) {
         this.remoteActions = [];
         this.remoteActions.push(remoteActions)
     }
-    this.body = body
+    this.body = body;
+    this.policyId = policyId;
     this.respawnRate =respawnRate;
     if (undefined === respawnRate) {
         this.respawnRate = CREEP_LIFE_TIME;
@@ -53,6 +54,7 @@ RouteRemoteActions.prototype.spawn = function (build, spawn) {
         Game.creeps[name].memory.tasks.state = undefined;
         Game.creeps[name].memory.tasks.tasklist
             = RouteRemoteActions.prototype.getTaskList(build.remoteActions);
+        Game.creeps[name].memory.policyId = build.policyId;
     }
     return name;
 };

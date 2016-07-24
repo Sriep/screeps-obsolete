@@ -15,7 +15,7 @@ var _ = require('lodash');
 
 var roleHarvester = {
 	findTarget: function(creep) {
-        oldTargetId = creep.memory.offloadTargetId;
+        var oldTargetId = creep.memory.offloadTargetId;
         if (oldTargetId == 0) {oldTargetId = undefined;}
         if (oldTargetId !== undefined)
         {           
@@ -43,9 +43,9 @@ var roleHarvester = {
                             structure.structureType == STRUCTURE_TOWER) 
                     && structure.energy < structure.energyCapacity;
                 }
-        });	             
+        });
         if(target) {
-            creep.memory.offloadTargetId = target.id;
+            //creep.memory.offloadTargetId = target.id;
 			return 	target; 
 		}
 

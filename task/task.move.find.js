@@ -45,7 +45,7 @@ TaskMoveFind.prototype.FindMethod = {
     FindFunction: gc.FIND_FUNCTION
 };
 
-TaskMoveFind.prototype.doTask = function(creep, task) {
+TaskMoveFind.prototype.doTask = function(creep, task, actions) {
    // console.log(creep,"In TaskMoveFind method", task.method, "task.findid"
    //     , task.findId,"target id",tasks.getTargetId(creep) );
    // console.log(creep,"fove find",task.findFunction,"module",task.findModule);
@@ -55,7 +55,7 @@ TaskMoveFind.prototype.doTask = function(creep, task) {
         if (tasks.getTargetId(creep)) {
             target = Game.getObjectById(tasks.getTargetId(creep));
         } else {
-       //     console.log("In move find removing cashed id",tasks.getTargetId(creep))
+     //       console.log("In move find removing cashed id",tasks.getTargetId(creep))
             tasks.setTargetId(creep, undefined);
         }
     //}
@@ -65,7 +65,7 @@ TaskMoveFind.prototype.doTask = function(creep, task) {
         switch (task.method) {
             case this.FindMethod.FindId:
                 target = Game.getObjectById(task.findId);
-          //      console.log(creep,"case this.FindMethod.FindId",task.findId,"target",target);
+             //   console.log(creep,"case this.FindMethod.FindId",task.findId,"target",target);
                 /// Siwtch to backup plan
                 if (!target && task.findId != task.findFunction) {
                     var module = require(task.findModule);
@@ -95,7 +95,7 @@ TaskMoveFind.prototype.doTask = function(creep, task) {
                 break;
             case this.FindMethod.FindFunction:
                 var module = require(task.findModule);
-                target = module[task.findFunction](creep, task);
+                target = module[task.findFunction](creep);
             //    console.log(creep,"find function returned",target);
                 break;
             default:
@@ -107,7 +107,7 @@ TaskMoveFind.prototype.doTask = function(creep, task) {
             tasks.setTargetId(creep, target.id);
     }
     if (!target) {
-       // console.log(creep,"find RESULT_FINISHED and cound not find any target")
+      //  console.log(creep,"find RESULT_FINISHED and cound not find any target")
       //  creep.say("No target");
         return gc.RESULT_FINISHED;
     }

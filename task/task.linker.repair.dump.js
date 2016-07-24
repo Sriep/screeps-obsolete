@@ -18,7 +18,7 @@ var roomBase = require("room.base");
 
 
 function TaskLinkerRepairDump (flagName) {
-    this.taskType = gc.TASK_FLEXI_LINK;
+    this.taskType = gc.TASK_LINKER_REPAIR_DUMP;
     this.conflicts = gc.HARVEST;
     this.flagName = flagName;
     this.pickup = true;

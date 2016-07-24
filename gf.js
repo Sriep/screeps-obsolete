@@ -62,6 +62,7 @@ var gf = {
         var deltaY = pos1.y - pos2.y;
         var offsets = gc.ADJACENCIES[deltaX][deltaY];
         var joinPos = [];
+        console.log("joinPointsBetween", pos1,pos2);
         for (var i = 0 ; i < offsets.length ; i++ ) {
             var pos = new RoomPosition( pos2.x + offsets[i].dx,
                                         pos2.y + offsets[i].dy,

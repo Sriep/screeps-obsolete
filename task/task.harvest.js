@@ -27,7 +27,7 @@ function TaskHarvest () {
 TaskHarvest.prototype.doTask = function(creep, task) {
     if (creep.carry.energy == creep.carryCapacity)  {
         tasks.setTargetId(creep, undefined);
-        //console.log(creep, "harvet at start RESULT_FINISHED full up")
+        //console.log(creep, "harvest at start RESULT_FINISHED full up")
         return gc.RESULT_FINISHED;
     }
     var source =  Game.getObjectById(tasks.getTargetId(creep));
@@ -50,10 +50,10 @@ TaskHarvest.prototype.doTask = function(creep, task) {
            // tasksActions.done(gc.HARVEST);
             if (creep.carry.energy == creep.carryCapacity) {
                 tasks.setTargetId(creep, undefined);
-            //    console.log(creep, "harvet RESULT_FINISHED ok full up")
+                console.log(creep, "harvest RESULT_FINISHED ok full up")
                 return gc.RESULT_FINISHED;
             }  else {
-             //   console.log(creep, "harvet RESULT_UNFINISHED ok")
+             //   console.log(creep, "harvest RESULT_UNFINISHED ok")
                 return gc.RESULT_UNFINISHED;
             }
         case    ERR_NOT_ENOUGH_RESOURCES:    //	-6	The target source does not contain any harvestable energy.

@@ -26,7 +26,7 @@ var TaskFlexiLink = require("task.flexi.link");
 
 
 function TaskFindMoveLinkerPos (flagName) {
-    this.taskType = gc.TASK_HARVEST_LINK;
+    this.taskType = gc.TASK_FIND_MOVE_LINKER_POS;
     this.conflicts = gc.MOVE;
     this.flagName = flagName;
     this.pickup = true;
@@ -34,24 +34,29 @@ function TaskFindMoveLinkerPos (flagName) {
 }
 
 TaskFindMoveLinkerPos.prototype.doTask = function(creep, task) {
+   // console.log(creep, "In TaskFindMoveLinkerPos task", JSON.stringify(task));
     var flag = Game.flags[task.flagName];
-
-    if (!task.flag) return gc.RESULT_FAILED;
+   // console.log(creep, "In TaskFindMoveLinkerPos", task.flagName
+   //     , creep.room.name, "==?" , flag.pos.roomName);
+    if (!task.flagName) return gc.RESULT_UNFINISHED;
     if (creep.room.name != flag.pos.roomName) return gc.RESULT_ROLLBACK;
 
     var homePos = this.findHomePosition(creep, task);
-
+    console.log(creep,"findHomoePosition",homePos);
     var newTaskList = [];
     var moveToSource;
     if (homePos) {
-        moveToSource = TaskMovePos(homePos,0)
+        moveToSource = new TaskMovePos(homePos,0)
     } else {
-        moveToSource = TaskMovePos(flag.pos,1)
+        console.log(creep,"before mande moveToSource",flag.pos,1);
+        moveToSource = new TaskMovePos(flag.pos,1)
     }
-    var flexiLink = TaskFlexiLink(task.flagName);
+    console.log(creep,"after mande moveToSource");
+    var flexiLink = new TaskFlexiLink(task.flagName);
     newTaskList.push(moveToSource);
     newTaskList.push(flexiLink);
     creep.memory.tasks.tasklist = newTaskList;
+    console.log(creep,"TaskFindMoveLinkerPos reset task lists at end of doTask");
     return  gc.RESULT_RESET;
 };
 
@@ -73,6 +78,7 @@ TaskFindMoveLinkerPos.prototype.findHomePosition = function (creep, task) {
         } else {
             flag.memory.linkType = gc.LINKER_DUMP;
         }
+        console.log("STRUCTURE_STORAGE,STRUCTURE_LINK, STRUCTURE_TERMINAL");
         return homePos
     }
     homePos = findLinkPos(flag.pos,STRUCTURE_TERMINAL, STRUCTURE_LINK, STRUCTURE_CONTAINER);
@@ -91,6 +97,7 @@ TaskFindMoveLinkerPos.prototype.findHomePosition = function (creep, task) {
     homePos = findLinkPos(flag.pos,STRUCTURE_LINK, STRUCTURE_CONTAINER);
     if (homePos) {
         flag.memory.linkType = gc.LINKER_LINK_LINK;
+        console.log("STRUCTURE_LINK,STRUCTURE_CONTAINER, ");
         return homePos;
     }
     homePos = findLinkPos(flag.pos,STRUCTURE_CONTAINER);
@@ -106,15 +113,17 @@ TaskFindMoveLinkerPos.prototype.findHomePosition = function (creep, task) {
                 || site.structureType == STRUCTURE_TERMINAL
         }
     });
+    console.log(creep,"TaskFindMoveLinkerPos looking for construction sites",sites.length, sites);
     for ( var i in sites) {
         var pointsBetween = gf.joinPointsBetween(sites[i].pos, flag.pos);
+        console.log(creep,"points between", JSON.stringify(pointsBetween) );
         if (pointsBetween.length > 0) {
             flag.memory.mainDumpId = sites[i].id;
             flag.memory.linkType = gc.LINKER_BUILD;
             return pointsBetween[0];
         }
     }
-    return undefined;
+    return flag.memory.linkType = undefined;//"I woz ere";//undefined;
 };
 
 

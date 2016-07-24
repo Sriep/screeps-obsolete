@@ -11,17 +11,18 @@ var stats = require("stats");
 var roleBase = require("role.base");
 var raceWorker = require("race.worker");
 var raceBase = require("race.base");
-var raceWorker = require("rase.worker");
+
 /**
  * Task move object. Used when we need to find the object to move to.
  * @module RouteNeutralPorter
  */
 
-function  RouteNeutralPorter  (room, flagName) {
+function  RouteNeutralPorter  (room, flagName, policyId) {
     this.type = gc.ROUTE_NEUTRAL_PORTER;
     this.owner = room;
     this.flagName = flagName;
-    this.size = raceWorker.maxSizeRoom(room);
+    this.policyId = policyId;
+    this.size = raceWorker.maxSizeRoom(Game.rooms[room]);
     var flag = Game.flags[flagName];
     if (flag) {
         this.respawnRate = this.respawnRate(flag.memory.porterFrom.distance,
@@ -39,6 +40,7 @@ RouteNeutralPorter.prototype.spawn = function (build, spawn, room ) {
             gc.ROLE_NEUTRAL_PORTER,
             build.owner,
             Game.flags[build.flagName]);
+        Game.creeps[name].memory.policyId = build.policyId;
     }
     return name;
 };

@@ -26,16 +26,16 @@ var routeBase = {
 
     attachRoute: function (roomName, routeType, order, priority) {
         var room = Game.rooms[roomName];
-        console.log(room,"attachRoute",routeType);
+        console.log(room,"attachRoute");
         if (!this.checkSetup(room)) return false;
-        module = this.moduleFromRoute(routeType);
+        //module = this.moduleFromRoute(routeType);
         order.id = this.getNextRouteId(room);
         if (priority === undefined) {
             order.priority = gc.DEFAULT_ROUTE_PRIORITY;
         } else {
             order.priority = priority;
         }
-        console.log(room,routeType,"attachRoute",JSON.stringify(order));
+        console.log(room,"attachRoute",JSON.stringify(order));
         room.memory.routes.details[order.id] = order;
         return true;
     },
@@ -57,6 +57,17 @@ var routeBase = {
         this.checkSetup(room);
         for (var i in  room.memory.routes.details) {
             console.log(roomName,JSON.stringify(room.memory.routes.details[i]));
+        }
+    },
+
+    filterBuilds: function (room, field, value) {
+        if (this.checkSetup(room)) {
+            var filteredOrders = [];
+            for (var i in  room.memory.routes.details) {
+                if (room.memory.routes.details[i][field] == value)
+                    filteredOrders.push(room.memory.routes.details[i]);
+            }
+            return filteredOrders;
         }
     },
 
@@ -100,6 +111,8 @@ var routeBase = {
         } // for
         return mostOverdueRoute;
     },
+
+
 
     spawn: function (spawn, room, build) {
         module = this.moduleFromRoute(build.type);
@@ -146,6 +159,8 @@ var routeBase = {
     },
 
     checkSetup: function(room) {
+        if (undefined == room)
+            return false;
         if (undefined === room.memory)
             return false;
         if (room.memory.routes === undefined) {

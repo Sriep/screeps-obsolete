@@ -137,6 +137,15 @@ var roomOwned = {
                 return this.getUpgradeRondTripLength(room, force);
         }
     },
+
+    accessPointsType: function (room, findType, opts) {
+        var sites = room.find(findType,opts);
+        var accessPoints = 0;
+        for ( var i = 0 ; i < sites.length ; i++ ) {
+            accessPoints += this.countAccessPoints(room, sites[i].pos);
+        }
+        return accessPoints;
+    },
     
     countAccessPoints: function (room, pos)
     {

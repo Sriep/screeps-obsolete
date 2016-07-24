@@ -17,12 +17,13 @@ var roomBase = require("room.base");
 var flagMineral = {
 
     run: function (flag) {
-        if (Game.flags[flagName].memory.extractor) {
+
+        if (flag.memory.extractor) {
             if ( roomBase.isMyRoom(flag.room.name)) {
                 flag.memory.linkerFrom = { room : flag.room.name, distance : 0 };
                 flag.memory.porterFrom = { room : flag.room.name, distance : 0 };
             } else  {
-                console.log("flagMineral flag", flag);
+              //  console.log("flagMineral flag", flag);
                 var atPos = flag.pos.lookFor(LOOK_STRUCTURES);
                 var extractorFound = false;
                 for ( var i = 0 ; i < atPos.length ; i++ ){

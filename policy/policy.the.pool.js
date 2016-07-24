@@ -107,8 +107,8 @@ var policyThePool = {
     },
 
     initialisePolicy: function (newPolicy) {
-        Memory.policies[THE_POOL].requisitions = {};
-        Memory.policies[THE_POOL].supplyCenters = {};
+        Memory.policies[gc.THE_POOL].requisitions = {};
+        Memory.policies[gc.THE_POOL].supplyCenters = {};
         Memory.nextRequisitionsId = 0;
         Memory.nextSupplyCenterId = 0;
         return true;

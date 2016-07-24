@@ -44,7 +44,7 @@ TaskOffload.prototype.offloadMethod = {
 
 TaskOffload.prototype.doTask = function(creep, task, actions) {
     var tasks = require("tasks");
-  //  console.log(creep,"In task Offload target id", tasks.getTargetId(creep));
+  // console.log(creep,"In task Offload target id", tasks.getTargetId(creep));
 
     if (creep.carry[task.resource] == 0) {
       //  console.log("tried Offloading witih no enrgy");

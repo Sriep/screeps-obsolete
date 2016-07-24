@@ -162,25 +162,24 @@ var policyPeace = {
         var creeps = _.filter(Game.creeps);
         console.log(room, "policy id", currentPolicy.id,"creeps", creeps.length);
 
-        var testNewCode = false;
-        if (testNewCode) {
+        var testNewCode = true;
+        var mode = room.mode
+        console.log(room,"room.mode is",room.mode);
+        if (testNewCode && room.mode != MODE_WORLD) {
             var linkers = require("linkers");
             linkers.attachFlaggedRoutes(room, currentPolicy);
             linkers.attachFlexiStoragePorters(room, currentPolicy);
-            policyMany2oneLinker.checkRepairer(room, currentPolicy);
-            linkers.attachFlaggedReverseController(room, currentPolicy);
-        }
-
-        if (room.memory.links !== undefined
+            linkers.attachRepairer(room, currentPolicy);
+            linkers.processBuildQueue(room,currentPolicy);
+        } else  {
+            if (room.memory.links !== undefined
                 && room.memory.links.info !== undefined
-                && room.memory.links.info.length > 0) {
-
-            if (policyMany2oneLinker.readyForMAny2OneLinker(currentPolicy)) {
+                && room.memory.links.info.length > 0
+                && policyMany2oneLinker.readyForMAny2OneLinker(currentPolicy)) {
                 policyMany2oneLinker.checkLinks(room, currentPolicy);
             }
             policyMany2oneLinker.checkRepairer(room, currentPolicy);
             policyMany2oneLinker.nonLinkBuilds(room, currentPolicy);
-
         }
         npcInvaderBattle.defendRoom(room);
     },

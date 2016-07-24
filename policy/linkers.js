@@ -13,6 +13,8 @@ var routeBase = require("route.base");
 var RouteLinker = require("route.linker");
 var RouteNeutralPorter = require("route.neutral.porter");
 var RouteRemoteActions = require("route.remote.actions");
+var RouteRepairer = require("route.repairer");
+var RouteFlexiStoragePorter = require("route.flexi.storage.porter");
 var gc = require("gc");
 var policyMany2oneLinker = require("policy.many2one.linker");
 var policy = require("policy");
@@ -24,49 +26,96 @@ var policy = require("policy");
 var linkers = {
     LINK_TO_SOURCE_RANGE: 2,
 
-    attachFlaggedRoutes: function (room, currentPolicy) {
+    attachFlaggedRoutes: function (room, policy) {
+     //   console.log(room,"attachFlaggedRoutes");
         var flags = _.filter(Game.flags, function (flag) {
-            return ( flag.memory.linkerFrom.room == room.name
-                    || flag.memory.porterFrom.room == room.name );
+            return ( flag.memory.linkerFrom
+                    && (flag.memory.linkerFrom.room == room.name
+                    || flag.memory.porterFrom.room == room.name) );
         });
+       // console.log(room,"attachFlaggedRoutes flags",flags);
         for ( var i = 0 ; i < flags.length ; i++ ) {
-            if ( flags[i].memory.linkerFrom
+            if ( flags[i].memory.linkerFrom && !this.alreadyInBulidQueue(room, flags[i])
                  && flags[i].memory.linkerFrom.room == room.name ) {
-                var order = new RouteLinker(room, flag.name);
-                routeBase.attachRoute(roomName, gc.ROLE_LINKER,order,gc.PRIORITY_LINKER);
+                var order = new RouteLinker(room.name, flags[i].name, policy.id);
+                routeBase.attachRoute(room.name, gc.ROLE_LINKER,order,gc.PRIORITY_LINKER);
             }
             if (flags[i].pos.roomName != room
-                && flags[i].memory.porterFrom
+                && flags[i].memory.porterFrom && !this.alreadyInBulidQueue(room, flags[i])
                 && flags[i].memory.porterFrom.room == room.name) {
-                 order = new RouteNeutralPorter(room, flag.name);
-                routeBase.attachRoute(roomName, gc.ROLE_NEUTRAL_PORTER,
+                 order = new RouteNeutralPorter(room.name, flags[i].name, policy.id);
+                routeBase.attachRoute(room.name, gc.ROLE_NEUTRAL_PORTER,
                                         order, gc.PRIORITY_NEUTRAL_PORTER);
             }
             if ( flags[i].memory.attachFlaggedReverseController
-                && flags[i].memory.claimerFrom.room == room.name) {
-                this.attachFlaggedReverseController(flag,room);
+                && flags[i].memory.claimerFrom.room == room.name
+                && !this.alreadyInBulidQueue(room, flags[i])) {
+                this.attachFlaggedReverseController(flag,room, policy);
             }
         }
+       // console.log(room,"attachFlaggedRoutes end of");
+    },
+
+    alreadyInBulidQueue: function(room, flag) {
+        return routeBase.filterBuilds(room,"flagName", flag.name).length > 0;
     },
 
     attachFlexiStoragePorters: function (room, policy) {
-        if ( 0 < policyMany2oneLinker.porterShortfall(room,currentPolicy)) {
-            var order = new RouteLinker(room, 0);
-            if (policy.creepLifeTicks(policy) < gc.MIDDLE_AGE_CREEP_LIFE_TO_LIVE) {
-                var priority = gc.PRIORITY_EMERGENCY_HOME_PORTER;
-            } else {
-                priority = gc.PRIORITY_HOME_PORTER
+
+        var creeps = _.filter(Game.creeps, function (creep) {
+            return creep.memory.policyId == policy.id})
+        console.log(room, "attachFlexiStoragePorters, 0 < porterShortfall",
+            policyMany2oneLinker.porterShortfall(room,policy));
+        console.log(room,"attachFlexiStoragePorters creeps", creeps.length ,
+            "< max can fit in room",this.maxCreepsCanFitInRoom(room),"policy.id",policy.id );
+        if ( 0 < policyMany2oneLinker.porterShortfall(room,policy)
+            && routeBase.filterBuilds(room,"type",gc.ROUTE_FLEXI_STORAGE_PORTER).length == 0) {
+
+             var creeps = _.filter(Game.creeps, function (creep) {
+                return creep.memory.policyId == policy.id})
+            if (creeps.length < this.maxCreepsCanFitInRoom(room)) {
+                var order = new RouteFlexiStoragePorter(room.name, 0, policy.id);
+                console.log("attachFlexiStoragePorters creeplife", this.creepLifeTicks(policy),
+                    "< middale age", gc.PORTER_PRIORITY_THRESHOLD);
+                if (this.creepLifeTicks(policy) < gc.PORTER_PRIORITY_THRESHOLD) {
+                    var priority = gc.PRIORITY_EMERGENCY_HOME_PORTER;
+                } else {
+                    priority = gc.PRIORITY_HOME_PORTER
+                }
+                routeBase.attachRoute(room.name, gc.ROUTE_FLEXI_STORAGE_PORTER,order,priority);
             }
-            routeBase.attachRoute(roomName, gc.ROLE_LINKER,order,priority);
+        }
+        //console.log(room,"End of attachFlexiStoragePorters");
+    },
+
+    maxCreepsCanFitInRoom: function (room) {
+        return roomOwned.accessPointsType(room, FIND_SOURCES)
+                         + room.find(FIND_SOURCES).length;
+    },
+
+    attachRepairer: function (room) {
+        if (routeBase.filterBuilds(room, "type", gc.ROUTE_REPAIRER).length == 0) {
+            var order = new RouteRepairer(room.name, policy.id);
+            routeBase.attachRoute(room.name, gc.ROUTE_REPAIRER,order,gc.PRIORITY_REPAIRER);
         }
     },
 
-    attachFlaggedReverseController: function (flag, room)
+    creepLifeTicks: function (policy) {
+        var creeps = _.filter(Game.creeps, function (creep) {
+            return creep.memory.policyId == policy.id})
+        var life = 0;
+        for ( var i = 0 ; i < creeps.length ; i++ ) {
+            life = life + creeps[i].ticksToLive;
+        }
+        return life;
+    },
+
+    attachFlaggedReverseController: function (flag, room, policy)
     {
         var size = raceClaimer.maxSizeRoom(room);
         var body = raceClaimer.body(size);
         var actions = {
-            room : room.name,
+            room : flag.pos.roomName,
             action : "reserveController",
             findFunction : "findController",
             findFunctionsModule : "policy.remote.actions"
@@ -78,9 +127,10 @@ var linkers = {
             room.name,
             actions,
             body,
-            respawn
+            respawn,
+            policyId
         );
-        routeBase.attachRoute(roomName, gc.ROUTE_REMOTE_ACTIONS,order,gc.PRIORITY_REVERSE_CONTROLLER);
+        routeBase.attachRoute(room.name, gc.ROUTE_REMOTE_ACTIONS,order,gc.PRIORITY_REVERSE_CONTROLLER);
     },
 
     processBuildQueue: function(room) {

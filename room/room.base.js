@@ -26,7 +26,7 @@ var roomBase = {
 
     examineRooms: function (update) {
         for ( var room in Game.rooms ) {
-            this.flagRoom(Game.rooms[room], force);
+            this.flagRoom(Game.rooms[room], update);
         }
         var nearByRooms = this.nearByRooms();
         nearByRooms.forEach( function (roomName) {
@@ -48,7 +48,7 @@ var roomBase = {
             var sources = room.find(FIND_SOURCES);
             for ( var i in sources ) {
                 flagName = sources[i].id;
-                if (!Game.flags[flagname])
+                if (!Game.flags[flagName])
                     sources[i].pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_SOURCE_COLOUR);
                 Game.flags[flagName].memory.type = gc.FLAG_SOURCE;
                 Game.flags[flagName].memory.resourceType = RESOURCE_ENERGY;
@@ -59,7 +59,7 @@ var roomBase = {
             }
             if (room.controller) {
                 flagName = room.controller.id;
-                if (!Game.flags[flagname])
+                if (!Game.flags[flagName])
                     room.controller.pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_CONTROLLER_COLOUR);
                 Game.flags[flagName].memory.type = gc.FLAG_CONTROLLER;
                 if (!this.isMyRoom(room.name)) {
@@ -69,7 +69,7 @@ var roomBase = {
             var minerals = room.find(FIND_MINERALS);
             for ( i in minerals ) {
                 flagName =  minerals[i].id;
-                if (!Game.flags[flagname])
+                if (!Game.flags[flagName])
                     minerals[i].pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_MINERAL_COLOUR);
                 Game.flags[flagName].memory.type = gc.FLAG_MINERAL;
                 Game.flags[flagName].memory.resourceType = minerals[i].mineralType;
@@ -80,7 +80,7 @@ var roomBase = {
             });
             for ( i in keeperLairs ) {
                 flagName = keeperLairs[i].id;
-                if (!Game.flags[flagname])
+                if (!Game.flags[flagName])
                     keeperLairs[i].pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_KEEPERS_LAIR_COLOUR);
                 Game.flags[flagName].memory.type = gc.FLAG_KEEPERS_LAIR_COLOUR;
             }

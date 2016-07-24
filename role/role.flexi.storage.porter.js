@@ -24,6 +24,7 @@ var TaskOffloadSwitch = require("task.offload.switch");
 var roleFlexiStoragePorter = {
 
     getTaskList: function(creep) {
+        console.log(creep,"In roleFlexiStoragePorter getTaskList");
         var taskList = [];
         var taskSwitcher =  new TaskOffloadSwitch(creep);
         taskList.push(taskSwitcher);

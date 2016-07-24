@@ -17,7 +17,7 @@ var TaskFlexiLink = require("rask.flexiLink");
 
 
 function TaskLinkerDump (flagName) {
-    this.taskType = gc.TASK_FLEXI_LINK;
+    this.taskType = gc.TASK_LINKER_DUMP;
     this.conflicts = gc.HARVEST;
     this.flagName = flagName;
     this.pickup = true;

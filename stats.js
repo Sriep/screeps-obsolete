@@ -332,7 +332,7 @@ var stats = {
    // console.log("New creep produced with name:", result,JSON.stringify(result));
 
     createCreep: function(spawn, body, name, policy) {
-       console.log(spawn);
+       //console.log(spawn);
         var rtv = spawn.createCreep(body, name, {policyId: policy});
         if (_.isString(rtv) && this.on) {
             var raceBase = require("race.base");
