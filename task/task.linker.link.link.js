@@ -8,7 +8,7 @@
 "use strict";
 var gc = require("gc");
 var tasks = require("tasks");
-var TaskFlexiLink = require("rask.flexiLink");
+var TaskFlexiLink = require("task.flexi.link");
 /**
  * Task harvest object.
  * @module TaskLinkerLinkLink
@@ -39,12 +39,51 @@ TaskLinkerLinkLink.prototype.doTask = function(creep, task) {
     var linkFlag = Game.flags[flag.memory.mainDumpId];
     if (linkFlag) {
         var nextLinkId = linkFlag.memory.sendToLinkId;
-        if (lnextLinkId) {
-            link.transferEnergy(nextLinkId);
-            return gc.RESULT_UNFINISHED
+        if (!nextLinkId) {
+            var links = creep.room.find(FIND_STRUCTURES, {
+                filter: function(object) {
+                    return object.id != flag.memory.mainDumpId;
+                }
+            });
+            if (links.length > 0) {
+                nextLinkId == links[0];
+            } else {
+                return gc.RESULT_UNFINISHED;
+            }
         }
+        link.transferEnergy(nextLinkId);
+        return gc.RESULT_UNFINISHED
     }
     return TaskFlexiLink.prototype.resetState(creep, task);
 };
 
 module.exports = TaskLinkerLinkLink;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

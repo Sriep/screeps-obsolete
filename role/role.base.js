@@ -421,6 +421,7 @@ var roleBase = {
         }
         var tasks = require("tasks");
         tasks.doTasks(creep);
+        creep.say(creep.memory.role);
         return;
           //  if (creep.name == "Skyler"){
          //    this.resetTasks(creep);

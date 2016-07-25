@@ -160,7 +160,7 @@ var gc = {
     REPAIRER_WORKER_SIZE: 5,
     REPAIRER_THRESHOLD: 5,
     BLOCKSIZE_COST_WORKER: 200,
-    EMERGENCY_DOWNGRADING_THRESHOLD: 5000,
+    EMERGENCY_DOWNGRADING_THRESHOLD: 1000,
     MANY2ONE_REQUIRED_LIFE: 5000,
     STORAGE_STOCKPILE: 30000,
     OLD_CREEP_LIFETOLIVE: 200,
@@ -173,6 +173,7 @@ var gc = {
     THE_POOL: 0,
     MAX_TASK_ACTIONS: 5,
     PORTER_PRIORITY_THRESHOLD: this.MIDDLE_AGE_CREEP_LIFE_TO_LIVE,
+    MIN_ENERGY_CAPACITY_LINKERS: 400,
 
     //Build priorities
     PRIORITY_EMERGENCY_HOME_PORTER: 1,
@@ -188,6 +189,9 @@ var gc = {
     FLAG_CONTROLLER_COLOUR: COLOR_PURPLE,
     FLAG_MINERAL_COLOUR: COLOR_GREY,
     FLAG_KEEPERS_LAIR_COLOUR: COLOR_ORANGE,
+
+    //AI
+    AI_CONSTRUCTION: true,
 
     //Room permeates
 
@@ -208,22 +212,26 @@ var gc = {
         },
         "1" : {
             "2"  : [ { dx : 1, dy : 1 } , { dx : 0 , dy : 1 } ],
-            "1"  : [ { dx : 0, dy : 1 } , { dx : 1, dy : 0 } ],
-            "0"  : [ { dx : 0, dy : 1 } , { dx : 1, dy : 1 }, { dx : 1 , dy : -1 }, { dx : 0 , dy : -1 } ],
-            "-1" : [ { dx : 1, dy : 0 } , { dx : 0, dy : -1 } ],
+            "1"  : [ { dx : 0, dy : 1 } , { dx : 1, dy : 1 }, { dx : 1, dy : 0 }, { dx : 0, dy : 0 } ],
+            "0"  : [ { dx : 0, dy : 1 } , { dx : 1, dy : 1 }, { dx : 1, dy : 1 }, { dx : 1 , dy : -1 },
+                { dx : 0 , dy : -1 }, { dx : 0, dy : 0 } ],
+            "-1" : [ { dx : 1, dy : 0 } , { dx : 1, dy : -1 }, { dx : 0, dy : -1 }, { dx : 0, dy : 0 } ],
             "-2" : [ { dx : 1, dy : -1 }, { dx : 0 , dy : -1 } ]
         },
         "0" : {
             "2"  : [ { dx : -1, dy : 1 } , { dx : 0, dy : 1 }, { dx : 1 , dy : 1 } ],
-            "1"  : [ { dx : -1, dy : 0 } , { dx : -1, dy : 1 }, { dx : 1 , dy : 1 }, { dx : 1 , dy : 0 } ],
-            "-1" : [ { dx : -1, dy : 0 } , { dx : -1, dy : -11 }, { dx : 1 , dy : -1 }, { dx : 1 , dy : 0 } ],
+            "1"  : [ { dx : -1, dy : 0 } , { dx : -1, dy : 1 } , { dx : 0, dy : 1 },
+                { dx : 1 , dy : 1 }, { dx : 1 , dy : 0 }, { dx : 0, dy : 0 } ],
+            "-1" : [ { dx : -1, dy : 0 } , { dx : -1, dy : -1 } , { dx : 0, dy : 1 }, { dx : 1 , dy : -1 },
+                { dx : 1 , dy : 0 }, { dx : 0, dy : 0 } ],
             "-2" : [ { dx : -1, dy : -1 } , { dx : 0, dy : -1 }, { dx : 1 , dy : -1 } ]
         },
         "-1" : {
             "2"  : [ { dx : -1, dy : 1 } , { dx : 0 , dy : 1 } ],
-            "1"  : [ { dx : -1, dy : 0 } , { dx : 0, dy : 1 } ],
-            "0"  : [ { dx : 0, dy : 1 } , { dx : -1, dy : 1 }, { dx : -1 , dy : -1 }, { dx : 0 , dy : -1 } ],
-            "-1" : [ { dx : -1, dy : 0 } , { dx : 0, dy : -1 } ],
+            "1"  : [ { dx : -1, dy : 0 } , { dx : -1, dy : 1 }, { dx : 0, dy : 1 } , { dx : 0, dy : 0 }],
+            "0"  : [ { dx : 0, dy : 1 } , { dx : -1, dy : 1 }, { dx : -1, dy : 0 }, { dx : -1 , dy : -1 },
+                { dx : 0 , dy : -1 } , { dx : 0, dy : 0 }],
+            "-1" : [ { dx : -1, dy : 0 }, { dx : -1, dy : -1 } , { dx : 0, dy : -1 }, { dx : 0, dy : 0 } ],
             "-2" : [ { dx : -1, dy : -1 }, { dx : 0 , dy : -1 } ]
         },
         "-2" : {

@@ -27,33 +27,84 @@ var linkers = {
     LINK_TO_SOURCE_RANGE: 2,
 
     attachFlaggedRoutes: function (room, policy) {
+        if (!this.notReadyForLinkers(room))
+            return;
+
      //   console.log(room,"attachFlaggedRoutes");
         var flags = _.filter(Game.flags, function (flag) {
             return ( flag.memory.linkerFrom
                     && (flag.memory.linkerFrom.room == room.name
                     || flag.memory.porterFrom.room == room.name) );
         });
-       // console.log(room,"attachFlaggedRoutes flags",flags);
         for ( var i = 0 ; i < flags.length ; i++ ) {
-            if ( flags[i].memory.linkerFrom && !this.alreadyInBulidQueue(room, flags[i])
+            var previous = routeBase.filterBuilds(room,"flagName", flags[i].name);
+
+            if ( flags[i].memory.linkerFrom
                  && flags[i].memory.linkerFrom.room == room.name ) {
+
                 var order = new RouteLinker(room.name, flags[i].name, policy.id);
-                routeBase.attachRoute(room.name, gc.ROLE_LINKER,order,gc.PRIORITY_LINKER);
+                if (previous && previous.size != order.size) {
+                    routeBase.showRoutes();
+                    console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+                    routeBase.removeRoute(room.name,previous.id);
+                    routeBase.showRoutes();
+                    previous = undefined;
+                }
+                if (!previous)
+                    routeBase.attachRoute(room.name, gc.ROLE_LINKER,order,gc.PRIORITY_LINKER);
             }
+
             if (flags[i].pos.roomName != room
-                && flags[i].memory.porterFrom && !this.alreadyInBulidQueue(room, flags[i])
+                && flags[i].memory.porterFrom
                 && flags[i].memory.porterFrom.room == room.name) {
-                 order = new RouteNeutralPorter(room.name, flags[i].name, policy.id);
-                routeBase.attachRoute(room.name, gc.ROLE_NEUTRAL_PORTER,
-                                        order, gc.PRIORITY_NEUTRAL_PORTER);
+
+                order = new RouteNeutralPorter(room.name, flags[i].name, policy.id);
+                if (previous && previous.size != order.size) {
+                    routeBase.removeRoute(room.name,previous.id);
+                    previous = undefined;
+                }
+                if (!previous)
+                    routeBase.attachRoute(room.name, gc.ROLE_NEUTRAL_PORTER,
+                                            order, gc.PRIORITY_NEUTRAL_PORTER);
             }
             if ( flags[i].memory.attachFlaggedReverseController
-                && flags[i].memory.claimerFrom.room == room.name
-                && !this.alreadyInBulidQueue(room, flags[i])) {
-                this.attachFlaggedReverseController(flag,room, policy);
+                && flags[i].memory.claimerFrom.room == room.name) {
+                if (previous && previous.size != raceClaimer.maxSizeRoom(room)) {
+                    routeBase.removeRoute(room.name,previous.id);
+                    previous = undefined;
+                }
+                if (!previous)
+                    this.attachFlaggedReverseController(flags[i],room, policy);
             }
         }
-       // console.log(room,"attachFlaggedRoutes end of");
+        console.log(room,"attachFlaggedRoutes end of");
+    },
+
+    attachFlaggedReverseController: function (flag, room, policy)
+    {
+        var size = raceClaimer.maxSizeRoom(room);
+        var body = raceClaimer.body(size);
+        var actions = {
+            room : flag.pos.roomName,
+            action : "reserveController",
+            findFunction : "findController",
+            findFunctionsModule : "policy.remote.actions"
+        };
+        var timeReversing = CREEP_CLAIM_LIFE_TIME - flag.memory.claimerFrom.distance;
+        var ticksReversedLifetime = size * timeReversing;
+        var respawn = ticksReversedLifetime - Math.ceil(gc.REVERSE_CLAIM_SAFETYNET / size);
+        var order = new RouteRemoteActions(
+            room.name,
+            actions,
+            body,
+            respawn,
+            policyId
+        );
+        routeBase.attachRoute(room.name, gc.ROUTE_REMOTE_ACTIONS,order,gc.PRIORITY_REVERSE_CONTROLLER);
+    },
+
+    notReadyForLinkers: function (room) {
+        return room.energyCapacityAvailable > gc.MIN_ENERGY_CAPACITY_LINKERS;
     },
 
     alreadyInBulidQueue: function(room, flag) {
@@ -110,28 +161,7 @@ var linkers = {
         return life;
     },
 
-    attachFlaggedReverseController: function (flag, room, policy)
-    {
-        var size = raceClaimer.maxSizeRoom(room);
-        var body = raceClaimer.body(size);
-        var actions = {
-            room : flag.pos.roomName,
-            action : "reserveController",
-            findFunction : "findController",
-            findFunctionsModule : "policy.remote.actions"
-        };
-        var timeReversing = CREEP_CLAIM_LIFE_TIME - flag.memory.claimerFrom.distance;
-        var ticksReversedLifetime = size * timeReversing;
-        var respawn = ticksReversedLifetime - Math.ceil(gc.REVERSE_CLAIM_SAFETYNET / size);
-        var order = new RouteRemoteActions(
-            room.name,
-            actions,
-            body,
-            respawn,
-            policyId
-        );
-        routeBase.attachRoute(room.name, gc.ROUTE_REMOTE_ACTIONS,order,gc.PRIORITY_REVERSE_CONTROLLER);
-    },
+
 
     processBuildQueue: function(room) {
         var spawns = room.find(FIND_MY_SPAWNS);

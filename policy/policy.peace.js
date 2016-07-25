@@ -181,7 +181,37 @@ var policyPeace = {
             policyMany2oneLinker.checkRepairer(room, currentPolicy);
             policyMany2oneLinker.nonLinkBuilds(room, currentPolicy);
         }
+        if (gc.AI_CONSTRUCTION)
+            this.newConstruction(room);
         npcInvaderBattle.defendRoom(room);
+    },
+
+    newConstruction: function (room) {
+       var spawns = room.find(FIND_MY_SPAWNS);
+        var extensions = room.find(FIND_MY_STRUCTURES, {
+            filter: { structureType: STRUCTURE_EXTENSION }
+        });
+        var sites = room.find(FIND_CONSTRUCTION_SITES, {
+            filter: { structureType: STRUCTURE_EXTENSION }
+        });
+        var maxExtensions = CONTROLLER_STRUCTURES[STRUCTURE_EXTENSION][room.controller.level];
+        console.log(room,"builds spawns",spawns,"extensions",extensions.length,
+                            "max extensions",maxExtensions,"controller level", room.controller.level);
+       /* if (extensions.length + sites.length < maxExtensions) {
+            var numSites = maxExtensions - extensions.length - sites.length;
+            var x = 2, y = 3;
+            var range = 2;
+            while (numSites--) {
+                var perimeter = getPerimeter(range);
+                for ( i = 0 ; i < perimeter.length ; i += 2 ) {
+                    var pos = new RoomPosition( spawns[0].pos.x + perimeter[i].x,
+                        spawns[0].pos.y + perimeter[i].y    , room.name);
+                    var result =  room.createConstructionSite(pos, STRUCTURE_EXTENSION);
+                    if (result == OK)
+                        numSites--
+                }
+            }
+        }*/
     },
 
     calculateAndAssignRoles: function (room, currentPolicy) {

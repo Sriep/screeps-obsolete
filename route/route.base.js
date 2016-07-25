@@ -64,10 +64,13 @@ var routeBase = {
         if (this.checkSetup(room)) {
             var filteredOrders = [];
             for (var i in  room.memory.routes.details) {
+               // console.log(room,"filterBuilds", JSON.stringify(room.memory.routes.details[i]));
                 if (room.memory.routes.details[i][field] == value)
                     filteredOrders.push(room.memory.routes.details[i]);
             }
+           // console.log("filter builds end of",filteredOrders);
             return filteredOrders;
+
         }
     },
 

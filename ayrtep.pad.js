@@ -68,6 +68,10 @@ var ayrtepPad = {
     bottom: function () {
         console.log("START MY  PAD START MY  PAD");
 
+       // var mainStructs = gf.structureTypeInRange(pos, mainStructType, 2);
+
+
+
      //   var roleLinker = require("role.linker");
      //   var taskList = roleLinker.getTaskList(undefined,"57589753e1b559579a707197");
      //   console.log("role.linker get task list", taskList);

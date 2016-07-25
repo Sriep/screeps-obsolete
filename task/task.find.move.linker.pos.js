@@ -34,13 +34,13 @@ function TaskFindMoveLinkerPos (flagName) {
 }
 
 TaskFindMoveLinkerPos.prototype.doTask = function(creep, task) {
-   // console.log(creep, "In TaskFindMoveLinkerPos task", JSON.stringify(task));
+  //  console.log(creep, "In TaskFindMoveLinkerPos task", JSON.stringify(task));
     var flag = Game.flags[task.flagName];
    // console.log(creep, "In TaskFindMoveLinkerPos", task.flagName
    //     , creep.room.name, "==?" , flag.pos.roomName);
     if (!task.flagName) return gc.RESULT_UNFINISHED;
     if (creep.room.name != flag.pos.roomName) return gc.RESULT_ROLLBACK;
-
+    console.log("berfore  var homePos = this.findHomePosition(creep, task);")
     var homePos = this.findHomePosition(creep, task);
     console.log(creep,"findHomoePosition",homePos);
     var newTaskList = [];
@@ -67,7 +67,8 @@ TaskFindMoveLinkerPos.prototype.findHomePosition = function (creep, task) {
     flag.memory.alternateLinkId = undefined;
     flag.memory.alternateLinkType = undefined;
     var homePos;
-    homePos = findLinkPos(flag.pos,STRUCTURE_STORAGE,STRUCTURE_LINK, STRUCTURE_TERMINAL);
+    console.log(creep,"TaskFindMoveLinkerPos");
+    homePos = findLinkPos(flag,STRUCTURE_STORAGE,STRUCTURE_LINK, STRUCTURE_TERMINAL);
     if (homePos) {
         if (flag.memory.alternateLinkType == STRUCTURE_LINK) {
             if (flag.memory.type = gc.FLAG_SOURCE) {
@@ -81,7 +82,8 @@ TaskFindMoveLinkerPos.prototype.findHomePosition = function (creep, task) {
         console.log("STRUCTURE_STORAGE,STRUCTURE_LINK, STRUCTURE_TERMINAL");
         return homePos
     }
-    homePos = findLinkPos(flag.pos,STRUCTURE_TERMINAL, STRUCTURE_LINK, STRUCTURE_CONTAINER);
+    console.log(creep,"about to look",STRUCTURE_TERMINAL, STRUCTURE_LINK, STRUCTURE_CONTAINER);
+    homePos = findLinkPos(flag,STRUCTURE_TERMINAL, STRUCTURE_LINK, STRUCTURE_CONTAINER);
     if (homePos) {
         if (flag.memory.alternateLinkType == STRUCTURE_LINK) {
             if (flag.memory.type = gc.FLAG_SOURCE) {
@@ -94,13 +96,14 @@ TaskFindMoveLinkerPos.prototype.findHomePosition = function (creep, task) {
         }
         return homePos
     }
-    homePos = findLinkPos(flag.pos,STRUCTURE_LINK, STRUCTURE_CONTAINER);
+    console.log(creep,"about to look",STRUCTURE_LINK, STRUCTURE_CONTAINER);
+    homePos = findLinkPos(flag,STRUCTURE_LINK, STRUCTURE_CONTAINER);
     if (homePos) {
         flag.memory.linkType = gc.LINKER_LINK_LINK;
         console.log("STRUCTURE_LINK,STRUCTURE_CONTAINER, ");
         return homePos;
     }
-    homePos = findLinkPos(flag.pos,STRUCTURE_CONTAINER);
+    homePos = findLinkPos(flag,STRUCTURE_CONTAINER);
     if (homePos) {
         flag.memory.linkType = gc.LINKER_REPAIR_DUMP;
         return homePos;
@@ -116,7 +119,7 @@ TaskFindMoveLinkerPos.prototype.findHomePosition = function (creep, task) {
     console.log(creep,"TaskFindMoveLinkerPos looking for construction sites",sites.length, sites);
     for ( var i in sites) {
         var pointsBetween = gf.joinPointsBetween(sites[i].pos, flag.pos);
-        console.log(creep,"points between", JSON.stringify(pointsBetween) );
+       // console.log(creep,"points between", JSON.stringify(pointsBetween) );
         if (pointsBetween.length > 0) {
             flag.memory.mainDumpId = sites[i].id;
             flag.memory.linkType = gc.LINKER_BUILD;
@@ -127,12 +130,14 @@ TaskFindMoveLinkerPos.prototype.findHomePosition = function (creep, task) {
 };
 
 
-var findLinkPos = function (pos, mainStructType, secondStructType, thirdStructType) {
+var findLinkPos = function (flag, mainStructType, secondStructType, thirdStructType) {
     var homePos;
-
-    var mainStructs = gf.structureTypeInRange(pos, mainStructType, 2);
+    console.log(flag,"before structureTypeInRange");
+    var mainStructs = gf.structureTypeInRange(flag.pos, mainStructType, 2);
+    console.log(flag.pos,"in findLinkPos sturture types",mainStructType,secondStructType,"main structs", mainStructs);
     if (mainStructs.length > 0) {
-        var possibleSites = gf.joinPointsBetween(mainStructs[0].pos, pos);
+        var possibleSites = gf.joinPointsBetween(mainStructs[0].pos, flag.pos);
+        console.log(flag.pos,"findLinkPos",possibleSites);
         if ( possibleSites.length == 1 || !secondStructType ) {
             homePos = possibleSites[0];
             flag.memory.mainDumpId = mainStructs[0].id;
@@ -163,6 +168,7 @@ var findLinkPos = function (pos, mainStructType, secondStructType, thirdStructTy
         } //else if
 
     } // if
+    console.log(flag.pos,"end of findLinkPos",homePos);
     return homePos;
 };
 

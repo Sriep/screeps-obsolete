@@ -37,11 +37,14 @@ var gf = {
 
     structureTypeInRange: function (pos, structureType, range) {
         if (!range) range = 1;
-        var structures = Game.rooms[pos.roomName].find(FIND_MY_STRUCTURES, {
+        console.log("structureTypeInRange",pos, structureType,range);
+        var structures = Game.rooms[pos.roomName].find(FIND_STRUCTURES, {
             filter: { structureType: structureType }
         });
+        console.log(pos,"structureTypeInRange",structureType,"obj",structures);
         var inRange = [];
         for  ( var i = 0 ; i < structures.length ; i++ )  {
+            console.log(pos,"pos",structures[i].pos,"is it in range",pos.inRangeTo(structures[i], range))
             if ( pos.inRangeTo(structures[i], range) )
                 inRange.push(structures[i]);
         }
@@ -85,6 +88,21 @@ var gf = {
             default:
                 return undefined;
         }
+    },
+
+    getPerimeter: function (N) {
+        var perimeter = [];
+        for ( var i = -N ; i <= N ; i++ ) {
+            if ( i != -N )
+                perimeter.push( { x : N, y : i } );
+            if ( i != N )
+                perimeter.push( { x : i, y : N } );
+            if ( i != N )
+                perimeter.push( { x : -N, y : i } );
+            if ( i != -N )
+                perimeter.push( { x : i, y : -N } );
+        }
+        return perimeter;
     }
 
 };

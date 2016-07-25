@@ -8,7 +8,7 @@
 "use strict";
 var gc = require("gc");
 var tasks = require("tasks");
-var TaskFlexiLink = require("rask.flexiLink");
+var TaskFlexiLink = require("task.flexi.link");
 
 /**
  * Task harvest object.
@@ -34,7 +34,10 @@ TaskLinkerDump.prototype.doTask = function(creep, task) {
     if (!dump)  {
         return TaskFlexiLink.prototype.resetState(creep, task);
     }
-    creep.transfer(dump, Game.flags[flagName].memory.resource);
+
+    var result = creep.transfer(dump, flag.memory.resourceType);
+    //console.log(creep,"reault of transfer",result,dump, flag.memory.resourceType);
+
     return gc.RESULT_UNFINISHED;
 };
 

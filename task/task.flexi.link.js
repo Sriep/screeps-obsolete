@@ -30,15 +30,15 @@ function TaskFlexiLink (flagName) {
 }
 
 TaskFlexiLink.prototype.doTask = function(creep, task) {
-   // console.log(creep,"in TaskFlexiLink.doTask", JSON.stringify(task));
-   // console.log(creep,"task.flagName", task.flagName,"Game.flags",Game.flags);
+    //console.log(creep,"in TaskFlexiLink.doTask", JSON.stringify(task));
+    //console.log(creep,"task.flagName", task.flagName,"Game.flags",Game.flags);
     var flag = Game.flags[task.flagName];
-  //  console.log(creep,"in TaskFlexiLink.doTask flag",flag);
+    //console.log(creep,"in TaskFlexiLink.doTask flag",flag);
     if (!flag.memory.operator
         || creep.id != flag.memory.operator.id
         || undefined == flag.memory.linkType)
         initilise(creep,task,flag);
-   // console.log(creep, "In TaskFlexiLink doTask linkType", flag.memory.linkType);
+    //console.log(creep, "In TaskFlexiLink doTask linkType", flag.memory.linkType);
     var moduleName = "task." + flag.memory.linkType;
     var taskModule = require(moduleName);
     return taskModule.prototype.doTask(creep, task);
