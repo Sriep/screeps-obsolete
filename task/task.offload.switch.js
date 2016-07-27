@@ -39,7 +39,7 @@ function TaskOffloadSwitch (resourceId, storageIds) {
 }
 
 TaskOffloadSwitch.prototype.doTask = function(creep) {
-  //  console.log(creep,"TaskOffloadSwitch");
+   // console.log(creep,"TaskOffloadSwitch");
     tasks.setTargetId(creep, undefined);
     if (undefined === creep)
         return gc.RESULT_UNFINISHED;
@@ -58,7 +58,7 @@ TaskOffloadSwitch.prototype.doTask = function(creep) {
         return gc.RESULT_RESET
     }
 
-    var constructionSites = creep.room.find(FIND_MY_CONSTRUCTION_SITES);
+    var constructionSites = creep.room.find(FIND_CONSTRUCTION_SITES);
     if (constructionSites.length > 0) {
         this.switchToConstruction(creep);
         return gc.RESULT_RESET
@@ -90,7 +90,8 @@ TaskOffloadSwitch.prototype.moveToStorage = function (creep)
     var energyDumps = creep.room.find(FIND_STRUCTURES, {
                         filter: function(object) {
                             return (object.structureType == STRUCTURE_CONTAINER
-                            || object.structureType == STRUCTURE_STORAGE) ;
+                            || object.structureType == STRUCTURE_STORAGE
+                            || object.structureType == STRUCTURE_TERMINAL) ;
                         }
     });
     var energy = 0;
@@ -99,9 +100,10 @@ TaskOffloadSwitch.prototype.moveToStorage = function (creep)
     }
  //  console.log(creep,creep.room,"energy dumps energy",energy);
     if (energy > 0) {
-        energyDumps.sort(function (a, b) {
-            return b.store[RESOURCE_ENERGY] - a.store[RESOURCE_ENERGY];
-        });
+        energyDumps.sort(this.energyDumpSortOrder);
+        //energyDumps.sort(function (a, b) {
+        //    return b.store[RESOURCE_ENERGY] - a.store[RESOURCE_ENERGY];
+        //});
       //console.log(creep,"TaskOffloadSwitch moveToStorage sorted energyDumpsbaba", JSON.stringify(energyDumps));
         moveToStorage = new TaskMoveFind(gc.FIND_ID, gc.RANGE_TRANSFER, energyDumps[0].id);
         moveToStorage.mode = gc.FLEXIMODE_CONTAINER;
@@ -112,6 +114,19 @@ TaskOffloadSwitch.prototype.moveToStorage = function (creep)
     }
     //console.log(creep,"moveToStorage rtv", moveToStorage, JSON.stringify(moveToStorage));
     return moveToStorage;
+};
+
+// todo could alter to take account of portors heading to container and their capacity.
+TaskOffloadSwitch.prototype.energyDumpSortOrder = function(a, b) {
+    if (a.structureType == STRUCTURE_CONTAINER
+        && b.structureType != STRUCTURE_CONTAINER
+        && a.store[RESOURCE_ENERGY]/a.storeCapacity > 0.5)
+        return -1;
+    if (b.structureType == STRUCTURE_CONTAINER
+        && a.structureType != STRUCTURE_CONTAINER
+        && b.store[RESOURCE_ENERGY]/b.storeCapacity > 0.5)
+        return 1;
+    return b.store[RESOURCE_ENERGY] - a.store[RESOURCE_ENERGY];
 };
 
 TaskOffloadSwitch.prototype.switchToFillUp = function (creep) {
@@ -148,7 +163,7 @@ TaskOffloadSwitch.prototype.switchToProduction = function (creep) {
 
 TaskOffloadSwitch.prototype.switchToConstruction = function (creep) {
     var moveToConstructionSite = new TaskMoveFind(gc.FIND_ROOM_OBJECT,gc.RANGE_BUILD
-        ,FIND_MY_CONSTRUCTION_SITES);
+        ,FIND_CONSTRUCTION_SITES);
     var offloadBuild = new TaskOffload(gc.BUILD);
     var switchTaskLists = new TaskOffloadSwitch();
 

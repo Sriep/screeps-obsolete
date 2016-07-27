@@ -81,19 +81,31 @@ var raceWorker = {
         return body.length / 3;
     },
 
+    energyFromSize: function (size, fast) {
+        if (fast){
+            return size * this.BLOCKSIZE_FAST;
+        }  else {
+            return size * this.BLOCKSIZE;
+        }
+    },
+
     maxSizeRoom: function(room, fast) {
     //    console.log("race.worker.maxSizeRoom",room.energyCapacityAvailable,this.BLOCKSIZE);
+        var withoutBodyPartLimit;
         if (fast) {
-            return Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE_FAST);
+            withoutBodyPartLimit = Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE_FAST);
+            return Math.min(withoutBodyPartLimit, gc.WORKER_FAST_MAX_SIZE);
         } else {
-            return Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE);
+            withoutBodyPartLimit =  Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE);
+            return Math.min(withoutBodyPartLimit, gc.WORKER_SLOW_MAX_SIZE);
         }
     },
 
     maxSizeFromEnergy: function(room)  {
       //  console.log(room,"room.energyAvailable",room.energyAvailable,"blocksize",this.BLOCKSIZE,
     //    "result",Math.floor(room.energyAvailable / this.BLOCKSIZE));
-        return Math.floor(room.energyAvailable / this.BLOCKSIZE);
+        var withoutBodyPartLimit =  Math.floor(room.energyAvailable / this.BLOCKSIZE);
+        return Math.min(withoutBodyPartLimit, gc.WORKER_SLOW_MAX_SIZE);
     },
 
     spawnWorkerSize: function(room, euilibEnergy) {
@@ -261,7 +273,6 @@ console.log("assignRoles havester", havesters_needed, "upgraders",upgraders_need
             }
      //  }
     },
-    
 
     body: function (size, fast) {
         var body = [];

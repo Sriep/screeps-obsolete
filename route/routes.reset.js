@@ -89,6 +89,8 @@ var routesReset = {
 
     roomW25S22:  function () {
         // routesReset = require("routes.reset"); routesReset.roomW25S22();
+        // routeBase = require("routes.base"); resetRoutes("W25S22);
+        //routeBase = require("routes.base"); resetRoutes("W25S22);
         // routesReset = require("routes.reset"); routesReset.resetRoutes("sim");
         var roomName = "W25S22";
         var room = Game.rooms[roomName];

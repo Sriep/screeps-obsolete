@@ -32,14 +32,14 @@ function TaskMoveRoom (roomName, pathOps, movesTowardsCenter) {
 }
 
 TaskMoveRoom.prototype.doTask = function(creep, task) {
-    console.log(creep,"TaskMoveRoom strt");
+    //console.log(creep,"TaskMoveRoom strt");
     if (task.startRoom === undefined || task.roomsToVisit == ERR_NO_PATH) { //First call to function. Initialise data.
         task.startRoom = creep.room.name;
         task.roomsToVisit = Game.map.findRoute(task.startRoom, task.roomName, task.pathOps);
         task.pathIndex = 0;
     }
     if (creep.room.name == task.roomName && !this.atBorder(creep.pos.x,creep.pos.y)) {
-        console.log(creep,"TaskMoveRoom at right room");
+        //console.log(creep,"TaskMoveRoom at right room");
         return gc.RESULT_FINISHED;
     }
 

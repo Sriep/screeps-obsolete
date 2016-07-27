@@ -40,23 +40,23 @@ TaskFindMoveLinkerPos.prototype.doTask = function(creep, task) {
    //     , creep.room.name, "==?" , flag.pos.roomName);
     if (!task.flagName) return gc.RESULT_UNFINISHED;
     if (creep.room.name != flag.pos.roomName) return gc.RESULT_ROLLBACK;
-    console.log("berfore  var homePos = this.findHomePosition(creep, task);")
+  //  console.log("berfore  var homePos = this.findHomePosition(creep, task);");
+
     var homePos = this.findHomePosition(creep, task);
-    console.log(creep,"findHomoePosition",homePos);
+    ///console.log(creep,"findHomoePosition",homePos);
     var newTaskList = [];
     var moveToSource;
     if (homePos) {
         moveToSource = new TaskMovePos(homePos,0)
     } else {
-        console.log(creep,"before mande moveToSource",flag.pos,1);
         moveToSource = new TaskMovePos(flag.pos,1)
     }
-    console.log(creep,"after mande moveToSource");
+    moveToSource.loop = false;
     var flexiLink = new TaskFlexiLink(task.flagName);
     newTaskList.push(moveToSource);
     newTaskList.push(flexiLink);
     creep.memory.tasks.tasklist = newTaskList;
-    console.log(creep,"TaskFindMoveLinkerPos reset task lists at end of doTask");
+   // console.log(creep,"TaskFindMoveLinkerPos reset task lists at end of doTask");
     return  gc.RESULT_RESET;
 };
 
@@ -67,11 +67,12 @@ TaskFindMoveLinkerPos.prototype.findHomePosition = function (creep, task) {
     flag.memory.alternateLinkId = undefined;
     flag.memory.alternateLinkType = undefined;
     var homePos;
-    console.log(creep,"TaskFindMoveLinkerPos");
+
     homePos = findLinkPos(flag,STRUCTURE_STORAGE,STRUCTURE_LINK, STRUCTURE_TERMINAL);
+   // console.log(creep,"TaskFindMoveLinkerPos", homePos);
     if (homePos) {
         if (flag.memory.alternateLinkType == STRUCTURE_LINK) {
-            if (flag.memory.type = gc.FLAG_SOURCE) {
+            if (flag.memory.type == gc.FLAG_SOURCE) {
                 flag.memory.linkType = gc.LINKER_LINK_DUMP;
             } else {
                 flag.memory.linkType = gc.LINKER_DUMP_LINK_DUMP;
@@ -79,14 +80,14 @@ TaskFindMoveLinkerPos.prototype.findHomePosition = function (creep, task) {
         } else {
             flag.memory.linkType = gc.LINKER_DUMP;
         }
-        console.log("STRUCTURE_STORAGE,STRUCTURE_LINK, STRUCTURE_TERMINAL");
+     //   console.log("STRUCTURE_STORAGE,STRUCTURE_LINK, STRUCTURE_TERMINAL");
         return homePos
     }
-    console.log(creep,"about to look",STRUCTURE_TERMINAL, STRUCTURE_LINK, STRUCTURE_CONTAINER);
+ //   console.log(creep,"about to look",STRUCTURE_TERMINAL, STRUCTURE_LINK, STRUCTURE_CONTAINER);
     homePos = findLinkPos(flag,STRUCTURE_TERMINAL, STRUCTURE_LINK, STRUCTURE_CONTAINER);
     if (homePos) {
         if (flag.memory.alternateLinkType == STRUCTURE_LINK) {
-            if (flag.memory.type = gc.FLAG_SOURCE) {
+            if (flag.memory.type == gc.FLAG_SOURCE) {
                 flag.memory.linkType = gc.LINKER_LINK_DUMP;
             } else {
                 flag.memory.linkType = gc.LINKER_DUMP_LINK_DUMP;
@@ -96,11 +97,11 @@ TaskFindMoveLinkerPos.prototype.findHomePosition = function (creep, task) {
         }
         return homePos
     }
-    console.log(creep,"about to look",STRUCTURE_LINK, STRUCTURE_CONTAINER);
+   // console.log(creep,"about to look",STRUCTURE_LINK, STRUCTURE_CONTAINER);
     homePos = findLinkPos(flag,STRUCTURE_LINK, STRUCTURE_CONTAINER);
     if (homePos) {
         flag.memory.linkType = gc.LINKER_LINK_LINK;
-        console.log("STRUCTURE_LINK,STRUCTURE_CONTAINER, ");
+       // console.log("STRUCTURE_LINK,STRUCTURE_CONTAINER, ");
         return homePos;
     }
     homePos = findLinkPos(flag,STRUCTURE_CONTAINER);
@@ -116,7 +117,7 @@ TaskFindMoveLinkerPos.prototype.findHomePosition = function (creep, task) {
                 || site.structureType == STRUCTURE_TERMINAL
         }
     });
-    console.log(creep,"TaskFindMoveLinkerPos looking for construction sites",sites.length, sites);
+  //  console.log(creep,"TaskFindMoveLinkerPos looking for construction sites",sites.length, sites);
     for ( var i in sites) {
         var pointsBetween = gf.joinPointsBetween(sites[i].pos, flag.pos);
        // console.log(creep,"points between", JSON.stringify(pointsBetween) );
@@ -132,20 +133,21 @@ TaskFindMoveLinkerPos.prototype.findHomePosition = function (creep, task) {
 
 var findLinkPos = function (flag, mainStructType, secondStructType, thirdStructType) {
     var homePos;
-    console.log(flag,"before structureTypeInRange");
+ //   console.log(flag,"before structureTypeInRange");
     var mainStructs = gf.structureTypeInRange(flag.pos, mainStructType, 2);
-    console.log(flag.pos,"in findLinkPos sturture types",mainStructType,secondStructType,"main structs", mainStructs);
+  //  console.log(flag.pos,"in findLinkPos sturture types",mainStructType,secondStructType,"main structs", mainStructs);
     if (mainStructs.length > 0) {
         var possibleSites = gf.joinPointsBetween(mainStructs[0].pos, flag.pos);
-        console.log(flag.pos,"findLinkPos",possibleSites);
-        if ( possibleSites.length == 1 || !secondStructType ) {
+       // console.log(flag.pos,"findLinkPos",possibleSites.length, possibleSites);
+        if (possibleSites.length > 0) {
             homePos = possibleSites[0];
             flag.memory.mainDumpId = mainStructs[0].id;
             flag.memory.mainDumpType = mainStructType;
-        } else if (possibleSites.length > 1 ) {
 
-            for (i = 0; i < possibleSites.length; i++) {
+        //if (possibleSites.length > 1 && secondStructType) {
+            for ( var i = 0 ; i < possibleSites.length ; i++ ) {
                 var secondStructs = gf.structureTypeInRange(possibleSites[i], secondStructType, 1);
+              //  console.log(flag.pos,"findLinkPos secondStructs",secondStructs);
                 if (secondStructs.length > 0) {
                     homePos = possibleSites[i];
                     flag.memory.mainDumpId = mainStructs[0].id;
@@ -168,7 +170,7 @@ var findLinkPos = function (flag, mainStructType, secondStructType, thirdStructT
         } //else if
 
     } // if
-    console.log(flag.pos,"end of findLinkPos",homePos);
+    //console.log(flag.pos,"end of findLinkPos",homePos);
     return homePos;
 };
 

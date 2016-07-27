@@ -21,10 +21,11 @@ var flagSource = {
         if (!flag.room)
             return;
 
-        if ( roomBase.isMyRoom(flag.room.name)) {
-            flag.memory.linkerFrom = { room : flag.room.name, distance : 0 };
-            flag.memory.porterFrom = { room : flag.room.name, distance : 0 };
-        } else if ( roomBase.isNeutralRoom(flag.room.name)) {
+        if ( roomBase.isMyRoom(flag.pos.roomName)) {
+            // todo Put in code to give real distance. Not sure if would be used usefully.
+            flag.memory.linkerFrom = { room : flag.pos.roomName, distance : 0 };
+            flag.memory.porterFrom = { room : flag.pos.roomName, distance : 0 };
+        } else if ( roomBase.isNeutralRoom(flag.pos.roomName)) {
         //    console.log("flagSource flag", flag);
             flag.memory.linkerFrom = this.linkerSupplyRoom(flag);
             flag.memory.porterFrom = this.porterSupplyRoom(flag);
@@ -51,3 +52,25 @@ var flagSource = {
 };
 
 module.exports = flagSource;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

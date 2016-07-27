@@ -133,9 +133,11 @@ var gc = {
     POLICY_HARVEST_KEEPER_SECTOR: "harvest.keeper.sector",
 
     // flags
-    FLAG_SOURCE: LOOK_SOURCES,
-    FLAG_MINERAL: LOOK_MINERALS,
+    FLAG_SOURCE: "source",
+    FLAG_MINERAL: "mineral",
     FLAG_CONTROLLER: STRUCTURE_CONTROLLER,
+    FLAG_KEEPERS_LAIR: "keeperlair",
+    FLAG_LINK: STRUCTURE_LINK,
 
     //Recurring orders
     ROUTE_NEUTRAL_HARVEST: "neutral.harvest",
@@ -158,6 +160,11 @@ var gc = {
     //misc
     LINKING_WORKER_SIZE: 5,
     REPAIRER_WORKER_SIZE: 5,
+    LINKING_MINER_SIZE: 5,
+    WORKER_SLOW_MAX_SIZE: 16,
+    WORKER_FAST_MAX_SIZE: 12,
+    SWORDSMAN_NEUTRAL_PATROL_SIZE: 6,
+
     REPAIRER_THRESHOLD: 5,
     BLOCKSIZE_COST_WORKER: 200,
     EMERGENCY_DOWNGRADING_THRESHOLD: 1000,
@@ -168,20 +175,25 @@ var gc = {
     DEFAULT_ROUTE_PRIORITY: 10,
     REVERSE_CLAIM_SAFETYNET: 100,
     MIDDLE_AGE_CREEP_LIFE_TO_LIVE: 750,
-    ROOM_UPDATE_RATE: 10,
-    FLAG_UPDATE_RATE: 10,
     THE_POOL: 0,
     MAX_TASK_ACTIONS: 5,
-    PORTER_PRIORITY_THRESHOLD: this.MIDDLE_AGE_CREEP_LIFE_TO_LIVE,
+    PORTER_PRIORITY_THRESHOLD: 750,//this.MIDDLE_AGE_CREEP_LIFE_TO_LIVE,
     MIN_ENERGY_CAPACITY_LINKERS: 400,
 
+    ROOM_UPDATE_RATE: 12,
+    FLAG_UPDATE_RATE: 1500,
+    LINKER_RESET_RATE: 250,
+    CHECK_FOR_ORPHANED_BUILDS_RATE: 1,
+
     //Build priorities
-    PRIORITY_EMERGENCY_HOME_PORTER: 1,
-    PRIORITY_LINKER: 2,
-    PRIORITY_NEUTRAL_PORTER: 5,
-    PRIORITY_HOME_PORTER: 3,
-    PRIORITY_REVERSE_CONTROLLER: 5,
-    PRIORITY_REPAIRER: 10,
+    PRIORITY_EMERGENCY_HOME_PORTER: 2,
+    PRIORITY_LINKER: 4,
+    PRIORITY_NEUTRAL_PORTER: 12,
+    PRIORITY_HOME_PORTER: 6,
+    PRIORITY_NEUTRAL_LINKER: 10,
+    PRIORITY_REVERSE_CONTROLLER: 14,
+    PRIORITY_REPAIRER: 8,
+    PRIORITY_ROOM_PATROL: 14,
 
     //flag colours
     FLAG_PERMANENT_COLOUR: COLOR_BLUE,
@@ -189,6 +201,8 @@ var gc = {
     FLAG_CONTROLLER_COLOUR: COLOR_PURPLE,
     FLAG_MINERAL_COLOUR: COLOR_GREY,
     FLAG_KEEPERS_LAIR_COLOUR: COLOR_ORANGE,
+    FLAG_STRUCTURE_COLOUR: COLOR_BROWN,
+    FLAG_LINK_COLOUR: COLOR_CYAN,
 
     //AI
     AI_CONSTRUCTION: true,
@@ -260,7 +274,28 @@ var gc = {
      {x :1, y:-2},
      {x:0,y:-2},
      {x :-1, y:-2}
-     ]
+     ],
+
+    SOURCE_KEEPER_BODY: [{"type":"tough","hits":100},{"type":"tough","hits":100},
+        {"type":"tough","hits":100},{"type":"tough","hits":100},
+        {"type":"tough","hits":100},{"type":"tough","hits":100},{"type":"tough","hits":100},
+        {"type":"tough","hits":100},{"type":"tough","hits":100},{"type":"tough","hits":100},
+        {"type":"tough","hits":100},{"type":"tough","hits":100},{"type":"tough","hits":100},
+        {"type":"tough","hits":100},{"type":"tough","hits":100},{"type":"tough","hits":100},
+        {"type":"tough","hits":100},{"type":"move","hits":100},{"type":"move","hits":100},
+        {"type":"move","hits":100},{"type":"move","hits":100},{"type":"move","hits":100},
+        {"type":"move","hits":100},{"type":"move","hits":100},{"type":"move","hits":100},
+        {"type":"move","hits":100},{"type":"move","hits":100},{"type":"move","hits":100},
+        {"type":"move","hits":100},{"type":"move","hits":100},{"type":"attack","hits":100},
+        {"type":"ranged_attack","hits":100},{"type":"attack","hits":100},
+        {"type":"ranged_attack","hits":100},{"type":"attack","hits":100},{"type":"ranged_attack","hits":100},
+        {"type":"attack","hits":100},{"type":"ranged_attack","hits":100},
+        {"type":"attack","hits":100},{"type":"ranged_attack","hits":100},{"type":"attack","hits":100},
+        {"type":"ranged_attack","hits":100},{"type":"attack","hits":100},
+        {"type":"ranged_attack","hits":100},{"type":"attack","hits":100},{"type":"ranged_attack","hits":100},
+        {"type":"attack","hits":100},{"type":"ranged_attack","hits":100},
+        {"type":"attack","hits":100},{"type":"ranged_attack","hits":100}]
+
 
 
 };

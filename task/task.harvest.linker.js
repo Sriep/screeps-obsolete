@@ -39,7 +39,7 @@ TaskHarvestLinker.prototype.doTask = function(creep, task) {
 
     var sourceLink = Game.getObjectById(task.homeLinkId);
     if (!sourceLink) {
-        console.log(creep, "no from link")
+        //console.log(creep, "no from link")
         //   creep.say("help link");
         //   var newHomeLink = this.findNewLink(creep, source);
         //    if (newHomeLink) {

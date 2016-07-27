@@ -37,8 +37,13 @@ RouteFlexiStoragePorter.prototype.spawn = function (build, spawn, room ) {
         roleBase.switchRoles(Game.creeps[name],
             gc.ROLE_FLEXI_STORAGE_PORTER);
         Game.creeps[name].memory.policyId = build.policyId;
+        Game.creeps[name].memory.buildReference = build.owner;
     }
     return name;
+};
+
+RouteFlexiStoragePorter.prototype.energyCost = function(build) {
+    return raceWorker.energyFromSize(build.size);
 };
 
 module.exports = RouteFlexiStoragePorter;

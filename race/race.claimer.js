@@ -28,6 +28,10 @@ var claimer = {
 
     maxSizeRoom: function(room) {
         return Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE);
+    },
+
+    energyFromSize: function (size) {
+        return size * this.BLOCKSIZE;
     }
 
 };

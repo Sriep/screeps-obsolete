@@ -19,6 +19,7 @@ var roleLinker = {
             console.log(creep,"In roleLinker getTaskList",flagName);
             var flag = Game.flags[flagName];
             console.log(creep,flagName,"getTaskList flag",flag);
+
             var taskList = [];
             var moveToRoom = new TaskMoveRoom(flag.pos.roomName);
             moveToRoom.loop = false;

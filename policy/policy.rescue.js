@@ -101,13 +101,13 @@ var policyRescue = {
 
             if (1 < roomOwned.countSiteAccess(room, FIND_SOURCES) ){
                 for (var i in creeps) {
-                    console.log(room, "acces sites >1",roomOwned.countSiteAccess(room, FIND_SOURCES));
+                   // console.log(room, "acces sites >1",roomOwned.countSiteAccess(room, FIND_SOURCES));
                     workparts = workparts + creeps[i].getActiveBodyparts(WORK);
                 }
                 workerSize = Math.min(raceWorker.maxSizeRoom(room), workparts+1);              
             } else {
-                console.log(room,"worker size", raceWorker.spawnWorkerSize(room,creeps.length*1000)
-                ,"energy num creeps x1000",creeps.length*1000)
+              //  console.log(room,"worker size", raceWorker.spawnWorkerSize(room,creeps.length*1000)
+              //  ,"energy num creeps x1000",creeps.length*1000)
                workerSize = raceWorker.spawnWorkerSize(room,creeps.length*1000)
             }
         }

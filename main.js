@@ -30,9 +30,9 @@ module.exports.loop = function () {
          // console.log("ops exception from ayrtepPad top",exp);
       //  }
         if (Game.time % gc.ROOM_UPDATE_RATE == 0 ){
-             roomBase.examineRooms();
+             roomBase.examineRooms(true);
         }
-        if (Game.time % gc.FLAG_UPDATE_RATE == 5 ){
+        if (Game.time % gc.FLAG_UPDATE_RATE == 0 ){
             flagBase.run();
         }
         freememory.freeCreeps();

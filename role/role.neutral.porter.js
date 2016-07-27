@@ -24,28 +24,28 @@ var roleNeutralPorter = {
 
     getTaskList: function(creep, homeRoom, flag) {
         var tasks = [];
-        var collectionId = flag.name;
-        if (!flag || !collectionId) return undefined;
+        //var collectionId = flag.name;
+        if (!flag) return undefined;
+        var collectionId  = flag.memory.mainDumpId
+        if (!collectionId) return undefined;
         var collectionObj = Game.getObjectById(collectionId);
 
         // Use ConstructionSite.progress to see if its a construction site
         // as only this structure has a progress field
-        if (!collectionObj
-            || collectionObj.progress !== undefined) {
-            console.log(creep, flag, "roleNeutralPorter.getTaskList  cannot find collecton object");
+        if (!collectionObj || collectionObj.progress !== undefined) {
+            console.log(creep, flag, "roleNeutralPorter.getTaskList  cannot find collection object");
             return undefined;
         }
 
-
         var moveToCollectionRoom = new TaskMoveRoom(flag.pos.roomName);
-        var moveToCollectonObj = new TaskMoveFind(gc.FIND_ID,gc.RANGE_TRANSFER, collectionId);
+        var moveToCollectionObj = new TaskMoveFind(gc.FIND_ID,gc.RANGE_TRANSFER, collectionId);
         var loadUp = new TaskLoadup(flag.memory.resourceType, collectionId);
         var moveHomeRoom = new TaskMoveRoom(homeRoom);
         var moveToOffload = new TaskMoveFind(gc.FIND_FUNCTION,gc.RANGE_TRANSFER,
                             "findTargetOffload", "role.neutral.porter");
         var offload = new TaskOffload (gc.TRANSFER, flag.memory.resourceType,  undefined, true);
         tasks.push(moveToCollectionRoom);
-        tasks.push(moveToCollectonObj);
+        tasks.push(moveToCollectionObj);
         tasks.push(loadUp);
         tasks.push(moveHomeRoom);
         tasks.push(moveToOffload);
@@ -73,9 +73,6 @@ var roleNeutralPorter = {
 
 
 module.exports = roleNeutralPorter;
-
-var moveToEnergyContainer = new TaskMoveFind(gc.FIND_FUNCTION,gc.RANGE_TRANSFER
-    , "findTarget","role.harvester");
 
 
 

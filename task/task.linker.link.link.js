@@ -24,6 +24,7 @@ function TaskLinkerLinkLink (flagName) {
 }
 
 TaskLinkerLinkLink.prototype.doTask = function(creep, task) {
+    //console.log(creep, "inTaskLinkerLinkLink");
     var flag = Game.flags[task.flagName];
     var source =  Game.getObjectById(task.flagName);
     if (!source) return TaskFlexiLink.prototype.help(creep, task);
@@ -32,29 +33,15 @@ TaskLinkerLinkLink.prototype.doTask = function(creep, task) {
 
     var link = Game.getObjectById(flag.memory.mainDumpId);
     if (!link)  {
+        //console.log(creep,"no link",link,flag.memory.mainDumpId)
         return TaskFlexiLink.prototype.resetState(creep, task);
     }
-    creep.transfer(link, Game.flags[flagName].memory.resource);
-
-    var linkFlag = Game.flags[flag.memory.mainDumpId];
-    if (linkFlag) {
-        var nextLinkId = linkFlag.memory.sendToLinkId;
-        if (!nextLinkId) {
-            var links = creep.room.find(FIND_STRUCTURES, {
-                filter: function(object) {
-                    return object.id != flag.memory.mainDumpId;
-                }
-            });
-            if (links.length > 0) {
-                nextLinkId == links[0];
-            } else {
-                return gc.RESULT_UNFINISHED;
-            }
-        }
-        link.transferEnergy(nextLinkId);
-        return gc.RESULT_UNFINISHED
-    }
-    return TaskFlexiLink.prototype.resetState(creep, task);
+   // cosole.log(creep,"invalid transfer args", link,flag.memory.resource );
+    var result =  TaskFlexiLink.prototype.transfer(creep,flag,link);
+    //var result = creep.transfer(link, flag.memory.resourceType);
+   // console.log(creep,"result of transfer to link",result);
+    //creep.say(result);
+    return gc.RESULT_UNFINISHED
 };
 
 module.exports = TaskLinkerLinkLink;

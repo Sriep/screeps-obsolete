@@ -24,26 +24,46 @@ var routeBase = {
         NeutralHarvest : gc.ROUTE_NEUTRAL_HARVEST
     },
 
-    attachRoute: function (roomName, routeType, order, priority) {
+    attachRoute: function (roomName, routeType, order, priority, reference) {
         var room = Game.rooms[roomName];
-        console.log(room,"attachRoute");
         if (!this.checkSetup(room)) return false;
-        //module = this.moduleFromRoute(routeType);
         order.id = this.getNextRouteId(room);
         if (priority === undefined) {
             order.priority = gc.DEFAULT_ROUTE_PRIORITY;
         } else {
             order.priority = priority;
         }
-        console.log(room,"attachRoute",JSON.stringify(order));
+        if (reference) this.setDueFromActiveRoute(room, order, reference);
         room.memory.routes.details[order.id] = order;
         return true;
     },
 
+    setDueFromActiveRoute: function (room, order, reference) {
+        var creeps = _.filter(Game.creeps, function (creep) {
+            return creep.memory.buildReference == reference
+                && creep.memory.buildType == order.type;
+        });
+        //console.log(room,"setDueFromActiveRoute order", JSON.stringify(order));
+        if (creeps == [] || creeps.length == 0) {
+            order.due = 0;
+            return;
+        }
+        creeps = creeps.sort(function (a,b) {return (b.ticksToLive - a.ticksToLive)});
+        console.log(room,"setDueFromActiveRoute creeeps",creeps, JSON.stringify(creeps));
+        var ticksSinceLastBuild = CREEP_LIFE_TIME - creeps[0].ticksToLive;
+        console.log("setDueFromActiveRoute ticksSinceLastBuild",ticksSinceLastBuild);
+        order.due = order.respawnRate - ticksSinceLastBuild;
+    },
+
     removeRoute: function(roomName, routeId) {
+        if (undefined === routeId) {
+            console.log("Trying to remove an undefined route");
+            return;
+        }
         var room = Game.rooms[roomName];
         this.checkSetup(room);
         room.memory.routes.details[routeId] = undefined;
+        //console.log(roomName,roomName,"romoveRoute length after",room.memory.routes.details.length);
     },
 
     resetRoutes: function (roomName) {
@@ -54,23 +74,48 @@ var routeBase = {
 
     showRoutes: function(roomName) {
         var room = Game.rooms[roomName];
+        if (!room) return;
         this.checkSetup(room);
         for (var i in  room.memory.routes.details) {
             console.log(roomName,JSON.stringify(room.memory.routes.details[i]));
         }
     },
 
+    buildQueueEnergyPerGen: function(room) {
+        //console.log("In  buildQueueEnergyPerGen",room);
+       // var room = Game.rooms[roomName];
+        if (!room) return;
+        if (!this.checkSetup(room)) return;
+        var energyPerGen = 0;
+        var queue = room.memory.routes.details;
+       // console.log(room,"buildQueueEnergyPerGen ernergyInBuildQueue", JSON.stringify(queue));
+        for ( var i in queue ) {
+            if (queue[i]) {
+                module = this.moduleFromRoute(queue[i].type);
+                var buildEnergy = module.prototype.energyCost(queue[i]);
+                var buildRespawn = queue[i].respawnRate ? queue[i].respawnRate : 0;
+                if (buildRespawn) {
+                    var energyBuildPerGen = buildEnergy *  CREEP_LIFE_TIME / buildRespawn;
+                    energyPerGen = energyPerGen + energyBuildPerGen;
+                }
+            }
+        }
+        return energyPerGen;
+    },
+
     filterBuilds: function (room, field, value) {
         if (this.checkSetup(room)) {
             var filteredOrders = [];
             for (var i in  room.memory.routes.details) {
-               // console.log(room,"filterBuilds", JSON.stringify(room.memory.routes.details[i]));
-                if (room.memory.routes.details[i][field] == value)
+               //console.log(room,"filterBuilds", JSON.stringify(room.memory.routes.details[i]));
+                if ( room.memory.routes.details[i]
+                    && room.memory.routes.details[i][field]
+                    && room.memory.routes.details[i][field] == value) {
                     filteredOrders.push(room.memory.routes.details[i]);
+                }
             }
            // console.log("filter builds end of",filteredOrders);
             return filteredOrders;
-
         }
     },
 
@@ -89,7 +134,7 @@ var routeBase = {
         var priority;
         for ( var i in details )  {
          //   console.log(room,"routeBase  nextBuild i",i,"details", JSON.stringify(details[i]));
-            if (details[i].due <= 0) {
+            if (details[i] && details[i].due <= 0) {
                 if (undefined === priority) {
                     priority = details[i].priority;
                     mostOverdueRoute = details[i];
@@ -119,7 +164,6 @@ var routeBase = {
 
     spawn: function (spawn, room, build) {
         module = this.moduleFromRoute(build.type);
-        //console.log(spawn,room,"spawn route base, buld.type",build.type,module)
         var result = module.prototype.spawn(build, spawn, room);
         if (_.isString(result)) {
             if (0 == room.memory.routes.details[build.id].respawnRate) {
@@ -127,11 +171,13 @@ var routeBase = {
             } else {
                 room.memory.routes.details[build.id].due
                     = room.memory.routes.details[build.id].respawnRate;
-             //   this.addToRegistry(result,room.memory.routes.details[build.id]);
             }
+            Game.creeps[result].memory.builtBy = room.name;
+            Game.creeps[result].memory.buildType = build.type;
         }
         return result;
     },
+
 
     addToRegistry: function (creepName, route) {
         if (route.operator == undefined ) {

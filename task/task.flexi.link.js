@@ -30,17 +30,21 @@ function TaskFlexiLink (flagName) {
 }
 
 TaskFlexiLink.prototype.doTask = function(creep, task) {
-    //console.log(creep,"in TaskFlexiLink.doTask", JSON.stringify(task));
-    //console.log(creep,"task.flagName", task.flagName,"Game.flags",Game.flags);
     var flag = Game.flags[task.flagName];
     //console.log(creep,"in TaskFlexiLink.doTask flag",flag);
     if (!flag.memory.operator
         || creep.id != flag.memory.operator.id
         || undefined == flag.memory.linkType)
         initilise(creep,task,flag);
-    //console.log(creep, "In TaskFlexiLink doTask linkType", flag.memory.linkType);
+
+    if ((Game.time - flag.memory.operator.arrived) % gc.LINKER_RESET_RATE == 0 ) {
+        return TaskFlexiLink.prototype.resetState(creep, task);
+    }
+  //  console.log(creep, "In TaskFlexiLink doTask linkType", flag.memory.linkType);
+    creep.say(flag.memory.linkType);
     var moduleName = "task." + flag.memory.linkType;
     var taskModule = require(moduleName);
+
     return taskModule.prototype.doTask(creep, task);
 };
 
@@ -74,6 +78,10 @@ TaskFlexiLink.prototype.resetState = function (creep, task) {
 TaskFlexiLink.prototype.help = function () {
     return gc.RESULT_FINISHED;
 };
+
+TaskFlexiLink.prototype.transfer = function (creep,flag,link) {
+    return creep.transfer(link, flag.memory.resourceType);
+}
 
 module.exports = TaskFlexiLink;
 

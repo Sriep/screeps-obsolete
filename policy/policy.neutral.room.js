@@ -26,7 +26,7 @@ var policyNeutralRoom = {
         if (undefined !== room) {
             if (undefined != room.controller && room.controller.my) {
 
-                var spawnSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
+                var spawnSites = room.find(FIND_CONSTRUCTION_SITES, {
                     filter: {structureType: STRUCTURE_SPAWN}
                 });
             //    console.log("draftNewPolicyId looking for spawn",spawnSites);

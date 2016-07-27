@@ -23,7 +23,12 @@ var raceSwordsman = {
 
     maxSize: function (room) {
         return Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE);
-    }
-}
+    },
+
+    energyFromSize: function (size) {
+        return size * this.BLOCKSIZE;
+    },
+
+};
 
 module.exports = raceSwordsman;

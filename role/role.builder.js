@@ -17,7 +17,7 @@ var roleBuilder = {
     
 	findTarget: function(creep) {
         //console.log("getting construction site");
-        return creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
+        return creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
 	},
 
     action: function(creep, target) {
@@ -30,7 +30,7 @@ var roleBuilder = {
                                                 , "findTargetSource","role.base");
         var harvest = new TaskHarvest();
         var moveToConstructionSite = new TaskMoveFind(gc.FIND_ROOM_OBJECT,gc.RANGE_BUILD
-                                                        ,FIND_MY_CONSTRUCTION_SITES);
+                                                        ,FIND_CONSTRUCTION_SITES);
         var offload = new TaskOffload(gc.BUILD);
         tasks.push(moveToConstructionSite);
         tasks.push(offload);       

@@ -34,7 +34,7 @@ TaskMoveXY.prototype.doTask = function(creep, task) {
         maxRooms: 1
     });
    // console.log(creep,"TaskMoveXY",result);
-   // creep.say(result);
+    //creep.say(result);
     switch (result) {
         case OK:    	            //0	The operation has been scheduled successfully.
             if (creep.pos.inRangeTo(task.x,task.y,task.range)) {

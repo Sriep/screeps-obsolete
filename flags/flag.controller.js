@@ -21,12 +21,12 @@ var roomBase = require("room.base");
 var flagController = {
 
     run: function (flag) {
-      //  console.log(flag,"flagController run");
+        console.log(flag,"flagController run",JSON.stringify(flag));
         if (!flag.room)
             return;
-        if ( roomBase.isMyRoom(flag.room.name)) {
-            //flag.memory.claimerFrom = { room : flag.room.name, distance : 0 };
-        } else if ( roomBase.isNeutralRoom(flag.room.name)) {
+        if ( roomBase.isMyRoom(flag.pos.roomName)) {
+            //flag.memory.claimerFrom = { room : flag.pos.roomName, distance : 0 };
+        } else if ( roomBase.isNeutralRoom(flag.pos.roomName)) {
           //  console.log("flagController flag", flag);
             flag.memory.claimerFrom = this.claimerSuppyRoom(flag);
         }

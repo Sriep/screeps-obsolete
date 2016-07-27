@@ -48,8 +48,13 @@ RouteNeutralHarvest.prototype.spawn = function (build, spawn, room ) {
             build.owner,
             build.sourceId,
             build.offlaodId);
+        Game.creeps[name].memory.buildReference = build.sourceId;
     }
     return name;
+};
+
+RouteNeutralHarvest.prototype.energyCost = function(build) {
+    return raceWorker.energyFromSize(build.size, build.fast);
 };
 
 module.exports = RouteNeutralHarvest;

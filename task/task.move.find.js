@@ -115,13 +115,14 @@ TaskMoveFind.prototype.doTask = function(creep, task, actions) {
 
     var distanceToGo = creep.pos.getRangeTo(target);
     if (distanceToGo <= task.range) {
-      //  console.log(creep,"find RESULT_FINISHED before move");
+     //   console.log(creep,"find RESULT_FINISHED before move");
      //   console.log(creep,"distanceToGo",distanceToGo,"<= range",task.range)
       //  creep.say("there");
         return gc.RESULT_FINISHED;
     }
 
     var result = creep.moveTo(target);
+  //  console.log(creep,"TaskMoveFind result",result);
     distanceToGo = creep.pos.getRangeTo(target);
     if (distanceToGo <= task.range) {
      //  console.log(creep,"find RESULT_FINISHED; after move range <= abut ");

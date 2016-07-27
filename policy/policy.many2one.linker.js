@@ -425,7 +425,9 @@ var policyMany2oneLinker = {
         energyForUpgrading = sourceEnergyLT - energyBuildLinkersAndRepairer - externalCommitments + availableInStorage;
         numPortersPartsNeeded = Math.max(5,energyForUpgrading / portersNoCommitmentsEnergyLT);
 
-        var porterShortfall = numPortersPartsNeeded - existingPorterParts;//*policy.creepsAgeFactor(currentPolicy);
+        var porterShortfall = numPortersPartsNeeded - existingPorterParts;
+        console.log(room,"many2one portorparts",numPortersPartsNeeded);
+        //*policy.creepsAgeFactor(currentPolicy);
 
 /*
          console.log("existingPorterParts",existingPorterParts,"externalCommitments",externalCommitments);

@@ -37,14 +37,14 @@ var gf = {
 
     structureTypeInRange: function (pos, structureType, range) {
         if (!range) range = 1;
-        console.log("structureTypeInRange",pos, structureType,range);
+        //console.log("structureTypeInRange",pos, structureType,range);
         var structures = Game.rooms[pos.roomName].find(FIND_STRUCTURES, {
             filter: { structureType: structureType }
         });
-        console.log(pos,"structureTypeInRange",structureType,"obj",structures);
+        //console.log(pos,"structureTypeInRange",structureType,"obj",structures);
         var inRange = [];
         for  ( var i = 0 ; i < structures.length ; i++ )  {
-            console.log(pos,"pos",structures[i].pos,"is it in range",pos.inRangeTo(structures[i], range))
+            //console.log(pos,"pos",structures[i].pos,"is it in range",pos.inRangeTo(structures[i], range))
             if ( pos.inRangeTo(structures[i], range) )
                 inRange.push(structures[i]);
         }
@@ -52,9 +52,14 @@ var gf = {
     },
 
     isStructureTypeAtPos: function (pos, structureType) {
+        if (!pos || !pos.roomName) return undefined;
+        if (!Game.rooms[pos.roomName]) return undefined;
         var atPos = pos.look();
+        if (!atPos) return false;
+        //console.log(pos,"isStructureTypeAtPos",structureType,atPos);
         for ( var i = 0 ; i < atPos.length ; i++ ) {
-            if (atPos[i].structure.structureType == structureType)
+            if (atPos[i].type ==  LOOK_STRUCTURES
+                && atPos[i].structure.structureType == structureType)
                 return true;
         }
         return false;
@@ -65,7 +70,7 @@ var gf = {
         var deltaY = pos1.y - pos2.y;
         var offsets = gc.ADJACENCIES[deltaX][deltaY];
         var joinPos = [];
-        console.log("joinPointsBetween", pos1,pos2);
+      //  console.log("joinPointsBetween", pos1,pos2);
         for (var i = 0 ; i < offsets.length ; i++ ) {
             var pos = new RoomPosition( pos2.x + offsets[i].dx,
                                         pos2.y + offsets[i].dy,

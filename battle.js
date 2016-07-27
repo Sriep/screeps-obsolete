@@ -13,7 +13,7 @@ var battle = {
     quickCombat: function ( enemyCreeps, friendlyCreeps ) {
         var enemies = this.convert(enemyCreeps);
         var friends = this.convert(friendlyCreeps);
-
+        console.log("quickCombat convets",enemies,friends);
         var turn = 1, range = 3;
         while (enemies.length > 0 && friends.length > 0) {
             var damagedEnemies, damagedFriends;
@@ -32,7 +32,9 @@ var battle = {
 
     convert: function (creeps) {
         var formattedCreeps = [];
+        console.log("convert", JSON.stringify(creeps));
         for ( var i = 0 ; i < creeps ; i++ ) {
+            console.log(creeps,"convert",i)
             var parts = creeps[i].hits;
             var attackParts = raceBase.occurrencesInBody(creeps[i].body, ATTACK);
             var rangedParts = raceBase.occurrencesInBody(creeps[i].body, RANGED_ATTACK);

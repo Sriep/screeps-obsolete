@@ -12,19 +12,20 @@
 var gc = require("gc");
 var stats = require("stats");
 var roleBase = require("role.base");
-var raceWorker = require("race.worker");
+var raceBase = require("race.base");
 var raceSwordsman = require("race.swordsman");
 /**
  * Task move object. Used when we need to find the object to move to.
  * @module RouteGiftCreep
  */
 
-function RouteGiftCreep  (room, policyId, bdoy, role, respawnRate) {
+function RouteGiftCreep  (room, policyId, body, role, respawnRate) {
     this.type = gc.ROUTE_GIFT_CREEP;
     this.owner = room;
     this.policy = policyId;
     this.respawnRate = respawnRate;
     this.body = body;
+    this.role = role;
     if (undefined == body) {
         this.body = raceSwordsman.body(1);
     }
@@ -39,12 +40,20 @@ RouteGiftCreep.prototype.spawn = function (build, spawn, room ) {
     if (_.isString(name)) {
         console.log("Spawning transporter",name);
         roleBase.switchRoles(Game.creeps[name],
-            gc.ROLE_PATROL_ROOM,
+            build.role,
             build.policyId,
             build.role
         );
+        Game.creeps[name].memory.buildReference = build.policy;
     }
     return name;
+};
+
+RouteGiftCreep.prototype.energyCost = function(build) {    // Hack until raceBase.energyFromBody gets implemented
+    if (raceBase.energyFromBody(build.body)) {
+        return raceBase.energyFromBody(build.body)
+    }
+    return raceSwordsman.energyFromSize(build.body.length/2);
 };
 
 module.exports = RouteGiftCreep;

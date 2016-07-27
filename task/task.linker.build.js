@@ -32,9 +32,9 @@ TaskLinkerBuild.prototype.doTask = function(creep, task) {
     creep.harvest(source);
 
     var site = Game.getObjectById(flag.memory.mainDumpId);
-    console.log(creep,"TaskLinkerBuild site", site);
+   // console.log(creep,"TaskLinkerBuild site", site);
     if (!site)  {
-        console.log(creep,"TaskLinkerBuild !site is true about to call resetStats");
+      //  console.log(creep,"TaskLinkerBuild !site is true about to call resetStats");
         return TaskFlexiLink.prototype.resetState(creep, task);
     }
     creep.build(site);

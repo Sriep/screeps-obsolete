@@ -6,6 +6,7 @@
 "use strict";
 var raceWorker = require("race.worker");
 var roleBase = require("role.base");
+var gc = require("gc");
 /**
  * Abstract object containing data and functions
  * related to owned rooms.
@@ -33,51 +34,99 @@ var roomOwned = {
         return supply;
     },
 
-    avDistanceBetween: function (room, obj1, obj2) {
-        console.log("In avDistanceBetween");
+    avProductionSupplyDistance: function (room) {
+        // todo Add mechanism for weighting spawns and extensions by capacity.
+        var source =  room.find(FIND_MY_STRUCTURES, {
+            filter: { structureType: STRUCTURE_STORAGE }
+        });
+        if (source.length == 0) {
+            source =  room.find(FIND_SOURCES);
+        }
+        var destinations =  room.find(FIND_STRUCTURES, {
+            filter: function(object) {
+                return (object.structureType == STRUCTURE_SPAWN
+                || object.structureType == STRUCTURE_EXTENSION);
+            }
+        });
+       // console.log(room,"avProductionSupplyDistance",source,destinations);
+        return this.avDistanceBetweenObjects(room, source, destinations) - gc.RANGE_TRANSFER;
+    },
+
+    avUpgradeDistance: function (room) {
+        var source =  room.find(FIND_MY_STRUCTURES, {
+            filter: { structureType: STRUCTURE_STORAGE }
+        });
+        if (source.length == 0) {
+            source =  room.find(FIND_SOURCES);
+        }
+        // console.log(room,"avProductionSupplyDistance",source,room.controller.pos);
+        return this.avDistanceFromObjects(room, source, room.controller.pos) - gc.RANGE_UPGRADE ;
+    },
+
+    avDistanceBetweenObjects: function (room, objArray1, objArray2) {
         var distance = 0;
-        var obj1s = room.find(obj1);
+        var journeys = 0;
+        for ( var i in objArray1 ) {
+            for ( var j in objArray2 ) {
+                var path = room.findPath(objArray1[i].pos, objArray2[j].pos,  {
+                    ignoreCreeps: true,
+                    ignoreRoads: true,
+                    ignoreDestructibleStructures: true});
+                //   console.log("two points " + objArray1[i].pos + objArray2[j].pos);
+                distance = distance + path.length;
+                journeys = journeys + 1;
+                  // console.log("avDistanceBetweenObjects path len " + path.length + " distance "
+                 //           + distance + " journeys " + journeys);
+            } //for ( var j in spawns )
+        } //for ( var i in sources ) {
+        return distance/journeys;
+    },
+
+    avDistanceBetween: function (room, findType1, findType2) {
+        var distance = 0;
+        var obj1s = room.find(findType1);
         if (obj1s.length > 0) {
-            var obj2s  = room.find(obj2);
+            var obj2s = room.find(findType2);
             if (obj2s.length > 0) {
-                var distance = 0;
-                var journies = 0;
-                for ( var i in obj1s ) {
-                    for ( var j in obj2s ) {
-                        var path = room.findPath(obj1s[i].pos, obj2s[j].pos,  {
-                                ignoreCreeps: true, 
-                                ignoreRoads: true,
-                                ignoreDestructibleStructures: true});
-                     //   console.log("two points " + obj1s[i].pos + obj2s[j].pos);
-                        distance = distance + path.length;
-                        journies = journies + 1;
-                     //   console.log("avDistanceBetween path len " + path.length + " distance "
-                    //            + distance + " journies " + journies);
-                    } //for ( var j in spawns )
-                } //for ( var i in sources ) {
-                distance = distance/journies; 
-            } // if (spawns.length > 0)                
-        } // if (sources.length > 0)
+                return this.avDistanceBetweenObjects(room, obj1s, obj2s);
+            }
+        }
         return distance;
     },
-    
-    avDistanceForm: function (room, obj1, pos2) {
+
+    avDistanceFromObjects: function (room,objects,pos) {
         var distance = 0;
-        var objs = room.find(obj1);
+        var journeys = 0;
+        for ( var i in objects ) {
+            var path = room.findPath(objects[i].pos, pos, {
+                ignoreCreeps: true,
+                ignoreRoads: true,
+                ignoreDestructibleStructures: true} );
+            distance = distance + path.length;
+            journeys = journeys + 1;
+           // console.log("avDistanceForm path len" + path.length + " distance "
+            //    + distance + " journeys " + journeys);
+        } //  for ( var i in objs )
+        return distance/journeys;
+    },
+    
+    avDistanceForm: function (room, findType, pos2) {
+        var distance = 0;
+        var objs = room.find(findType);
         if (objs.length > 0) {
             var distance = 0;
-            var journies = 0;
+            var journeys = 0;
             for ( var i in objs ) {
                 var path = room.findPath(objs[i].pos, pos2, {
                         ignoreCreeps: true, 
                         ignoreRoads: true,
                         ignoreDestructibleStructures: true} );               
                 distance = distance + path.length;
-                journies = journies + 1;    
-                //console.log("avDistanceForm path len" + path.length + " distance " 
-                //    + distance + " journies " + journies);
-            } //  for ( var i in objs )  
-            distance = distance/journies; 
+                journeys = journeys + 1;
+               // console.log("avDistanceForm path len" + path.length + " distance "
+               //     + distance + " journies " + journeys);
+            } ///  for ( var i in objs )
+            distance = distance/journeys;
         } // if (sources.length > 0)  
         return distance;
     },

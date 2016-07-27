@@ -17,16 +17,17 @@
 "use strict";
 var gc = require("gc");
 var stats = require("stats");
-var roleBase = require("role.base");
 var TaskMoveFind = require("task.move.find");
 var TaskMoveRoom = require("task.move.room");
 var TaskActionTarget = require("task.action.target");
+var raceClaimer = require("race.claimer");
+var raceBase = require("race.base");
 /**
  * Task move object. Used when we need to find the object to move to.
  * @module NeutralHarvestRoute
  */
 
-function  RouteRemoteActions  (room, remoteActions, body, respawnRate, policyId) {
+function  RouteRemoteActions  (room, remoteActions, body, respawnRate, policyId, reference) {
     this.type = gc.ROUTE_REMOTE_ACTIONS;
     this.owner = room;
     if (Array.isArray(remoteActions)) {
@@ -42,6 +43,7 @@ function  RouteRemoteActions  (room, remoteActions, body, respawnRate, policyId)
         this.respawnRate = CREEP_LIFE_TIME;
     }
     this.due = 0;
+    this.reference = reference;
 }
 
 RouteRemoteActions.prototype.spawn = function (build, spawn) {
@@ -54,7 +56,8 @@ RouteRemoteActions.prototype.spawn = function (build, spawn) {
         Game.creeps[name].memory.tasks.state = undefined;
         Game.creeps[name].memory.tasks.tasklist
             = RouteRemoteActions.prototype.getTaskList(build.remoteActions);
-        Game.creeps[name].memory.policyId = build.policyId;
+        Game.creeps[name].memory.policy = build.policyId;
+        Game.creeps[name].memory.buildReference = build.reference;
     }
     return name;
 };
@@ -75,6 +78,13 @@ RouteRemoteActions.prototype.getTaskList = function(remoteActions) {
     return taskList;
 };
 
+RouteRemoteActions.prototype.energyCost = function(build) {
+    // Hack until raceBase.energyFromBody gets implemented
+    if (raceBase.energyFromBody(build.body)) {
+        return raceBase.energyFromBody(build.body)
+    }
+    return raceClaimer.energyFromSize(build.body.length/2);
+};
 
 /*
 function RoutePatrolRoom.prototype.ActionList(room,action, findFunction, findFunctionsModule)   {

@@ -14,7 +14,7 @@
 var roomWar = { 
     TOWER_DM_REDUCTION: 0.5,
     PESIMISIM_FACTOR: 0.8,
-
+/*
     enterWareState: function(room) {
         var hostiles = room.find(FIND_HOSTILE_CREEPS);
         if (hostiles.length == 0 || this.existingForcesEnough(room)) {
@@ -79,13 +79,13 @@ var roomWar = {
         var hostiles = room.find(FIND_HOSTILE_CREEPS);  
         if(hostiles.length > 0) {
             var username = hostiles[0].owner.username;
-            Game.notify(`User ${username} spotted in room ${room.name}`);
+            //Game.notify(`User ${username} spotted in room ${room.name}`);
             var towers = room.find(FIND_MY_STRUCTURES, 
                 {filter: {structureType: STRUCTURE_TOWER}});
             towers.forEach(tower => tower.attack(hostiles[0]));
         }
     }
-
+*/
 };
 
 module.exports = roomWar;    

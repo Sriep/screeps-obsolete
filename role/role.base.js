@@ -353,7 +353,6 @@ var roleBase = {
              //   console.log("else",target);
             }
         }
-        debugger;
       //  console.log(creep,"findTargetSource target",target,"length sources", sources.length);
       //  console.log(creep,"findTargetSources access", JSON.stringify(access),"clostse index",iClosest);
         //creep.memory.tasks.targtId = target;
@@ -421,7 +420,7 @@ var roleBase = {
         }
         var tasks = require("tasks");
         tasks.doTasks(creep);
-        creep.say(creep.memory.role);
+        //creep.say(creep.memory.role);
         return;
           //  if (creep.name == "Skyler"){
          //    this.resetTasks(creep);

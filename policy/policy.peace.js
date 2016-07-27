@@ -147,8 +147,12 @@ var policyPeace = {
             , roomOwned.calaculateSuplly(room)
             , room.energyCapacityAvailable);
 
-        console.log(room,"updated supply level", roomOwned.calaculateSuplly(room)
-            ,room.energyCapacityAvailable );
+        economyLinkers = require("economy.linkers");
+    //    console.log(room, "energyCapacity",room.energyCapacityAvailable , "Energy in build queue",
+    //        routeBase.buildQueueEnergyPerGen(room), "Energy mined", economyLinkers.energyFromLinkersGen(room),
+    //        "Average supply journey", roomOwned.avProductionSupplyDistance(room),"Average upgarde distance",
+    //        roomOwned.avUpgradeDistance(room));
+
         routeBase.update(room);
         if (room.name == "W26S21") {
          //   this.initialisePolicy(currentPolicy);
@@ -160,27 +164,26 @@ var policyPeace = {
            // this.initialisePolicy(currentPolicy);
         }
         var creeps = _.filter(Game.creeps);
-        console.log(room, "policy id", currentPolicy.id,"creeps", creeps.length);
+        console.log(room, "policy id", currentPolicy.id,"creeps"
+            , creeps.length,"room.mode is",room.mode);
 
-        var testNewCode = true;
-        var mode = room.mode
-        console.log(room,"room.mode is",room.mode);
-        if (testNewCode && room.mode != MODE_WORLD) {
-            var linkers = require("linkers");
-            linkers.attachFlaggedRoutes(room, currentPolicy);
-            linkers.attachFlexiStoragePorters(room, currentPolicy);
-            linkers.attachRepairer(room, currentPolicy);
-            linkers.processBuildQueue(room,currentPolicy);
-        } else  {
-            if (room.memory.links !== undefined
-                && room.memory.links.info !== undefined
-                && room.memory.links.info.length > 0
-                && policyMany2oneLinker.readyForMAny2OneLinker(currentPolicy)) {
-                policyMany2oneLinker.checkLinks(room, currentPolicy);
-            }
-            policyMany2oneLinker.checkRepairer(room, currentPolicy);
-            policyMany2oneLinker.nonLinkBuilds(room, currentPolicy);
-        }
+        var testNewCode = false;
+       // if (room.name == "W25S22" || room.mode != MODE_WORLD) {
+            var economyLinkers = require("economy.linkers");
+            economyLinkers.attachFlaggedRoutes(room, currentPolicy);
+            economyLinkers.attachFlexiStoragePorters(room, currentPolicy);
+            economyLinkers.attachRepairer(room, currentPolicy);
+            economyLinkers.processBuildQueue(room,currentPolicy);
+       // } else  {
+       //     if (room.memory.links !== undefined
+        //        && room.memory.links.info !== undefined
+        //        && room.memory.links.info.length > 0
+       // //        && policyMany2oneLinker.readyForMAny2OneLinker(currentPolicy)) {
+      //          policyMany2oneLinker.checkLinks(room, currentPolicy);
+      //      }
+     //       policyMany2oneLinker.checkRepairer(room, currentPolicy);
+    //        policyMany2oneLinker.nonLinkBuilds(room, currentPolicy);
+    //    }
         if (gc.AI_CONSTRUCTION)
             this.newConstruction(room);
         npcInvaderBattle.defendRoom(room);

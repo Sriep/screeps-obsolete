@@ -120,6 +120,10 @@ var raceBase = {
         }
     },
  
+    energyFromBody: function (body) {
+        // TODO Implimnet function. Useed by RouteGiftCreep at moment.
+        return undefined;
+    },
 
     getEnergyFromBody: function (body) {
      //   console.log("getEnergyFromBody boidy length",body.length);
@@ -180,17 +184,34 @@ var raceBase = {
                 this.recycleCreep(Game.creeps[creepName]);
             } //  if (Game.creeps[creepName].memory.role = ROLE_UNASSIGNED)
         } //  for (var creepName in Game.creeps)
+        this.moveFlags();
 
-        this.moveLinks();
-
-          stats.upadateTick();
+        stats.upadateTick();
     },
 
-    moveLinks: function () {
-        var linkEntrance1 = Game.getObjectById("578fd0a01d5fe373181c40e4");
-        var linkStorage = Game.getObjectById("577ec1375a1c85636f551c4b");
-        if (linkEntrance1 && linkStorage)
-            linkEntrance1.transferEnergy(linkStorage);
+    moveFlags: function () {
+        for (var flagName in Game.flags){
+            var flag = Game.flags[flagName];
+
+            if (flag.memory.type == STRUCTURE_LINK) {
+                var link = Game.getObjectById(flag.name);
+               // console.log(flag,"move flags, nextid",link.memory.nextLinkId);;
+                if (flag.memory.nextLinkId) {
+                    var nextLink = Game.getObjectById(flag.memory.nextLinkId);
+                    if (nextLink) {
+                       // console.log(link,"transger to",nextLink);
+                        link.transferEnergy(nextLink);
+                    }
+               }// else if (!link.memory.isTerminalLink && link.memory.termianlLink) {
+                //    var terminalLink = Game.getObjectById(link.memory.termianlLink);
+                //    if (terminalLink) link.transferEnergy(terminalLink);
+               // }
+            }
+        }
+       // var linkEntrance1 = Game.getObjectById("578fd0a01d5fe373181c40e4");
+       // var linkStorage = Game.getObjectById("577ec1375a1c85636f551c4b");
+       // if (linkEntrance1 && linkStorage)
+       //     linkEntrance1.transferEnergy(linkStorage);
     },
 
     recycleCreep: function (creep) {

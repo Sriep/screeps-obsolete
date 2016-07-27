@@ -15,7 +15,7 @@ var roleSpawnBuilder = require("role.base");
 var roleSpawnBuilder = {
 
     findTarget: function(creep) {
-        return creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES, {
+        return creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES, {
             filter: { structureType:  STRUCTURE_SPAWN }
         });
     },

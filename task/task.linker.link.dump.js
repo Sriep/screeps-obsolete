@@ -24,6 +24,7 @@ function TaskLinkerLinkDump (flagName) {
 }
 
 TaskLinkerLinkDump.prototype.doTask = function(creep, task) {
+   // console.log(creep,"TaskLinkerLinkDump");
     var flag = Game.flags[task.flagName];
 
     var source =  Game.getObjectById(task.flagName);
@@ -44,7 +45,7 @@ TaskLinkerLinkDump.prototype.doTask = function(creep, task) {
         return TaskFlexiLink.prototype.resetState(creep, task);
     }
     creep.withdraw(link, RESOURCE_ENERGY);
-    creep.transfer(storage, RESOURCE_ENERGY);
+    creep.transfer(dump, RESOURCE_ENERGY);
     return gc.RESULT_UNFINISHED;
 };
 

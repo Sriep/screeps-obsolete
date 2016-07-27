@@ -65,7 +65,7 @@ var policyBuildspawn = {
 
 
         var source = room.find(FIND_SOURCES);
-        var spawnSites = room.find(FIND_MY_CONSTRUCTION_SITES, {
+        var spawnSites = room.find(FIND_CONSTRUCTION_SITES, {
             filter: { structureType:  STRUCTURE_SPAWN }
         });
         var role;

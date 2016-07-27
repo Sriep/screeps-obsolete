@@ -42,7 +42,7 @@ var policyNeutralBuilder = {
         var room = Game.rooms[oldPolicy.workRoom]
 
         if (undefined !== room) {
-            var sites = room.find(FIND_MY_CONSTRUCTION_SITES);
+            var sites = room.find(FIND_CONSTRUCTION_SITES);
             if (undefined !== sites && sites.length == 0) {
                 this.cleanUp(oldPolicy);
                 return null;

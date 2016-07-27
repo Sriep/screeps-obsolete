@@ -47,9 +47,9 @@ TaskLinkerDumpLinkDump.prototype.doTask = function(creep, task) {
     creep.withdraw(link, RESOURCE_ENERGY);
 
     if (transferEnergy) {
-        creep.transfer(storage, RESOURCE_ENERGY);
+        creep.transfer(dump, RESOURCE_ENERGY);
     } else {
-        creep.transfer(storage, flag.memory.resourceType);
+        creep.transfer(dump, flag.memory.resourceType);
     }
     return gc.RESULT_UNFINISHED;
 };

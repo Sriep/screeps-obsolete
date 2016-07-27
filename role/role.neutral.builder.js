@@ -28,7 +28,7 @@ var roleNeutralBuilder = {
         var harvest = new TaskHarvest();
         var moveToBuildRooom = new TaskMoveRoom(buildRoom);
         var moveToConstructionSite = new TaskMoveFind(gc.FIND_ROOM_OBJECT,gc.RANGE_BUILD
-                                             ,FIND_MY_CONSTRUCTION_SITES);
+                                             ,FIND_CONSTRUCTION_SITES);
         var offload = new TaskOffload(gc.BUILD);
 
         tasks.push(moveToSourceRoom);
@@ -44,7 +44,7 @@ var roleNeutralBuilder = {
 
     findTarget: function(creep) {
         //console.log("getting construction site");
-        return creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
+        return creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
     },
 
     action: function(creep, target) {

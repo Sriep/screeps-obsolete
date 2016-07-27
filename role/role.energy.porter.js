@@ -67,7 +67,7 @@ var roleEnergyPorter = {
         var louadupEnergy = new TaskLoadup(RESOURCE_ENERGY);
 
         var moveToConstructionSite = new TaskMoveFind(gc.FIND_ROOM_OBJECT,gc.RANGE_BUILD
-            ,FIND_MY_CONSTRUCTION_SITES);
+            ,FIND_CONSTRUCTION_SITES);
         var offloadBuild = new TaskOffload(gc.BUILD);
         
         taskList.push(moveToStorage);
