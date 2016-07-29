@@ -55,6 +55,16 @@ var routeBase = {
         order.due = order.respawnRate - ticksSinceLastBuild;
     },
 
+    resetDueIfRoureNotActive: function(room, build, reference) {
+        var creeps = _.filter(Game.creeps, function (creep) {
+            return creep.memory.buildReference == reference
+                && creep.memory.buildType == build.type;
+        });
+        if (creeps == [] || creeps.length == 0) {
+            build.due = 0;
+        }
+    },
+
     removeRoute: function(roomName, routeId) {
         if (undefined === routeId) {
             console.log("Trying to remove an undefined route");

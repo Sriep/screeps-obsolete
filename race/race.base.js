@@ -91,6 +91,16 @@ var raceBase = {
         }
     },
 
+    convertArrayToBody: function (bodyArray) {
+        var body = []
+        for ( var i = 0 ; i < bodyArray.length ; i++ ) {
+            var part = { "type" : bodyArray[i], "hits" : 100 }
+            body.push(part);
+        }
+        return body;
+    },
+
+
     occurrencesInBody: function(body, bodyPart, active) {
         body = this.convertBodyToArray(body);
         if (undefined === body) return 0;
@@ -181,7 +191,7 @@ var raceBase = {
             roleBase.run(Game.creeps[creepName]);
 
             if (gc.ROLE_UNASSIGNED == Game.creeps[creepName].memory.role) {
-                this.recycleCreep(Game.creeps[creepName]);
+           //     this.recycleCreep(Game.creeps[creepName]);
             } //  if (Game.creeps[creepName].memory.role = ROLE_UNASSIGNED)
         } //  for (var creepName in Game.creeps)
         this.moveFlags();
@@ -195,19 +205,18 @@ var raceBase = {
 
             if (flag.memory.type == STRUCTURE_LINK) {
                 var link = Game.getObjectById(flag.name);
-               // console.log(flag,"move flags, nextid",link.memory.nextLinkId);;
-                if (flag.memory.nextLinkId) {
-                    var nextLink = Game.getObjectById(flag.memory.nextLinkId);
-                    if (nextLink) {
-                       // console.log(link,"transger to",nextLink);
-                        link.transferEnergy(nextLink);
+               // console.log(flag,"move flags, nextid",link.memory.nextLinkId);
+                if (link) {
+                    if (flag.memory.nextLinkId) {
+                        var nextLink = Game.getObjectById(flag.memory.nextLinkId);
+                        if (nextLink) {
+                            // console.log(link,"transger to",nextLink);
+                            link.transferEnergy(nextLink);
+                        }
                     }
-               }// else if (!link.memory.isTerminalLink && link.memory.termianlLink) {
-                //    var terminalLink = Game.getObjectById(link.memory.termianlLink);
-                //    if (terminalLink) link.transferEnergy(terminalLink);
-               // }
+                } // if (link)
             }
-        }
+        } // for
        // var linkEntrance1 = Game.getObjectById("578fd0a01d5fe373181c40e4");
        // var linkStorage = Game.getObjectById("577ec1375a1c85636f551c4b");
        // if (linkEntrance1 && linkStorage)
@@ -215,6 +224,7 @@ var raceBase = {
     },
 
     recycleCreep: function (creep) {
+        // todo some really nasty bug in recycleCreep function, but don't need it at the moment
         var spawns = Game.spawns;
         for (var spawn in spawns ) {
             if (spawns[spawn].pos.inRangeTo(creep,1))

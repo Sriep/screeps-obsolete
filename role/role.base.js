@@ -523,7 +523,7 @@ var roleBase = {
         //console.log(creep,"roleBase.switchRoles role",role,"module",module,"length",Object.keys(module).length );
         creep.memory.tasks.tasklist = module.getTaskList(creep, para1, para2, para3, para4, para5,
                                                                 para6, para7, para8, para9, para10 );
-        console.log(creep,"basek form module.getTaskList", JSON.stringify(creep.memory.tasks.tasklist));
+        //console.log(creep,"back form module.getTaskList", JSON.stringify(creep.memory.tasks.tasklist));
 
         creep.memory.role = role;
         return true;

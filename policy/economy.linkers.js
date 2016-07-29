@@ -41,7 +41,7 @@ var linkers = {
         });
         for ( var i = 0 ; i < flags.length ; i++ ) {
             var order;
-
+            //console.log("attachFlaggedRoutes");
 
             if ( gc.FLAG_MINERAL == flags[i].memory.type
                     && !flags[i].memory.extractor) {
@@ -85,6 +85,11 @@ var linkers = {
             if (matches[i].type == order.type) {
                 if (matches[i].size == order.size
                     && matches[i].respawnRate == order.respawnRate) {
+                  //  console.log("keepMatchedBuildWithSameSize")
+                    // todo If linkers die need new ones quick. Should put somewhere else.
+                    if (matches[i].priority == gc.PRIORITY_LINKER && matches[i].due >0 ) {
+                        routeBase.resetDueIfRoureNotActive(room, matches[i], matches[i].flagName);
+                    }
                     return true;
                 } else {
                     routeBase.removeRoute(room.name, matches[i].id);

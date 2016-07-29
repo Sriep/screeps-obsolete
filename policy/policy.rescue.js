@@ -91,6 +91,10 @@ var policyRescue = {
         var creeps = _.filter(Game.creeps,
             function (creep) {return creep.memory.policyId == currentPolicy.id;});
 
+        var creeps = _.filter(Game.creeps, function (creep) {
+            return creep.memory.policyId == currentPolicy.id
+                && creep.memory.role == gc.ROLE_FLEXI_STORAGE_PORTER});
+
         var workerSize = 0;
         console.log(room,"ccccccccreeplength",creeps.length  );
         if (creeps.length == 0) {
@@ -117,7 +121,7 @@ var policyRescue = {
 
         var name = raceBase.spawn(raceWorker, currentPolicy, spawns[0], workerSize);
         if (_.isString(name)) {
-            roleBase.switchRoles(Game.creeps[name], gc.ROLE_HARVESTER);
+            roleBase.switchRoles(Game.creeps[name], gc.ROLE_FLEXI_STORAGE_PORTER);
         }
         console.log(room,"result of spawn",name,"workerSize",workerSize);
 

@@ -38,7 +38,6 @@ module.exports.loop = function () {
         freememory.freeCreeps();
         policy.enactPolicies();
         raceBase.moveCreeps();
-        recurringPolicies.run();
         ayrtepPad.bottom();
 
 

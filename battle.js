@@ -13,7 +13,17 @@ var battle = {
     quickCombat: function ( enemyCreeps, friendlyCreeps ) {
         var enemies = this.convert(enemyCreeps);
         var friends = this.convert(friendlyCreeps);
-        console.log("quickCombat convets",enemies,friends);
+        this.quickCombatInternal(enemies, friends);
+    },
+
+    quickCombatBodies: function( enemyBodies, friendlyBodies) {
+        var enemies = this.convertBodies(enemyBodies);
+        var friends = this.convertBodies(friendlyBodies);
+        console.log("quickCombatBodies, enemies and firends",enemies,friends)
+        this.quickCombatInternal(enemies, friends);
+    },
+
+    quickCombatInternal: function(enemies, friends) {
         var turn = 1, range = 3;
         while (enemies.length > 0 && friends.length > 0) {
             var damagedEnemies, damagedFriends;
@@ -32,13 +42,24 @@ var battle = {
 
     convert: function (creeps) {
         var formattedCreeps = [];
-        console.log("convert", JSON.stringify(creeps));
         for ( var i = 0 ; i < creeps ; i++ ) {
-            console.log(creeps,"convert",i)
-            var parts = creeps[i].hits;
+            var parts = creeps[i].hits/100;
             var attackParts = raceBase.occurrencesInBody(creeps[i].body, ATTACK);
             var rangedParts = raceBase.occurrencesInBody(creeps[i].body, RANGED_ATTACK);
             formattedCreeps.push( {  parts : parts, attackParts : attackParts, rangedParts : rangedParts} );
+        }
+        formattedCreeps.sort( function (a,b) { return a.parts - b.parts; });
+        return formattedCreeps;
+    },
+
+    convertBodies: function (bodies) {
+        var formattedCreeps = [];
+        for ( var i = 0 ; i < bodies ; i++ ) {
+            var parts = bodies[i].length;
+            var attackParts = raceBase.occurrencesInBody(bodies[i], ATTACK);
+            var rangedParts = raceBase.occurrencesInBody(bodies[i], RANGED_ATTACK);
+            formattedCreeps.push( {  parts : parts, attackParts : attackParts, rangedParts : rangedParts} );
+            console.log(i,"convertBodies",part);
         }
         formattedCreeps.sort( function (a,b) { return a.parts - b.parts; });
         return formattedCreeps;

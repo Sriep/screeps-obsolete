@@ -53,7 +53,7 @@ function  RouteLinker  (room, flagName, policyId) {
 }
 
 RouteLinker.prototype.spawn = function (build, spawn, room ) {
-    console.log("trying to spawn RouteLinker");
+   // console.log("trying to spawn RouteLinker");
     var body = raceWorker.body(build.size);
     var name = stats.createCreep(spawn, body, undefined, undefined);
     if (_.isString(name)) {

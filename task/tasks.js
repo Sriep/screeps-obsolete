@@ -54,7 +54,7 @@ var tasks = {
                 this.pickUpLooseEnergy(creep);
                 doneActions.actions.add(gc.PICKUP);
             }
-           // console.log(creep ,"about to do task", task.taskType,"Length of task list is", taskList.length);
+            //console.log(creep ,"about to do task", task.taskType,"Length of task list is", taskList.length);
            // creep.say(task.taskType);
             var result;
             if (!TaskActions.prototype.isConflict(doneActions, task.conflicts)) {
@@ -62,7 +62,7 @@ var tasks = {
                 var taskModule = require(moduleName);
                 result = taskModule.prototype.doTask(creep, task, doneActions);
 
-              //  console.log(creep, "done", task.taskType,"Task, return", result);
+            //    console.log(creep, "done", task.taskType,"Task, return", result);
                 if (this.Result.Finished == result) {
                     doneActions.actions.add(task.conflicts);
                 }
