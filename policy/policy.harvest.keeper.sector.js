@@ -31,7 +31,7 @@ var TaskMoveAttackPos = require("task.move.attack.pos");
  * @module policyAttackStructures
  */
 var policyHarvestKeeperSector = {
-    MARSHALLING_RANGE: 4,
+    MARSHALLING_RANGE: 2,
     MARSHALLING_COLOUR_1: COLOR_RED,
     MARSHALLING_COLOUR_2: COLOR_ORANGE,
     KEEPER_OWNER: "Source Keeper",
@@ -43,7 +43,7 @@ var policyHarvestKeeperSector = {
         AfterAction: "after.action"
     },
 
-    flag: Game.flags[policy.id],
+    flag: undefined,
 
     keeper: [TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,
             TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,MOVE,MOVE,MOVE,
@@ -54,17 +54,32 @@ var policyHarvestKeeperSector = {
             RANGED_ATTACK,ATTACK,RANGED_ATTACK,ATTACK,RANGED_ATTACK],
 
     initialisePolicy: function (newPolicy) {
-        newPolicy.marshallingPreActionPos.createFlag(newPolicy.id , COLOR_RED, COLOR_GREEN);
+        newPolicy.marshallingPreActionPos.createFlag(newPolicy.id ,
+            gc.FLAG_HARVEST_KEEPER_COLOUR, gc.FLAG_KEEPERS_LAIR_COLOUR);
+        this.flag = Game.flags[newPolicy.id];
         Memory.policies[newPolicy.id].state = this.State.Marshalling;
         return true;
     },
 
+    marshalCreeps: function (policy) {
+        var creeps = _.filter(Game.creeps, function(creep) { return creep.memory.policyId == policy.id});
+        for ( var i = 0 ; i < creeps.length ; i++ ) {
+            var moveToFlag = TaskMovePos (flag.pos, this.MARSHALLING_RANGE);
+            creeps[i].memory.taskList = [];
+            creeps[i].memory.taskList.push(moveToFlag);
+        }
+    },
+
     draftNewPolicyId: function(oldPolicy) {
+        //return null;
         return oldPolicy;
     },
 
     enactPolicy: function(currentPolicy) {
-        switch(Memory.policies[newPolicy.id].state){
+        console.log(currentPolicy.id,"keeper harvest flag", JSON.stringify(this.flag));
+        console.log(currentPolicy.id,"keeper harvest flag", JSON.stringify(currentPolicy));
+        this.marshalCreeps(currentPolicy);
+        switch(Memory.policies[currentPolicy.id].state){
             case this.State.Marshalling:
                 this.marshalling(currentPolicy);
                 break;
@@ -278,6 +293,7 @@ var policyHarvestKeeperSector = {
     },
 
     readyAttackKeeper: function (policy) {
+        console.log("In readyAttackKeeper0", policy.id);
         var myAttackCreeps = _.filter(Game.creeps, function (creep) {
             return creep.memory.policyId == policy.id
                     && creep.getActiveBodyparts(ATTACK) > 0

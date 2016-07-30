@@ -74,7 +74,6 @@ var roomBase = {
             if (!Game.flags[flagName])
                 room.controller.pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_CONTROLLER_COLOUR);
             Game.flags[flagName].memory.type = gc.FLAG_CONTROLLER;
-            ///debugger;
             if (!this.isMyRoom(room.name)) {
                 Game.flags[flagName].memory.upgradeController = (sources.length >= 2);
             }

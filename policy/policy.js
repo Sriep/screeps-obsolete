@@ -326,7 +326,7 @@ var policy = {
 
     creepLifeTicks: function (policy) {
         var creeps = _.filter(Game.creeps, function (creep) {
-            return creep.memory.policyId == policy.id})
+            return creep.memory.policyId == policy.id});
         var life = 0;
         for ( var i = 0 ; i < creeps.length ; i++ ) {
             life = life + creeps[i].ticksToLive;

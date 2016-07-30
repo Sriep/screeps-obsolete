@@ -20,10 +20,14 @@ var raceBase = require("race.base");
  * @module RouteFlexiStoragePorter
  */
 
-function  RouteFlexiStoragePorter  (room, respawnRate, policyId) {
+function  RouteFlexiStoragePorter  (room, respawnRate, policyId, size) {
     this.type = gc.ROUTE_FLEXI_STORAGE_PORTER;
     this.owner = room;
-    this.size = raceWorker.maxSizeRoom(Game.rooms[room]);
+    if (size) {
+        this.size = size;
+    } else {
+        this.size = raceWorker.maxSizeRoom(Game.rooms[room]);
+    }
     this.policyId = policyId;
     this.respawnRate = respawnRate;
     this.due = 0;

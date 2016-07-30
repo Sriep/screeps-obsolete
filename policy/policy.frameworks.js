@@ -92,16 +92,15 @@ var policyFrameworks = {
         return p;
     },
 
-    policyHarvestKeeperSector: function(keeperRoom, marshallingPreActionPos, marshallingActivePos) {
+    policyHarvestKeeperSector: function(keeperRoom, marshallingPreActionPos, marshallingActivePos, start) {
         var newPolicy = {
             id : policy.getNextPolicyId(),
             type : gc.POLICY_HARVEST_KEEPER_SECTOR,
             keeperRoom : keeperRoom,
-            marshallingPreActionPos : marshallingPoint,
-            marshallingActivePos : marshallingPoint
+            marshallingPreActionPos : marshallingPreActionPos,
+            marshallingActivePos : marshallingActivePos
         };
         if (start) {
-            var module = policy.getModuleFromPolicy(newPolicy);
             policy.activatePolicy(newPolicy);
         }
         return newPolicy;
