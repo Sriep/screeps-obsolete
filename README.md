@@ -62,7 +62,7 @@ Library of the various types of creeps used catalogued by body type.
 This is where custom user code is designed to be put.
 - Each policy is run once per tick with handlers so that a finite state system can be set up.
 - The economy for each room is run using policies.
-- These special room policies are where the requests in the flats are enacted.
+- These special room policies are where the requests in the flags are enacted.
 
 ## Main game loop.
 As shown below each tick. Memory on dead ticks are freed.
@@ -72,7 +72,7 @@ As shown below each tick. Memory on dead ticks are freed.
 This is where custom user code is designed to be put. 
 - Each policy is run once per tick with handlers so that a finite state system can be set up.
 - The economy for each room is run using policies. 
-- These special room policies are where the requests in the flats are enacted.
+- These special room policies are where the requests in the flags are enacted.
 
 ## Main game loop.
 As shown below each tick. Memory on dead ticks are freed. 
