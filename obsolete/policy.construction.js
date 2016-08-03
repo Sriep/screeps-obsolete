@@ -74,7 +74,7 @@ var policyConstruction = {
         }
 
         var equilbriumCreeps = nHavesters + nUpgraders + nBuilders + toSupply;
-        var creeps = _.filter(Game.creeps, (creep) => creep.memory.policyId == currentPolicy.id);
+        var creeps = _.filter(Game.creeps,  function (creep) {return creep.memory.policyId == currentPolicy.id});
         var nCreeps = creeps.length;
         var nWorkParts = raceBase.countBodyParts(creeps, WORK);
         if ( equilbriumCreeps * policy.LINKING_WORKER_SIZE < nWorkParts )
@@ -88,7 +88,8 @@ var policyConstruction = {
         } else {
             nHavesters = Math.max(Math.ceil(nHavesters),2);
         }
-        policyPeace.spawnCreep(room,currentPolicy, equilbriumCreeps );
+        var economyCentral = require("economy.central");
+        economyCentral.spawnCreep(room,currentPolicy, equilbriumCreeps );
 
         //Has not spawned but energy at capacty no need for havesters
         if (policy.energyStorageAtCapacity(room)){

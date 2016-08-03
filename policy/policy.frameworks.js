@@ -15,18 +15,18 @@ var gc = require("gc");
 var policyFrameworks = {
     Type: {
         THE_POOL: "the.pool",
-        PEACE: "peace",
-        CONSTRUCTION: "construction",
-        DEFEND: "defence",
-        RESCUE: "rescue",
-        FOREIGN_HARVEST: "foreign.harvest",
-        FOREIGN_ROAD: "neutral.road",
-        NEUTRAL_ROOM: "neutral.room",
-        CLAIM: "claim",
-        BUILD_SPAWN: "buildspawn",
-        GIFT_CREEP: "gift.cree[",
+        PEACE: gc.POLICY_PEACE,
+      //  CONSTRUCTION: "construction",
+      //  DEFEND: "defence",
+        RESCUE: gc.POLICY_RESCUE,
+       // FOREIGN_HARVEST: "foreign.harvest",
+        //FOREIGN_ROAD: "neutral.road",
+        NEUTRAL_ROOM: gc.NEUTRAL_ROOM,
+       // CLAIM: "claim",
+        BUILD_SPAWN: gc.POLICY_BUILD_SPAWN,
+       // GIFT_CREEP: "gift.creep",
         NEUTRAL_BUILDER: gc.POLICY_NEUTRAL_BUILDER,
-        POLICY_MANY2ONE_LINKERS: gc.POLICY_MANY2ONE_LINKERS,
+        //POLICY_MANY2ONE_LINKERS: gc.POLICY_MANY2ONE_LINKERS,
         POLICY_HARVEST_KEEPER_SECTOR: gc.POLICY_HARVEST_KEEPER_SECTOR
     },
 
@@ -92,6 +92,30 @@ var policyFrameworks = {
         return p;
     },
 
+    createRescuePolicy: function(room)
+    {
+        var p = { id : policy.getNextPolicyId(),
+            type : this.Type.RESCUE,
+            room : room};
+        return p;
+    },
+
+    createNeutralRoomPolicy: function(room)
+    {
+        var p = { id : policy.getNextPolicyId(),
+            type : this.Type.NEUTRAL_ROOM,
+            room : room};
+        return p;
+    },
+
+    createBuildspawn: function(room)
+    {
+        var p = { id : policy.getNextPolicyId(),
+            type : this.Type.BUILD_SPAWN,
+            room : room};
+        return p;
+    },
+
     policyHarvestKeeperSector: function(keeperRoom, marshallingPreActionPos, marshallingActivePos, start) {
         var newPolicy = {
             id : policy.getNextPolicyId(),
@@ -125,6 +149,19 @@ var policyFrameworks = {
         return newPolicy;
     },
 
+    createThePool: function() {
+        var p  = {
+            id : 0,
+            type : this.Type.THE_POOL,
+            requisitions : {},
+            supplyCentres : {},
+            nextRequisitionsId : 0,
+            nextSupplyCentreId : 0
+        }
+        return p;
+    }
+
+/*
     createPotrolRoomPolicy: function(roomPos, creepSize, start)
     {
         var newPolicy = {
@@ -203,29 +240,7 @@ var policyFrameworks = {
         return newPolicy;
     },
 
-    createRescuePolicy: function(room)
-    {
-        var p = { id : policy.getNextPolicyId(),
-            type : this.Type.RESCUE,
-            room : room};
-        return p;
-    },
 
-    createNeutralRoomPolicy: function(room)
-    {
-        var p = { id : policy.getNextPolicyId(),
-            type : this.Type.NEUTRAL_ROOM,
-            room : room};
-        return p;
-    },
-
-    createBuildspawn: function(room)
-    {
-        var p = { id : policy.getNextPolicyId(),
-            type : this.Type.BUILD_SPAWN,
-            room : room};
-        return p;
-    },
 
     createDefendPolicy: function(room)
     {
@@ -243,18 +258,7 @@ var policyFrameworks = {
         };
         return p;
     },
-
-    createThePool: function() {
-        var p  = {
-            id : 0,
-            type : this.Type.THE_POOL,
-            requisitions : {},
-            supplyCentres : {},
-            nextRequisitionsId : 0,
-            nextSupplyCentreId : 0
-        }
-        return p;
-    }
+*/
     
 }
 

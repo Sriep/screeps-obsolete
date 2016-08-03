@@ -21,7 +21,7 @@ var roomBase = require("room.base");
 var flagLink = {
 
     run: function (flag) {
-         console.log(flag,"flagLink run",JSON.stringify(flag));
+       // console.log(flag,"flagLink run",JSON.stringify(flag));
         if (!flag.room || !flag.memory)
             return;
         if ( roomBase.isMyRoom(flag.pos.roomName)) {

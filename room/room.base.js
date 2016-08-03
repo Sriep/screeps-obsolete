@@ -9,6 +9,8 @@
 "use strict";
 var raceWorker = require("race.worker");
 var roleBase = require("role.base");
+var RouteScout = require("route.scout");
+var routeBase = require("route.base");
 var gc = require("gc");
 var gf = require("gf");
 /**
@@ -32,12 +34,26 @@ var roomBase = {
             }
         }
         var nearByRooms = this.nearByRooms();
+        console.log("examineRooms nearByRooms", JSON.stringify(nearByRooms))
         nearByRooms.forEach( function (roomName) {
          //  console.log("in foreach room",roomName);
             if (Memory.rooms[roomName] === undefined
                 || Memory.rooms[roomName].memory === undefined
                 || !Memory.rooms[roomName].memory.flagged) {
-                    roomBase.sendScout(roomName);
+             //   console.log("examineRooms send scout to",roomName,"Memory.rooms[roomName]",
+             //       Memory.rooms[roomName]);
+
+                if(Memory.rooms[roomName]){
+             //       console.log("examineRooms send scout to",roomName,"Memory.rooms[roomName].memory"
+            //            ,Memory.rooms[roomName].memory);
+                    if (Memory.rooms[roomName].memory) {
+            //            console.log("examineRooms send scout to",roomName,"Memory.rooms[roomName].memory.flagged"
+             //           ,Memory.rooms[roomName].memory.flagged);
+                    }
+                }
+
+                   // TODO get send sout working. Only send scout if room is not flagged but has entry to owned room
+                   // roomBase.sendScout(roomName);
             }
             if (roomBase.isEnemyRoom(roomName)) {
                 roomBase.planInvasion();
@@ -136,9 +152,32 @@ var roomBase = {
         return Game.rooms[roomName].controller.my;
     },
 
-    sendScout: function (room) {
+    sendScout: function (roomName) {
     //    TODO send a count creep to room
      //   console.log("send scout to", room);
+        console.log("In sendScout to", roomName);
+        var myRooms = _.filter(Game.rooms, function (room) {
+            return room.controller && room.controller.my
+        });
+        for ( var i = 0 ; i < myRooms.length ; i++ )
+        {
+            var exits = Game.map.describeExits(myRooms[i].name);
+            for ( var j in exits) {
+                if (exits[j] == roomName)
+                    return this.sendScoutFromTo(roomName, myRooms[i].name)
+            }
+        }
+    },
+
+    sendScoutFromTo: function(fromRoom, toRoom) {
+        var order = new RouteScout(toRoom);
+        var scoutsOrders = routeBase.filterBuilds(Game.rooms[fromRoom],"type",gc.ROUTE_SCOUT);
+        for ( var i = 0 ; i < scoutsOrders ; i++ ) {
+            if (toRoom == scoutsOrders[i].targetRoom)
+                return;
+        }
+        console.log("sendScoutFromTo",fromRoom,toRoom,JSON.stringify(order));
+        routeBase.attachRoute(fromRoom, gc.ROLE_SCOUT, order, gc.PRIORITY_SCOUT);
     },
 
     planInvasion: function (room) {
@@ -147,13 +186,13 @@ var roomBase = {
     },
 
     nearByRooms: function (){
-        var myrooms = _.filter(Game.rooms, function (room) {
+        var myRooms = _.filter(Game.rooms, function (room) {
             return room.controller && room.controller.my
         });
-        var nearByRooms = new Set(myrooms);
-        for ( var i = 0 ; i < myrooms.length ; i++ )
+        var nearByRooms = new Set(myRooms);
+        for ( var i = 0 ; i < myRooms.length ; i++ )
         {
-            var exits = Game.map.describeExits(myrooms[i].name);
+            var exits = Game.map.describeExits(myRooms[i].name);
             for ( var j in exits) {
                 nearByRooms.add(exits[j]);
             }

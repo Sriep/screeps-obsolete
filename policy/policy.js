@@ -29,7 +29,7 @@ var policy = {
     enactPolicies: function()
     {
         this.checkRoomPolicies();
-        var i =  Object.keys(Memory.policies).length;
+        //var i =  Object.keys(Memory.policies).length;
         for (var i in Memory.policies) {
             var oldPolicyModule = this.getModuleFromPolicy(Memory.policies[i]);
            // console.log("enactPolicies",JSON.stringify(Memory.policies[i]));

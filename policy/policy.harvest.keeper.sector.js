@@ -21,9 +21,9 @@ var TaskAttackTarget = require("task.attack.target");
 var TaskMoveFind = require("task.move.find");
 var TaskWait = require("task.wait");
 var TaskMoveRoom = require("task.move.room");
-var Battle = require("battle");
+var Battle = require("combat.quick.estimate");
 var raceBase = require("race.base");
-var battle = require("battle");
+var battle = require("combat.quick.estimate");
 var TaskHeal = require("task.heal");
 var TaskMoveAttackPos = require("task.move.attack.pos");
 /**

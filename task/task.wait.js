@@ -12,7 +12,7 @@ var gc = require("gc");
  * @module TaskWait
  */
 
-function TaskWait (whatFor, moduleName) {
+function TaskWait (whatFor, moduleName,turns) {
     this.taskType = gc.TASK_WAIT;
     this.conflicts = gc.MOVE;
     this.whatFor = whatFor;
@@ -21,11 +21,21 @@ function TaskWait (whatFor, moduleName) {
         this.whatFor = function() {return true;};
     }
     this.moduleName = moduleName;
+    this.turns = turns;
     this.loop = false;
     this.pickup = true;
 }
 
 TaskWait.prototype.doTask = function(creep, task) {
+
+    if (task.turns !== undefined) {
+        if ( 0 == task.turns)
+            return gc.RESULT_FINISHED;
+        else {
+            task.turns--
+            return gc.RESULT_UNFINISHED;
+        }
+    }
 
     if (undefined !== task.moduleName) {
         var module;

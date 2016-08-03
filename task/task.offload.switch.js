@@ -69,8 +69,8 @@ TaskOffloadSwitch.prototype.doTask = function(creep) {
 }
 
 TaskOffloadSwitch.prototype.needEmergencyUpgrade = function (creep) {
-    return creep.room.controller.ticksToDowngrade < gc.EMERGENCY_DOWNGRADING_THRESHOLD
-            || creep.room.controller.level < 2;
+    return creep.room.controller.ticksToDowngrade < gc.EMERGENCY_DOWNGRADING_THRESHOLD;
+           // || creep.room.controller.level < 2;
 };
 
 TaskOffloadSwitch.prototype.changeState = function (creep, state) {

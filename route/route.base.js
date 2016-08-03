@@ -27,6 +27,7 @@ var routeBase = {
     attachRoute: function (roomName, routeType, order, priority, reference) {
         var room = Game.rooms[roomName];
         if (!this.checkSetup(room)) return false;
+        //console.log("attachRoute rooName",roomName);
         order.id = this.getNextRouteId(room);
         if (priority === undefined) {
             order.priority = gc.DEFAULT_ROUTE_PRIORITY;
@@ -34,6 +35,7 @@ var routeBase = {
             order.priority = priority;
         }
         if (reference) this.setDueFromActiveRoute(room, order, reference);
+        console.log("attachRoute rooName",JSON.stringify(order));
         room.memory.routes.details[order.id] = order;
         return true;
     },
@@ -49,13 +51,14 @@ var routeBase = {
             return;
         }
         creeps = creeps.sort(function (a,b) {return (b.ticksToLive - a.ticksToLive)});
-        console.log(room,"setDueFromActiveRoute creeeps",creeps, JSON.stringify(creeps));
+        //onsole.log(room,"setDueFromActiveRoute creeeps",creeps, JSON.stringify(creeps));
         var ticksSinceLastBuild = CREEP_LIFE_TIME - creeps[0].ticksToLive;
-        console.log("setDueFromActiveRoute ticksSinceLastBuild",ticksSinceLastBuild);
+        //console.log("setDueFromActiveRoute ticksSinceLastBuild",ticksSinceLastBuild);
         order.due = order.respawnRate - ticksSinceLastBuild;
+        if (order.due < 0) order.due = 0;
     },
 
-    resetDueIfRoureNotActive: function(room, build, reference) {
+    resetDueIfRouteNotActive: function(room, build, reference) {
         var creeps = _.filter(Game.creeps, function (creep) {
             return creep.memory.buildReference == reference
                 && creep.memory.buildType == build.type;

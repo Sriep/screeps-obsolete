@@ -6,8 +6,6 @@
  * @author Piers Shepperson
  */
 "use strict";
-var policyThePool = require("policy.the.pool");
-var raceBase = require("race.base");
 var roomOwned = require("room.owned");
 var routeBase = require("route.base");
 var RouteLinker = require("route.linker");
@@ -16,7 +14,6 @@ var RouteRemoteActions = require("route.remote.actions");
 var RouteRepairer = require("route.repairer");
 var RouteFlexiStoragePorter = require("route.flexi.storage.porter");
 var gc = require("gc");
-var policyMany2oneLinker = require("policy.many2one.linker");
 var policy = require("policy");
 var raceClaimer = require("race.claimer");
 var RoutePatrolRoom = require("route.patrol.room");
@@ -88,7 +85,7 @@ var linkers = {
                   //  console.log("keepMatchedBuildWithSameSize")
                     // todo If linkers die need new ones quick. Should put somewhere else.
                     if (matches[i].priority == gc.PRIORITY_LINKER && matches[i].due >0 ) {
-                        routeBase.resetDueIfRoureNotActive(room, matches[i], matches[i].flagName);
+                        routeBase.resetDueIfRouteNotActive(room, matches[i], matches[i].flagName);
                     }
                     return true;
                 } else {
@@ -143,7 +140,6 @@ var linkers = {
             }
         }
     },
-
 
     attachFlaggedReverseController: function (flag, room, policy, body)
     {
@@ -200,7 +196,7 @@ var linkers = {
     attachFlexiStoragePorters: function (room, policy) {
 
         console.log(room, "attachFlexiStoragePorters, 0 < porterShortfall",
-            policyMany2oneLinker.porterShortfall(room,policy));
+            this.porterShortfall(room,policy));
 
         var creeps = _.filter(Game.creeps, function (creep) {
             return creep.memory.policyId == policy.id
@@ -215,15 +211,16 @@ var linkers = {
       //   "parts for upgarde",this.partsForUpgrade(room,0));
 
 
-        if ( 0 < policyMany2oneLinker.porterShortfall(room,policy)
+        if ( 0 < this.porterShortfall(room,policy)
             && routeBase.filterBuilds(room,"type",gc.ROUTE_FLEXI_STORAGE_PORTER).length == 0) {
 
 
            if (creeps.length <= this.maxCreepsCanFitInRoom(room)) {
                 var order = new RouteFlexiStoragePorter(room.name, 0, policy.id);
-              //  console.log("attachFlexiStoragePorters creeplife", this.creepLifeTicks(policy),
-              //      "< middale age", gc.PORTER_PRIORITY_THRESHOLD);
-                if (this.creepLifeTicks(policy) < gc.PORTER_PRIORITY_THRESHOLD) {
+                console.log("attachFlexiStoragePorters creeplife", this.creepLifeTicks(policy),
+                    "< middale age", gc.PORTER_PRIORITY_THRESHOLD);
+               var creepLifeTicks = this.creepLifeTicks(policy);
+               if (creepLifeTicks < gc.PORTER_PRIORITY_THRESHOLD) {
                     var priority = gc.PRIORITY_EMERGENCY_HOME_PORTER;
                 } else {
                     priority = gc.PRIORITY_HOME_PORTER
@@ -261,10 +258,13 @@ var linkers = {
 
     creepLifeTicks: function (policy) {
         var creeps = _.filter(Game.creeps, function (creep) {
-            return creep.memory.policyId == policy.id})
+            return creep.memory.policyId == policy.id});
         var life = 0;
+        var length = creeps.length;
+        var one  = creeps[0];
         for ( var i = 0 ; i < creeps.length ; i++ ) {
-            life = life + creeps[i].ticksToLive;
+            if (creeps[i] && creeps[i].ticksToLive)
+                life = life + creeps[i].ticksToLive;
         }
         return life;
     },
@@ -300,9 +300,10 @@ var linkers = {
                             break;
                         case gc.ROUTE_REMOTE_ACTIONS:
                         case gc.ROUTE_PATROL_ROOM:
-                            if (flag.memory.claimerFrom.room != room.name) {
+                            if (flag.memory.claimerFrom && flag.memory.claimerFrom.room != room.name) {
                                 routeBase.removeRoute(room.name, builds[i].id);
                             }
+                            break;
                         default:
                     } //switch
                 } //if (flag )
@@ -387,15 +388,79 @@ var linkers = {
     processBuildQueue: function(room) {
         var spawns = room.find(FIND_MY_SPAWNS);
         var nextBuild = routeBase.nextBuild(room);
-
+        //console.log("processBuldQueue next build", JSON.stringify(nextBuild));
         if (undefined !== nextBuild) {
             var i = spawns.length-1;
             do {
                 var result = routeBase.spawn(spawns[i], room, nextBuild);
-               // console.log(room,"processBuildQueue",i,result);
+                //console.log(room,"processBuildQueue",i,result);
             } while ( result == ERR_BUSY && i--)
         }
-    }
+    },
+
+    existingPorterParts: function (currentPolicy) {
+        var parts = 0;
+        var porters = _.filter(Game.creeps, function (creep) {
+            return (creep.memory.policyId == currentPolicy.id
+            &&  creep.memory.role == gc.ROLE_FLEXI_STORAGE_PORTER );
+        });
+        // console.log("existingPorterParts number creeps",porters.length);
+        parts = 0;
+        for (var i in porters) {
+            parts = parts + porters[i].getActiveBodyparts(WORK);
+        }
+        //   console.log("existingPorterParts  parts",parts);
+        return parts;
+    },
+
+    porterShortfall: function (room,currentPolicy) {
+        //var porterSize = this.porterSize(room);
+        var existingPorterParts = this.existingPorterParts(currentPolicy);
+
+        //var externalCommitments = poolSupply.getEnergyInBuildQueue();
+
+        var energyInStorage;
+        if ( room.storage !== undefined) {
+            energyInStorage = room.storage.store[RESOURCE_ENERGY];
+        } else {
+            energyInStorage = 0;
+        }
+        var portersNoCommitmentsEnergyLT = roomOwned.energyLifeTime(room, 1, gc.ROLE_FLEXI_STORAGE_PORTER);
+        var sourceEnergyLT  = roomOwned.allSourcesEnergy(room) *5;
+        var energyBuildLinkersAndRepairer = 4*1000;
+        var energyForUpgrading = sourceEnergyLT - energyBuildLinkersAndRepairer;// - externalCommitments;
+        var numPortersPartsNeeded = Math.max(5,energyForUpgrading / portersNoCommitmentsEnergyLT);
+
+        var extraPartsForStorage = existingPorterParts - numPortersPartsNeeded;
+        // console.log("extraPartsForStorage",extraPartsForStorage,"existingPorterParts"
+        //                  ,existingPorterParts,"numPortersPartsNeeded",numPortersPartsNeeded);
+
+        var availableInStorage = Math.max(0, energyInStorage - gc.STORAGE_STOCKPILE - extraPartsForStorage * portersNoCommitmentsEnergyLT);
+        //    console.log("available InStorage",availableInStorage,"energyInStorage",energyInStorage,"extraPartsForStorage",
+        //                     extraPartsForStorage,"portersNoCommitmentsEnergyLT",portersNoCommitmentsEnergyLT);
+
+        energyForUpgrading = sourceEnergyLT - energyBuildLinkersAndRepairer + availableInStorage ;//externalCommitments
+        numPortersPartsNeeded = Math.max(5,energyForUpgrading / portersNoCommitmentsEnergyLT);
+
+        var porterShortfall = numPortersPartsNeeded - existingPorterParts;
+        //  console.log(room,"many2one portorparts",numPortersPartsNeeded);
+        //*policy.creepsAgeFactor(currentPolicy);
+
+        /*
+         console.log("existingPorterParts",existingPorterParts,"externalCommitments",externalCommitments);
+         console.log("portersNoCommitmentsEnergyLT",portersNoCommitmentsEnergyLT,"sourceEnergyLT",sourceEnergyLT
+         ,"energyBuildLinkersAndRepairer",energyBuildLinkersAndRepairer);
+
+         console.log("energyForUpgrading",energyForUpgrading,"sourceEnergyLT",sourceEnergyLT,
+         "energyBuildLinkersAndRepairer",energyBuildLinkersAndRepairer,"externalCommitments",externalCommitments,
+         "energyInStorage",energyInStorage);
+         console.log("numPortersPartsNeeded",numPortersPartsNeeded,"energyForUpgrading",energyForUpgrading,
+         "portersNoCommitmentsEnergyLT",portersNoCommitmentsEnergyLT);
+         console.log(room,"porterShortfall",porterShortfall,"numPortersPartsNeeded",numPortersPartsNeeded,"existingPorterParts"
+         ,existingPorterParts,"age factor",policy.creepsAgeFactor(currentPolicy));
+         */
+        return porterShortfall;
+    },
 };
 
 

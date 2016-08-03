@@ -29,7 +29,7 @@ function  RouteNeutralPorter  (room, flagName, policyId) {
             flag.memory.porterFrom.distance,
             flag.memory.energyCapacity
         );
-        console.log(room,"RouteNeutralPorter",maxForRoom,"maxForRoom size onegen",sizeForOnePerGen)
+        //console.log(room,"RouteNeutralPorter",maxForRoom,"maxForRoom size onegen",sizeForOnePerGen)
         this.size = Math.min(maxForRoom, sizeForOnePerGen)
         var flag = Game.flags[flagName];
         this.respawnRate = RouteNeutralPorter.prototype.calcRespawnRate(
@@ -59,7 +59,7 @@ RouteNeutralPorter.prototype.spawn = function (build, spawn, room ) {
 RouteNeutralPorter.prototype.sizeForOneGenerationRespawn = function(distance, energyCapacity) {
     var SourceEnergyPerGeneration = energyCapacity * CREEP_LIFE_TIME / ENERGY_REGEN_TIME;
     var size = SourceEnergyPerGeneration * 2*distance/(CREEP_LIFE_TIME*CARRY_CAPACITY);
-    console.log("sizeForOneGenerationRespawn",SourceEnergyPerGeneration,size);
+   // console.log("sizeForOneGenerationRespawn",SourceEnergyPerGeneration,size);
     return Math.floor(size);
 };
 

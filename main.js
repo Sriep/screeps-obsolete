@@ -29,16 +29,17 @@ module.exports.loop = function () {
       //  catch(exp) {
          // console.log("ops exception from ayrtepPad top",exp);
       //  }
-        if (Game.time % gc.ROOM_UPDATE_RATE == 0 ){
-             roomBase.examineRooms(true);
-        }
-        if (Game.time % gc.FLAG_UPDATE_RATE == 0 ){
-            flagBase.run();
-        }
-        freememory.freeCreeps();
-        policy.enactPolicies();
-        raceBase.moveCreeps();
-        ayrtepPad.bottom();
+    if (Game.time % gc.ROOM_UPDATE_RATE == 0 ){
+         roomBase.examineRooms(true);
+    }
+    if (Game.time % gc.FLAG_UPDATE_RATE == 0 ){
+        flagBase.run();
+    }
+    freememory.freeCreeps();
+    policy.enactPolicies();
+    raceBase.moveCreeps();
+
+    ayrtepPad.bottom();
 
 
         console.log("************************ " + Game.time + " *********************************");
