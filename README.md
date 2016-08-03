@@ -17,7 +17,7 @@ Currently, consists of several 'class libraries'
 ## Roles
 These represent an array of tasks which perform some useful function.
 - Each tick the doTask methods from the task at the head of the array are called until a stop criterion is found.
-- A roles array of tasks can be self-modifying, however, in this case, there will typically be one key task that is central to the role.
+- A role's array of tasks can be self-modifying, however, in this case, there will typically be one key task that is central to the role.
 
 ## Routes
 Encapsulates the build queue for a room.
@@ -48,8 +48,7 @@ This is where custom user code is designed to be put.
 ## Main game loop.
 As shown below each tick. Memory on dead ticks are freed. 
 - Each policy is enacted then all the creeps are moved. 
-- At intervals each visible room examined and flags placed on important objects, this is a quick process and ROOM_UPDATE_RATE can probably be set to 1. 
->>>>>>> origin/master
+- At intervals each visible room examined and flags placed on important objects, this is a quick process and ROOM_UPDATE_RATE can probably be set to 1.
 - At a different interval, each flag is processed with information about how the flagged object should be interacted with. This is a time-consuming process that does not need to be carried out that often, so FLAG_UPDATE_RATE can be quite long.
 
 ```javascript
@@ -65,7 +64,6 @@ As shown below each tick. Memory on dead ticks are freed.
 ```
 
 ## Creeps
-<<<<<<< HEAD
 Creeps are not meant to be moved directly either in Policies or elsewhere.
 Instead, they should be given roles or task lists and sent on their way.
 The raceBase.moveCreeps method then does all the work.
