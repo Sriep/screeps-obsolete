@@ -18,7 +18,7 @@ Screeps-Typescript-Declarations/
 #grunt files
 Gruntfile.js
 package.json
-grunt_screeps.bat*
+grunt_screeps.bat
 
 # Runtime data
 pids

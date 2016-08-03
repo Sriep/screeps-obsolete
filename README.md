@@ -65,7 +65,7 @@ As shown below each tick. Memory on dead ticks are freed.
 
 ## Creeps
 Creeps are not meant to be moved directly either in Policies or elsewhere.
-Instead, they should be given roles or task lists and sent on their way.
-The raceBase.moveCreeps method then does all the work.
-Of course in an emergency feel free to take control of and micromanage individual creeps.
+- Instead, they should be given roles or task lists and sent on their way.
+- The raceBase.moveCreeps method then does all the work.
+- Of course in an emergency feel free to take control of and micromanage individual creeps.
 

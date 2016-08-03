@@ -61,7 +61,7 @@ var ayrtepPad = {
         console.log("------------------------------ routes W25S23 ---------------------------");
     //    routeBase.showRoutes("W25S23");
         console.log("------------------------------ routes W25S19 ---------------------------");
-        //   routeBase.showRoutes("W25S19");
+           routeBase.showRoutes("W25S19");
         console.log("---------------------------------------------------------------------");
 
      //   console.log("------------------------------ routes sim ---------------------------");
@@ -154,6 +154,7 @@ var ayrtepPad = {
       //  routeBase.resetRoutes("W26S21");
       //  routeBase.resetRoutes("W25S22");
      //   routeBase.resetRoutes("W25S23");
+       // routeBase.resetRoutes("W25S19");
 
        // w26s21.memory.routes = {};
       //  w26s21.memory.routes.details = {};
