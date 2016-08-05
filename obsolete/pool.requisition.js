@@ -3,7 +3,7 @@
  * @author Piers Shepperson
  */
 "use strict";
-var policyThePool = require("policy.the.pool");
+//var policyThePool = require("policy.the.pool");
 var raceBase = require("race.base");
 /**
  * Requisition object for using the pool

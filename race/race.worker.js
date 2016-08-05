@@ -91,13 +91,13 @@ var raceWorker = {
 
     maxSizeRoom: function(room, fast) {
     //    console.log("race.worker.maxSizeRoom",room.energyCapacityAvailable,this.BLOCKSIZE);
-        var withoutBodyPartLimit;
+        var workerBodyPartLimit;
         if (fast) {
-            withoutBodyPartLimit = Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE_FAST);
-            return Math.min(withoutBodyPartLimit, gc.WORKER_FAST_MAX_SIZE);
+            workerBodyPartLimit = Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE_FAST);
+            return Math.min(workerBodyPartLimit, gc.WORKER_FAST_MAX_SIZE);
         } else {
-            withoutBodyPartLimit =  Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE);
-            return Math.min(withoutBodyPartLimit, gc.WORKER_SLOW_MAX_SIZE);
+            workerBodyPartLimit =  Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE);
+            return Math.min(workerBodyPartLimit, gc.WORKER_SLOW_MAX_SIZE);
         }
     },
 

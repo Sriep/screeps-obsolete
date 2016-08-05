@@ -23,7 +23,7 @@ var raceScout = {
     },
 
     maxSizeRoom: function(room) {
-        return Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE);
+        return Math.min(50, Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE));
     },
 
     energyFromSize: function (size) {

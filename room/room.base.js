@@ -34,31 +34,18 @@ var roomBase = {
             }
         }
         var nearByRooms = this.nearByRooms();
-        console.log("examineRooms nearByRooms", JSON.stringify(nearByRooms))
-        nearByRooms.forEach( function (roomName) {
-         //  console.log("in foreach room",roomName);
-            if (Memory.rooms[roomName] === undefined
-                || Memory.rooms[roomName].memory === undefined
-                || !Memory.rooms[roomName].memory.flagged) {
-             //   console.log("examineRooms send scout to",roomName,"Memory.rooms[roomName]",
-             //       Memory.rooms[roomName]);
+      //  console.log("examineRooms nearByRooms", JSON.stringify(nearByRooms));
+        for ( var i = 0 ; i < nearByRooms.length ; i++ ) {
 
-                if(Memory.rooms[roomName]){
-             //       console.log("examineRooms send scout to",roomName,"Memory.rooms[roomName].memory"
-            //            ,Memory.rooms[roomName].memory);
-                    if (Memory.rooms[roomName].memory) {
-            //            console.log("examineRooms send scout to",roomName,"Memory.rooms[roomName].memory.flagged"
-             //           ,Memory.rooms[roomName].memory.flagged);
-                    }
-                }
 
-                   // TODO get send sout working. Only send scout if room is not flagged but has entry to owned room
-                   // roomBase.sendScout(roomName);
+            if (Memory.rooms[nearByRooms[i]] === undefined
+                || !Memory.rooms[nearByRooms[i]].flagged) {
+                   roomBase.sendScout(nearByRooms[i]);
             }
-            if (roomBase.isEnemyRoom(roomName)) {
+            if (roomBase.isEnemyRoom(nearByRooms[i])) {
                 roomBase.planInvasion();
             }
-        });
+        }
     },
 
     flagRoom: function (room) {
@@ -153,32 +140,42 @@ var roomBase = {
     },
 
     sendScout: function (roomName) {
-    //    TODO send a count creep to room
-     //   console.log("send scout to", room);
-        console.log("In sendScout to", roomName);
+        var adjacencies = this.findAdjacentOwnedRooms(roomName);
+        if (adjacencies.length > 0) {
+            this.sendScoutFromTo(adjacencies[0], roomName)
+        }
+    },
+
+    findAdjacentOwnedRooms: function (roomName) {
         var myRooms = _.filter(Game.rooms, function (room) {
             return room.controller && room.controller.my
         });
+        var adjacencies = [];
         for ( var i = 0 ; i < myRooms.length ; i++ )
         {
             var exits = Game.map.describeExits(myRooms[i].name);
             for ( var j in exits) {
                 if (exits[j] == roomName)
-                    return this.sendScoutFromTo(roomName, myRooms[i].name)
+                    adjacencies.push(myRooms[i].name);
             }
         }
+        return adjacencies;
     },
 
     sendScoutFromTo: function(fromRoom, toRoom) {
+        //console.log("send scout from",fromRoom,"to", toRoom);
         var order = new RouteScout(toRoom);
         var scoutsOrders = routeBase.filterBuilds(Game.rooms[fromRoom],"type",gc.ROUTE_SCOUT);
-        for ( var i = 0 ; i < scoutsOrders ; i++ ) {
+       // console.log("sendScoutFromTo scoutsOrders", JSON.stringify(scoutsOrders));
+        for ( var i = 0 ; i < scoutsOrders.length ; i++ ) {
             if (toRoom == scoutsOrders[i].targetRoom)
                 return;
         }
-        console.log("sendScoutFromTo",fromRoom,toRoom,JSON.stringify(order));
+        //console.log("sendScoutFromTo about to attach",fromRoom,toRoom,JSON.stringify(order));
         routeBase.attachRoute(fromRoom, gc.ROLE_SCOUT, order, gc.PRIORITY_SCOUT);
     },
+
+
 
     planInvasion: function (room) {
         // TODO plan invasion of enemy room
@@ -189,14 +186,19 @@ var roomBase = {
         var myRooms = _.filter(Game.rooms, function (room) {
             return room.controller && room.controller.my
         });
-        var nearByRooms = new Set(myRooms);
+        var nearByRooms = [];
         for ( var i = 0 ; i < myRooms.length ; i++ )
         {
             var exits = Game.map.describeExits(myRooms[i].name);
+           // console.log("nearByRooms exits",i,JSON.stringify(exits));
             for ( var j in exits) {
-                nearByRooms.add(exits[j]);
+                if (nearByRooms.indexOf(exits[j]) == -1) {
+                    nearByRooms.push(exits[j]);
+                }
             }
+
         }
+       // console.log("nearByRooms nearByRooms", JSON.stringify(nearByRooms));
         return nearByRooms;
     },
 
@@ -259,22 +261,53 @@ var roomBase = {
         return { room : roomClosest, distance : distanceClosest };
     },
 
-    exitToEntrance: function (exitPos, newRoom)
+    justInsideNextRoom: function (thisRoom, nextRoom, pos) {
+        if (!thisRoom || !nextRoom) return undefined;
+        if (!pos)
+             pos = new RoomPosition(25,25,thisRoom);
+        var exits = Game.map.describeExits(thisRoom);
+        for ( var i in exits ) {
+            if (exits[i] == nextRoom) {
+                var exit = pos.findClosestByPath(nextRoom);
+                return this.exitToEntrance(exit, exits[i], true);
+            }
+        }
+        return undefined;
+    },
+
+    exitToEntrance: function (exitPos, newRoom, oneStep)
     {
+        var step = oneStep ? 1 : 0;
         if (exitPos && newRoom) {
           //  console.log( "exitPos",JSON.stringify(exitPos),"newroom", newRoom );
             var newX = exitPos.x, newY=exitPos.y;
-            if (exitPos.x == 0) newX = 49;
-            if (exitPos.x == 49) newX = 0;
-            if (exitPos.y == 0) newY = 49;
-            if (exitPos.y == 49) newY = 0;
+            if (exitPos.x == 0) newX = 49 - step;
+            if (exitPos.x == 49) newX = 0 + step;
+            if (exitPos.y == 0) newY = 49 - step;
+            if (exitPos.y == 49) newY = 0 + step;
           //  console.log(newX,newY,newRoom);
             var entrance = new RoomPosition(newX, newY, newRoom);
             return entrance;
         }
+    },
+
+    centroid: function( posArray ) {
+        if (posArray && posArray.length > 0) {
+            var x = 0;
+            var y = 0;
+            for ( var i = 0 ; i < posArray.length ; i++ ) {
+                x += posArray[i].x;
+                y += posArray[i].y;
+            }
+            return new RoomPosition(
+                Math.round(x),
+                Math.round(y),
+                posArray[0].roomName
+            );
+        } else {
+            return undefined;
+        }
     }
-
-
 
 };
 

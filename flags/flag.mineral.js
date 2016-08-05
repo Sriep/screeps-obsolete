@@ -18,6 +18,8 @@ var gf = require("gf");
 var flagMineral = {
 
     run: function (flag) {
+        if (!Game.rooms[flag.pos.roomName]) return;
+
       //  console.log("flagMineral run flag",flag);
         if (gf.isStructureTypeAtPos(flag.pos, STRUCTURE_EXTRACTOR)) {
             flag.memory.extractor = true;
@@ -37,8 +39,8 @@ var flagMineral = {
                 }
                 if ( roomBase.isNeutralRoom(flag.pos.roomName)
                     && extractorFound ) {
-                    flag.memory.linkerFrom = this.linkerSupplyRoom(flag);
-                    flag.memory.porterFrom = this.porterSupplyRoom(flag);
+                  //  flag.memory.linkerFrom = this.linkerSupplyRoom(flag);
+                  //  flag.memory.porterFrom = this.porterSupplyRoom(flag);
                 }
             }
         }

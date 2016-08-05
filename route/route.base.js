@@ -132,6 +132,20 @@ var routeBase = {
         }
     },
 
+    filterBuildsF: function (room, filterFunction) {
+        if (this.checkSetup(room)) {
+            var filteredOrders = [];
+            for (var i in  room.memory.routes.details) {
+                //console.log(room,"filterBuilds", JSON.stringify(room.memory.routes.details[i]));
+                if ( room.memory.routes.details[i]
+                    && filterFunction(room.memory.routes.details[i])) {
+                    filteredOrders.push(room.memory.routes.details[i]);
+                }
+            }
+            return filteredOrders;
+        }
+    },
+
     update: function(room) {
         this.checkSetup(room);
         for ( var i in room.memory.routes.details )  {
@@ -146,7 +160,7 @@ var routeBase = {
         var details = room.memory.routes.details;
         var priority;
         for ( var i in details )  {
-         //   console.log(room,"routeBase  nextBuild i",i,"details", JSON.stringify(details[i]));
+           // console.log(room,"routeBase  nextBuild i",i,"details", JSON.stringify(details[i]));
             if (details[i] && details[i].due <= 0) {
                 if (undefined === priority) {
                     priority = details[i].priority;
@@ -178,13 +192,18 @@ var routeBase = {
     spawn: function (spawn, room, build) {
         module = this.moduleFromRoute(build.type);
         var result = module.prototype.spawn(build, spawn, room);
+      //  console.log("spawn result", result);
         if (_.isString(result)) {
+           // debugger;
+            //console.log("routeBase just before set due");
             if (0 == room.memory.routes.details[build.id].respawnRate) {
                 this.removeRoute(room.name, build.id);
             } else {
                 room.memory.routes.details[build.id].due
                     = room.memory.routes.details[build.id].respawnRate;
+              //  console.log("routeBase set due to respawn", JSON.stringify(room.memory.routes.details[build.id]));
             }
+          //  console.log("routeBase just after set due");
             Game.creeps[result].memory.builtBy = room.name;
             Game.creeps[result].memory.buildType = build.type;
         }

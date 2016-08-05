@@ -10,9 +10,11 @@ var roleGift = {
     getTaskList: function(creep,policyId, role) {
         var taskList = [];
         var room = Memory.policies[policyId].room;
-        var moveToRoom = new TaskMoveRoom(room);
+        if (room) {
+            var moveToRoom = new TaskMoveRoom(room);
+            taskList.push(moveToRoom);
+        }
         var give = new TaskSwitchOwner(policyId, room, role);
-        taskList.push(moveToRoom);
         taskList.push(give);
         return taskList;
     },

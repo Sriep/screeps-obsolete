@@ -29,33 +29,21 @@ var policy = {
     enactPolicies: function()
     {
         this.checkRoomPolicies();
-        //var i =  Object.keys(Memory.policies).length;
         for (var i in Memory.policies) {
             var oldPolicyModule = this.getModuleFromPolicy(Memory.policies[i]);
-           // console.log("enactPolicies",JSON.stringify(Memory.policies[i]));
-         //   console.log("oldPolicyModule", JSON.stringify(oldPolicyModule))
             var newPolicyDetails = oldPolicyModule.draftNewPolicyId(Memory.policies[i]);
-            //console.log(JSON.stringify(oldPolicyModule) ,"newPolicyDetails",newPolicyDetails,"i =",i);
             if (newPolicyDetails === null) {
-              //  console.log("Terminate policy",Memory.policies[i].type,Memory.policies[i].id);
                 delete Memory.policies[i];
-                //Memory.policies.splice(i, 1);
             } else if ( newPolicyDetails.id != Memory.policies[i].id) {
                 var newPolicyModule = this.getModuleFromPolicy(newPolicyDetails);
                 this.activatePolicy(newPolicyDetails);
                 newPolicyModule.switchPolicy(Memory.policies[i], newPolicyDetails);
-               // console.log("Removing old policy",Memory.policies[i].type,"id", Memory.policies[i].id );
                 delete Memory.policies[i];
-                //Memory.policies.splice(i, 1);
-               // console.log("Enact new policy",newPolicyDetails.type,newPolicyDetails.id);
                 newPolicyModule.enactPolicy(newPolicyDetails);
-
             } else {
-               // console.log("ENACT POLICY",Memory.policies[i].type, Memory.policies[i].id);
                 oldPolicyModule.enactPolicy(Memory.policies[i]);
-               // console.log("FINISHED POLICY");
             } // if(newPolicyDetails !===
-        } //while
+        } // for
     },
 
 
@@ -70,8 +58,8 @@ var policy = {
             policies = {};
         }
         if (policies[0] === undefined) {
-            var thePoolPolicyDetails = policyFrameworks.createThePool();
-            this.activatePolicy(thePoolPolicyDetails);
+           // var thePoolPolicyDetails = policyFrameworks.createThePool();
+           // this.activatePolicy(thePoolPolicyDetails);
         }
 
         for(var roomIndex in Game.rooms) {
@@ -171,8 +159,8 @@ var policy = {
         }
         if (undefined === Memory.policies){
             Memory.policies = {};
-            var thePoolPolicyDetails = policyFrameworks.createThePool();
-            this.activatePolicy(thePoolPolicyDetails);
+          //  var thePoolPolicyDetails = policyFrameworks.createThePool();
+          //  this.activatePolicy(thePoolPolicyDetails);
         }
         var module = this.getModuleFromPolicy(policyDetails);
         console.log("activatePolicy id",policyDetails.id,"module",module);

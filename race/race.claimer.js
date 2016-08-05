@@ -27,7 +27,7 @@ var raceClaimer = {
     },
 
     maxSizeRoom: function(room) {
-        return Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE);
+        return Math.min(Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE));
     },
 
     energyFromSize: function (size) {

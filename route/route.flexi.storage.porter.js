@@ -34,14 +34,17 @@ function  RouteFlexiStoragePorter  (room, respawnRate, policyId, size) {
 }
 
 RouteFlexiStoragePorter.prototype.spawn = function (build, spawn, room ) {
-    console.log("trying to spawn RouteFlexiStoragePorter");
+   // console.log("trying to spawn RouteFlexiStoragePorter");
     var body = raceWorker.body(build.size);
     var name = stats.createCreep(spawn, body, undefined, undefined);
+    //console.log("RouteFlexiStoragePorter spawn result", name);
+    debugger;
     if (_.isString(name)) {
         roleBase.switchRoles(Game.creeps[name],
             gc.ROLE_FLEXI_STORAGE_PORTER);
         Game.creeps[name].memory.policyId = build.policyId;
         Game.creeps[name].memory.buildReference = build.owner;
+       // console.log("RouteFlexiStoragePorter spawn name is string name", name);
     }
     return name;
 };

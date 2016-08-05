@@ -7,9 +7,9 @@ var raceBase = require("race.base");
 var gc = require("gc");
 /**
  * Abstract base object for battles.
- * @module CombatQuickEstimate
+ * @module BattleQuickEstimate
  */
-var CombatQuickEstimate = {
+var BattleQuickEstimate = {
 
     quickCombat: function ( enemyCreeps, friendlyCreeps ) {
         var enemies = this.convert(enemyCreeps);
@@ -165,7 +165,7 @@ var CombatQuickEstimate = {
 
 };
 
-module.exports = CombatQuickEstimate;
+module.exports = BattleQuickEstimate;
 
 
 

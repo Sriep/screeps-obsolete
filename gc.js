@@ -131,7 +131,10 @@ var gc = {
     POLICY_PATROL_ROOM: "patrol.room",
     POLICY_HARVEST_NEUTRAL_ROOM: "harvest.neutral.room",
     POLICY_REMOTE_ACTIONS: "remote.actions",
-    POLICY_HARVEST_KEEPER_SECTOR: "harvest.keeper.sector",
+    POLICY_KEEPER_SECTOR_MARSHAL: "keeper.sector.marshal",
+    POLICY_KEEPER_SECTOR_ATTACK: "keeper.sector.attack",
+    POLICY_KEEPER_SECTOR_AFTER_ACTION: "keeper.sector.after.action",
+    POLICY_KEEPER_SECTOR_SUPPRESS: "keeper.sector.suppress",
 
     // flags
     FLAG_SOURCE: "source",
@@ -183,8 +186,13 @@ var gc = {
     MIN_ENERGY_CAPACITY_LINKERS: 400,
     MAX_QUICK_BATTLE_LENGTH: 20,
 
-    ROOM_UPDATE_RATE: 2,
-    FLAG_UPDATE_RATE: 53,
+    TIME_TRANSFER_LOAD: 1,
+    TIME_BUILD_LOAD: 10,
+    TIME_UPGRADE_LOAD: 50,
+
+
+    ROOM_UPDATE_RATE: 1,
+    FLAG_UPDATE_RATE: 17,
     LINKER_RESET_RATE: 27,
     CHECK_FOR_ORPHANED_BUILDS_RATE: 17,
 
@@ -198,6 +206,9 @@ var gc = {
     PRIORITY_REPAIRER: 8,
     PRIORITY_ROOM_PATROL: 12,
     PRIORITY_SCOUT: 9,
+    PRIORITY_KEEPER_ATTACK: 9,
+    PRIORITY_KEEPER_HARVEST: 11,
+    PRIORITY_KEEPER_PORTER: 14,
 
     //flag colours
     FLAG_PERMANENT_COLOUR: COLOR_BLUE,
@@ -281,6 +292,12 @@ var gc = {
      {x :-1, y:-2}
      ],
 
+    KEEPER_OWNER: "Source Keeper",
+    KEEPER_CYCLE_MAX_WAIT: 30,
+    KEEPER_HARVEST_MIN_CONTROLLER_LEVEL: 6,
+    KEEPER_SWORDSMAN_PARTS_NEEDED_GEN: 50,
+    KEEPER_HEALER_PARTS_NEEDED_GEN: 0,
+    KEEPER_MARSHALING_RANGE: 2,
     SOURCE_KEEPER_BODY: [{"type":"tough","hits":100},{"type":"tough","hits":100},
         {"type":"tough","hits":100},{"type":"tough","hits":100},
         {"type":"tough","hits":100},{"type":"tough","hits":100},{"type":"tough","hits":100},
@@ -299,7 +316,15 @@ var gc = {
         {"type":"ranged_attack","hits":100},{"type":"attack","hits":100},
         {"type":"ranged_attack","hits":100},{"type":"attack","hits":100},{"type":"ranged_attack","hits":100},
         {"type":"attack","hits":100},{"type":"ranged_attack","hits":100},
-        {"type":"attack","hits":100},{"type":"ranged_attack","hits":100}]
+        {"type":"attack","hits":100},{"type":"ranged_attack","hits":100}],
+
+    SOURCE_KEEPER_BODY_ARRAY: [TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,
+        TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,MOVE,MOVE,MOVE,
+        MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,
+        ATTACK,RANGED_ATTACK,ATTACK,RANGED_ATTACK,ATTACK,
+        RANGED_ATTACK,ATTACK,RANGED_ATTACK,ATTACK,RANGED_ATTACK,
+        ATTACK,RANGED_ATTACK,ATTACK,RANGED_ATTACK,ATTACK,
+        RANGED_ATTACK,ATTACK,RANGED_ATTACK,ATTACK,RANGED_ATTACK]
 
 
 

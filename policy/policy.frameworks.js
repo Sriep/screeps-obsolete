@@ -116,13 +116,73 @@ var policyFrameworks = {
         return p;
     },
 
-    policyHarvestKeeperSector: function(keeperRoom, marshallingPreActionPos, marshallingActivePos, start) {
+    policyKeeperSectorMarshal: function(keeperRoom, marshallingPos, start, oldPolicy) {
+        if (oldPolicy) {
+            var newPolicy = {
+                id : oldPolicy.id,
+                type : gc.POLICY_KEEPER_SECTOR_AFTER_ACTION,
+                flag: oldPolicy.flag,
+                keeperRoom : oldPolicy.keeperRoom,
+                marshallingPos : oldPolicy.marshallingPos,
+                tickLastAttackStarted : undefined,
+                cleared : false
+            };
+        } else {
+            var newPolicy = {
+                id : policy.getNextPolicyId(),
+                type : gc.POLICY_KEEPER_SECTOR_MARSHAL,
+                flag: undefined,
+                keeperRoom : keeperRoom,
+                marshallingPos : marshallingPos,
+                cleared : false
+            };
+        }
+        if (start) {
+            policy.activatePolicy(newPolicy);
+        }
+        return newPolicy;
+    },
+
+    policyKeeperSectorAfterAction: function(oldPolicy, start) {
         var newPolicy = {
-            id : policy.getNextPolicyId(),
-            type : gc.POLICY_HARVEST_KEEPER_SECTOR,
-            keeperRoom : keeperRoom,
-            marshallingPreActionPos : marshallingPreActionPos,
-            marshallingActivePos : marshallingActivePos
+            id : oldPolicy.id,
+            type : gc.POLICY_KEEPER_SECTOR_AFTER_ACTION,
+            flag: oldPolicy.flag,
+            keeperRoom : oldPolicy.keeperRoom,
+            marshallingPos : oldPolicy.marshallingPos,
+            tickLastAttackStarted : oldPolicy.tickLastAttackStarted,
+            cleared : oldPolicy.cleared
+        };
+        if (start) {
+            policy.activatePolicy(newPolicy);
+        }
+        return newPolicy;
+    },
+
+    policyKeeperSectorSuppress: function(oldPolicy, start) {
+        var newPolicy = {
+            id : oldPolicy.id,
+            type : gc.POLICY_KEEPER_SECTOR_SUPPRESS,
+            flag: oldPolicy.flag,
+            keeperRoom : oldPolicy.keeperRoom,
+            marshallingPos : oldPolicy.marshallingPos,
+            tickLastAttackStarted : oldPolicy.tickLastAttackStarted,
+            cleared : true
+        };
+        if (start) {
+            policy.activatePolicy(newPolicy);
+        }
+        return newPolicy;
+    },
+
+    policyKeeperSectorAttack: function(oldPolicy, start) {
+        var newPolicy = {
+            id : oldPolicy.id,
+            type : gc.POLICY_KEEPER_SECTOR_ATTACK,
+            flag: oldPolicy.flag,
+            keeperRoom : oldPolicy.keeperRoom,
+            marshallingPos : oldPolicy.marshallingPos,
+            cleared : oldPolicy.cleared
         };
         if (start) {
             policy.activatePolicy(newPolicy);

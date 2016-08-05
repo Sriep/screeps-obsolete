@@ -16,12 +16,12 @@ var recurringPolicies = require("recurring.policies");
 
 // Any modules that you use that modify the game's prototypes should be require'd
 // before you require the profiler.
-var profiler = require("screeps-profiler");
+//var profiler = require("screeps-profiler");
 // This line monkey patches the global prototypes.
-profiler.enable();
+//profiler.enable();
 
 module.exports.loop = function () {
-    profiler.wrap(function() {
+    //profiler.wrap(function() {
         PathFinder.use(true);
        // try {
             ayrtepPad.top();
@@ -29,21 +29,19 @@ module.exports.loop = function () {
       //  catch(exp) {
          // console.log("ops exception from ayrtepPad top",exp);
       //  }
-    if (Game.time % gc.ROOM_UPDATE_RATE == 0 ){
-         roomBase.examineRooms(true);
-    }
-    if (Game.time % gc.FLAG_UPDATE_RATE == 0 ){
-        flagBase.run();
-    }
-    freememory.freeCreeps();
-    policy.enactPolicies();
-    raceBase.moveCreeps();
+        if (Game.time % gc.ROOM_UPDATE_RATE == 0 ){
+             roomBase.examineRooms(true);
+        }
+        if (Game.time % gc.FLAG_UPDATE_RATE == 0 ){
+            flagBase.run();
+        }
+        freememory.freeCreeps();
+        policy.enactPolicies();
+        raceBase.moveCreeps();
 
-    ayrtepPad.bottom();
-
-
+        ayrtepPad.bottom()
         console.log("************************ " + Game.time + " *********************************");
-    }) // profiler.wrap(function()
+   // }) // profiler.wrap(function()
 }
 //JSON.stringify(memory);
 //Game.rooms["W26S21"]

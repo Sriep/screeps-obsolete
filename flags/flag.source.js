@@ -20,17 +20,23 @@ var flagSource = {
       //  console.log(flag,"flagSource run");
         if (!flag.room)
             return;
-
+       // console.log("flagSource before if statment", flag, flag.memory.energyCapacity, JSON.stringify(flag.memory));
         if ( roomBase.isMyRoom(flag.pos.roomName)) {
             // todo Put in code to give real distance. Not sure if would be used usefully.
+          //  console.log("flagSource flag in my room", flag, flag.memory.energyCapacity);
             flag.memory.linkerFrom = { room : flag.pos.roomName, distance : 0 };
             flag.memory.porterFrom = { room : flag.pos.roomName, distance : 0 };
-        } else if ( roomBase.isNeutralRoom(flag.pos.roomName)) {
-        //    console.log("flagSource flag", flag);
+        } else if ( roomBase.isNeutralRoom(flag.pos.roomName)
+            && SOURCE_ENERGY_KEEPER_CAPACITY != flag.memory.energyCapacity ) {
+          //  console.log("flagSource flag", flag, flag.memory.energyCapacity);
             flag.memory.linkerFrom = this.linkerSupplyRoom(flag);
             flag.memory.porterFrom = this.porterSupplyRoom(flag);
       //      console.log("after flagSource flag", flag);
+        } else {
+           // flag.memory.linkerFrom = undefined;
+            //flag.memory.porterFrom = undefined;
         }
+       // console.log("flagSource after if statment", flag, flag.memory.energyCapacity,JSON.stringify(flag.memory));
     },
 
     linkerSupplyRoom : function (flag) {

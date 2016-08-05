@@ -17,7 +17,9 @@ var gc = require("gc");
 var policy = require("policy");
 var raceClaimer = require("race.claimer");
 var RoutePatrolRoom = require("route.patrol.room");
+var RouteGiftCreep  = require("route.gift.creep");
 var raceSwordsman = require("race.swordsman");
+var raceWorker = require("race.worker");
 /**
  * Requisition object for using the pool
  * @module policy
@@ -57,7 +59,6 @@ var linkers = {
                 }
             }
 
-
             if (flags[i].pos.roomName != room.name
                 && flags[i].memory.porterFrom
                 && room.name == flags[i].memory.porterFrom.room) {
@@ -69,6 +70,7 @@ var linkers = {
             }
         }
         this.attachFlaggedControlRoutes(room, policy);
+        //this.attachFlaggedKeeperLairRoutes(room, policy);
 
         if (Game.time % gc.CHECK_FOR_ORPHANED_BUILDS_RATE == 0 ){
             this.checkForOrphanedBuilds(room);
@@ -195,8 +197,17 @@ var linkers = {
 
     attachFlexiStoragePorters: function (room, policy) {
 
+       // console.log(room, "attachFlexiStoragePorters, 0 < porterShortfall",
+      //      this.porterShortfall(room,policy), "existing parts",  this.existingPorterParts(policy)
+      //      ,"quick partsNeeded",this.quickPorterPartsNeeded(room));
+
+    //    console.log(room, "attachFlexiStoragePorters, 0 < porterShortfall",
+    ///        this.porterShortfall(room,policy), "existing parts",  this.existingPorterParts(policy)
+    //        ,"porterPartsNeeded",this.porterPartsNeeded(room));
+
         console.log(room, "attachFlexiStoragePorters, 0 < porterShortfall",
-            this.porterShortfall(room,policy));
+            this.porterShortfall(room,policy), "existing parts",  this.existingPorterParts(policy));
+        //this.porterPartsNeeded(room);
 
         var creeps = _.filter(Game.creeps, function (creep) {
             return creep.memory.policyId == policy.id
@@ -209,6 +220,7 @@ var linkers = {
 
       //  console.log(room,"partsForBuildQueue",this.partsForBuildQueue(room,0),
       //   "parts for upgarde",this.partsForUpgrade(room,0));
+        //if (this.existingPorterParts(policy) < this.porterPartsNeeded(room))
 
 
         if ( 0 < this.porterShortfall(room,policy)
@@ -229,6 +241,87 @@ var linkers = {
            }
         }
         //console.log(room,"End of attachFlexiStoragePorters");
+    },
+
+    attachFlaggedKeeperLairRoutes: function(room, policy) {
+        if (room.controller.level < gc.KEEPER_HARVEST_MIN_CONTROLLER_LEVEL)
+            return;
+        var keeperPolicies = _.filter(Memory.policies, function (policy) {
+            return ( (policy.type == gc.POLICY_KEEPER_SECTOR_MARSHAL
+                    || policy.type == gc.POLICY_KEEPER_SECTOR_ATTACK
+                    || policy.type == gc.POLICY_KEEPER_SECTOR_AFTER_ACTION
+                    || policy.type == gc.POLICY_KEEPER_SECTOR_SUPPRESS)
+                    && policy.keeperRoom == room.name);
+        });
+        if (!keeperPolicies) return;
+        for ( var i = 0 ; i < keeperPolicies.length ; i++ ) {
+            this.keeperRoomSendSolders(room, keeperPolicies[i])
+            if (keeperPolicies[i].roomCleared) {
+                var flags = _.filter(Game.flags, function (flag) {
+                    return ( flag.memory.policyId == keeperPolicies[i].id);
+                });
+                for ( var j = 0 ; j < flags.length ;  j ++ ) {
+                    switch (flag.memory.type) {
+                        case gc.FLAG_SOURCE:
+                            this.keeperRoomSendHarvesters(room, policy, flags[j]);
+                            this.keeperRoomSendPorters(room, policy, flag[j]);
+                            break;
+                        case gc.FLAG_MINERAL:
+                            this.keeperRoomSendMiners(room, policy, flag[j]);
+                            break;
+                        default:
+                    } // switch
+                } // for j
+            } else {
+                var gifts = routeBase.filterBuilds(room, "policy", keeperPolicies[i].id);
+                for ( var k = 0 ; k < gifts.length ; k++ ){
+                    routeBase.removeRoute(gifts[k].id);
+                }
+            } // if (policy.roomCleared)
+        } // for i
+    },
+
+    keeperRoomSendSolders: function(room, keeperPolicy) {
+        var gifts = routeBase.filterBuildsF(room, function(build) {
+           return build.policy == keeperPolicy.id && build.role == gc.ROLE_PATROL_ROOM;
+        });
+        if (gifts.length == 0) {
+            var maxSizeSwordsMan = raceSwordsman.maxSize(room);
+            var swordsManBody = raceSwordsman.body(maxSizeSwordsMan);
+            var respawnRate = Math.floor(CREEP_LIFE_TIME * gc.KEEPER_SWORDSMAN_PARTS_NEEDED_GEN / maxSizeSwordsMan);
+            var order = new RouteGiftCreep(
+                room.name,
+                policy.id,
+                swordsManBody,
+                gc.ROLE_PATROL_ROOM,
+                respawnRate
+            );
+            routeBase.attachRoute(room, gc.ROLE_GIFT, order, gc.PRIORITY_KEEPER_ATTACK);
+        }
+    },
+
+    keeperRoomSendHarvesters: function(room, policy, flag) {
+        var gifts = routeBase.filterBuildsF(room, function(build) {
+            return build.policy == flag.memory.policyId && build.role == gc.ROLE_LINKER;
+        });
+        if (gifts.length == 0) {
+            var order = new RouteLinker( room.name, flag.name, policy.id );
+            routeBase.attachRoute(room, gc.ROLE_GIFT, order, gc.PRIORITY_KEEPER_HARVEST);
+        }
+    },
+
+    keeperRoomSendPorters: function(room, policy, flag) {
+        var gifts = routeBase.filterBuildsF(room, function(build) {
+            return build.policy == flag.memory.policyId && build.role == gc.ROLE_NEUTRAL_PORTER;
+        });
+        if (gifts.length == 0) {
+            var order = new RouteLinker( room.name, flag.name, policy.id );
+            routeBase.attachRoute(room, gc.ROLE_GIFT, order, gc.PRIORITY_KEEPER_PORTER);
+        }
+    },
+
+    keeperRoomSendMiners: function(room, flag) {
+    // TODO Mine minerals in cleared keeper rooms.
     },
 
     maxCreepsCanFitInRoom: function (room) {
@@ -330,70 +423,45 @@ var linkers = {
         return energyCycle * CREEP_LIFE_TIME / ENERGY_REGEN_TIME;
     },
 
-    partsForBuildQueue: function(room, porterCosts, avProductionSupplyDistance, buildQueueEnergyPerGen) {
-        if (!porterCosts) porterCosts = 0;
-        if (!avProductionSupplyDistance) avProductionSupplyDistance = roomOwned.avProductionSupplyDistance(room);
-        if (!buildQueueEnergyPerGen) buildQueueEnergyPerGen = routeBase.buildQueueEnergyPerGen(room);
+    porterPartsNeeded: function (room) {
+        var avProductionSupplyDistance = roomOwned.avProductionSupplyDistance(room);
+        var productionEnergyPerPart = CREEP_LIFE_TIME  * CARRY_CAPACITY
+            / (2 * avProductionSupplyDistance + gc.TIME_TRANSFER_LOAD);
 
-        var distance = avProductionSupplyDistance;
-        var energyPerPart = CREEP_CLAIM_LIFE_TIME  * CARRY_CAPACITY / (2*distance);
-       // console.log(room,"partsforupgrade distance",distance,"energyPerPart",energyPerPart);
-        return (buildQueueEnergyPerGen + porterCosts)/ energyPerPart;
+        var avUpgradeDistance = roomOwned.avUpgradeDistance(room)
+        var upgradeEnergyPerPart = CREEP_LIFE_TIME * CARRY_CAPACITY
+            / ( 2 * avUpgradeDistance + gc.TIME_UPGRADE_LOAD);
+
+        var energyAvailable = this.energyFromLinkersGen(room);
+        var buildQueueEnergy = routeBase.buildQueueEnergyPerGen(room);
+        var WORKER_PART_COST = raceWorker.BLOCKSIZE;
+     //   console.log("production distance",avProductionSupplyDistance,"productio energy",productionEnergyPerPart,
+    //        "upgrade distance", avUpgradeDistance, "upgrade energy",upgradeEnergyPerPart,
+      //      "energy avaliabel",energyAvailable,"buildqueue", buildQueueEnergy);
+
+        var denominator = WORKER_PART_COST * productionEnergyPerPart
+                            - WORKER_PART_COST * upgradeEnergyPerPart
+                            + productionEnergyPerPart * upgradeEnergyPerPart;
+
+        var productionParts = ( WORKER_PART_COST * energyAvailable + upgradeEnergyPerPart * buildQueueEnergy )
+                                / denominator;
+
+
+        var upgradeParts = ( productionEnergyPerPart *  energyAvailable
+                            - WORKER_PART_COST * energyAvailable - productionEnergyPerPart * buildQueueEnergy )
+                            / denominator;
+        console.log("porterPartsNeeded poductin", productionParts, "upgrade", upgradeParts,
+            "total", productionParts + upgradeParts);
+        return productionParts + upgradeParts;
     },
-
-    partsForUpgrade: function(room, porterCosts, avUpgradeDistance, buildQueueEnergyPerGen, energyFromLinkersGen) {
-        if (!porterCosts) porterCosts = 0;
-        if (!avUpgradeDistance) avUpgradeDistance = roomOwned.avUpgradeDistance(room);
-        if (!buildQueueEnergyPerGen) energyFromLinkersGen = this.energyFromLinkersGen(room);
-        if (!buildQueueEnergyPerGen) buildQueueEnergyPerGen = routeBase.buildQueueEnergyPerGen(room);
-
-        var distance = avUpgradeDistance;
-        var energyPerPart = CREEP_CLAIM_LIFE_TIME * CARRY_CAPACITY / (2*distance+50);
-        var upgraderEnergy = energyFromLinkersGen
-                                - buildQueueEnergyPerGen - porterCosts ;
-        //console.log(room,"partsforupgrade distance",distance,"energyPerPart",energyPerPart
-       //                     ,"upgraderEnergy",upgraderEnergy);
-        return upgraderEnergy / energyPerPart;
-    },
-
-    porterPartsNeeded: function (room, avProductionSupplyDistance, avUpgradeDistance,
-                                 buildQueueEnergyPerGen, energyFromLinkersGen) {
-        if (!avProductionSupplyDistance) avProductionSupplyDistance = roomOwned.avProductionSupplyDistance(room);
-        if (!avUpgradeDistance) avUpgradeDistance = roomOwned.avUpgradeDistance(room);
-        if (!energyFromLinkersGen) energyFromLinkersGen = this.energyFromLinkersGen(room);
-        if (!buildQueueEnergyPerGen) buildQueueEnergyPerGen = routeBase.buildQueueEnergyPerGen(room);
-        console.log(avProductionSupplyDistance,avUpgradeDistance,energyFromLinkersGen,buildQueueEnergyPerGen);
-
-        var WORKER_PART_COST = 200;
-        var buildParts = this.partsForBuildQueue(room,0,avProductionSupplyDistance,buildQueueEnergyPerGen);
-        var upgradeParts = this.partsForUpgrade(room,0,avUpgradeDistance,
-                                        buildQueueEnergyPerGen,energyFromLinkersGen);
-        var porterCost = WORKER_PART_COST*(buildParts+upgradeParts);
-        console.log(room,"porterPartsNeede build", buildParts,"upgrade",upgradeParts,"  porterCost iteration1", porterCost);
-        buildParts = this.partsForBuildQueue(room,porterCost);
-        upgradeParts = this.partsForBuildQueue(room,porterCost);
-        console.log(room,"porterPartsNeede after itteration  build", buildParts,"upgrade",upgradeParts,
-        "eneergy",WORKER_PART_COST*(buildParts+upgradeParts));
-        return buildParts+upgradeParts;
-
-/*
-        var distance = roomOwned.avUpgradeDistance(room)+50 + roomOwned.avProductionSupplyDistance(room);
-        var energyPerPart = CREEP_CLAIM_LIFE_TIME * CARRY_CAPACITY / distance;
-        var energy = this.energyFromLinkersGen(room);
-        return energy / energyPerPart;*/
-
-    },
-
 
     processBuildQueue: function(room) {
         var spawns = room.find(FIND_MY_SPAWNS);
         var nextBuild = routeBase.nextBuild(room);
-        //console.log("processBuldQueue next build", JSON.stringify(nextBuild));
         if (undefined !== nextBuild) {
             var i = spawns.length-1;
             do {
                 var result = routeBase.spawn(spawns[i], room, nextBuild);
-                //console.log(room,"processBuildQueue",i,result);
             } while ( result == ERR_BUSY && i--)
         }
     },
@@ -441,6 +509,7 @@ var linkers = {
 
         energyForUpgrading = sourceEnergyLT - energyBuildLinkersAndRepairer + availableInStorage ;//externalCommitments
         numPortersPartsNeeded = Math.max(5,energyForUpgrading / portersNoCommitmentsEnergyLT);
+        //console.log("porterShortfall number of parts needed", numPortersPartsNeeded);
 
         var porterShortfall = numPortersPartsNeeded - existingPorterParts;
         //  console.log(room,"many2one portorparts",numPortersPartsNeeded);

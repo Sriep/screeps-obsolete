@@ -1,24 +1,27 @@
 /**
- * @fileOverview Screeps module. Abstract base object containing data and 
- * functions for infantry creeps. 
+ * Created by Piers on 04/08/2016.
+ */
+/**
+ * @fileOverview Screeps module. Abstract base object containing data and
+ * functions for infantry creeps.
  * @author Piers Shepperson
  */
 "use strict";
 /**
  * Abstract base object containing data and functions for use by my infantry
  * creeps. Infantry contain mainly "ATTACK" and "MOVE" parts.
- * @module raceSwordsman
+ * @module raceHealer
  */
-var raceSwordsman = {
-    BLOCKSIZE: 80 + 50,
+var raceHealer = {
+    BLOCKSIZE: 250 + 50,
 
     body: function (size) {
         var body = [];
         for (var i = 0 ; i < size ; i++) {
-            body.push(ATTACK);
+            body.push(HEAL);
             body.push(MOVE);
         } // for
-        return body;	    
+        return body;
     },
 
     maxSize: function (room) {
@@ -31,4 +34,4 @@ var raceSwordsman = {
 
 };
 
-module.exports = raceSwordsman;
+module.exports = raceHealer;
