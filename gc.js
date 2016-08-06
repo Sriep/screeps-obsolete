@@ -109,7 +109,6 @@ var gc = {
     //task results
     RESULT_FINISHED: "finished",
     RESULT_UNFINISHED: "unfinished",
-    RESULT_FAILED: "failed",
     RESULT_ROLLBACK: "rollback",
     RESULT_RESET: "reset",
 

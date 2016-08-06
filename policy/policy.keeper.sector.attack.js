@@ -30,6 +30,8 @@ var battle = require("combat.quick.estimate");
 var TaskHeal = require("task.heal");
 var TaskMoveAttackPos = require("task.move.attack.pos");
 var policyFrameworks = require("policy.frameworkds");
+var Game = require("Game");
+
 /**
  * Abstract Policy
  * @module policyKeeperSectorAttack

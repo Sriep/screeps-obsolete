@@ -353,8 +353,6 @@ var linkers = {
         var creeps = _.filter(Game.creeps, function (creep) {
             return creep.memory.policyId == policy.id});
         var life = 0;
-        var length = creeps.length;
-        var one  = creeps[0];
         for ( var i = 0 ; i < creeps.length ; i++ ) {
             if (creeps[i] && creeps[i].ticksToLive)
                 life = life + creeps[i].ticksToLive;

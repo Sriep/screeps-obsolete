@@ -24,7 +24,7 @@ var tasks = {
     Result: {
         Finished: gc.RESULT_FINISHED,
         Unfinished: gc.RESULT_UNFINISHED,
-        Failed: gc.RESULT_FAILED,
+        //Failed: gc.RESULT_FAILED,
         Rollback: gc.RESULT_ROLLBACK,
         Reset: gc.RESULT_RESET
     },
@@ -37,8 +37,7 @@ var tasks = {
         result = this.Result.Finished;
         var doneActions = new TaskActions(gc.CREEP);
         var actionCount = 0;
-        while ((result == this.Result.Finished || result == this.Result.Failed //|| result == this.Result.Rollback
-                    || result == this.Result.Rollback)
+        while ((result == this.Result.Finished || result == this.Result.Rollback)
                             && taskList.length > 0 && actionCount++ < gc.MAX_TASK_ACTIONS) {
             var task = taskList[0];
             while (task !== undefined && task === null) {

@@ -21,11 +21,6 @@ These represent an array of tasks which perform some useful function.
 
 ## Routes
 Encapsulates the build queue for a room.
-- The route.base node represent the build queues.
-- The other route. nodes represent individual build items.
-
-## Routes
-Encapsulates the build queue for a room. 
 - The route.base node represent the build queues. 
 - The other route. nodes represent individual build items.
 - They are designed to be linked to roles.

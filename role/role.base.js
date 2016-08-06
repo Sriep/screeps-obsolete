@@ -413,15 +413,14 @@ var roleBase = {
     },
    
     run: function(creep) {
-
         if (!creep.memory.tasks || !creep.memory.tasks.tasklist) {
             roleBase.switchRoles(creep, gc.ROLE_FLEXI_STORAGE_PORTER);
-          return;
         }
         var tasks = require("tasks");
         tasks.doTasks(creep);
-        //creep.say(creep.memory.role);
-        return;
+    },
+
+     oldRun: function(creep) {
           //  if (creep.name == "Skyler"){
          //    this.resetTasks(creep);
          //   }
@@ -436,7 +435,7 @@ var roleBase = {
 
           // }
     //    }
- /*       if (creep.memory.role === undefined){
+        if (creep.memory.role === undefined){
             creep.memory.role = gc.ROLE_BUILDER;
            // console.log(creep , "LLLLLLLLLLLLLOST ROLE")
         }
@@ -492,7 +491,7 @@ var roleBase = {
                 roleBase.fillUpEnergy(creep);
                 break;
             default:
-        }*/
+        }
     },
 
     convert: function (creep, role) {
@@ -533,7 +532,6 @@ var roleBase = {
         if (undefined !== role) {
             var name = "role." + role;
             var modulePtr = require(name);
-            //console.log("rolebase.getModuleFromRole role",role,"name",name,"module", modulePtr);
             return modulePtr;
         }  else {
             return undefined;

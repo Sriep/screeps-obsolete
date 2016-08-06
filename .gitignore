@@ -14,7 +14,7 @@ JSDoc
 .*
 *_
 Screeps-Typescript-Declarations/
-
+ScreepsAutocomplete/
 #grunt files
 Gruntfile.js
 package.json
