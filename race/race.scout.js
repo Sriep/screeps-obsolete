@@ -11,6 +11,7 @@
  */
 var raceScout = {
     BLOCKSIZE: 50,
+    BLOCKSIZE_PARTS: 1,
     BODY: [MOVE],
 
 

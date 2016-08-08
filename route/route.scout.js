@@ -36,7 +36,7 @@ function RouteScout (targetRoom, size, respawnRate) {
     this.due = 0;
 }
 
-RouteScout.prototype.spawn = function (build, spawn, room ) {
+RouteScout.prototype.spawn = function (build, spawn) {
     var name = stats.createCreep(spawn, build.body, undefined, undefined);
     if (_.isString(name)) {
         console.log("Spawning scout",name);

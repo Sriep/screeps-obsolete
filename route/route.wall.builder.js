@@ -1,4 +1,7 @@
 /**
+ * Created by Piers on 08/08/2016.
+ */
+/**
  * Created by Piers on 23/07/2016.
  */
 /**
@@ -14,33 +17,36 @@ var raceBase = require("race.base");
 
 /**
  * Task move object. Used when we need to find the object to move to.
- * @module RouteFlexiStoragePorter
+ * @module RouteWallBuilder
  */
 
-function  RouteRepairer  (room, policyId) {
-    this.type = gc.ROUTE_REPAIRER;
+function  RouteWallBuilder  (room, size) {
+    this.type = gc.ROUTE_WALL_BUILDER;
     this.owner = room;
-    this.size = Math.min(raceWorker.maxSizeRoom(Game.rooms[room], true),gc.REPAIRER_WORKER_SIZE);
-    this.policyId = policyId;
+    if (size) {
+        this.size = size;
+    } else {
+        this.size = raceWorker.maxSizeRoom(Game.rooms[room], true);
+    }
     this.respawnRate = CREEP_LIFE_TIME;
     this.due = 0;
 }
 
-RouteRepairer.prototype.spawn = function (build, spawn, room ) {
+RouteWallBuilder.prototype.spawn = function (build, spawn, room ) {
     //console.log("trying to spawn RouteFlexiStoragePorter");
-    var body = raceWorker.body(build.size,true);
+    var body = raceWorker.body(build.size, true);
     var name = stats.createCreep(spawn, body, undefined, undefined);
     if (_.isString(name)) {
         roleBase.switchRoles(Game.creeps[name],
-            gc.ROLE_REPAIRER);
+            gc.ROLE_WALL_BUILDER);
         Game.creeps[name].memory.policyId = build.policyId;
         Game.creeps[name].memory.buildReference = build.owner;
     }
     return name;
 };
 
-RouteRepairer.prototype.energyCost = function(build) {
+RouteWallBuilder.prototype.energyCost = function(build) {
     return raceWorker.energyFromSize(build.size);
 };
 
-module.exports = RouteRepairer;
+module.exports = RouteWallBuilder;

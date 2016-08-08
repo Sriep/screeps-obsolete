@@ -4,11 +4,16 @@
  * @author Piers Shepperson
  */
 
-var    policy = require("policy");
-var    policyFrameworks = require("policy.frameworks");
-var   npcInvaderBattle = require("npc.invader.battle");
-var    raceWorker = require("race.worker");
-var   stats = require("stats");
+var policy = require("policy");
+var policyFrameworks = require("policy.frameworks");
+var npcInvaderBattle = require("npc.invader.battle");
+var BattleDefenceEstimate = require("battle.defence.estimate");
+var raceWorker = require("race.worker");
+var stats = require("stats");
+var raceSwordsman = require("race.swordsman");
+var gc = require("gc");
+var roleBase = require("role.base");
+var raceBase = require("race.base");
 
 /**
  * Abstract object for handling  decisions when the room needs is under attack.
@@ -29,28 +34,23 @@ var policyDefence = {
      */   
     draftNewPolicyId: function(oldPolicy) {
         var room =  Game.rooms[oldPolicy.room];
-        //console.log("In policy defence");
         if (undefined == room) {
-            return oldPolicy;
+            return null;//oldPolicy;
         }
-
-        if (this.beingAttaced(room)) {
+        if (this.beingAttacked(room)) {
             return oldPolicy;
         }
         var policyRescue = require("policy.rescue")
         if (policyRescue.needsRescue(room, oldPolicy)) {
             return policyFrameworks.createRescuePolicy(room.name);
         }
-     //   var policyConstruction = require("policy.construction");
-     //   if (policyConstruction.startConstruction(room)) {
-    //        return policyFrameworks.createConstructionPolicy(room.name);
-    //    }
-        return policyFrameworks.createPeacePolicy(room.name                
-            , room.memory.links.fromLinks
-            , room.memory.links.toLink);
+        return policyFrameworks.createPeacePolicy(room.name);
     },
 
     initialisePolicy: function (newPolicy) {
+        var room = Game.rooms[newPolicy.room];
+        if (room.memory)
+            room.memory.policyId = newPolicy.id;
         return true;
     },
     
@@ -60,22 +60,27 @@ var policyDefence = {
      * @returns {none} 
      */
     enactPolicy: function(currentPolicy) {
-        currentPolicy.room = "W26S21";
+        //currentPolicy.room = "W26S21";
         var room = Game.rooms[currentPolicy.room];
-      //  stats.updateStats(room);
-        room.memory.policyId = currentPolicy.id;
+        console.log("Enact policy defence room", room);
 
-        var nHavesters = room.find(FIND_MY_CREEPS).length;
-        var nBuilders = 0;
-        var nRepairers = 0;      
-        var nUpgraders = 0;
-        raceWorker.assignWorkerRoles(currentPolicy, nHavesters, nUpgraders,
-                                nBuilders , nRepairers);
+        var spawns = room.find(FIND_MY_SPAWNS);
+        if (spawns == undefined || spawns == []) return npcInvaderBattle.defendRoom(room);
+        var size = raceBase.maxSizeFromEnergy(gc.RACE_SWORDSMAN, room);
+        var body = raceSwordsman.body(size);
+        console.log("body",body,"size",size);
+        var name = spawns[0].createCreep(body);
+        console.log("enact policy try to spawn swordsman result",name);
+       // var name = raceBase.spawn(raceWorker, currentPolicy, spawns[0], workerSize);
+        if (_.isString(name)) {
+            roleBase.switchRoles(Game.creeps[name], gc.ROLE_PATROL_ROOM);
+            Game.creeps[name].policyId = currentPolicy.id;
+            console.log(room, "result of spawn", name, "swordsman");
+        }
         npcInvaderBattle.defendRoom(room);
     },
 
-    switchPolicy: function(oldPolicyId, newPolicy)
-    {
+    switchPolicy: function(oldPolicyId, newPolicy) {
         switch(oldPolicyId.type) {
         case policyFrameworks.Type.RESCUE:
             break;
@@ -83,8 +88,7 @@ var policyDefence = {
             break;
         case policyFrameworks.Type.DEFEND:
             break;
-        case policyFrameworks.Type.PEACE:  
-            policy.breakUpLinks(Game.rooms[oldPolicyId.room]);
+        case policyFrameworks.Type.PEACE:
         default:
         }
         policy.reassignCreeps(oldPolicyId, newPolicy);
@@ -92,40 +96,112 @@ var policyDefence = {
 
     /**
      * Detects the presence of suspicious enemy units.
-     * @function beingAttaced
+     * @function beingAttacked
      * @param   {Object} room  The room that might need rescuing.
-     * @returns {Bool} True inidcates we should use a rescue policy. 
+     * @returns {Bool} True inidcates we should use a rescue policy.
      */
-    beingAttaced: function(room) {
+    beingAttacked: function(room) {
         if (room == undefined) {
             return false;
         }
         var hostiles = room.find(FIND_HOSTILE_CREEPS);
-        var foundAttackPart = false;
-        var i = 0;
-        //while (!foundAttackPart && i < hostiles.length) {
-           // if (hostiles[i].getActiveBodyparts(ATTACK) > 0
-           //     || hostiles[i].getActiveBodyparts(RANGED_ATTACK) > 0
-           //     || hostiles[i].getActiveBodyparts(CLAIM) > 0
-           //     || hostiles[i].getActiveBodyparts(HEAL) > 0) {
-           //         return true;
-           //     }
-        //}
-        return hostiles.length > 0;
-    },
-/*
-    infantrySize: function(room) {
-        var targets = room.find(FIND_HOSTILE_CREEPS);
-        var spawns = Game.spawns;
-        for (var i in targets) {
-            if (targets[i].pos.inRangeTo(spawns[0],this.PANICK_ENEMY_CLOSE))
-            {
-                return Math.floor(room.energyCapacityAvailable
-                                        /raceInfantry.BLOCKSIZE); 
-           }
+        if ( !hostiles || 0 == hostiles.length ) return false;
+        for ( var i = 0 ; i < hostiles.length ; i++ ) {
+            if (hostiles[i].owner  && hostiles[i].owner != "Invader")
+                return true;
         }
-        return Math.max(workParts+1, raceWorker.maxSizeFromEnergy(room));
-    }*/
-}
+
+        //var hostileParts = _.sum(hostiles.body.length);
+        //console.log("hostileparts", hostileParts);
+        //if ( hostileParts >50) return true;
+
+        var towers = room.find(FIND_MY_STRUCTURES, {
+            filter: { structureType: STRUCTURE_TOWER }
+        });
+        var friendlies = room.find(FIND_MY_CREEPS, {
+            filter: function(creep) {
+                return creep.getActiveBodyparts(ATTACK) > 0
+                    ||  creep.getActiveBodyparts(RANGED_ATTACK) > 0;
+            }
+        });
+        if ( towers.length == 0 && friendlies.length == 0) {
+            return true;
+        } else {
+            //console.log("beingAttacked about to call quickDefence",hostiles,friendlies,towers);
+            var simResult = BattleDefenceEstimate.quickDefence(hostiles, friendlies, towers);
+            //console.log("back from BattleDefenceEstimate");
+            //console.log("beingAttacked simResult", simResult);
+            //console.log("simBattleResult", JSON.stringify(simResult));
+            if (towers.length > 0) {
+                return towers.length > simResult.towers.length;
+            } else  {
+
+                return friendlies.length > simResult.defenders.length;
+            }
+        }
+    }
+};
 
 module.exports = policyDefence;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -20,12 +20,13 @@ var RoutePatrolRoom = require("route.patrol.room");
 var RouteGiftCreep  = require("route.gift.creep");
 var raceSwordsman = require("race.swordsman");
 var raceWorker = require("race.worker");
+
 /**
  * Requisition object for using the pool
- * @module policy
+ * @module economyLinkers
  */
 
-var linkers = {
+var economyLinkers = {
     LINK_TO_SOURCE_RANGE: 2,
 
     attachFlaggedRoutes: function (room, policy) {
@@ -171,7 +172,6 @@ var linkers = {
     },
 
     attachPatrolCreep: function (flag, room, body) {
-
         var respawn = CREEP_LIFE_TIME - flag.memory.claimerFrom.distance;
         var order = new RoutePatrolRoom(
             room.name,
@@ -229,8 +229,8 @@ var linkers = {
 
            if (creeps.length <= this.maxCreepsCanFitInRoom(room)) {
                 var order = new RouteFlexiStoragePorter(room.name, 0, policy.id);
-                console.log("attachFlexiStoragePorters creeplife", this.creepLifeTicks(policy),
-                    "< middale age", gc.PORTER_PRIORITY_THRESHOLD);
+               // console.log("attachFlexiStoragePorters creeplife", this.creepLifeTicks(policy),
+              //      "< middale age", gc.PORTER_PRIORITY_THRESHOLD);
                var creepLifeTicks = this.creepLifeTicks(policy);
                if (creepLifeTicks < gc.PORTER_PRIORITY_THRESHOLD) {
                     var priority = gc.PRIORITY_EMERGENCY_HOME_PORTER;
@@ -532,7 +532,7 @@ var linkers = {
 
 
 
-module.exports = linkers;
+module.exports = economyLinkers;
 
 
 

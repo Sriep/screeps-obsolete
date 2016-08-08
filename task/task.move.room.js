@@ -21,14 +21,16 @@ var TaskMoveXY = require("task.move.xy")
  * @module tasksHarvest
  */
 
-function TaskMoveRoom (roomName, pathOps, movesTowardsCenter) {
+function TaskMoveRoom (roomName, pathOps, customMoveToFunction, functionModule) {
     this.taskType = gc.TASK_MOVE_ROOM;
     this.conflicts = gc.MOVE;
     this.roomName = roomName;
     this.pathOps = pathOps;
     this.loop = true;
     this.pickup = true;
-    this.movesTowardsCenter = movesTowardsCenter;
+    //this.movesTowardsCenter = movesTowardsCenter;
+    this.customMoveToFunction = customMoveToFunction;
+    this.functionModule = functionModule;
 }
 
 TaskMoveRoom.prototype.doTask = function(creep, task) {
@@ -68,9 +70,21 @@ TaskMoveRoom.prototype.doTask = function(creep, task) {
 
     if ( task.roomsToVisit[task.pathIndex] !== undefined) {
         var exit = creep.pos.findClosestByPath(task.roomsToVisit[task.pathIndex].exit);
-        var result = creep.moveTo(exit, {
-            maxRooms: 1, ignoreDestructibleStructures: true
-        });
+        var result;
+        if (task.customMoveToFunction) {
+            if(task.functionModule) {
+                var fModule = require(task.functionModule);
+                result = fModule[task.customMoveToFunction](creep, exit);
+            } else {
+                result = task.customMoveToFunction(creep, exit);
+            }
+        } else {
+            result = creep.moveTo(exit);
+        }
+
+        //var result = creep.moveTo(exit, {
+        //    maxRooms: 1, ignoreDestructibleStructures: true
+        //});
     } else {
         return gc.RESULT_FINISHED;
     }

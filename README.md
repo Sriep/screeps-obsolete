@@ -20,7 +20,7 @@ These represent an array of tasks which perform some useful function.
 - A role's array of tasks can be self-modifying, however, in this case, there will typically be one key task that is central to the role.
 
 ## Routes
-Encapsulates the build queue for a room. 
+Encapsulates the build queue for a room.
 - The route.base node represent the build queues. 
 - The other route. nodes represent individual build items.
 - They are designed to be linked to roles.

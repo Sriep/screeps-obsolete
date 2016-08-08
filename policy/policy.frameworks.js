@@ -17,7 +17,7 @@ var policyFrameworks = {
         THE_POOL: "the.pool",
         PEACE: gc.POLICY_PEACE,
       //  CONSTRUCTION: "construction",
-      //  DEFEND: "defence",
+        DEFENCE: gc.POLICY_DEFENCE,
         RESCUE: gc.POLICY_RESCUE,
        // FOREIGN_HARVEST: "foreign.harvest",
         //FOREIGN_ROAD: "neutral.road",
@@ -209,19 +209,28 @@ var policyFrameworks = {
         return newPolicy;
     },
 
-    createThePool: function() {
-        var p  = {
-            id : 0,
-            type : this.Type.THE_POOL,
-            requisitions : {},
-            supplyCentres : {},
-            nextRequisitionsId : 0,
-            nextSupplyCentreId : 0
-        }
+    createDefencePolicy: function(roomName)
+    {
+        var p = { id : policy.getNextPolicyId(),
+            type : gc.POLICY_DEFENCE,
+            room : roomName};
         return p;
     }
 
 /*
+        createThePool: function() {
+            var p  = {
+                id : 0,
+                type : this.Type.THE_POOL,
+                requisitions : {},
+                supplyCentres : {},
+                nextRequisitionsId : 0,
+                nextSupplyCentreId : 0
+            }
+            return p;
+        },
+
+
     createPotrolRoomPolicy: function(roomPos, creepSize, start)
     {
         var newPolicy = {

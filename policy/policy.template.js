@@ -27,17 +27,6 @@ var policyTemplate = {
         return oldPolicy;
     },
 
-    assignWorker: function(creep, policy)
-    {
-    },
-
-    clearCreep: function(creep) {
-    },
-
-    cleanUp: function(oldPolicy)
-    {
-    },
-
     switchPolicy: function(oldPolicy, newPolicy)
     {
     },

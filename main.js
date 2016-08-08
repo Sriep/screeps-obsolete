@@ -22,25 +22,21 @@ var recurringPolicies = require("recurring.policies");
 
 module.exports.loop = function () {
     //profiler.wrap(function() {
-        PathFinder.use(true);
-       // try {
-            ayrtepPad.top();
-       // }
-      //  catch(exp) {
-         // console.log("ops exception from ayrtepPad top",exp);
-      //  }
-        if (Game.time % gc.ROOM_UPDATE_RATE == 0 ){
-             roomBase.examineRooms(true);
-        }
-        if (Game.time % gc.FLAG_UPDATE_RATE == 0 ){
-            flagBase.run();
-        }
-        freememory.freeCreeps();
-        policy.enactPolicies();
-        raceBase.moveCreeps();
+    //console.log("************************ Start ", Game.time," *********************************");
+    PathFinder.use(true);
+    ayrtepPad.top();
 
-        ayrtepPad.bottom()
-        console.log("************************ " + Game.time + " *********************************");
+    roomBase.examineRooms();
+    if (Game.time % gc.FLAG_UPDATE_RATE == 0 ){
+        flagBase.run();
+    }
+    freememory.freeCreeps();
+    policy.enactPolicies();
+    raceBase.moveCreeps();
+
+    ayrtepPad.bottom()
+
+    console.log("************************ End ",  Game.time, " *********************************");
    // }) // profiler.wrap(function()
 }
 //JSON.stringify(memory);

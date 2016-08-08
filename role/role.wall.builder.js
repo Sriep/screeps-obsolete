@@ -1,3 +1,6 @@
+/**
+ * Created by Piers on 08/08/2016.
+ */
 /*
  * Module code goes here. Use 'module.exports' to export things:
  * module.exports.thing = 'a thing';
@@ -14,55 +17,50 @@ var stats = require("stats");
 var TaskMoveFind = require("task.move.find");
 var TaskHarvest = require("task.harvest");
 var TaskOffload = require("task.offload");
+var TaskFlexiLoadup = require("task.flexi.loadup");
 var _ = require('lodash');
 
-var roleRepairer = {
+var roleWallBuilder = {
 
     getTaskList: function(creep) {
         var tasks = [];
-        var moveToSource = new TaskMoveFind(gc.FIND_FUNCTION,gc.RANGE_HARVEST,"findTargetSource"
-                                            ,"role.base");
-        var harvest = new TaskHarvest();
-        var findSomethingToRepair = new TaskMoveFind(
+        var loadup = new TaskFlexiLoadup(RESOURCE_ENERGY)
+        var findWall = new TaskMoveFind(
             gc.FIND_FUNCTION,
             gc.RANGE_REPAIR,
             "findTarget",
-            "role.repairer",
+            "role.wall.builder",
             undefined,
             undefined,
             "moveAndRepair",
-            "role.repairer"
+            "role.wall.builder"
         );
         var offload = new TaskOffload(gc.REPAIR);
-        moveToSource.loop = true;
-        harvest.loop = true;
-        findSomethingToRepair.loop = true;
-        offload.loop = true;
-        tasks.push(moveToSource);
-        tasks.push(harvest);
-        tasks.push(findSomethingToRepair);
+
+        tasks.push(loadup);
+        tasks.push(findWall);
         tasks.push(offload);
         return tasks;
     },
 
     findTarget: function(creep) {
-        var damagedStructures = creep.room.find(FIND_STRUCTURES, {
+        var walls = creep.room.find(FIND_STRUCTURES, {
             filter: function(object) {
                 return object.hits < object.hitsMax
-                    && object.hitsMax - object.hits > REPAIR_POWER;
+                    && ( object.structureType == STRUCTURE_RAMPART
+                        || object.structureType == STRUCTURE_WALL );
             }
         });
-        //console.log(Creep,"length of damaged structures", damagedStructures.length);
-        damagedStructures.sort(function (a,b) {return (a.hits - b.hits)});
-        if(damagedStructures.length > 0) {
-            return 	damagedStructures[0];
+        walls.sort(function (a,b) {return (a.hits - b.hits)});
+        if(walls.length > 0) {
+            console.log(creep,"found wall to build",walls[0]);
+            return 	walls[0];
         }
-        console.log(creep,"Repairer can't find target!");
+        console.log(creep,"Wall builder can't find target!");
         return undefined;
     },
 
     findTargetInRange: function(creep) {
-        //console.log("findTargetInRange", creep)
         var repairTargets = creep.pos.findInRange(FIND_STRUCTURES, gc.RANGE_REPAIR, {
             filter: function(object) {
                 return object.hits < object.hitsMax
@@ -77,20 +75,14 @@ var roleRepairer = {
     },
 
     moveAndRepair: function(creep, target) {
-        //console.log(creep, "moveAndRepair", target);
         var repairTarget = this.findTargetInRange(creep);
         if(repairTarget) creep.repair(repairTarget);
         creep.moveTo(target);
     },
 
-
-    action: function(creep, target) {
-        return stats.repair(creep,target);
-    }
-    
 };
 
-module.exports = roleRepairer;
+module.exports = roleWallBuilder;
 
 
 

@@ -27,17 +27,18 @@ var roomBase = {
     // STRUCTURE_PORTAL, STRUCTURE_POWER_BANK, STRUCTURE_POWER_SPAWN
 
 
-    examineRooms: function (force) {
+    examineRooms: function () {
+        var force;
+        if (Game.time % gc.ROOM_UPDATE_RATE == 0 ){
+            force = true;
+        }
         for ( var room in Game.rooms ) {
             if (room.memory && !room.memory.flagged || force) {
                 this.flagRoom(Game.rooms[room], force);
             }
         }
         var nearByRooms = this.nearByRooms();
-      //  console.log("examineRooms nearByRooms", JSON.stringify(nearByRooms));
         for ( var i = 0 ; i < nearByRooms.length ; i++ ) {
-
-
             if (Memory.rooms[nearByRooms[i]] === undefined
                 || !Memory.rooms[nearByRooms[i]].flagged) {
                    roomBase.sendScout(nearByRooms[i]);
@@ -203,44 +204,44 @@ var roomBase = {
     },
 
     distanceBetween: function  (posFrom, posTo) {
-      //  console.log(JSON.stringify(posFrom),"to", JSON.stringify(posTo));
         var room = Game.rooms[posFrom.roomName];
         if (undefined === room) return undefined;
         var route = Game.map.findRoute(room.name, posTo.roomName);
-       // console.log("route", JSON.stringify(route));
         var distance = 0;
         if (route.length > 0) {
             var exit = posFrom.findClosestByPath(route[0].exit);
             if (!exit) {
                 exit = posFrom.findClosestByRange(route[0].exit);
             }
-          //  console.log("after findclostedbypath",exit);
             distance = posFrom.findPathTo(exit).length;
             var entrance = this.exitToEntrance(exit, route[0].room);
             for (var i = 1; i < route.length; i++) {
-           //     console.log("distanceFrom exit",exit, "entrance",entrance,"distance",distance);
-          //      console.log( "JSON.stringify(route[i])",JSON.stringify(route[i]));
                 exit = entrance.findClosestByPath(route[i].exit);
-             //   console.log("exit",exit);
                 distance += entrance.findPathTo(exit).length;
-              //  console.log("distance",distance);
                 entrance = this.exitToEntrance(exit, route[i].room);
             }
         }
-      //  console.log("distance",distance)
+       // console.log(distance,"distance between from", posFrom,"to", posTo, "entrance", JSON.stringify(entrance));
         distance += posTo.findPathTo(entrance).length;
-     //   console.log("distance",distance,"posTofindpatho",posTo.findPathTo(entrance).length)
         return distance;
     },
 
     findClosest: function (pos, findType, Opts) {
         var exits = Game.map.describeExits(pos.roomName);
+        //console.log("findCoslest exits",JSON.stringify(exits));
         var roomClosest, distanceClosest;
         for ( var i in exits ) {
             if (roomBase.isMyRoom(exits[i])) {
                 var exit = pos.findClosestByPath(parseInt(i));
+                //console.log("findClosest exit",i,JSON.stringify(exit));
                 if (!exit) {
+                    //console.log("findClosest using range",i,JSON.stringify(exit));
+                    //todo some bug. for now arbitrarily set distance to 25, should do something cleverer
                     exit = pos.findClosestByRange(parseInt(i));
+                    if (!distanceClosest || distanceClosest > 25) {
+                        distanceClosest = 25;
+                        roomClosest = exits[i];
+                    }
                 }
                 if (exit) {
                     var entrance = this.exitToEntrance(exit, exits[i]);

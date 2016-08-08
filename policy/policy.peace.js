@@ -11,11 +11,14 @@ var roomOwned = require("room.owned");
 var _ = require('lodash');
 var policyBuildspawn = require("policy.buildspawn");
 var roleBase = require("role.base");
-var poolSupply = require("pool.supply");
+//var poolSupply = require("pool.supply");
 var gc = require("gc");
 var tasks = require("tasks");
+var policyDefence = require("policy.defence");
 var routeBase = require("route.base");
 var npcInvaderBattle = require("npc.invader.battle");
+var economyRepair = require("economy.repair");
+//var economyDefence = require("economy.defence");
 
 /**
  * Abstract base object for deceison when at peace decisions. Peace is
@@ -42,6 +45,10 @@ var policyPeace = {
 
         if (!room.controller.my) {
             return policyFrameworks.createNeutralRoomPolicy(room);
+        }
+
+        if (policyDefence.beingAttacked(room)) {
+            return policyFrameworks.createDefencePolicy(room.name);
         }
 
         if (!policyBuildspawn.spawnFound(oldPolicy)) {
@@ -101,9 +108,9 @@ var policyPeace = {
         //var policyMany2oneLinker = require("policy.many2one.linker");
         var room = Game.rooms[currentPolicy.room];
         console.log("ENACT POLICY PEACE", room);
-        poolSupply.updateSupplyLevel(room.name
-            , roomOwned.calaculateSuplly(room)
-            , room.energyCapacityAvailable);
+        //poolSupply.updateSupplyLevel(room.name
+        //    , roomOwned.calaculateSuplly(room)
+        //    , room.energyCapacityAvailable);
 
         economyLinkers = require("economy.linkers");
         //    console.log(room, "energyCapacity",room.energyCapacityAvailable , "Energy in build queue",
@@ -130,7 +137,12 @@ var policyPeace = {
         var economyLinkers = require("economy.linkers");
         economyLinkers.attachFlaggedRoutes(room, currentPolicy);
         economyLinkers.attachFlexiStoragePorters(room, currentPolicy);
-        economyLinkers.attachRepairer(room, currentPolicy);
+        //economyRepair.attachRepairer(room, currentPolicy);
+        economyRepair.attachWallBuilder(room, currentPolicy);
+        console.log("repair need per gen", economyRepair.maintenanceGen(room)
+            , "number",economyRepair.numberMaintain(room),
+            "walls to build", economyRepair.countWallsToBuild(room)
+            , "enegy neeed for walls",economyRepair.energyBuildWalls(room));
         economyLinkers.processBuildQueue(room, currentPolicy);
         // } else  {
         //     if (room.memory.links !== undefined

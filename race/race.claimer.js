@@ -13,6 +13,7 @@ var raceClaimer = {
     //BLOCKSIZE: 600 + 50 + 50,
     //BODY: [CLAIM, MOVE,MOVE],
     BLOCKSIZE: 600 + 50,
+    BLOCKSIZE_PARTS: 2,
     BODY: [CLAIM, MOVE],
 
 

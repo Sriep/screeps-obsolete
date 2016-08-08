@@ -14,6 +14,7 @@
  */
 var raceHealer = {
     BLOCKSIZE: 250 + 50,
+    BLOCKSIZE_PARTS: 2,
 
     body: function (size) {
         var body = [];

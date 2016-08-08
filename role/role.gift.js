@@ -4,20 +4,28 @@
 var gc = require("gc");
 var TaskMoveRoom = require("task.move.room");
 var TaskSwitchOwner = require("task.switch.owner");
+var TaskSwitchRole = require("task.switch.role");
 
 var roleGift = {
 
-    getTaskList: function(creep,policyId, role) {
+    getTaskList: function(creep,room, policyId, role) {
         var taskList = [];
-        var room = Memory.policies[policyId].room;
+        if (!room && policyId)
+            room = Memory.policies[policyId].room;
         if (room) {
             var moveToRoom = new TaskMoveRoom(room);
             taskList.push(moveToRoom);
         }
-        var give = new TaskSwitchOwner(policyId, room, role);
-        taskList.push(give);
+        if (policyId) {
+            var give = new TaskSwitchOwner(policyId, room, role);
+            taskList.push(give);
+        }
+        if (role) {
+            var switchRole = new TaskSwitchRole(role);
+            taskList.push(switchRole);
+        }
         return taskList;
-    },
+    }
 
 };
 

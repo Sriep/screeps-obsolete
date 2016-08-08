@@ -44,14 +44,20 @@ var policyRescue = {
         if (!policyBuildspawn.spawnFound(oldPolicy))      {
              return policyFrameworks.createBuildspawn(room.name);
         }
-      //  if (policyDefence.beingAttaced(room)) {
+      //  if (policyDefence.beingAttacked(room)) {
       //      return policyFrameworks.createDefendPolicy(room.name);
        // }
         if (this.needsRescue(room, oldPolicy)) {
             return oldPolicy;
         }
-        return  policyFrameworks.createPeacePolicy(room.name                
-            , room.memory.links.info);
+        if (room.memory.links) {
+            return  policyFrameworks.createPeacePolicy(room.name
+                , room.memory.links.info);
+        } else {
+            return  policyFrameworks.createPeacePolicy(room.name
+                , undefined);
+        }
+
     },
 
     initialisePolicy: function (newPolicy) {
@@ -96,7 +102,7 @@ var policyRescue = {
                 && creep.memory.role == gc.ROLE_FLEXI_STORAGE_PORTER});
 
         var workerSize = 0;
-        console.log(room,"ccccccccreeplength",creeps.length  );
+        //console.log(room,"ccccccccreeplength",creeps.length  );
         if (creeps.length == 0) {
             console.log("RRRRRRRRRRRRescue build first worker size", raceWorker.maxSizeFromEnergy(room));
             workerSize = raceWorker.maxSizeFromEnergy(room);

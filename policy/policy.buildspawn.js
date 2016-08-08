@@ -122,9 +122,9 @@ var policyBuildspawn = {
             default:
         }
         policy.reassignCreeps(oldPolicyId, newPolicy);
-    },
+    }
 
-}
+};
 
 module.exports = policyBuildspawn;
 

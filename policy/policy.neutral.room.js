@@ -92,7 +92,7 @@ var policyNeutralRoom = {
 
     /**
      * Detects the presence of suspicious enemy units.
-     * @function beingAttaced
+     * @function beingAttacked
      * @param   {Object} room  The room that might need rescuing.
      * @returns {Bool} True inidcates we should use a rescue policy.
      */

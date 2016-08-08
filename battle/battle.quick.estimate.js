@@ -11,10 +11,12 @@ var gc = require("gc");
  */
 var BattleQuickEstimate = {
 
-    quickCombat: function ( enemyCreeps, friendlyCreeps ) {
+    quickCombat: function ( enemyCreeps, friendlyCreeps, maxTurns ) {
+        console.log("quickCombat start",enemyCreeps,friendlyCreeps);
         var enemies = this.convert(enemyCreeps);
         var friends = this.convert(friendlyCreeps);
-        return this.quickCombatInternal(enemies, friends);
+        console.log("quickCombat converts",enemies,friends);
+        return this.quickCombatInternal(enemies, friends, maxTurns);
     },
 
     quickCombatBodies: function( enemyBodies, friendlyBodies) {
@@ -24,23 +26,24 @@ var BattleQuickEstimate = {
         return this.quickCombatInternal(enemies, friends);
     },
 
-    quickCombatInternal: function(enemies, friends) {
-        var turn = 1, range = 3;
-        var turns = 0
+    quickCombatInternal: function(enemies, friends, maxTurns) {
+        var range = 3;
+        var turns = maxTurns ? maxTurns : 0;
+        console.log("quickCombatInternal",JSON.stringify(enemies),"friends", JSON.stringify(friends));
         while (enemies.length > 0 && friends.length > 0
-                && turns++ < gc.MAX_QUICK_BATTLE_LENGTH ) {
-           // console.log("quickCombatInternal while start enemies", enemies,"friends", friends);
+                && turns++ < gc.MAX_SIM_BATTLE_LENGTH ) {
+            console.log("quickCombatInternal while start enemies", enemies,"friends", friends);
             var damagedEnemies, damagedFriends;
             damagedFriends = this.applyRangedDamage(enemies, friends, range);
             damagedEnemies = this.applyRangedDamage(friends, enemies, range);
             this.removeDead(damagedFriends);
             this.removeDead(damagedEnemies);
-          //  console.log("afrter ranged damagedEnemies".damagedEnemies,"damagedFriends",damagedFriends);
+            console.log("afrter ranged damagedEnemies",damagedEnemies,"damagedFriends",damagedFriends);
             if (range <= 1) {
                 damagedFriends = this.applyDamage(enemies, damagedFriends);
                 damagedEnemies = this.applyDamage(friends, damagedEnemies);
             }
-           // console.log("after attack damagedEnemies".damagedEnemies,"damagedFriends",damagedFriends);
+            console.log("after attack damagedEnemies",damagedEnemies,"damagedFriends",damagedFriends);
             this.removeDead(damagedFriends);
             this.removeDead(damagedEnemies);
 
@@ -50,10 +53,11 @@ var BattleQuickEstimate = {
             console.log("after quickCombatInternal while end enemies", JSON.stringify(enemies));
             console.log("after quickCombatInternal while end friends", JSON.stringify(friends));
         }
-        return { friends : friends, enemies : enemies , turns : turns };
+        return { "friends" : friends, "enemies" : enemies , "turns" : turns };
     },
 
     removeDead: function(injured) {
+        if (!injured) return injured;
         for ( var i = 0 ; i < injured.length ; i++ ) {
             if ( injured[i].parts <= 0)
                 injured.splice(i);
@@ -62,6 +66,7 @@ var BattleQuickEstimate = {
 
     convert: function (creeps) {
         var formattedCreeps = [];
+        console.log("convert",JSON.stringify(creeps));
         for ( var i = 0 ; i < creeps.length  ; i++ ) {
             var numParts = creeps[i].hits/100;
             var attackParts = raceBase.occurrencesInBody(creeps[i].body, ATTACK);
@@ -69,6 +74,7 @@ var BattleQuickEstimate = {
             formattedCreeps.push( {  parts : numParts, attackParts : attackParts, rangedParts : rangedParts} );
         }
         formattedCreeps.sort( function (a,b) { return a.parts - b.parts; });
+        console.log("convert formattedCreeps",formattedCreeps);
         return formattedCreeps;
     },
 
@@ -87,18 +93,20 @@ var BattleQuickEstimate = {
     },
 
     applyDamage: function (attackers, defenders) {
+        //console.log("applyDamage start");
         var damagedDefenders = JSON.parse(JSON.stringify(defenders));
         for (var i = 0 ; i < attackers.length ; i++ ){
             this.damageWeakest(damagedDefenders, attackers[i].attackParts*ATTACK_POWER);
         }
+      //  console.log("applyDamage end");
         return damagedDefenders;
     },
 
     applyRangedDamage: function(attackers, defenders, range) {
+        if (!attackers) return defenders;
+
         var damagedDefenders = JSON.parse(JSON.stringify(defenders));
-      //  console.log("applyRangedDamage before attackers", JSON.stringify(attackers));
-       // console.log("applyRangedDamage before defenders", JSON.stringify(defenders));
-       // console.log("range",range);
+       // console.log("applyRangedDamage", attackers);
         if (3 == range) {
             for (var i = 0 ; i < attackers.length ; i++ ){
                 this.damageWeakest(damagedDefenders, attackers[i].rangedParts*RANGED_ATTACK_POWER);
@@ -112,13 +120,11 @@ var BattleQuickEstimate = {
                 this.damageAll(damagedDefenders, attackers[i].rangedParts*RANGED_ATTACK_POWER);
             }
         }
-        //console.log("applyRangedDamage after attackers", JSON.stringify(attackers));
-       // console.log("applyRangedDamage after defenders", JSON.stringify(defenders));
         return damagedDefenders;
     },
 
     damageWeakest: function(defenders, damage) {
-        //  console.log("damageWeakest before damage", damage,"defenders", JSON.stringify(defenders));
+        //console.log("damageWeakest before damage", damage,"defenders", JSON.stringify(defenders));
         for ( var i = 0 ; i < defenders.length ; i++ ) {
             if (damage < defenders[i].hits) {
                 if (0 == i) {
@@ -140,7 +146,7 @@ var BattleQuickEstimate = {
     },
 
     damageCreep: function (creepInfo, damage) {
-      //  console.log("before damageCreep  creepinfo", JSON.stringify(creepInfo), "damage",damage);
+       // console.log("before damageCreep  creepinfo", JSON.stringify(creepInfo), "damage",damage);
         creepInfo.parts = creepInfo.parts - damage / 100;
         var damagedAttackParts = Math.floor( creepInfo.attackParts + creepInfo.rangedParts -  creepInfo.parts );
         if (damagedAttackParts > 0){
@@ -157,7 +163,7 @@ var BattleQuickEstimate = {
                 creepInfo.rangedParts = 0;
             }
         }
-   //     console.log("after damageCreep  creepinfo", JSON.stringify(creepInfo));
+        //console.log("after damageCreep  creepinfo", JSON.stringify(creepInfo));
         return creepInfo;
     }
 

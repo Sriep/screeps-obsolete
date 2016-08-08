@@ -26,6 +26,7 @@ var raceWorker = {
     blockSize: 100 + 50 + 50,
     BLOCKSIZE: 100 + 50 + 50,
     BLOCKSIZE_FAST: 100 + 50 + 50 + 50,
+    BLOCKSIZE_PARTS: 3,
 	
     buildRatio: 1.0,
 	repairerRatio: 0.08,

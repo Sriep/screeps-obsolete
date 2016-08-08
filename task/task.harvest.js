@@ -34,17 +34,17 @@ TaskHarvest.prototype.doTask = function(creep, task) {
     if (!source) {
      //   console.log(creep,"Trying to harvest with invalid source", source, "id",tasks.getTargetId(creep));
         if (creep.carry.energy == creep.carryCapacity) {
-      //      console.log(creep, "harvet RESULT_FINISHED full up no source");
+            console.log(creep, "harvet RESULT_FINISHED full up no source");
             return gc.RESULT_FINISHED;
         }  else {
            /// keep trying to get to source
           //  creep.say("Help source");
-         //   console.log(creep, "harvet RESULT_ROLLBACK no source")
+            console.log(creep, "harvet RESULT_ROLLBACK no source")
             return gc.RESULT_ROLLBACK;
         }
     }
     var rtv = creep.harvest(source);
-   // console.log(creep,"TaskHarvest result",rtv);
+    console.log(creep,"TaskHarvest result",rtv);
     switch (rtv) {
         case    OK:                         // 0	The operation has been scheduled successfully.;
            // tasksActions.done(gc.HARVEST);
@@ -53,15 +53,16 @@ TaskHarvest.prototype.doTask = function(creep, task) {
                 console.log(creep, "harvest RESULT_FINISHED ok full up")
                 return gc.RESULT_FINISHED;
             }  else {
-             //   console.log(creep, "harvest RESULT_UNFINISHED ok")
+                console.log(creep, "harvest RESULT_UNFINISHED ok cary enegy and capacity"
+                    ,creep.carry.energy,"capacity",creep.carryCapacity)
                 return gc.RESULT_UNFINISHED;
             }
         case    ERR_NOT_ENOUGH_RESOURCES:    //	-6	The target source does not contain any harvestable energy.
             if (creep.carry.energy == 0) {
-            //    console.log(creep, "harvet RESULT_UNFINISHED not eough resouces")
+                console.log(creep, "harvet RESULT_UNFINISHED not eough resouces")
                 return gc.RESULT_UNFINISHED;
             }  else {
-             //   console.log(creep, "harvet RESULT_FINISHED full up not eough resouces")
+                console.log(creep, "harvet RESULT_FINISHED full up not eough resouces")
                 if (creep.carry.energy == creep.carryCapacity || !this.waitForRespawn) {
                     tasks.setTargetId(creep, undefined);
                     return gc.RESULT_FINISHED;                

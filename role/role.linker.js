@@ -21,12 +21,14 @@ var roleLinker = {
             console.log(creep,flagName,"getTaskList flag",flag);
 
             var taskList = [];
-            var moveToRoom = new TaskMoveRoom(flag.pos.roomName);
-            moveToRoom.loop = false;
+            if (flag) {
+                var moveToRoom = new TaskMoveRoom(flag.pos.roomName);
+                moveToRoom.loop = false;
+                taskList.push(moveToRoom);
+            }
+
             var findAndMoveLinkPos = new TaskFindMoveLinkerPos(flagName);
             var flexiLink = new TaskFlexiLink(flagName);
-
-            taskList.push(moveToRoom);
             taskList.push(findAndMoveLinkPos);
             taskList.push(flexiLink);
             return taskList;

@@ -15,7 +15,16 @@ var tasks = require("tasks");
  * @module tasksHarvest
  */
 
-function TaskMoveFind (findMethod, range, method , module, moveToOpts, findId) {
+function TaskMoveFind (
+    findMethod,
+    range,
+    method ,
+    findModule,
+    moveToOpts,
+    findId,
+    customMoveToFunction,
+    functionModule
+) {
     this.taskType = gc.TASK_MOVE_FIND;
     this.conflicts = gc.MOVE;
     this.method = findMethod;
@@ -27,12 +36,14 @@ function TaskMoveFind (findMethod, range, method , module, moveToOpts, findId) {
     this.findStructure = method;
     this.findFilter = method;
     this.findFunction = method;
-    this.findModule = module;
+    this.findModule = findModule;
     if (undefined === range)
         range =1;
     else
         this.range = range;
     this.moveToOpts = moveToOpts;
+    this.customMoveToFunction = customMoveToFunction;
+    this.functionModule = functionModule;
     this.loop = true;
     this.pickup = true;
 }
@@ -45,20 +56,13 @@ TaskMoveFind.prototype.FindMethod = {
     FindFunction: gc.FIND_FUNCTION
 };
 
-TaskMoveFind.prototype.doTask = function(creep, task, actions) {
-   // console.log(creep,"In TaskMoveFind method", task.method, "task.findid"
-   //     , task.findId,"target id",tasks.getTargetId(creep) );
-   // console.log(creep,"fove find",task.findFunction,"module",task.findModule);
-    //tasks.setTargetId(creep, undefined);
+TaskMoveFind.prototype.doTask = function(creep, task) {
     var target = undefined;
-    //if (task.method != this.FindMethod.FindId)  {
-        if (tasks.getTargetId(creep)) {
-            target = Game.getObjectById(tasks.getTargetId(creep));
-        } else {
-     //       console.log("In move find removing cashed id",tasks.getTargetId(creep))
-            tasks.setTargetId(creep, undefined);
-        }
-    //}
+    if (tasks.getTargetId(creep)) {
+        target = Game.getObjectById(tasks.getTargetId(creep));
+    } else {
+        tasks.setTargetId(creep, undefined);
+    }
 
     if (!target) {
      //   console.log(creep,"no target look for one method",task.method);
@@ -67,13 +71,15 @@ TaskMoveFind.prototype.doTask = function(creep, task, actions) {
                 target = Game.getObjectById(task.findId);
              //   console.log(creep,"case this.FindMethod.FindId",task.findId,"target",target);
                 /// Siwtch to backup plan
-                if (!target && task.findId != task.findFunction) {
+                if (!target && task.findModule && task.findFunction) {
+                //    console.log(creep,"TaskMoveFind", target, "module", task.findModule, task.findId, task.findFunction);
                     var module = require(task.findModule);
                     target = module[task.findFunction](creep);
                     if (target) {
                         tasks.setTargetId(creep, target.id);
                         creep("switch");
                     }
+                 //   console.log(creep,"TaskMoveFind end of if");
                 }
                 break;
             case this.FindMethod.FindRoomObject:
@@ -120,8 +126,23 @@ TaskMoveFind.prototype.doTask = function(creep, task, actions) {
       //  creep.say("there");
         return gc.RESULT_FINISHED;
     }
+//(typeof task.customMoveToFunction === "function" )
+    var result;
+    if (task.customMoveToFunction) {
+        if(  task.functionModule) {
+            var fModule = require(task.functionModule);
+            if (typeof fModule[task.customMoveToFunction] === "function" )
+                result = fModule[task.customMoveToFunction](creep, target);
+            else console.log(creep,"following is not a function",fModule[task.customMoveToFunction]);
+        } else {
+            result = task.customMoveToFunction(creep, target);
+        }
+    } else {
+        if (task.customMoveToFunction)
+            console.log(creep,"TaskMoveFind",task.customMoveToFunction,"is not a function");
+        result = creep.moveTo(target);
+    }
 
-    var result = creep.moveTo(target);
   //  console.log(creep,"TaskMoveFind result",result);
     distanceToGo = creep.pos.getRangeTo(target);
     if (distanceToGo <= task.range) {

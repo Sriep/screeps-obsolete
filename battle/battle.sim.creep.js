@@ -18,7 +18,8 @@ var gc = require("gc");
     function BattleSimCreep (creepOrParts, attackParts, rangedParts, healParts) {
         if (arguments.length  == 1) {
             var creep = creepOrParts;
-            this.startParts = Object.keys.length(creep.body);
+            this.startParts = Object.keys(creep.body).length;
+           // this.startParts = _.filter(creep.body).length;
             this.parts =  _.filter(creep.body, function (part) {
                 return part.hits > 0
             }).length;

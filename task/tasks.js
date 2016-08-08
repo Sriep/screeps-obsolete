@@ -57,6 +57,7 @@ var tasks = {
            // creep.say(task.taskType);
             var result;
             if (!TaskActions.prototype.isConflict(doneActions, task.conflicts)) {
+                if (task.taskType == "task.switch.role") return;
                 var moduleName = "task." + task.taskType;
                 var taskModule = require(moduleName);
                 result = taskModule.prototype.doTask(creep, task, doneActions);

@@ -11,6 +11,7 @@
  */
 var raceSwordsman = {
     BLOCKSIZE: 80 + 50,
+    BLOCKSIZE_PARTS: 2,
 
     body: function (size) {
         var body = [];

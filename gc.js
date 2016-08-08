@@ -48,6 +48,8 @@ var gc = {
     ROLE_GIFT: "gift",
     ROLE_NEUTRAL_PORTER: "neutral.porter",
     ROLE_SCOUT: "scout",
+    ROLE_WALL_BUILDER: "wall.builder",
+
     
     //Tasks
     TASK_MOVE_FIND: "move.find",
@@ -71,10 +73,12 @@ var gc = {
     TASK_HEAL: "heal",
     TASK_LINKER_BUILD: "linker.build",
     TASK_LINKER_DUMP: "linker.build",
-    TASK_LINKER_DUMP_LINK_DUMP: "task.linker.dump.link.dump",
-    TASK_LINKER_LINK_DUMP: "task.linker.link.dump",
-    TASK_LINKER_LINK_LINK: "task.linker.link.link",
-    TASK_LINKER_REPAIR_DUMP: "task.linker.repair.dump",
+    TASK_LINKER_DUMP_LINK_DUMP: "linker.dump.link.dump",
+    TASK_LINKER_LINK_DUMP: "linker.link.dump",
+    TASK_LINKER_LINK_LINK: "linker.link.link",
+    TASK_LINKER_REPAIR_DUMP: "linker.repair.dump",
+    TASK_SWITCH_ROLE: "switch.role",
+    TASK_FLEXI_LOADUP: "flexi.loadup",
 
 
 //Offload switch task's states
@@ -82,6 +86,7 @@ var gc = {
     SWITCH_STATE_CONSTRUCTION:  "construction",
     SWITCH_STATE_FILLUP:  "fillup",
     SWITCH_STATE_UPGRADE:  "upgrade",
+    SWITCH_STATE_REPAIR: "repair",
     
     //TaskMoveFind.prototype.FindMethod
     FIND_ID : "find.id",
@@ -116,7 +121,7 @@ var gc = {
     POLICY_POLICY_THE_POOL: "the.pool",
     POLICY_PEACE: "peace",
     POLICY_CONSTRUCTION: "construction",
-    POLICY_DEFEND: "defence",
+    POLICY_DEFENCE: "defence",
     POLICY_RESCUE: "rescue",
     POLICY_FOREIGN_HARVEST: "foreign.harvest",
     POLICY_FOREIGN_ROAD: "neutral.road",
@@ -152,6 +157,7 @@ var gc = {
     ROUTE_FLEXI_STORAGE_PORTER: "flexi.storage.porter",
     ROUTE_REPAIRER: "repairer",
     ROUTE_SCOUT:    "scout",
+    ROUTE_WALL_BUILDER: "wall.builder",
 
     // Linker types
     LINKER_DUMP: "linker.dump",
@@ -183,17 +189,18 @@ var gc = {
     MAX_TASK_ACTIONS: 5,
     PORTER_PRIORITY_THRESHOLD: 750,//this.MIDDLE_AGE_CREEP_LIFE_TO_LIVE,
     MIN_ENERGY_CAPACITY_LINKERS: 400,
-    MAX_QUICK_BATTLE_LENGTH: 20,
+    MAX_SIM_BATTLE_LENGTH: 20,
+    MAX_SIM_DEFENCE_LENGTH: 40,
 
     TIME_TRANSFER_LOAD: 1,
     TIME_BUILD_LOAD: 10,
     TIME_UPGRADE_LOAD: 50,
 
 
-    ROOM_UPDATE_RATE: 1,
-    FLAG_UPDATE_RATE: 17,
-    LINKER_RESET_RATE: 27,
-    CHECK_FOR_ORPHANED_BUILDS_RATE: 17,
+    ROOM_UPDATE_RATE: 17,
+    FLAG_UPDATE_RATE: 41,
+    LINKER_RESET_RATE: 37,
+    CHECK_FOR_ORPHANED_BUILDS_RATE: 19,
 
     //Build priorities
     PRIORITY_EMERGENCY_HOME_PORTER: 2,
@@ -208,6 +215,7 @@ var gc = {
     PRIORITY_KEEPER_ATTACK: 9,
     PRIORITY_KEEPER_HARVEST: 11,
     PRIORITY_KEEPER_PORTER: 14,
+    PRIORITY_WALL_BUILDER: 16,
 
     //flag colours
     FLAG_PERMANENT_COLOUR: COLOR_BLUE,

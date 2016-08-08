@@ -112,6 +112,18 @@ var raceBase = {
         return count;
     },
 
+    maxSizeFromEnergy: function(race, room)  {
+        module = this.getModuleFromRace(race);
+        var withoutBodyPartLimit =  Math.floor(room.energyAvailable / module.BLOCKSIZE);
+        return Math.min(withoutBodyPartLimit, Math.floor(module.BLOCKSIZE_PARTS));
+    },
+
+    maxSizeRoom: function(race, room) {
+        module = this.getModuleFromRace(race);
+        var bodyPartLimit =  Math.floor(room.energyCapacityAvailable/module.BLOCKSIZE);
+        return Math.min(bodyPartLimit, Math.floor(50/module.BLOCKSIZE_PARTS));
+    },
+
     getRaceFromBody: function (body) {
         if (raceWorker.isWorker(body)) {
             return gc.RACE_WORKER;

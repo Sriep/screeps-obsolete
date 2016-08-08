@@ -14,7 +14,7 @@ var tasks = require("tasks");
  * @module tasksHarvest
  */
 
-function TaskMoveXY (x, y, range) {
+function TaskMoveXY (x, y, range, customMoveFunction, functionModule) {
     this.taskType = gc.TASK_MOVE_XY;
     this.conflicts = gc.MOVE;
     this.x = x;
@@ -24,6 +24,8 @@ function TaskMoveXY (x, y, range) {
     } else {
         this.range =range;
     }
+    this.customMoveFunction = customMoveFunction;
+    this.functionModule = functionModule;
     this.loop = true;
     this.pickup = true;
 }
@@ -33,6 +35,20 @@ TaskMoveXY.prototype.doTask = function(creep, task) {
     var result = creep.moveTo(task.x,task.y, {
         maxRooms: 1
     });
+    var result;
+    var result
+    if (task.customMoveToFunction) {
+        var xy = new RoomPosition( task.x, task.y, creep.pos.roomName );
+        if(task.functionModule) {
+            var fModule = require(task.functionModule);
+            result = fModule[task.customMoveToFunction](creep, xy);
+        } else {
+            result = task.customMoveToFunction(creep, xy);
+        }
+    } else {
+        result = creep.moveTo(task.x,task.y);
+    }
+
    // console.log(creep,"TaskMoveXY",result);
     //creep.say(result);
     switch (result) {

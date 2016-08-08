@@ -19,9 +19,10 @@ var raceSwordsman = require("race.swordsman");
  * @module RouteGiftCreep
  */
 
-function RouteGiftCreep  (room, policyId, body, role, respawnRate) {
+function RouteGiftCreep  (room, targetRoom, policyId, body, role, respawnRate) {
     this.type = gc.ROUTE_GIFT_CREEP;
     this.owner = room;
+    this.targetRoom = targetRoom;
     this.policy = policyId;
     this.respawnRate = respawnRate;
     this.body = body;
@@ -40,7 +41,8 @@ RouteGiftCreep.prototype.spawn = function (build, spawn, room ) {
     if (_.isString(name)) {
         console.log("Spawning transporter",name);
         roleBase.switchRoles(Game.creeps[name],
-            build.role,
+            gc.ROLE_GIFT,
+            build.targetRoom,
             build.policyId,
             build.role
         );

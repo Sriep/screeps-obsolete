@@ -63,10 +63,11 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
                 case gc.BUILD:
                 case gc.REPAIR:
                 case gc.TRANSFER:
-                //    console.log(creep, "rolllback first switch");
-                //    creep.say("no target");
-                    return gc.RESULT_FINISHED;
-                  //  return gc.RESULT_ROLLBACK;
+                    if (task.canUseAlternative) {
+                        return gc.RESULT_ROLLBACK;
+                    } else {
+                        return gc.RESULT_FINISHED;
+                    }
                 case gc.UPGRADE_CONTROLLER:
                 case gc.DROP:
                 default:
@@ -85,7 +86,16 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
                // console.log(creep,"offloaded all energy - FINSIHED",task.offloadMethod);
               //  creep.say("empty");
                 tasks.setTargetId(creep, undefined);
-                return gc.RESULT_FINISHED;
+                if (creep.carry.energy == 0)
+                {
+                    return gc.RESULT_FINISHED;
+                } else {
+                    if (task.canUseAlternative) {
+                        tasks.setTargetId(creep, undefined);
+                        return gc.RESULT_ROLLBACK;
+                    }
+                    return gc.RESULT_FINISHED;
+                }
             }
             else {
                 switch (task.offloadMethod) {
