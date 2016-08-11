@@ -33,7 +33,7 @@ function  RouteWallBuilder  (room, size) {
 }
 
 RouteWallBuilder.prototype.spawn = function (build, spawn, room ) {
-    //console.log("trying to spawn RouteFlexiStoragePorter");
+    console.log("trying to spawn RouteFlexiStoragePorter");
     var body = raceWorker.body(build.size, true);
     var name = stats.createCreep(spawn, body, undefined, undefined);
     if (_.isString(name)) {

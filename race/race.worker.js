@@ -282,17 +282,25 @@ console.log("assignRoles havester", havesters_needed, "upgraders",upgraders_need
         {
             size = Math.min(16,size);
             for (var i = 0; i < size; i++) {
-                body.push(WORK);
                 body.push(CARRY);
+            } // for
+            for (var i = 0; i < size; i++) {
                 body.push(MOVE);
+            } // for
+            for (var i = 0; i < size; i++) {
+                body.push(WORK);
             } // for
         } else {
             size = Math.min(12,size);
             for (var i = 0; i < size; i++) {
-                body.push(WORK);
                 body.push(CARRY);
+            } // for
+            for (var i = 0; i < size; i++) {
                 body.push(MOVE);
                 body.push(MOVE);
+            } // for
+            for (var i = 0; i < size; i++) {
+                body.push(WORK);
             } // for
 
         }

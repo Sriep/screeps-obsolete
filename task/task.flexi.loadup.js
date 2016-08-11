@@ -32,18 +32,22 @@ function TaskFlexiLoadup (resourceId) {
     this.conflicts = gc.TRANSFER;
     this.resourceId = resourceId;
     this.oldTaskList = undefined;
-    this.state = gc.SWITCH_STATE_FILLUP;
+    //this.state = gc.SWITCH_STATE_FILLUP;
     this.pickup = true;
     this.loop = true;
 }
 
 TaskFlexiLoadup.prototype.doTask = function(creep, task) {
+   // console.log(creep, "TaskFlexiLoadup start",JSON.stringify(creep.memory.tasks.tasklist));
     tasks.setTargetId(creep, undefined);
     if (undefined === creep)
         return gc.RESULT_FINISHED;
+    if ( undefined == task.state) {
+        task.state = gc.SWITCH_STATE_FILLUP;
+    }
 
-    console.log(creep,"TaskFlexiLoadup creep.carryCapacity ",creep.carryCapacity
-       ,"carry",_.sum(creep.carry),"state",task.state);
+    //console.log(creep,"TaskFlexiLoadup creep.carryCapacity ",creep.carryCapacity
+    //   ,"carry",_.sum(creep.carry),"state",task.state);
 
     if ( creep.carry.energy == 0
         && gc.SWITCH_STATE_REPAIR == task.state ) {
@@ -51,29 +55,42 @@ TaskFlexiLoadup.prototype.doTask = function(creep, task) {
     }
     if (creep.carryCapacity <= _.sum(creep.carry)
         && gc.SWITCH_STATE_FILLUP == task.state ) {
-        task.state = gc.SWITCH_STATE_REPAIR;
+        task.state = gc.SWITCH_STATE_REPAIR
     }
 
-    console.log(creep,"TaskFlexiLoadup creep.carryCapacity ",creep.carryCapacity
-        ,"carry",_.sum(creep.carry),"state",task.state);
-
     if ( task.state == gc.SWITCH_STATE_REPAIR) {
-        console.log(creep,"TaskFlexiLoadup before",task.oldTaskList);
-        if (task.oldTaskList) {
-            console.log(creep,"TaskFlexiLoadup oldTaskList",  JSON.stringify(task.oldTaskList));
-            creep.memory.tasks.tasklist = task.oldTaskList;
-            task.oldTaskList = undefined;
-        }
+        //console.log("switch to offload");
+        this.switchToOffload(creep, task);
         return gc.RESULT_FINISHED;
-    } else {
-        var oldTaskList = creep.memory.tasks.tasklist;
-        this.switchToFillUp(creep, oldTaskList, task);
-        console.log(creep,"TaskFlexiLoadup newtasklist len", creep.memory.tasks.tasklist.length);
+
+    } else { // task.state == gc.SWITCH_STATE_FILLUP)
+        //console.log("switchToFillUp");
+        this.switchToFillUp(creep, task);
         return gc.RESULT_FINISHED
     }
 };
 
-TaskFlexiLoadup.prototype.switchToFillUp = function (creep, oldTaskList, task) {
+TaskFlexiLoadup.prototype.switchToOffload = function (creep, task) {
+    //console.log(creep, "somehow got into switchToOffload");
+    var findWall = new TaskMoveFind(
+        gc.FIND_FUNCTION,
+        gc.RANGE_REPAIR,
+        "findTarget",
+        "role.wall.builder",
+        undefined,
+        undefined,
+        "moveAndRepair",
+        "role.repairer"
+    );
+    var offload = new TaskOffload(gc.REPAIR);
+    var newTaskList = [];
+    newTaskList.push(findWall);
+    newTaskList.push(offload);
+    newTaskList.push(task);
+    creep.memory.tasks.tasklist = newTaskList;
+};
+
+TaskFlexiLoadup.prototype.switchToFillUp = function (creep, task) {
     var moveToStorage  = TaskOffloadSwitch.prototype.moveToStorage(creep);
     var loadupEnergy;
     if (moveToStorage.mode == gc.FLEXIMODE_HARVEST) {
@@ -81,16 +98,68 @@ TaskFlexiLoadup.prototype.switchToFillUp = function (creep, oldTaskList, task) {
     } else {
         loadupEnergy = new TaskLoadup(RESOURCE_ENERGY);
     }
-    var switchTaskLists = new TaskFlexiLoadup(task.resourceId);
-    switchTaskLists.oldTaskList = oldTaskList;
     var newTaskList = [];
     newTaskList.push(moveToStorage);
     newTaskList.push(loadupEnergy);
-    newTaskList.push(switchTaskLists);
+    newTaskList.push(task);
     creep.memory.tasks.tasklist = newTaskList;
+    //console.log(creep, "switchToFillUp end",JSON.stringify(creep.memory.tasks.tasklist));
 };
 
 module.exports = TaskFlexiLoadup;
+
+/*
+TaskFlexiLoadup.prototype.doTask = function(creep, task) {
+    return;
+    tasks.setTargetId(creep, undefined);
+    if (undefined === creep)
+        return gc.RESULT_FINISHED;
+    if ( undefined == creep.memory.tasks.state) {
+        creep.memory.tasks.state = gc.SWITCH_STATE_FILLUP;
+    }
+
+    console.log(creep,"TaskFlexiLoadup creep.carryCapacity ",creep.carryCapacity
+        ,"carry",_.sum(creep.carry),"state",creep.memory.tasks.state);
+
+
+    if ( creep.carry.energy == 0
+        && gc.SWITCH_STATE_REPAIR == creep.memory.tasks.state ) {
+
+        task.oldTaskList = creep.memory.tasks.tasklist;
+        creep.memory.tasks.tasklist = undefined;
+        tasks.setTargetId(creep, undefined);
+        creep.memory.tasks.state = gc.SWITCH_STATE_FILLUP;
+
+    }
+    if (creep.carryCapacity <= _.sum(creep.carry)
+        && gc.SWITCH_STATE_FILLUP == creep.memory.tasks.state ) {
+
+        creep.memory.tasks.tasklist = task.oldTaskList;
+        task.oldTaskList = undefined;
+        tasks.setTargetId(creep, undefined);
+        creep.memory.tasks.state = gc.SWITCH_STATE_REPAIR
+    }
+    if ( gc.SWITCH_STATE_FILLUP == creep.memory.tasks.state
+        && undefined === task.oldTaskList ) {
+
+        task.oldTaskList = creep.memory.tasks.tasklist;
+    }
+
+    console.log(creep,"TaskFlexiLoadup state", creep.memory.tasks.state);
+
+    console.log(creep,"TaskFlexiLoadup creep.carryCapacity ",creep.carryCapacity
+        ,"carry",_.sum(creep.carry),"state",creep.memory.tasks.state);
+
+    if ( creep.memory.tasks.state == gc.SWITCH_STATE_REPAIR) {
+        tasks.setTargetId(creep, undefined);
+        return gc.RESULT_FINISHED;
+    } else { // creep.memory.tasks.state == gc.SWITCH_STATE_FILLUP)
+        var oldTaskList = task.oldTaskList;
+        this.switchToFillUp(creep, oldTaskList, task);
+        console.log(creep,"TaskFlexiLoadup newtasklist len", creep.memory.tasks.tasklist.length);
+        return gc.RESULT_FINISHED
+    }
+};*/
 
 
 

@@ -163,9 +163,9 @@ var policy = {
           //  this.activatePolicy(thePoolPolicyDetails);
         }
         var module = this.getModuleFromPolicy(policyDetails);
-        console.log("activatePolicy id",policyDetails.id,"module",module);
+        //console.log("activatePolicy id",policyDetails.id,"module",module);
         if (undefined === module) {
-            console.log("activatePolciy cant make module",JSON.stringify(policyDetails));
+            //console.log("activatePolciy cant make module",JSON.stringify(policyDetails));
             return false;
         }
         if (undefined  !== module.validPolicy) {

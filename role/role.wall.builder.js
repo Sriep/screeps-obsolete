@@ -23,6 +23,7 @@ var _ = require('lodash');
 var roleWallBuilder = {
 
     getTaskList: function(creep) {
+        console.log(creep,"roleWallBuilder");
         var tasks = [];
         var loadup = new TaskFlexiLoadup(RESOURCE_ENERGY)
         var findWall = new TaskMoveFind(
@@ -33,7 +34,7 @@ var roleWallBuilder = {
             undefined,
             undefined,
             "moveAndRepair",
-            "role.wall.builder"
+            "role.repairer"
         );
         var offload = new TaskOffload(gc.REPAIR);
 
@@ -52,14 +53,15 @@ var roleWallBuilder = {
             }
         });
         walls.sort(function (a,b) {return (a.hits - b.hits)});
+        //console.log(creep,"Walls",walls);
         if(walls.length > 0) {
             console.log(creep,"found wall to build",walls[0]);
             return 	walls[0];
         }
-        console.log(creep,"Wall builder can't find target!");
+
         return undefined;
     },
-
+/*
     findTargetInRange: function(creep) {
         var repairTargets = creep.pos.findInRange(FIND_STRUCTURES, gc.RANGE_REPAIR, {
             filter: function(object) {
@@ -73,11 +75,13 @@ var roleWallBuilder = {
         else
             return undefined;
     },
-
+*/
     moveAndRepair: function(creep, target) {
-        var repairTarget = this.findTargetInRange(creep);
-        if(repairTarget) creep.repair(repairTarget);
-        creep.moveTo(target);
+        var roleRepairer = require("role.repairer");
+        return roleRepairer.moveAndRepair(creep, target);
+        //var repairTarget = this.findTargetInRange(creep);
+        //if(repairTarget) creep.repair(repairTarget);
+        //return creep.moveTo(target);
     },
 
 };

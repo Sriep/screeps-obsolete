@@ -24,7 +24,7 @@ function TaskLoadup (resourceId, targetId) {
 }
 
 TaskLoadup.prototype.doTask = function(creep, task) {
-   // console.log(creep,"task loadup")
+    //console.log(creep,"task loadup")
     if (!task.targetId) {
         var storage =  Game.getObjectById(tasks.getTargetId(creep));
     } else {

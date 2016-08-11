@@ -45,7 +45,7 @@ var BattleDefenceEstimate = {
             result.turns += rtv.turns;
         }
 
-        console.log("quickDefence result", JSON.stringify(result));
+      //  console.log("quickDefence result", JSON.stringify(result));
         return result;
     },
 

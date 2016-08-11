@@ -29,5 +29,4 @@ var roleGift = {
 
 };
 
-//function TaskHarvestLinker (sourceId, homeLinkId, targetLinkId) {
 module.exports = roleGift;

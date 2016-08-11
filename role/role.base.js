@@ -415,6 +415,7 @@ var roleBase = {
     run: function(creep) {
         if (!creep.memory.tasks || !creep.memory.tasks.tasklist) {
             roleBase.switchRoles(creep, gc.ROLE_FLEXI_STORAGE_PORTER);
+            creep.memory.switchedToFlixPorterInRoleBaserun = true;
         }
         var tasks = require("tasks");
         tasks.doTasks(creep);

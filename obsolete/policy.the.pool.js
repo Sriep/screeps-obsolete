@@ -51,11 +51,11 @@ var policyThePool = {
         var creep = Game.creeps[creepName];
         if (undefined === creep.memory.tasks)
             creep.memory.tasks = {};
-        console.log(creep,"pool completedOrder here is the order", JSON.stringify(order[0]) );
+        //console.log(creep,"pool completedOrder here is the order", JSON.stringify(order[0]) );
         creep.memory.tasks.tasklist = order[0].taskList;
         creep.memory.policyId = order[0].requester;
         creep.memory.role = order[0].role;
-        console.log(creep,"pool complteedOrder requester", order[0].requester);
+        //console.log(creep,"pool complteedOrder requester", order[0].requester);
         if (order[0].orderRoom !== undefined &&
             undefined !== Game.rooms[order[0].orderRoom]) {
             var deliverTo = new TaskMovePos(order[0].orderRoom,1);
@@ -63,9 +63,9 @@ var policyThePool = {
             deliverTo.pickup =false;
             creep.memory.tasks.tasklist.unshift(deliverTo);
         }
-        console.log("pool completedorder[0] creep",creep,"role"
-            ,creep.memory.role,"policy id", creep.memory.policyId );
-        console.log("completedorder[0] new tasklist"  ,JSON.stringify(creep.memory.tasks.tasklist));
+        //console.log("pool completedorder[0] creep",creep,"role"
+        //    ,creep.memory.role,"policy id", creep.memory.policyId );
+        //console.log("completedorder[0] new tasklist"  ,JSON.stringify(creep.memory.tasks.tasklist));
     },
 
     returnToPool: function (name) {

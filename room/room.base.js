@@ -39,6 +39,9 @@ var roomBase = {
         }
         var nearByRooms = this.nearByRooms();
         for ( var i = 0 ; i < nearByRooms.length ; i++ ) {
+            //console.log("examineRooms near by rooms",nearByRooms,
+           //     "is flagged?", Memory.rooms[nearByRooms[i]].flagged);
+            //Memory.rooms[nearByRooms[i]].flagged = false;
             if (Memory.rooms[nearByRooms[i]] === undefined
                 || !Memory.rooms[nearByRooms[i]].flagged) {
                    roomBase.sendScout(nearByRooms[i]);
@@ -232,6 +235,7 @@ var roomBase = {
         var roomClosest, distanceClosest;
         for ( var i in exits ) {
             if (roomBase.isMyRoom(exits[i])) {
+
                 var exit = pos.findClosestByPath(parseInt(i));
                 //console.log("findClosest exit",i,JSON.stringify(exit));
                 if (!exit) {

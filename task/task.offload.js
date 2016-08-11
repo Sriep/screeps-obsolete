@@ -44,7 +44,7 @@ TaskOffload.prototype.offloadMethod = {
 
 TaskOffload.prototype.doTask = function(creep, task, actions) {
     var tasks = require("tasks");
-  // console.log(creep,"In task Offload target id", tasks.getTargetId(creep));
+  //console.log(creep,"In task Offload target id", tasks.getTargetId(creep));
 
     if (creep.carry[task.resource] == 0) {
       //  console.log("tried Offloading witih no enrgy");
@@ -54,7 +54,7 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
 
     var target = Game.getObjectById(tasks.getTargetId(creep));
     if (!target) {
-      //  console.log(creep,"Offload, No target Id found",task.offloadMethod);
+        //console.log(creep,"Offload, No target Id found",task.offloadMethod);
         tasks.setTargetId(creep, undefined);
         if (creep.carry.energy == 0)
             return gc.RESULT_FINISHED;
@@ -76,7 +76,8 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
         }
     }
     var result = stats[task.offloadMethod](creep, target, task.resource, task.amount);
-    //console.log(creep,"Task Offload result", result, "target",target);
+    //console.log(creep,"Task Offload result", result, "target",target,
+    //    "method", JSON.stringify(task.offloadMethod));
     switch (result ) {
         case OK:
             if (creep.carry.energy == 0
@@ -97,7 +98,7 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
                     return gc.RESULT_FINISHED;
                 }
             }
-            else {
+            else { // creep.carry.energy != 0
                 switch (task.offloadMethod) {
                     case gc.BUILD:
                         if (Game.getObjectById(target.id)) {
@@ -105,7 +106,15 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
                            // console.log(creep, "Build object still three, result unfinished");
                             return gc.RESULT_UNFINISHED;                          
                         }
+                        break;
                     case gc.REPAIR:
+                        //return gc.RESULT_ROLLBACK;
+                        if ( target.hitsMax - target.hits < 100) {
+                            tasks.setTargetId(creep, undefined);
+                            return gc.RESULT_FINISHED;
+                        } else {
+                            return gc.RESULT_UNFINISHED;
+                        }
                     case gc.TRANSFER:
                         tasks.setTargetId(creep, undefined);
                         creep.say("next target");

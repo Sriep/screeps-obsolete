@@ -34,16 +34,12 @@ function TaskFindMoveLinkerPos (flagName) {
 }
 
 TaskFindMoveLinkerPos.prototype.doTask = function(creep, task) {
-  //  console.log(creep, "In TaskFindMoveLinkerPos task", JSON.stringify(task));
     var flag = Game.flags[task.flagName];
-   // console.log(creep, "In TaskFindMoveLinkerPos", task.flagName
-   //     , creep.room.name, "==?" , flag.pos.roomName);
     if (!task.flagName) return gc.RESULT_UNFINISHED;
     if (creep.room.name != flag.pos.roomName) return gc.RESULT_ROLLBACK;
-  //  console.log("berfore  var homePos = this.findHomePosition(creep, task);");
 
     var homePos = this.findHomePosition(creep, task);
-    ///console.log(creep,"findHomoePosition",homePos);
+
     var newTaskList = [];
     var moveToSource;
     if (homePos) {
@@ -56,7 +52,7 @@ TaskFindMoveLinkerPos.prototype.doTask = function(creep, task) {
     newTaskList.push(moveToSource);
     newTaskList.push(flexiLink);
     creep.memory.tasks.tasklist = newTaskList;
-   // console.log(creep,"TaskFindMoveLinkerPos reset task lists at end of doTask");
+
     return  gc.RESULT_RESET;
 };
 

@@ -29,29 +29,29 @@ var BattleQuickEstimate = {
     quickCombatInternal: function(enemies, friends, maxTurns) {
         var range = 3;
         var turns = maxTurns ? maxTurns : 0;
-        console.log("quickCombatInternal",JSON.stringify(enemies),"friends", JSON.stringify(friends));
+        //console.log("quickCombatInternal",JSON.stringify(enemies),"friends", JSON.stringify(friends));
         while (enemies.length > 0 && friends.length > 0
                 && turns++ < gc.MAX_SIM_BATTLE_LENGTH ) {
-            console.log("quickCombatInternal while start enemies", enemies,"friends", friends);
+            //console.log("quickCombatInternal while start enemies", enemies,"friends", friends);
             var damagedEnemies, damagedFriends;
             damagedFriends = this.applyRangedDamage(enemies, friends, range);
             damagedEnemies = this.applyRangedDamage(friends, enemies, range);
             this.removeDead(damagedFriends);
             this.removeDead(damagedEnemies);
-            console.log("afrter ranged damagedEnemies",damagedEnemies,"damagedFriends",damagedFriends);
+            //console.log("afrter ranged damagedEnemies",damagedEnemies,"damagedFriends",damagedFriends);
             if (range <= 1) {
                 damagedFriends = this.applyDamage(enemies, damagedFriends);
                 damagedEnemies = this.applyDamage(friends, damagedEnemies);
             }
-            console.log("after attack damagedEnemies",damagedEnemies,"damagedFriends",damagedFriends);
+            //console.log("after attack damagedEnemies",damagedEnemies,"damagedFriends",damagedFriends);
             this.removeDead(damagedFriends);
             this.removeDead(damagedEnemies);
 
             enemies = damagedEnemies;
             friends = damagedFriends;
             if (range > 1) range--;
-            console.log("after quickCombatInternal while end enemies", JSON.stringify(enemies));
-            console.log("after quickCombatInternal while end friends", JSON.stringify(friends));
+            //console.log("after quickCombatInternal while end enemies", JSON.stringify(enemies));
+            //console.log("after quickCombatInternal while end friends", JSON.stringify(friends));
         }
         return { "friends" : friends, "enemies" : enemies , "turns" : turns };
     },
@@ -66,7 +66,7 @@ var BattleQuickEstimate = {
 
     convert: function (creeps) {
         var formattedCreeps = [];
-        console.log("convert",JSON.stringify(creeps));
+        //console.log("convert",JSON.stringify(creeps));
         for ( var i = 0 ; i < creeps.length  ; i++ ) {
             var numParts = creeps[i].hits/100;
             var attackParts = raceBase.occurrencesInBody(creeps[i].body, ATTACK);
@@ -74,7 +74,7 @@ var BattleQuickEstimate = {
             formattedCreeps.push( {  parts : numParts, attackParts : attackParts, rangedParts : rangedParts} );
         }
         formattedCreeps.sort( function (a,b) { return a.parts - b.parts; });
-        console.log("convert formattedCreeps",formattedCreeps);
+        //console.log("convert formattedCreeps",formattedCreeps);
         return formattedCreeps;
     },
 

@@ -55,7 +55,6 @@ var initilise = function(creep,task,flag) {
         flag.memory.operator.arrived = Game.time;
         flag.memory.operator.ageStarted = CREEP_LIFE_TIME - creep.ticksToLive;
     }
-
     if (!flag.memory.mainDumpId || undefined == flag.memory.linkType) {
         creep.room.createConstructionSite(creep.pos, STRUCTURE_CONTAINER);
         var sites = creep.room.find(FIND_CONSTRUCTION_SITES, {

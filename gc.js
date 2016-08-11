@@ -49,6 +49,7 @@ var gc = {
     ROLE_NEUTRAL_PORTER: "neutral.porter",
     ROLE_SCOUT: "scout",
     ROLE_WALL_BUILDER: "wall.builder",
+    ROLE_SUPPRESS_KEEPERS: "suppress.keepers",
 
     
     //Tasks
@@ -79,6 +80,7 @@ var gc = {
     TASK_LINKER_REPAIR_DUMP: "linker.repair.dump",
     TASK_SWITCH_ROLE: "switch.role",
     TASK_FLEXI_LOADUP: "flexi.loadup",
+    TASK_SUPPRESS_KEEPERS: "suppress.keepers",
 
 
 //Offload switch task's states
@@ -158,6 +160,7 @@ var gc = {
     ROUTE_REPAIRER: "repairer",
     ROUTE_SCOUT:    "scout",
     ROUTE_WALL_BUILDER: "wall.builder",
+    ROUTE_SUPPRESS_KEEPERS: "suppress.keepers",
 
     // Linker types
     LINKER_DUMP: "linker.dump",
@@ -176,9 +179,11 @@ var gc = {
     SWORDSMAN_NEUTRAL_PATROL_SIZE: 6,
 
     REPAIRER_THRESHOLD: 5,
+    KEEP_FREE_STORAGE_SPACE: 800000,
     BLOCKSIZE_COST_WORKER: 200,
     EMERGENCY_DOWNGRADING_THRESHOLD: 1500,
     MANY2ONE_REQUIRED_LIFE: 5000,
+    LOAD_FROM_CONTAINER_RATIO: 0.4,
     STORAGE_STOCKPILE: 30000,
     OLD_CREEP_LIFETOLIVE: 200,
     LINKER_AGE_THRESHOLD: 10,
@@ -210,12 +215,12 @@ var gc = {
     PRIORITY_NEUTRAL_LINKER: 10,
     PRIORITY_REVERSE_CONTROLLER: 12,
     PRIORITY_REPAIRER: 8,
-    PRIORITY_ROOM_PATROL: 12,
+    PRIORITY_WALL_BUILDER: 8,
+    PRIORITY_ROOM_PATROL: 11,
     PRIORITY_SCOUT: 9,
     PRIORITY_KEEPER_ATTACK: 9,
     PRIORITY_KEEPER_HARVEST: 11,
     PRIORITY_KEEPER_PORTER: 14,
-    PRIORITY_WALL_BUILDER: 16,
 
     //flag colours
     FLAG_PERMANENT_COLOUR: COLOR_BLUE,

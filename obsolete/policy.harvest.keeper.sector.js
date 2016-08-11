@@ -76,8 +76,8 @@ var policyHarvestKeeperSector = {
     },
 
     enactPolicy: function(currentPolicy) {
-        console.log(currentPolicy.id,"keeper harvest flag", JSON.stringify(this.flag));
-        console.log(currentPolicy.id,"keeper harvest flag", JSON.stringify(currentPolicy));
+       // console.log(currentPolicy.id,"keeper harvest flag", JSON.stringify(this.flag));
+       // console.log(currentPolicy.id,"keeper harvest flag", JSON.stringify(currentPolicy));
         this.marshalCreeps(currentPolicy);
         switch(Memory.policies[currentPolicy.id].state){
             case this.State.Marshalling:

@@ -35,7 +35,7 @@ var routeBase = {
             order.priority = priority;
         }
         if (reference) this.setDueFromActiveRoute(room, order, reference);
-        console.log("attachRoute rooName",JSON.stringify(order));
+        //console.log("attachRoute rooName",JSON.stringify(order));
         room.memory.routes.details[order.id] = order;
         return true;
     },

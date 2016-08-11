@@ -20,9 +20,12 @@ var raceClaimer = {
     body: function (size) {
         var body = [];
         for (var i = 0 ; i < size ; i++) {
-            body.push(CLAIM);
             body.push(MOVE);
           //  body.push(MOVE);
+        } // for
+        for (var i = 0 ; i < size ; i++) {
+            body.push(CLAIM);
+            //  body.push(MOVE);
         } // for
         return body;
     },

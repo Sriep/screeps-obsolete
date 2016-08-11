@@ -44,27 +44,27 @@ TaskOffloadSwitch.prototype.doTask = function(creep) {
     if (undefined === creep)
         return gc.RESULT_UNFINISHED;
     if (creep.carry.energy == 0) {
-    //    console.log(creep,"TaskOffloadSwitch switchToFillUp");
+        //console.log(creep,"TaskOffloadSwitch switchToFillUp");
         this.switchToFillUp(creep);
         return gc.RESULT_RESET
     }
     
     if (this.needEmergencyUpgrade(creep)) {
         this.switchToUpgradeing(creep);
-      //  console.log(creep,"TaskOffloadSwitch needEmergencyUpgrade");
+       // console.log(creep,"TaskOffloadSwitch needEmergencyUpgrade");
         return gc.RESULT_RESET
     }
 
     if (roleEnergyPorter.nextEnergyContainer(creep)){
         this.switchToProduction(creep);
-      //  console.log(creep,"TaskOffloadSwitch switchToProduction");
+       // console.log(creep,"TaskOffloadSwitch switchToProduction");
         return gc.RESULT_RESET
     }
 
     var constructionSites = creep.room.find(FIND_CONSTRUCTION_SITES);
     if (constructionSites.length > 0) {
         this.switchToConstruction(creep);
-       // console.log(creep,"TaskOffloadSwitch switchToConstruction");
+       //console.log(creep,"TaskOffloadSwitch switchToConstruction");
         return gc.RESULT_RESET
     }
 
@@ -122,11 +122,11 @@ TaskOffloadSwitch.prototype.moveToStorage = function (creep) {
 TaskOffloadSwitch.prototype.energyDumpSortOrder = function(a, b) {
     if (a.structureType == STRUCTURE_CONTAINER
         && b.structureType != STRUCTURE_CONTAINER
-        && a.store[RESOURCE_ENERGY]/a.storeCapacity > 0.3)
+        && a.store[RESOURCE_ENERGY]/a.storeCapacity > gc.LOAD_FROM_CONTAINER_RATIO)
         return -1;
     if (b.structureType == STRUCTURE_CONTAINER
         && a.structureType != STRUCTURE_CONTAINER
-        && b.store[RESOURCE_ENERGY]/b.storeCapacity > 0.3)
+        && b.store[RESOURCE_ENERGY]/b.storeCapacity > gc.LOAD_FROM_CONTAINER_RATIO)
         return 1;
     var bEnergy, aEnergy;
     if (a.structureType == STRUCTURE_LINK) {

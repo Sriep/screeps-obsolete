@@ -16,8 +16,10 @@ var raceSwordsman = {
     body: function (size) {
         var body = [];
         for (var i = 0 ; i < size ; i++) {
-            body.push(ATTACK);
             body.push(MOVE);
+        } // for
+        for (var i = 0 ; i < size ; i++) {
+            body.push(ATTACK);
         } // for
         return body;	    
     },

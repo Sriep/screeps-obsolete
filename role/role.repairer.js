@@ -62,7 +62,7 @@ var roleRepairer = {
     },
 
     findTargetInRange: function(creep) {
-        //console.log("findTargetInRange", creep)
+       // console.log("findTargetInRange", creep)
         var repairTargets = creep.pos.findInRange(FIND_STRUCTURES, gc.RANGE_REPAIR, {
             filter: function(object) {
                 return object.hits < object.hitsMax
@@ -70,6 +70,7 @@ var roleRepairer = {
             }
         });
         repairTargets.sort(function (a,b) {return (a.hits - b.hits)});
+        //console.log(creep,"find repaire target in range",repairTargets);
         if (repairTargets.length > 0)
             return repairTargets[0];
         else
@@ -80,7 +81,8 @@ var roleRepairer = {
         //console.log(creep, "moveAndRepair", target);
         var repairTarget = this.findTargetInRange(creep);
         if(repairTarget) creep.repair(repairTarget);
-        creep.moveTo(target);
+        return creep.moveTo(target);
+        //console.log(creep,"")
     },
 
 

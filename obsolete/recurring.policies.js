@@ -144,7 +144,7 @@ var recurringPolicies = {
         room.memory.links.info.push(link2);
        // room.memory.links.info.push(link3);
         room.memory.links.info.push(link4);
-        console.log(room,"linksForW25S23", JSON.stringify(room.memory.links));
+        //console.log(room,"linksForW25S23", JSON.stringify(room.memory.links));
     }
 
 

@@ -72,21 +72,21 @@ var policyPeace = {
        // var policyMany2oneLinker = require("policy.many2one.linker");
         // var room = Game.rooms[newPolicy.room];
         //policyMany2oneLinker.initialiseLinks(newPolicy);
-        this.connvertToFlexiWorkers(room, newPolicy);
+        //this.connvertToFlexiWorkers(room, newPolicy);
         return true;
     },
 
     connvertToFlexiWorkers: function (room, currentPolicy) {
         var creeps = _.filter(Game.creeps, function (creep) {
-            return (creep.memory.policyId == currentPolicy.id );
+            return creep.memory.policyId == currentPolicy.id
+                    && creeps[i].memory.role != gc.ROLE_FLEXI_STORAGE_PORTER
+                    && creeps[i].memory.role != gc.ROLE_LINKER
+                    && creeps[i].memory.role != gc.ROLE_NEUTRAL_PORTER
+                    && creeps[i].memory.role != gc.ROLE_WALL_BUILDER;
         });
         for (var i = 0; i < creeps.length; i++) {
-            if (creeps[i].memory.role != gc.ROLE_FLEXI_STORAGE_PORTER
-                || creeps[i].memory.role != gc.ROLE_LINKER_SOURCE
-                || creeps[i].memory.role != gc.ROLE_LINKER_MINER_STORAGE) {
-
-                roleBase.switchRoles(creeps[i], gc.ROLE_FLEXI_STORAGE_PORTER);
-            }
+            roleBase.switchRoles(creeps[i], gc.ROLE_FLEXI_STORAGE_PORTER);
+            creeps[i].memory.switchedInconnvertToFlexiWorkers = true;
         }
     },
 
@@ -113,10 +113,10 @@ var policyPeace = {
         //    , room.energyCapacityAvailable);
 
         economyLinkers = require("economy.linkers");
-        //    console.log(room, "energyCapacity",room.energyCapacityAvailable , "Energy in build queue",
-        //        routeBase.buildQueueEnergyPerGen(room), "Energy mined", economyLinkers.energyFromLinkersGen(room),
-        //        "Average supply journey", roomOwned.avProductionSupplyDistance(room),"Average upgarde distance",
-        //        roomOwned.avUpgradeDistance(room));
+            console.log(room, "energyCapacity",room.energyCapacityAvailable , "Energy in build queue",
+                routeBase.buildQueueEnergyPerGen(room), "Energy mined", economyLinkers.energyFromLinkersGen(room),
+                "Average supply journey", roomOwned.avProductionSupplyDistance(room),"Average upgarde distance",
+                roomOwned.avUpgradeDistance(room));
 
         routeBase.update(room);
         if (room.name == "W26S21") {
@@ -129,8 +129,8 @@ var policyPeace = {
             // this.initialisePolicy(currentPolicy);
         }
         var creeps = _.filter(Game.creeps);
-        console.log(room, "policy id", currentPolicy.id, "creeps"
-            , creeps.length, "room.mode is", room.mode);
+        //console.log(room, "policy id", currentPolicy.id, "creeps"
+        //    , creeps.length, "room.mode is", room.mode);
 
         var testNewCode = false;
         // if (room.name == "W25S22" || room.mode != MODE_WORLD) {
@@ -139,10 +139,10 @@ var policyPeace = {
         economyLinkers.attachFlexiStoragePorters(room, currentPolicy);
         //economyRepair.attachRepairer(room, currentPolicy);
         economyRepair.attachWallBuilder(room, currentPolicy);
-        console.log("repair need per gen", economyRepair.maintenanceGen(room)
-            , "number",economyRepair.numberMaintain(room),
-            "walls to build", economyRepair.countWallsToBuild(room)
-            , "enegy neeed for walls",economyRepair.energyBuildWalls(room));
+       // console.log("repair need per gen", economyRepair.maintenanceGen(room)
+      //      , "number",economyRepair.numberMaintain(room),
+       //     "walls to build", economyRepair.countWallsToBuild(room)
+        //    , "enegy neeed for walls",economyRepair.energyBuildWalls(room));
         economyLinkers.processBuildQueue(room, currentPolicy);
         // } else  {
         //     if (room.memory.links !== undefined

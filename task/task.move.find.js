@@ -44,6 +44,7 @@ function TaskMoveFind (
     this.moveToOpts = moveToOpts;
     this.customMoveToFunction = customMoveToFunction;
     this.functionModule = functionModule;
+    this.rembemerTarget = undefined;
     this.loop = true;
     this.pickup = true;
 }
@@ -63,23 +64,24 @@ TaskMoveFind.prototype.doTask = function(creep, task) {
     } else {
         tasks.setTargetId(creep, undefined);
     }
+    //console.log(creep,"taskmovefind target",target);
 
     if (!target) {
-     //   console.log(creep,"no target look for one method",task.method);
+        //console.log(creep,"no target look for one method",task.method);
         switch (task.method) {
             case this.FindMethod.FindId:
                 target = Game.getObjectById(task.findId);
-             //   console.log(creep,"case this.FindMethod.FindId",task.findId,"target",target);
+                //console.log(creep,"case this.FindMethod.FindId",task.findId,"target",target);
                 /// Siwtch to backup plan
                 if (!target && task.findModule && task.findFunction) {
-                //    console.log(creep,"TaskMoveFind", target, "module", task.findModule, task.findId, task.findFunction);
+                    //console.log(creep,"TaskMoveFind", target, "module", task.findModule, task.findId, task.findFunction);
                     var module = require(task.findModule);
                     target = module[task.findFunction](creep);
                     if (target) {
                         tasks.setTargetId(creep, target.id);
-                        creep("switch");
+                  //      creep("switch");
                     }
-                 //   console.log(creep,"TaskMoveFind end of if");
+                    //console.log(creep,"TaskMoveFind end of if");
                 }
                 break;
             case this.FindMethod.FindRoomObject:
@@ -108,13 +110,19 @@ TaskMoveFind.prototype.doTask = function(creep, task) {
                 console.log(creep,"Invalid find method");
             //Unreachable
         }
-       // console.log(creep,"TaskMoveFind do target is", target, "method is", task.method);
-        if (target)
+        //console.log(creep,"TaskMoveFind do target is", target, "method is", task.method);
+        if (target) {
             tasks.setTargetId(creep, target.id);
+         //   console.log(creep,"movefind setTargetId to",tasks.getTargetId(creep),"of",target);
+        }
+
     }
+
+   // console.log(creep,"taskmovefind2 target",target);
+
     if (!target) {
       //  console.log(creep,"find RESULT_FINISHED and cound not find any target")
-      //  creep.say("No target");
+       // creep.say("No target");
         return gc.RESULT_FINISHED;
     }
   //  console.log(creep,"movefind target", target);
@@ -131,27 +139,32 @@ TaskMoveFind.prototype.doTask = function(creep, task) {
     if (task.customMoveToFunction) {
         if(  task.functionModule) {
             var fModule = require(task.functionModule);
-            if (typeof fModule[task.customMoveToFunction] === "function" )
+            if (typeof fModule[task.customMoveToFunction] === "function" ) {
                 result = fModule[task.customMoveToFunction](creep, target);
-            else console.log(creep,"following is not a function",fModule[task.customMoveToFunction]);
+               // console.log(creep," result = fModule[task.customMoveToFunction](creep, target)",result);
+            }
+            else {
+               // console.log(creep,"following is not a function",fModule[task.customMoveToFunction]);
+                //console.log(creep,"functionmoduel",task.functionModule,"function",task.customMoveToFunction);
+            }
         } else {
             result = task.customMoveToFunction(creep, target);
+            //console.log(creep,target,"TaskMoveFind result = task.customMoveToFunction(creep, target)",result);
         }
     } else {
-        if (task.customMoveToFunction)
-            console.log(creep,"TaskMoveFind",task.customMoveToFunction,"is not a function");
         result = creep.moveTo(target);
+        //console.log(creep,"TaskMoveFind result = creep.moveTo(target)",result);
     }
 
-  //  console.log(creep,"TaskMoveFind result",result);
+    //console.log(creep,"TaskMoveFind result",result);
     distanceToGo = creep.pos.getRangeTo(target);
     if (distanceToGo <= task.range) {
-     //  console.log(creep,"find RESULT_FINISHED; after move range <= abut ");
-       // creep.say("There");
+       //console.log(creep,"find RESULT_FINISHED; after move range <= abut ");
+      //  creep.say("There");
         return gc.RESULT_FINISHED;
     }  else {
-     //  console.log(creep,"find RESULT_UNFINISHED after move range <= abut to",result);
-       // creep.say(result);
+       //console.log(creep,"result of moveTo",result);
+        creep.say(result);
         switch (result) {
             case OK:    //	0	The operation has been scheduled successfully.
             case ERR_TIRED: //	-11	The fatigue indicator of the creep is non-zero.

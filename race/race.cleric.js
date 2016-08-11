@@ -1,5 +1,5 @@
 /**
- * Created by Piers on 04/08/2016.
+ * Created by Piers on 09/08/2016.
  */
 /**
  * @fileOverview Screeps module. Abstract base object containing data and
@@ -10,23 +10,26 @@
 /**
  * Abstract base object containing data and functions for use by my infantry
  * creeps. Infantry contain mainly "ATTACK" and "MOVE" parts.
- * @module raceHealer
+ * @module raceCleric
  */
-var raceHealer = {
-    BLOCKSIZE: 250 + 50,
-    BLOCKSIZE_PARTS: 2,
+var raceCleric = {
+    BLOCKSIZE: 250 + 80 + 50 + 50,
+    BLOCKSIZE_PARTS: 4,
 
-    body: function (size) {
+    body: function (attack, heal) {
         var body = [];
-        for (var i = 0 ; i < size ; i++) {
+        for (var i = 0 ; i < attack + heal ; i++) {
             body.push(MOVE);
-        } // for
-        for (var i = 0 ; i < size ; i++) {
+        }
+        for (var j = 0 ; j < attack ; j++) {
+            body.push(ATTACK);
+        }
+        for (var k = 0 ; k < heal ; k++) {
             body.push(HEAL);
-        } // for
+        }
         return body;
     },
-
+/*
     maxSize: function (room) {
         return Math.min(25, Math.floor(room.energyCapacityAvailable/this.BLOCKSIZE));
     },
@@ -34,7 +37,7 @@ var raceHealer = {
     energyFromSize: function (size) {
         return size * this.BLOCKSIZE;
     },
-
+*/
 };
 
-module.exports = raceHealer;
+module.exports = raceCleric;

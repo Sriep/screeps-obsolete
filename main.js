@@ -1,8 +1,3 @@
-/**
- * @fileOverview Screeps main processing loop.
- * @author Piers Shepperson
- */
-
 var raceBase = require("race.base");
 var freememory = require("freememory");
 var policy = require("policy");
@@ -22,7 +17,7 @@ var recurringPolicies = require("recurring.policies");
 
 module.exports.loop = function () {
     //profiler.wrap(function() {
-    //console.log("************************ Start ", Game.time," *********************************");
+   // console.log("************************ Start ", Game.time," *********************************");
     PathFinder.use(true);
     ayrtepPad.top();
 
@@ -38,10 +33,7 @@ module.exports.loop = function () {
 
     console.log("************************ End ",  Game.time, " *********************************");
    // }) // profiler.wrap(function()
-}
-//JSON.stringify(memory);
-//Game.rooms["W26S21"]
-
+};
 
 
 
