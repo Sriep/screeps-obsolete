@@ -13,6 +13,7 @@ var RouteScout = require("route.scout");
 var routeBase = require("route.base");
 var gc = require("gc");
 var gf = require("gf");
+
 /**
  * Abstract object containing data and functions
  * related to owned rooms.
@@ -34,14 +35,11 @@ var roomBase = {
         }
         for ( var room in Game.rooms ) {
             if (room.memory && !room.memory.flagged || force) {
-                this.flagRoom(Game.rooms[room], force);
+                this.flagRoom(Game.rooms[room]);
             }
         }
         var nearByRooms = this.nearByRooms();
         for ( var i = 0 ; i < nearByRooms.length ; i++ ) {
-            //console.log("examineRooms near by rooms",nearByRooms,
-           //     "is flagged?", Memory.rooms[nearByRooms[i]].flagged);
-            //Memory.rooms[nearByRooms[i]].flagged = false;
             if (Memory.rooms[nearByRooms[i]] === undefined
                 || !Memory.rooms[nearByRooms[i]].flagged) {
                    roomBase.sendScout(nearByRooms[i]);
@@ -53,16 +51,26 @@ var roomBase = {
     },
 
     flagRoom: function (room) {
-     //   console.log("in flag room");
         this.flagPermanents(room);
         if (room.controller && room.controller.my) {
-          //  console.log("about to flagMyRoomStructures");
             this.flagMyRoomStructures(room);
         }
     },
 
     flagPermanents: function (room) {
         var flagName;
+
+        var keeperLairs = room.find(FIND_STRUCTURES, {
+            filter: { structureType: STRUCTURE_KEEPER_LAIR }
+        });
+        for ( i in keeperLairs ) {
+            flagName = keeperLairs[i].id;
+            if (!Game.flags[flagName])
+                keeperLairs[i].pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_KEEPERS_LAIR_COLOUR);
+            Game.flags[flagName].memory.type = gc.FLAG_KEEPERS_LAIR;
+            Game.flags[flagName].memory.keeperLairRoom = true;
+        }
+
         var sources = room.find(FIND_SOURCES);
         for ( var i in sources ) {
             flagName = sources[i].id;
@@ -75,6 +83,7 @@ var roomBase = {
             if (room.controller && sources.length >= 2  && !this.isMyRoom(room.name)) {
                 Game.flags[flagName].memory.upgradeController = true;
             }
+            if (keeperLairs.length > 0) Game.flags[flagName].memory.keeperLairRoom = true;
         }
         if (room.controller) {
             flagName = room.controller.id;
@@ -84,28 +93,20 @@ var roomBase = {
             if (!this.isMyRoom(room.name)) {
                 Game.flags[flagName].memory.upgradeController = (sources.length >= 2);
             }
+            if (keeperLairs.length > 0) Game.flags[flagName].memory.keeperLairRoom = true;
         }
+
         var minerals = room.find(FIND_MINERALS);
         for ( i in minerals ) {
             flagName =  minerals[i].id;
             if (!Game.flags[flagName])
                 minerals[i].pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_MINERAL_COLOUR);
             Game.flags[flagName].memory.type = gc.FLAG_MINERAL;
-          //  console.log("flagPermanents",flagName,"type",Game.flags[flagName].memory.type );
             Game.flags[flagName].memory.resourceType = minerals[i].mineralType;
-          //  console.log(flagName,"flagPermanents minerals[i].pos,",minerals[i].pos,"is extractor"
-          //      ,gf.isStructureTypeAtPos(minerals[i].pos, STRUCTURE_EXTRACTOR));
             Game.flags[flagName].memory.extractor = gf.isStructureTypeAtPos(minerals[i].pos, STRUCTURE_EXTRACTOR);
+            if (keeperLairs.length > 0) Game.flags[flagName].memory.keeperLairRoom = true;
         }
-        var keeperLairs = room.find(FIND_STRUCTURES, {
-            filter: { structureType: STRUCTURE_KEEPER_LAIR }
-        });
-        for ( i in keeperLairs ) {
-            flagName = keeperLairs[i].id;
-            if (!Game.flags[flagName])
-                keeperLairs[i].pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_KEEPERS_LAIR_COLOUR);
-            Game.flags[flagName].memory.type = gc.FLAG_KEEPERS_LAIR;
-        }
+
         room.memory.flagged = true;
     },
 
@@ -124,6 +125,7 @@ var roomBase = {
     },
 
     isEnemyRoom: function (roomName) {
+        if (!roomName) return undefined;
         if (!Game.rooms[roomName]) return undefined;
         if (!Game.rooms[roomName].controller) return false;
         if (!Game.rooms[roomName].controller.owner) return false;
@@ -133,7 +135,7 @@ var roomBase = {
     isNeutralRoom: function (roomName) {
         if (!Game.rooms[roomName]) return undefined;
         if (!Game.rooms[roomName].controller) return true;
-        if (!Game.rooms[roomName].controller.owner) return true;
+        return !Game.rooms[roomName].controller.owner;
     },
 
     isMyRoom: function (roomName) {
@@ -167,16 +169,21 @@ var roomBase = {
     },
 
     sendScoutFromTo: function(fromRoom, toRoom) {
-        //console.log("send scout from",fromRoom,"to", toRoom);
-        var order = new RouteScout(toRoom);
-        var scoutsOrders = routeBase.filterBuilds(Game.rooms[fromRoom],"type",gc.ROUTE_SCOUT);
-       // console.log("sendScoutFromTo scoutsOrders", JSON.stringify(scoutsOrders));
-        for ( var i = 0 ; i < scoutsOrders.length ; i++ ) {
-            if (toRoom == scoutsOrders[i].targetRoom)
-                return;
+      //  console.log("send scout from",fromRoom,"to", toRoom);
+        var matches = routeBase.filterBuildsF(Game.rooms[fromRoom], function(build) {
+            return build.type == gc.ROUTE_SCOUT
+                && build.targetRoom == toRoom;
+        });
+
+       // console.log("length mathcs",matches);
+       // if (matches)
+        //    console.log("math",JSON.stringify(matches));
+        if (!matches || matches.length == 0)  {
+            //routeBase.removeRoute(Game.rooms[fromRoom], matches[0].id);
+          //  console.log("abot to attach route");
+            var order = new RouteScout(toRoom);
+          //  routeBase.attachRoute(fromRoom, gc.ROLE_SCOUT, order, gc.PRIORITY_SCOUT);
         }
-        //console.log("sendScoutFromTo about to attach",fromRoom,toRoom,JSON.stringify(order));
-        routeBase.attachRoute(fromRoom, gc.ROLE_SCOUT, order, gc.PRIORITY_SCOUT);
     },
 
 
@@ -207,26 +214,86 @@ var roomBase = {
     },
 
     distanceBetween: function  (posFrom, posTo) {
-        var room = Game.rooms[posFrom.roomName];
-        if (undefined === room) return undefined;
-        var route = Game.map.findRoute(room.name, posTo.roomName);
+        var DEFUALT_DISTANCE_ON_ERROR = 25
+        //console.log("distance between start", JSON.stringify(posFrom)
+        //    , "posTo", JSON.stringify(posTo));
+        var route = Game.map.findRoute(posFrom.roomName, posTo.roomName, {
+            routeCallback(roomName, fromRoomName) {
+                if(!roomBase.canSeeRoom(roomName)
+                    || roomBase.isEnemyRoom(roomName)) {	// avoid this room
+                    return Infinity;
+                }
+                return 1;
+            }});
+        //console.log("distanceBetween route", JSON.stringify(route));
+        if (ERR_NO_PATH == route)
+            return route;
+
         var distance = 0;
         if (route.length > 0) {
             var exit = posFrom.findClosestByPath(route[0].exit);
-            if (!exit) {
-                exit = posFrom.findClosestByRange(route[0].exit);
+           // console.log("distanceBetween exit",exit,"posFrom",posFrom,"route",JSON.stringify(route));
+            if (exit)
+                distance = posFrom.findPathTo(exit).length;
+            else {
+                //console.log("distanceBetween null path between" ,exit, "and", route[0].exit);
+                distance = DEFUALT_DISTANCE_ON_ERROR;
+                //todo hack think this is a bug in screeps code. Come with better fix.
             }
-            distance = posFrom.findPathTo(exit).length;
             var entrance = this.exitToEntrance(exit, route[0].room);
+
             for (var i = 1; i < route.length; i++) {
                 exit = entrance.findClosestByPath(route[i].exit);
-                distance += entrance.findPathTo(exit).length;
+                if (exit) {
+                    distance += entrance.findPathTo(exit).length;
+                    entrance = this.exitToEntrance(exit, route[i].room);
+                }      else {
+                    //console.log("distanceBetween null path between" ,exit, "and", route[i].exit);
+                    distance += DEFUALT_DISTANCE_ON_ERROR;
+                    //todo hack think this is a bug in screeps code. Come with better fix.
+                    entrance = undefined;
+                }
+            }
+        }
+        //console.log(distance,"distance between from", posFrom,"to", posTo, "entrance", JSON.stringify(entrance));
+        if (entrance)
+            distance += posTo.findPathTo(entrance).length;
+        else
+            distance += DEFUALT_DISTANCE_ON_ERROR;
+        return distance;
+    },
+
+    distanceBetweenApprox: function  (posFrom, posTo) {
+       // console.log("distance between start", JSON.stringify(posFrom)
+       //     , "posTo", JSON.stringify(posTo));
+        var route = Game.map.findRoute(posFrom.roomName, posTo.roomName, {
+            routeCallback(roomName, fromRoomName) {
+                if(roomBase.isEnemyRoom(roomName)) {	// avoid this room
+                    return Infinity;
+                }
+                return 1;
+            }});
+       // console.log("distanceBetween route", JSON.stringify(route));
+
+        var distance = 0;
+        if (route.length > 0) {
+            var exit = posFrom.findClosestByRange(route[0].exit);
+            distance = posFrom.getRangeTo(exit).length;
+            var entrance = this.exitToEntrance(exit, route[0].room);
+
+            for (var i = 1; i < route.length; i++) {
+                exit = posFrom.findClosestByRange(route[i].exit);
+                distance += entrance.getRangeTo(exit).length;
                 entrance = this.exitToEntrance(exit, route[i].room);
             }
         }
        // console.log(distance,"distance between from", posFrom,"to", posTo, "entrance", JSON.stringify(entrance));
-        distance += posTo.findPathTo(entrance).length;
+        distance += posTo.getRangeTo(entrance).length;
         return distance;
+    },
+
+    canSeeRoom: function(roomPos) {
+        return Game.rooms[roomPos] !== undefined;
     },
 
     findClosest: function (pos, findType, Opts) {

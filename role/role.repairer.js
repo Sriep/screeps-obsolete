@@ -7,15 +7,12 @@
  * mod.thing == 'a thing'; // true
  */
 "use strict";
-
-var roleBase = require("role.base");
 var gc = require("gc");
 var stats = require("stats");
 var TaskMoveFind = require("task.move.find");
 var TaskHarvest = require("task.harvest");
 var TaskOffload = require("task.offload");
 var _ = require('lodash');
-
 var roleRepairer = {
 
     getTaskList: function(creep) {
@@ -61,8 +58,7 @@ var roleRepairer = {
         return undefined;
     },
 
-    findTargetInRange: function(creep) {
-       // console.log("findTargetInRange", creep)
+    findRepairTargetInRange: function(creep) {
         var repairTargets = creep.pos.findInRange(FIND_STRUCTURES, gc.RANGE_REPAIR, {
             filter: function(object) {
                 return object.hits < object.hitsMax
@@ -70,19 +66,31 @@ var roleRepairer = {
             }
         });
         repairTargets.sort(function (a,b) {return (a.hits - b.hits)});
-        //console.log(creep,"find repaire target in range",repairTargets);
         if (repairTargets.length > 0)
             return repairTargets[0];
         else
             return undefined;
     },
 
+    findBuildTargetInRange: function(creep) {
+        var buildTargets = creep.pos.findInRange(FIND_CONSTRUCTION_SITES, gc.RANGE_BUILD);
+        if (buildTargets.length > 0)
+            return buildTargets[0];
+        else
+            return undefined;
+    },
+
     moveAndRepair: function(creep, target) {
-        //console.log(creep, "moveAndRepair", target);
-        var repairTarget = this.findTargetInRange(creep);
-        if(repairTarget) creep.repair(repairTarget);
+        var repairTarget = this.findRepairTargetInRange(creep);
+        if(repairTarget)  creep.repair(repairTarget);
+        else {
+            var buildTarget = this.findBuildTargetInRange(creep);
+            console.log(creep,"build target",buildTarget);
+            if (buildTarget) {
+                creep.build(buildTarget);
+            }
+        }
         return creep.moveTo(target);
-        //console.log(creep,"")
     },
 
 

@@ -10,7 +10,7 @@ var TaskSuppressKeepers = require("task.suppress.keepers");
 
 var roleGift = {
 
-    getTaskList: function(creep,keeperRoomName,) {
+    getTaskList: function(creep,keeperRoomName) {
         var taskList = [];
         var moveToLocation = new TaskMoveRoom(keeperRoomName);
         var suppressKeeper = new TaskSuppressKeepers();

@@ -23,7 +23,7 @@ var raceBase = require("race.base");
  * @module RouteLinker
  */
 
-function  RouteLinker  (room, flagName, policyId) {
+function  RouteLinker  (room, flagName, policyId, defensive, fast, healParts) {
     this.type = gc.ROUTE_LINKER;
     this.owner = room;
     this.flagName = flagName;
@@ -36,30 +36,29 @@ function  RouteLinker  (room, flagName, policyId) {
             if (room != flag.pos.roomName) workerParts++;
             this.size = Math.min(raceWorker.maxSizeRoom(Game.rooms[room]), Math.ceil(workerParts));
         } else {
-           /* var mineral = Game.getObjectById(flagName);
-            var ticksToRegeneration = mineral.ticksToRegeneration;
-            if (!ticksToRegeneration) ticksToRegeneration = MINERAL_REGEN_TIME;
-            var amountPerTick =  mineral.mineralAmount / ticksToRegeneration;
-            var workerParts = Math.ceil(amountPerTick / HARVEST_POWER);
-            this.size = Math.min(raceWorker.maxSizeRoom(Game.rooms[room]), workerParts);
-            console.log("routeliner mineral", mineral.mineralAmount,"ticksToRegeneration",
-                mineral.ticksToRegeneration,"pertick", amountPerTick);
-            console.log(room,"RouteLinker size",this.size, raceWorker.maxSizeRoom(Game.rooms[room]), workerParts);*/
             this.size = gc.LINKING_MINER_SIZE;
         }
         this.respawnRate = CREEP_LIFE_TIME - flag.memory.porterFrom.distance - CREEP_SPAWN_TIME;
     }
+    this.defensive = defensive ? defensive : false;
+    this.fast = fast ? fast : false;
+    this.healParts = healParts ? healParts : 0;
     this.due = 0;
 }
 
 RouteLinker.prototype.spawn = function (build, spawn, room ) {
    // console.log("trying to spawn RouteLinker");
-    var body = raceWorker.body(build.size);
+    var body = raceWorker.body(build.size, build.fast);
+    for ( var i = 0 ; i < build.healParts ; i++ ) {
+        body.push(HEAL);
+        body.unshift(MOVE);
+    }
     var name = stats.createCreep(spawn, body, undefined, undefined);
     if (_.isString(name)) {
         roleBase.switchRoles(Game.creeps[name],
             gc.ROLE_LINKER,
-            build.flagName);
+            build.flagName,
+            build.defensive);
         Game.creeps[name].memory.policyId = build.policyId;
         Game.creeps[name].memory.buildReference = build.flagName;
     }
@@ -76,8 +75,11 @@ RouteLinker.prototype.equals = function (route1, route2 ) {
 };
 
 RouteLinker.prototype.energyCost = function(build) {
-    //console.log("In RouteLinker.energyCost");
     return raceWorker.energyFromSize(build.size);
+};
+
+RouteLinker.prototype.parts = function(build) {
+    return 2 * build.size;
 };
 
 module.exports = RouteLinker;

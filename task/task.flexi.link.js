@@ -27,9 +27,14 @@ function TaskFlexiLink (flagName) {
     this.flagName = flagName;
     this.pickup = true;
     this.loop = true;
+    this.defensiveRetreat = false;
 }
 
 TaskFlexiLink.prototype.doTask = function(creep, task) {
+    if (task.defensiveRetreat)
+        if (tasks.defensiveRetreat(creep))
+            return gc.RESULT_ROLLBACK;
+
     var flag = Game.flags[task.flagName];
     //console.log(creep,"in TaskFlexiLink.doTask flag",flag);
     if (!flag.memory.operator

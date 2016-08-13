@@ -31,6 +31,7 @@ function TaskFindMoveLinkerPos (flagName) {
     this.flagName = flagName;
     this.pickup = true;
     this.loop = true;
+    this.defensiveRetreat = false;
 }
 
 TaskFindMoveLinkerPos.prototype.doTask = function(creep, task) {
@@ -39,18 +40,30 @@ TaskFindMoveLinkerPos.prototype.doTask = function(creep, task) {
     if (creep.room.name != flag.pos.roomName) return gc.RESULT_ROLLBACK;
 
     var homePos = this.findHomePosition(creep, task);
+    //console.log(creep,"TaskFindMoveLinkerPos home pos",homePos);
 
     var newTaskList = [];
-    var moveToSource;
-    if (homePos) {
-        moveToSource = new TaskMovePos(homePos,0)
-    } else {
-        moveToSource = new TaskMovePos(flag.pos,1)
-    }
-    moveToSource.loop = false;
+
     var flexiLink = new TaskFlexiLink(task.flagName);
+    var moveToSource;
+    if (task.defensiveRetreat) {
+        if (homePos) {
+            moveToSource = new TaskMovePos(homePos, 0, undefined, "defensiveMoveTo", "tasks")
+        } else {
+            moveToSource = new TaskMovePos(flag.pos,1,undefined, "defensiveMoveTo","tasks");
+        }
+        flexiLink.defensiveRetreat = true;
+    } else {
+        if (homePos) {
+            moveToSource = new TaskMovePos(homePos, 0)
+        } else {
+            moveToSource = new TaskMovePos(flag.pos,1);
+        }
+    }
+
     newTaskList.push(moveToSource);
     newTaskList.push(flexiLink);
+    //console.log(creep,"TaskFindMoveLinkerPos tasks",newTaskList);
     creep.memory.tasks.tasklist = newTaskList;
 
     return  gc.RESULT_RESET;
@@ -123,7 +136,7 @@ TaskFindMoveLinkerPos.prototype.findHomePosition = function (creep, task) {
             return pointsBetween[0];
         }
     }
-    return flag.memory.linkType = undefined;//"I woz ere";//undefined;
+    return undefined; //flag.memory.linkType == undefined;//"I woz ere";//undefined;
 };
 
 

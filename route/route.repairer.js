@@ -43,4 +43,8 @@ RouteRepairer.prototype.energyCost = function(build) {
     return raceWorker.energyFromSize(build.size);
 };
 
+RouteRepairer.prototype.parts = function(build) {
+    return build.size * 2 ;
+};
+
 module.exports = RouteRepairer;

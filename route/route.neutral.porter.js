@@ -17,33 +17,38 @@ var raceBase = require("race.base");
  * @module RouteNeutralPorter
  */
 
-function  RouteNeutralPorter  (room, flagName, policyId) {
+function  RouteNeutralPorter  (room, flagName, policyId, healParts) {
     this.type = gc.ROUTE_NEUTRAL_PORTER;
     this.owner = room;
     this.flagName = flagName;
     this.policyId = policyId;
-    var maxForRoom = raceWorker.maxSizeRoom(Game.rooms[room]);
+    var maxForRoom = raceWorker.maxSizeRoom(Game.rooms[room], true);
     var flag = Game.flags[flagName];
     if (flag) {
         var sizeForOnePerGen = RouteNeutralPorter.prototype.sizeForOneGenerationRespawn(
             flag.memory.porterFrom.distance,
             flag.memory.energyCapacity
         );
-        console.log(room,"RouteNeutralPorter",maxForRoom,"maxForRoom size onegen",sizeForOnePerGen)
+        //console.log(room,"RouteNeutralPorter",maxForRoom,"maxForRoom size onegen",sizeForOnePerGen)
         this.size = Math.min(maxForRoom, sizeForOnePerGen)
-        var flag = Game.flags[flagName];
+        flag = Game.flags[flagName];
         this.respawnRate = RouteNeutralPorter.prototype.calcRespawnRate(
             flag.memory.porterFrom.distance,
             flag.memory.energyCapacity,
             this.size
         );
     }
+    this.healParts = healParts ? healParts : 0;
     this.due = 0;
 }
 
 RouteNeutralPorter.prototype.spawn = function (build, spawn, room ) {
   //  console.log("trying to spawn RouteLinker");
     var body = raceWorker.body(build.size, true);
+    for ( var i = 0 ; i < build.healParts ; i++ ) {
+        body.push(HEAL);
+        body.unshift(MOVE);
+    }
     var name = stats.createCreep(spawn, body, undefined, undefined);
     if (_.isString(name)) {
         roleBase.switchRoles(Game.creeps[name],
@@ -57,10 +62,10 @@ RouteNeutralPorter.prototype.spawn = function (build, spawn, room ) {
 };
 
 RouteNeutralPorter.prototype.sizeForOneGenerationRespawn = function(distance, energyCapacity) {
-    console.log("sizeForOneGenerationRespawn distance",distance,"energyCapacity",energyCapacity);
+   // console.log("sizeForOneGenerationRespawn distance",distance,"energyCapacity",energyCapacity);
     var SourceEnergyPerGeneration = energyCapacity * CREEP_LIFE_TIME / ENERGY_REGEN_TIME;
     var size = SourceEnergyPerGeneration * 2*distance/(CREEP_LIFE_TIME*CARRY_CAPACITY);
-    console.log("sizeForOneGenerationRespawn",SourceEnergyPerGeneration,size);
+  //  console.log("sizeForOneGenerationRespawn",SourceEnergyPerGeneration,size);
     return Math.ceil(size);
 };
 
@@ -83,6 +88,10 @@ RouteNeutralPorter.prototype.equals = function (route1, route2 ) {
 
 RouteNeutralPorter.prototype.energyCost = function(build) {
     return raceWorker.energyFromSize(build.size, true);
+};
+
+RouteNeutralPorter.prototype.parts = function(build) {
+    return build.size * 3;
 };
 
 module.exports = RouteNeutralPorter;

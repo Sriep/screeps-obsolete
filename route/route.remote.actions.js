@@ -47,7 +47,7 @@ function  RouteRemoteActions  (room, remoteActions, body, respawnRate, policyId,
 }
 
 RouteRemoteActions.prototype.spawn = function (build, spawn) {
-    console.log("trying to spawn RouteRemoteActions");
+   // console.log("trying to spawn RouteRemoteActions");
     var name = stats.createCreep(spawn, build.body, undefined, undefined);
     if (_.isString(name)) {
         console.log("Spawning",name);
@@ -84,6 +84,10 @@ RouteRemoteActions.prototype.energyCost = function(build) {
         return raceBase.energyFromBody(build.body)
     }
     return raceClaimer.energyFromSize(build.body.length/2);
+};
+
+RouteRemoteActions.prototype.parts = function(build) {
+    return build.body.length;
 };
 
 /*

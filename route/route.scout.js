@@ -56,6 +56,10 @@ RouteScout.prototype.energyCost = function(build) {    // Hack until raceBase.en
     return raceScout.energyFromSize(build.body.length);
 };
 
+RouteScout.prototype.parts = function(build) {
+    return build.body.length;
+};
+
 module.exports = RouteScout;
 
 

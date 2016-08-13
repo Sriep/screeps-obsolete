@@ -7,7 +7,9 @@
  * @author Piers Shepperson
  */
 var gc = require("gc");
-var TaskActions = require("task.actions")
+var gf = require("gc");
+var TaskActions = require("task.actions");
+var roleRepairer = require("role.repairer");
 /**
  * Task base object.
  * @module tasks
@@ -45,7 +47,6 @@ var tasks = {
                 task = taskList[0];
             }
             if (undefined ===  task.taskType) {
-           //     console.log(creep,"tasks.doTasks",JSON.stringify(task));
                 return;
             }
 
@@ -53,8 +54,11 @@ var tasks = {
                 this.pickUpLooseEnergy(creep);
                 doneActions.actions.add(gc.PICKUP);
             }
-            //console.log(creep ,"about to do task", task.taskType,"Length of task list is", taskList.length);
+
+          //  if (creep.name == "Jack")
+          //      console.log(creep ,"about to do task", task.taskType,"Length of task list is", taskList.length);
            // creep.say(task.taskType);
+
             var result;
             if (!TaskActions.prototype.isConflict(doneActions, task.conflicts)) {
                 if (task.taskType == "task.switch.role") return;
@@ -62,7 +66,9 @@ var tasks = {
                 var taskModule = require(moduleName);
                 result = taskModule.prototype.doTask(creep, task, doneActions);
 
-            //    console.log(creep, "done", task.taskType,"Task, return", result);
+              //  if (creep.name == "Jack")
+              //     console.log(creep, "done", task.taskType,"Task, return", result);
+
                 if (this.Result.Finished == result) {
                     doneActions.actions.add(task.conflicts);
                 }
@@ -144,37 +150,68 @@ var tasks = {
         } else {
             creep.memory.tasks.targetId = targetId.id;
         }
-
-     //   } else if (undefined === targetId.id) {
-     //       creep.memory.tasks.targetId = targetId;
-    //    } else {
-    ///        creep.memory.tasks.targetId = targetId.id;
-    //    }
-    },
-/*
-    setHomeLinkId: function (creep, homeLinkId) {
-        creep.memory.tasks.homeLinkId = homeLinkId;
     },
 
-    getHomeLinkId: function(creep){
-        return creep.memory.tasks.homeLinkId;
+    defensiveRetreat: function (creep, pos, heal) {
+        if (creep.getActiveBodyparts(HEAL) > 0 && creep.hits < creep.hitsMax)
+            creep.heal(creep);
+        var danger = creep.pos.findInRange(FIND_HOSTILE_CREEPS, gc.RANGE_RANGED_ATTACK+1,{
+            filter: function(object) {
+                return object.getActiveBodyparts(ATTACK) > 0
+                    || object.getActiveBodyparts(RANGED_ATTACK) > 0;
+            }
+        });
+        if (danger.length > 0) {
+            console.log(creep,"defensiveRetreat");
+            var direction = creep.pos.getDirectionTo(danger[0]);
+            var moveDirection;
+            var bestTerrain;
+            console.log(creep,creep.pos.roomName,"defensiveRetreat enemy direction", direction);
+            for ( var i = 0 ; i < gc.OPPOSITE_DIRECTION[direction].length ; i++ ) {
+
+                var x = creep.pos.x + gc.DELTA_DIRECTION[gc.OPPOSITE_DIRECTION[direction][i]].x;
+                var y = creep.pos.y + gc.DELTA_DIRECTION[gc.OPPOSITE_DIRECTION[direction][i]].y;
+                var  terrain  = Game.map.getTerrainAt(x, y, creep.room.name);
+                console.log(creep,"i",i,"x",x,"y",y,"terrain",terrain);
+                if (gc.PLAIN == terrain
+                    || (gc.SWAMP == terrain && bestTerrain != gc.PLAIN) ) {
+                    moveDirection = gc.OPPOSITE_DIRECTION[direction][i];
+                    bestTerrain = terrain;
+                }
+            }
+            if (!moveDirection) {
+                for ( var k = 0 ; k < gc.SIDEWAYS_DIRECTION[direction].length ; k++ ) {
+                    x = creep.pos.x + gc.DELTA_DIRECTION[gc.SIDEWAYS_DIRECTION[direction][k]].x;
+                    y = creep.pos.y + gc.DELTA_DIRECTION[gc.SIDEWAYS_DIRECTION[direction][k]].y;
+                    terrain  = Game.map.getTerrainAt(x, y, creep.room.name);
+                    console.log(creep,"k",k,"x",x,"y",y,"terrain",terrain);
+                    if (gc.PLAIN == terrain
+                        || (gc.SWAMP == terrain && bestTerrain != gc.PLAIN) ) {
+                        moveDirection = gc.OPPOSITE_DIRECTION[direction][k];
+                        bestTerrain = terrain;
+                    }
+                }
+            }
+            if (moveDirection) return creep.move(moveDirection);
+        }
+        if (pos) return roleRepairer.moveAndRepair(creep,pos);
+        else return undefined;
     },
 
-    setTargetLinkId: function (creep, targetLinkId) {
-        creep.memory.tasks.targetLinkId = targetLinkId;
+    defensiveMoveTo: function (creep, pos, heal) {
+        var result = this.defensiveRetreat(creep, pos);
+        if (undefined === result)
+            return creep.moveTo(pos);
+        else
+            return result;
     },
-
-    getTargetLinkId: function(creep) {
-        return creep.memory.tasks.targetLinkId;
-    },
-*/
 
     emptyTaskList: function(creep) {
         console.log(creep,"empty task list");
         creep.say("What to do?")
     }
 
-}
+};
 
 module.exports = tasks;
 

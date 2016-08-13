@@ -35,6 +35,11 @@ var gf = {
         return true;
     },
 
+    oppositeDirection: function (pos, direction) {
+
+
+    },
+
     structureTypeInRange: function (pos, structureType, range) {
         if (!range) range = 1;
         //console.log("structureTypeInRange",pos, structureType,range);

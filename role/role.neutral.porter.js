@@ -16,6 +16,7 @@ var TaskOffload = require("task.offload");
 var TaskLoadup = require("task.loadup");
 var gc = require("gc");
 var gf= require("gf");
+var tasks = require("tasks");
 /**
  * Abstract role object for creeps building in a neutral room
  * @module roleNeutralPorter
@@ -26,7 +27,7 @@ var roleNeutralPorter = {
         var tasks = [];
         //var collectionId = flag.name;
         if (!flag) return undefined;
-        var collectionId  = flag.memory.mainDumpId
+        var collectionId  = flag.memory.mainDumpId;
         if (!collectionId) return undefined;
         var collectionObj = Game.getObjectById(collectionId);
 
@@ -38,12 +39,41 @@ var roleNeutralPorter = {
         }
 
         var moveToCollectionRoom = new TaskMoveRoom(flag.pos.roomName);
-        var moveToCollectionObj = new TaskMoveFind(gc.FIND_ID,gc.RANGE_TRANSFER, collectionId);
+
+        //var moveToCollectionObj = new TaskMoveFind(gc.FIND_ID,gc.RANGE_TRANSFER, collectionId);
+        /*var moveToCollectionObj = new TaskMoveFind(
+            gc.FIND_ID,
+            gc.RANGE_TRANSFER,
+            collectionId,
+            undefined,
+            undefined,
+            undefined,
+            "defensiveMoveTo",
+            "tasks"
+        );*/
+        var moveToCollectionObj = new TaskMoveFind(
+            gc.FIND_FUNCTION ,
+            gc.RANGE_TRANSFER,
+            "findPickup",
+            "role.neutral.porter",
+            undefined,
+            undefined,
+            "defensiveMoveTo",
+            "tasks"
+        );
+
         var loadUp = new TaskLoadup(flag.memory.resourceType, collectionId);
-        var moveHomeRoom = new TaskMoveRoom(homeRoom);
+        //var moveHomeRoom = new TaskMoveRoom(homeRoom);
+        var moveHomeRoom = new TaskMoveRoom(
+            homeRoom,
+            undefined,
+            "defensiveMoveTo",
+            "tasks"
+        );
         var moveToOffload = new TaskMoveFind(gc.FIND_FUNCTION,gc.RANGE_TRANSFER,
                             "findTargetOffload", "role.neutral.porter");
         var offload = new TaskOffload (gc.TRANSFER, flag.memory.resourceType,  undefined, true);
+
         tasks.push(moveToCollectionRoom);
         tasks.push(moveToCollectionObj);
         tasks.push(loadUp);
@@ -53,6 +83,22 @@ var roleNeutralPorter = {
         return tasks;
     },
 
+    findPickup: function (creep) {
+        var containers = creep.room.find(FIND_STRUCTURES, {
+            filter: function (struc) {
+                return (struc.structureType == STRUCTURE_CONTAINER
+                && struc.store[RESOURCE_ENERGY] > 0);
+            }
+        });
+        if (containers.length > 0) {
+            containers.sort(function (c1, c2) {
+                return c2.store[RESOURCE_ENERGY] - c1.store[RESOURCE_ENERGY];
+            });
+            return containers[0];
+        } else {
+            return tasks.getTargetId(creep);
+        }
+    },
 
 
     findTargetOffload: function(creep) {

@@ -26,15 +26,15 @@ var raceCleric = require("race.cleric");
  * @module RouteSuppressKeepers
  */
 
-function RouteSuppressKeepers (keeperRoom, body, respawnRate) {
+function RouteSuppressKeepers (keeperRoom, body, respawnRate, atttack, heal) {
     this.type = gc.ROUTE_SUPPRESS_KEEPERS;
     this.keeperRoom = keeperRoom;
     if (body) {
         this.body = body;
     } else {
-        raceCleric.body(15, 10)
+        this.body = raceCleric.body(atttack, heal)
     }
-    if (respawnRate)
+    if (undefined !== respawnRate)
         this.respawnRate = respawnRate;
     else
         this.respawnRate = CREEP_LIFE_TIME - 100;
@@ -45,20 +45,29 @@ RouteSuppressKeepers.prototype.spawn = function (build, spawn) {
     var name = stats.createCreep(spawn, build.body, undefined, undefined);
     if (_.isString(name)) {
         console.log("Spawning scout",name);
-        roleBase.switchRoles(Game.creeps[name],
-            gc.ROLE_SCOUT,
-            build.targetRoom
+        roleBase.switchRoles(
+            Game.creeps[name],
+            gc.ROLE_SUPPRESS_KEEPERS,
+            build.keeperRoom
         );
         Game.creeps[name].memory.buildReference = build.targetRoom;
+        Memory.rooms[build.keeperRoom].suppressed = Game.time;
     }
     return name;
 };
 
 RouteSuppressKeepers.prototype.energyCost = function(build) {    // Hack until raceBase.energyFromBody gets implemented
-    if (raceBase.energyFromBody(build.body)) {
-        return raceBase.energyFromBody(build.body)
-    }
-    return raceScout.energyFromSize(build.body.length);
+   // i//f (raceBase.energyFromBody(build.body)) {
+   //     return raceBase.energyFromBody(build.body)
+   // }
+  //  return raceCleric.energyFromSize(build.body.length);
+    return 4800;
+};
+
+RouteSuppressKeepers.prototype.parts = function(build) {
+    //console.log(JSON.stringify(build));
+    //return build.body.length;
+    return 50;
 };
 
 module.exports = RouteSuppressKeepers;

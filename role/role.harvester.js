@@ -58,8 +58,12 @@ var roleHarvester = {
 
     getTaskList: function(creep) {
         var tasks = [];
-        var moveToSource = new TaskMoveFind(gc.FIND_FUNCTION ,gc.RANGE_HARVEST
-                                             , "findTargetSource","role.base");
+        var moveToSource = new TaskMoveFind(
+            gc.FIND_FUNCTION ,
+            gc.RANGE_HARVEST,
+            "findTargetSource",
+            "role.base"
+        );
         var harvest = new TaskHarvest();
         var moveToEnergyContainer = new TaskMoveFind(gc.FIND_FUNCTION,gc.RANGE_TRANSFER
                                                         , "findTarget","role.harvester");

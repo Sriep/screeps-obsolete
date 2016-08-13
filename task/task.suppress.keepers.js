@@ -37,20 +37,26 @@ TaskSuppressKeepers.prototype.doTask = function(creep, task) {
                 return object.hits < object.hitsMax;
             }
         });
-        if (creep.pos.isNearTo(injured))
+        if (creep.pos.getRangeTo(injured) < gc.KEEPER_SUPPRESSOR_HEAL_RANGE) {
+            creep.moveTo(injured);
             creep.heal(injured);
+        }
+
     }
 
     var target = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
+    //console.log(creep,"TaskSuppressKeepers", target);
     if (target) {
         creep.moveTo(target);
         creep.attack(target);
     } else {
-        var lairs = creep.room.find(FIND_MY_STRUCTURES, {
+        var lairs = creep.room.find(FIND_STRUCTURES, {
             filter: { structureType: STRUCTURE_KEEPER_LAIR }
         });
+        if (!lairs || lairs.length == 0) return gc.RESULT_FINISHED;
         lairs.sort( function(l1,l2) { return l1.ticksToSpawn - l2.ticksToSpawn; });
-        creep.moveTo(lairs[0]);
+        var result = creep.moveTo(lairs[0]);
+        //console.log(creep,"TaskSuppressKeepers result",result,"lairs0",lairs[0]);
     }
     return gc.RESULT_UNFINISHED;
 };

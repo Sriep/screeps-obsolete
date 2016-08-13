@@ -58,6 +58,10 @@ RouteGiftCreep.prototype.energyCost = function(build) {    // Hack until raceBas
     return raceSwordsman.energyFromSize(build.body.length/2);
 };
 
+RouteGiftCreep.prototype.parts = function(build) {
+    return build.body.length;
+};
+
 module.exports = RouteGiftCreep;
 
 

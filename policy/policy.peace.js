@@ -113,8 +113,9 @@ var policyPeace = {
         //    , room.energyCapacityAvailable);
 
         economyLinkers = require("economy.linkers");
-            console.log(room, "energyCapacity",room.energyCapacityAvailable , "Energy in build queue",
-                routeBase.buildQueueEnergyPerGen(room), "Energy mined", economyLinkers.energyFromLinkersGen(room),
+        console.log(room, "energyCapacity",room.energyCapacityAvailable , "Energy in build queue",
+                routeBase.buildQueueEnergyPerGen(room),"spawn time",routeBase.buldQueueRespawnTimePerGen(room) );
+        console.log(room, "Energy mined", economyLinkers.energyFromLinkersGen(room),
                 "Average supply journey", roomOwned.avProductionSupplyDistance(room),"Average upgarde distance",
                 roomOwned.avUpgradeDistance(room));
 
@@ -135,25 +136,14 @@ var policyPeace = {
         var testNewCode = false;
         // if (room.name == "W25S22" || room.mode != MODE_WORLD) {
         var economyLinkers = require("economy.linkers");
-        economyLinkers.attachFlaggedRoutes(room, currentPolicy);
-        economyLinkers.attachFlexiStoragePorters(room, currentPolicy);
-        //economyRepair.attachRepairer(room, currentPolicy);
-        economyRepair.attachWallBuilder(room, currentPolicy);
-       // console.log("repair need per gen", economyRepair.maintenanceGen(room)
-      //      , "number",economyRepair.numberMaintain(room),
-       //     "walls to build", economyRepair.countWallsToBuild(room)
-        //    , "enegy neeed for walls",economyRepair.energyBuildWalls(room));
+
+        if (Game.time % gc.ATTACH_FLAGGED_ROUTES_RATE == 0 ){
+            economyLinkers.attachFlaggedRoutes(room, currentPolicy);
+            economyLinkers.attachFlexiStoragePorters(room, currentPolicy);
+            economyRepair.attachWallBuilder(room, currentPolicy);
+        }
         economyLinkers.processBuildQueue(room, currentPolicy);
-        // } else  {
-        //     if (room.memory.links !== undefined
-        //        && room.memory.links.info !== undefined
-        //        && room.memory.links.info.length > 0
-        // //        && policyMany2oneLinker.readyForMAny2OneLinker(currentPolicy)) {
-        //          policyMany2oneLinker.checkLinks(room, currentPolicy);
-        //      }
-        //       policyMany2oneLinker.checkRepairer(room, currentPolicy);
-        //        policyMany2oneLinker.nonLinkBuilds(room, currentPolicy);
-        //    }
+
         if (gc.AI_CONSTRUCTION)
             this.newConstruction(room);
         npcInvaderBattle.defendRoom(room);

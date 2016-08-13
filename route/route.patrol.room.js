@@ -40,7 +40,7 @@ function  RoutePatrolRoom  (room, patrolRoom, startPos, body, respawnRate, refer
 }
 
 RoutePatrolRoom.prototype.spawn = function (build, spawn, room ) {
-    console.log("trying to spawn RoutePatrolRoom");
+    //console.log("trying to spawn RoutePatrolRoom");
     var name = stats.createCreep(spawn, build.body, undefined, undefined);
     if (_.isString(name)) {
         console.log("Spawning transporter",name);
@@ -72,6 +72,9 @@ RoutePatrolRoom.prototype.energyCost = function(build) {
     return raceSwordsman.energyFromSize(build.body.length/2);
 };
 
+RoutePatrolRoom.prototype.parts = function(build) {
+    return build.body.length;
+};
 
 module.exports = RoutePatrolRoom;
 

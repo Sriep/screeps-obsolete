@@ -209,7 +209,7 @@ var policyMany2oneLinker = {
            // console.log("checkRepairer fond none existing parts",
               //  this.existingPorterParts(currentPolicy)," > thershole",gc.REPAIRER_THRESHOLD);
             if (this.existingPorterParts(currentPolicy) > gc.REPAIRER_THRESHOLD) {
-               console.log(room,"checkRepairer Trying to spawn repairer")
+             //  console.log(room,"checkRepairer Trying to spawn repairer")
                 this.spawnRepairer(room, currentPolicy)
 
             }
@@ -307,19 +307,19 @@ var policyMany2oneLinker = {
         }
 
         var nextBuild = routeBase.nextBuild(room);
-        console.log(room,"routeBase next build", nextBuild);
+       // console.log(room,"routeBase next build", nextBuild);
         if (undefined !== nextBuild) {
            var result = routeBase.spawn(spawns[0], room, nextBuild);
-            console.log(room,"routeBase spawn result",result);
+           // console.log(room,"routeBase spawn result",result);
            return;
        }
 
         if (externalCommitments) {
             var build = poolSupply.nextRequisition(room.name);
-            console.log(room, "about to build ", build.energy);
+            //console.log(room, "about to build ", build.energy);
             var buildName = stats.createCreep(spawns[0], build.body, undefined, currentPolicy.id);
             if (_.isString(buildName)) {
-                console.log(room, "Built contract creep energy cost", build.energy);
+              //  console.log(room, "Built contract creep energy cost", build.energy);
                 policySupply.completedOrder(room.name, build, buildName);
             }
         }

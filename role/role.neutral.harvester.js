@@ -17,45 +17,45 @@ var gc = require("gc");
  */
 var roleNeutralHarvester = {
 
-    getTaskList: function(creep, sourceRoom, storageRoom, sourceId, offLoadId) {
+    getTaskList: function(creep, homeRoomName, targetRoomName, sourceId, resourceId) {
+        if (!resourceId) resourceId = RESOURCE_ENERGY;
+
         var tasks = [];
-        console.log("sourceRoom",sourceRoom,"storageRoom",storageRoom
-            ,"sourceId",sourceId,"offLoadId",offLoadId);
-        
-        var moveToSourceRoom = new TaskMoveRoom(sourceRoom);
-        var moveToSource;
-        if (undefined == sourceId) {
-            moveToSource = new TaskMoveFind(gc.FIND_ROOM_OBJECT,gc.RANGE_HARVEST, FIND_SOURCES);
-        } else {
-            moveToSource = new TaskMoveFind(gc.FIND_ID,gc.RANGE_HARVEST, sourceId);
-        }
+        var moveToSourceRoom = new TaskMoveRoom(targetRoomName);
+        var moveToSource= new TaskMoveFind(
+            gc.FIND_ID,
+            gc.RANGE_HARVEST,
+            sourceId,
+            undefined,
+            undefined,
+            undefined,
+            "defensiveMoveTo",
+            "tasks"
+         );
         var harvest = new TaskHarvest();
-        harvest.waitForRespawn = true;
-
-        var moveToStorageRoom = new TaskMoveRoom(storageRoom);
-        var moveToStorage;
-        if (undefined === offLoadId) {
-            offLoadId = Game.rooms[storageRoom].storage.id;
-            moveToStorage = new TaskMoveFind(gc.FIND_ID,gc.RANGE_HARVEST, offLoadId);
-        } else {
-            moveToStorage = new TaskMoveFind(gc.FIND_ID,gc.RANGE_HARVEST, offLoadId);
-        }
-
-
-        var offload = new TaskOffload(gc.TRANSFER, RESOURCE_ENERGY);
-        offload.canUseAlternative = true;
+        var moveHomeRoom = new TaskMoveRoom(
+            homeRoomName,
+            undefined,
+            "defensiveMoveTo",
+            "tasks"
+        );
+        var moveToOffload = new TaskMoveFind(
+            gc.FIND_FUNCTION,
+            gc.RANGE_TRANSFER,
+            "findTargetOffload",
+            "role.neutral.porter"
+        );
+        var offload = new TaskOffload (gc.TRANSFER, resourceId,  undefined, true);
 
         tasks.push(moveToSourceRoom);
         tasks.push(moveToSource);
         tasks.push(harvest);
-        tasks.push(moveToStorageRoom);
-        tasks.push(moveToStorage);
+        tasks.push(moveHomeRoom);
+        tasks.push(moveToOffload);
         tasks.push(offload);
-
         return tasks;
     }
 };
-
 
 module.exports = roleNeutralHarvester;
 

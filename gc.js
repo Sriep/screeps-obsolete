@@ -50,7 +50,6 @@ var gc = {
     ROLE_SCOUT: "scout",
     ROLE_WALL_BUILDER: "wall.builder",
     ROLE_SUPPRESS_KEEPERS: "suppress.keepers",
-
     
     //Tasks
     TASK_MOVE_FIND: "move.find",
@@ -161,6 +160,7 @@ var gc = {
     ROUTE_SCOUT:    "scout",
     ROUTE_WALL_BUILDER: "wall.builder",
     ROUTE_SUPPRESS_KEEPERS: "suppress.keepers",
+    ROUTE_MINER: "miner",
 
     // Linker types
     LINKER_DUMP: "linker.dump",
@@ -179,7 +179,7 @@ var gc = {
     SWORDSMAN_NEUTRAL_PATROL_SIZE: 6,
 
     REPAIRER_THRESHOLD: 5,
-    KEEP_FREE_STORAGE_SPACE: 800000,
+    KEEP_FREE_STORAGE_SPACE: 80000,
     BLOCKSIZE_COST_WORKER: 200,
     EMERGENCY_DOWNGRADING_THRESHOLD: 1500,
     MANY2ONE_REQUIRED_LIFE: 5000,
@@ -202,25 +202,27 @@ var gc = {
     TIME_UPGRADE_LOAD: 50,
 
 
-    ROOM_UPDATE_RATE: 17,
-    FLAG_UPDATE_RATE: 41,
-    LINKER_RESET_RATE: 37,
-    CHECK_FOR_ORPHANED_BUILDS_RATE: 19,
+    ROOM_UPDATE_RATE: 139,
+    FLAG_UPDATE_RATE: 51,
+    LINKER_RESET_RATE: 53,
+    CHECK_FOR_ORPHANED_BUILDS_RATE: 191,
+    ATTACH_FLAGGED_ROUTES_RATE: 31,
 
     //Build priorities
     PRIORITY_EMERGENCY_HOME_PORTER: 2,
     PRIORITY_LINKER: 4,
-    PRIORITY_NEUTRAL_PORTER: 12,
+    PRIORITY_NEUTRAL_PORTER: 11,
     PRIORITY_HOME_PORTER: 6,
     PRIORITY_NEUTRAL_LINKER: 10,
     PRIORITY_REVERSE_CONTROLLER: 12,
     PRIORITY_REPAIRER: 8,
-    PRIORITY_WALL_BUILDER: 8,
+    PRIORITY_WALL_BUILDER: 16,
     PRIORITY_ROOM_PATROL: 11,
     PRIORITY_SCOUT: 9,
-    PRIORITY_KEEPER_ATTACK: 9,
-    PRIORITY_KEEPER_HARVEST: 11,
+    PRIORITY_KEEPER_ATTACK: 12,
+    PRIORITY_KEEPER_HARVEST: 14,
     PRIORITY_KEEPER_PORTER: 14,
+    PRIORITY_MINER: 18,
 
     //flag colours
     FLAG_PERMANENT_COLOUR: COLOR_BLUE,
@@ -304,12 +306,63 @@ var gc = {
      {x :-1, y:-2}
      ],
 
+    ONE_MOVE: [
+        {x:1, y:1},
+        {x:1, y:0},
+        {x:1, y:-1},
+        {x:0, y:1},
+        {x:0, y:0},
+        {x:0, y:-1},
+        {x:-1, y:1},
+        {x:-1, y:0},
+        {x:-1, y:-1},
+    ],
+
+    OPPOSITE_DIRECTION: {
+        1 : [BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT],
+        2 : [LEFT, BOTTOM_LEFT, BOTTOM],
+        3 : [TOP_LEFT, LEFT, BOTTOM_LEFT],
+        4 : [LEFT, TOP_LEFT, TOP],
+        5 : [TOP_LEFT, TOP, TOP_RIGHT],
+        6 : [TOP, TOP_RIGHT, RIGHT],
+        7 : [TOP_RIGHT, RIGHT, BOTTOM_RIGHT],
+        8 : [RIGHT, BOTTOM_RIGHT, BOTTOM]
+    },
+
+    SIDEWAYS_DIRECTION: {
+        1 : [LEFT, BOTTOM],
+        2 : [TOP_LEFT, BOTTOM_RIGHT],
+        3 : [TOP, BOTTOM],
+        4 : [BOTTOM_LEFT, TOP_RIGHT],
+        5 : [LEFT, RIGHT],
+        6 : [TOP_LEFT, BOTTOM_RIGHT],
+        7 : [TOP, BOTTOM],
+        8 : [TOP_RIGHT, BOTTOM_LEFT]
+    },
+
+    PLAIN: "plain",
+    SWAMP: "swamp",
+    WALL: "wall",
+
+    DELTA_DIRECTION: {
+        1 : {x:0, y:-1},
+        2 : {x:1, y:-1},
+        3 : {x:1, y:0 },
+        4 : {x:1, y:1 },
+        5 : {x:0, y:1 },
+        6 : {x:-1, y:1 },
+        7 : {x:-1, y:0 },
+        8 : {x:-1, y:-1 }
+    },
+
     KEEPER_OWNER: "Source Keeper",
     KEEPER_CYCLE_MAX_WAIT: 30,
     KEEPER_HARVEST_MIN_CONTROLLER_LEVEL: 6,
     KEEPER_SWORDSMAN_PARTS_NEEDED_GEN: 50,
-    KEEPER_HEALER_PARTS_NEEDED_GEN: 0,
+    KEEPER_ATTACK_SPAWN_RATE_BUFFER: 150,
+    KEEPER_HARVESTER_HEALER_PARTS: 1,
     KEEPER_MARSHALING_RANGE: 2,
+    KEEPER_SUPPRESSOR_HEAL_RANGE: 4,
     SOURCE_KEEPER_BODY: [{"type":"tough","hits":100},{"type":"tough","hits":100},
         {"type":"tough","hits":100},{"type":"tough","hits":100},
         {"type":"tough","hits":100},{"type":"tough","hits":100},{"type":"tough","hits":100},

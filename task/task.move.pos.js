@@ -44,20 +44,15 @@ TaskMovePos.prototype.doTask = function(creep, task) {
         task.roomName = task.roomPos.roomName; // ToDP error
         task.x = task.roomPos.x;
         task.y = task.roomPos.y;
-        //task.roomsToVisit = Game.map.findRoute(task.startRoom, task.roomPos.room, task.pathOps);
         task.pathIndex = 0;
     }
-   // console.log(creep,"In TaskMovePos");
-    //task.x = task.roomPos.x;
-    //task.y = task.roomPos.y;
     if (undefined == task.roomPos)
         return gc.RESULT_FINISHED;
     task.roomName = task.roomPos.roomName;
     if (creep.room.name == task.roomPos.roomName
         && !TaskMoveRoom.prototype.atBorder(creep.pos.x,creep.pos.y)) {
-        return TaskMoveXY.prototype.doTask(creep, task, task.range, task.customMoveToFunction, task.functionModule);
+        return TaskMoveXY.prototype.doTask(creep, task);
     }
-    //console.log(creep,"In TaskMovePos about to call TaskMoveRoom");
     TaskMoveRoom.prototype.doTask(creep, task, task.customMoveToFunction, task.functionModule);
     return  gc.RESULT_UNFINISHED;
 }

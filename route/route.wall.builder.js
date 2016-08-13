@@ -33,7 +33,7 @@ function  RouteWallBuilder  (room, size) {
 }
 
 RouteWallBuilder.prototype.spawn = function (build, spawn, room ) {
-    console.log("trying to spawn RouteFlexiStoragePorter");
+    //console.log("trying to spawn RouteFlexiStoragePorter");
     var body = raceWorker.body(build.size, true);
     var name = stats.createCreep(spawn, body, undefined, undefined);
     if (_.isString(name)) {
@@ -47,6 +47,10 @@ RouteWallBuilder.prototype.spawn = function (build, spawn, room ) {
 
 RouteWallBuilder.prototype.energyCost = function(build) {
     return raceWorker.energyFromSize(build.size);
+};
+
+RouteWallBuilder.prototype.parts = function(build) {
+    return build.size * 3;
 };
 
 module.exports = RouteWallBuilder;

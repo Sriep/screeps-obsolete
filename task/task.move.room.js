@@ -34,14 +34,14 @@ function TaskMoveRoom (roomName, pathOps, customMoveToFunction, functionModule) 
 }
 
 TaskMoveRoom.prototype.doTask = function(creep, task) {
-    //console.log(creep,"TaskMoveRoom strt");
+    //console.log(creep,"TaskMoveRoom start");
     if (task.startRoom === undefined || task.roomsToVisit == ERR_NO_PATH) { //First call to function. Initialise data.
         task.startRoom = creep.room.name;
         task.roomsToVisit = Game.map.findRoute(task.startRoom, task.roomName, task.pathOps);
         task.pathIndex = 0;
     }
     if (creep.room.name == task.roomName && !this.atBorder(creep.pos.x,creep.pos.y)) {
-        //console.log(creep,"TaskMoveRoom at right room");
+       // console.log(creep,"TaskMoveRoom at right room");
         return gc.RESULT_FINISHED;
     }
 
@@ -56,10 +56,10 @@ TaskMoveRoom.prototype.doTask = function(creep, task) {
     if ( this.atBorder(creep.pos.x,creep.pos.y ) ) {
         var currentRoom = creep.room;
         var targetRoom = task.roomsToVisit[task.pathIndex].room;
-        var nextStepD = this.nextStepIntoRoom(creep.pos, targetRoom)
+        var nextStepD = this.nextStepIntoRoom(creep.pos, targetRoom);
         var result = creep.move(nextStepD);
         if (OK == result) {
-            task.pathIndex++
+            task.pathIndex++;
             if (targetRoom = creep.room) {
                 creep.memory.tasks.newRoom = targetRoom;
             }
@@ -70,7 +70,6 @@ TaskMoveRoom.prototype.doTask = function(creep, task) {
 
     if ( task.roomsToVisit[task.pathIndex] !== undefined) {
         var exit = creep.pos.findClosestByPath(task.roomsToVisit[task.pathIndex].exit);
-        var result;
         if (task.customMoveToFunction) {
             if(task.functionModule) {
                 var fModule = require(task.functionModule);
@@ -81,11 +80,8 @@ TaskMoveRoom.prototype.doTask = function(creep, task) {
         } else {
             result = creep.moveTo(exit);
         }
-
-        //var result = creep.moveTo(exit, {
-        //    maxRooms: 1, ignoreDestructibleStructures: true
-        //});
     } else {
+       // console.log(creep,"duh! about to return finish");
         return gc.RESULT_FINISHED;
     }
 

@@ -8,7 +8,7 @@
 "use strict";
 var gc = require("gc");
 var TaskActions = require("task.actions")
-var tasks = require("tasks");
+
 
 /**
  * Task move object. Used when we need to find the object to move to.
@@ -59,6 +59,7 @@ TaskMoveFind.prototype.FindMethod = {
 
 TaskMoveFind.prototype.doTask = function(creep, task) {
     var target = undefined;
+    var tasks = require("tasks");
     if (tasks.getTargetId(creep)) {
         target = Game.getObjectById(tasks.getTargetId(creep));
     } else {

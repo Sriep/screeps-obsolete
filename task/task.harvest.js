@@ -7,7 +7,6 @@
  */
 var gc = require("gc");
 var TaskActions = require("task.actions");
-var tasks = require("tasks");
 var TaskMoveFind = require("task.move.find");
 
 /**
@@ -16,54 +15,66 @@ var TaskMoveFind = require("task.move.find");
  */
 
 
-function TaskHarvest () {
+function TaskHarvest (sourceId) {
     this.taskType = gc.TASK_HARVEST;
     this.conflicts = gc.HARVEST;
+    this.sourceId = sourceId;
     this.pickup = true;
     this.loop = true;
     this.waitForRespawn = false;
+    this.defensive = false;
 }
 
 TaskHarvest.prototype.doTask = function(creep, task) {
-    if (creep.carry.energy == creep.carryCapacity)  {
+    var tasks = require("tasks");
+    if (task.defensiveRetreat)
+        if (tasks.defensiveRetreat(creep))
+            return gc.RESULT_ROLLBACK;
+    if (_.sum(creep.carry) == creep.carryCapacity)  {
         tasks.setTargetId(creep, undefined);
-        //console.log(creep, "harvest at start RESULT_FINISHED full up")
+       // console.log(creep, "harvest at start RESULT_FINISHED full up")
         return gc.RESULT_FINISHED;
     }
-    var source =  Game.getObjectById(tasks.getTargetId(creep));
+    var source;
+    if (task.sourceId) {
+        source = Game.getObjectById(task.sourceId);
+    }
     if (!source) {
-     //   console.log(creep,"Trying to harvest with invalid source", source, "id",tasks.getTargetId(creep));
-        if (creep.carry.energy == creep.carryCapacity) {
-            console.log(creep, "harvet RESULT_FINISHED full up no source");
+        source =  Game.getObjectById(tasks.getTargetId(creep));
+    }
+    if (!source) {
+        //console.log(creep,"Trying to harvest with invalid source", source, "id",tasks.getTargetId(creep));
+        if (_.sum(creep.carry) == creep.carryCapacity) {
+          //  console.log(creep, "harvet RESULT_FINISHED full up no source");
             return gc.RESULT_FINISHED;
         }  else {
            /// keep trying to get to source
           //  creep.say("Help source");
-            console.log(creep, "harvet RESULT_ROLLBACK no source")
+           // console.log(creep, "harvet RESULT_ROLLBACK no source")
             return gc.RESULT_ROLLBACK;
         }
     }
     var rtv = creep.harvest(source);
-    console.log(creep,"TaskHarvest result",rtv);
+   // console.log(creep,"TaskHarvest result",rtv);
     switch (rtv) {
         case    OK:                         // 0	The operation has been scheduled successfully.;
            // tasksActions.done(gc.HARVEST);
-            if (creep.carry.energy == creep.carryCapacity) {
+            if (_.sum(creep.carry) == creep.carryCapacity) {
                 tasks.setTargetId(creep, undefined);
-                console.log(creep, "harvest RESULT_FINISHED ok full up")
+           //     console.log(creep, "harvest RESULT_FINISHED ok full up")
                 return gc.RESULT_FINISHED;
             }  else {
-                console.log(creep, "harvest RESULT_UNFINISHED ok cary enegy and capacity"
-                    ,creep.carry.energy,"capacity",creep.carryCapacity)
+           //     console.log(creep, "harvest RESULT_UNFINISHED ok cary enegy and capacity"
+          //          ,creep.carry.energy,"capacity",creep.carryCapacity)
                 return gc.RESULT_UNFINISHED;
             }
         case    ERR_NOT_ENOUGH_RESOURCES:    //	-6	The target source does not contain any harvestable energy.
-            if (creep.carry.energy == 0) {
-                console.log(creep, "harvet RESULT_UNFINISHED not eough resouces")
+            if (_.sum(creep.carry) == 0) {
+             //   console.log(creep, "harvet RESULT_UNFINISHED not eough resouces")
                 return gc.RESULT_UNFINISHED;
             }  else {
-                console.log(creep, "harvet RESULT_FINISHED full up not eough resouces")
-                if (creep.carry.energy == creep.carryCapacity || !this.waitForRespawn) {
+             //   console.log(creep, "harvet RESULT_FINISHED full up not eough resouces")
+                if (_.sum(creep.carry) == creep.carryCapacity || !this.waitForRespawn) {
                     tasks.setTargetId(creep, undefined);
                     return gc.RESULT_FINISHED;                
                 } else {

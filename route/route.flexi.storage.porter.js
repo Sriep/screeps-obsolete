@@ -53,6 +53,10 @@ RouteFlexiStoragePorter.prototype.energyCost = function(build) {
     return raceWorker.energyFromSize(build.size);
 };
 
+RouteFlexiStoragePorter.prototype.parts = function(build) {
+    return 2 * build.size;
+};
+
 module.exports = RouteFlexiStoragePorter;
 
 

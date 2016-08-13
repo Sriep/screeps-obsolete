@@ -39,7 +39,7 @@ var flagMineral = {
                 }
                 if ( roomBase.isNeutralRoom(flag.pos.roomName)
                     && extractorFound ) {
-                  //  flag.memory.linkerFrom = this.linkerSupplyRoom(flag);
+                    flag.memory.linkerFrom = this.linkerSupplyRoom(flag);
                   //  flag.memory.porterFrom = this.porterSupplyRoom(flag);
                 }
             }

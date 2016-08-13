@@ -108,12 +108,30 @@ var routeBase = {
                 var buildEnergy = module.prototype.energyCost(queue[i]);
                 var buildRespawn = queue[i].respawnRate ? queue[i].respawnRate : 0;
                 if (buildRespawn) {
-                    var energyBuildPerGen = buildEnergy *  CREEP_LIFE_TIME / buildRespawn;
-                    energyPerGen = energyPerGen + energyBuildPerGen;
+                    energyPerGen += buildEnergy *  CREEP_LIFE_TIME / buildRespawn;
                 }
             }
         }
         return energyPerGen;
+    },
+
+    buldQueueRespawnTimePerGen: function(room) {
+        if (!room) return;
+        if (!this.checkSetup(room)) return;
+        var partsPerGen = 0;
+        var queue = room.memory.routes.details;
+        // console.log(room,"buildQueueEnergyPerGen ernergyInBuildQueue", JSON.stringify(queue));
+        for ( var i in queue ) {
+            if (queue[i]) {
+                module = this.moduleFromRoute(queue[i].type);
+                var buildParts = module.prototype.parts(queue[i]);
+                var buildRespawn = queue[i].respawnRate ? queue[i].respawnRate : 0;
+                if (buildRespawn) {
+                    partsPerGen += buildParts *  CREEP_LIFE_TIME / buildRespawn;
+                }
+            }
+        }
+        return partsPerGen * CREEP_SPAWN_TIME;
     },
 
     filterBuilds: function (room, field, value) {
@@ -144,6 +162,7 @@ var routeBase = {
             }
             return filteredOrders;
         }
+        return [];
     },
 
     update: function(room) {
@@ -192,7 +211,7 @@ var routeBase = {
     spawn: function (spawn, room, build) {
         module = this.moduleFromRoute(build.type);
         var result = module.prototype.spawn(build, spawn, room);
-      //  console.log("spawn result", result);
+       // console.log("spawn result", result, "build", JSON.stringify(build));
         if (_.isString(result)) {
            // debugger;
             //console.log("routeBase just before set due");
@@ -201,11 +220,14 @@ var routeBase = {
             } else {
                 room.memory.routes.details[build.id].due
                     = room.memory.routes.details[build.id].respawnRate;
-              //  console.log("routeBase set due to respawn", JSON.stringify(room.memory.routes.details[build.id]));
+                //console.log("routeBase set due to respawn", JSON.stringify(room.memory.routes.details[build.id]));
             }
           //  console.log("routeBase just after set due");
             Game.creeps[result].memory.builtBy = room.name;
             Game.creeps[result].memory.buildType = build.type;
+        } else if (ERR_GCL_NOT_ENOUGH == result || ERR_INVALID_ARGS == result) {
+            console.log("routeBase spawn result",result, "invalid build details", JSON.stringify(build));
+            this.removeRoute(room.name, build.id);
         }
         return result;
     },

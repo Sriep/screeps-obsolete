@@ -31,13 +31,9 @@ function TaskMoveXY (x, y, range, customMoveFunction, functionModule) {
 }
 
 TaskMoveXY.prototype.doTask = function(creep, task) {
-
-    var result = creep.moveTo(task.x,task.y, {
-        maxRooms: 1
-    });
     var result;
-    var result
     if (task.customMoveToFunction) {
+       // console.log(creep,"customMoveToFunction",JSON.stringify(task));
         var xy = new RoomPosition( task.x, task.y, creep.pos.roomName );
         if(task.functionModule) {
             var fModule = require(task.functionModule);
@@ -54,7 +50,6 @@ TaskMoveXY.prototype.doTask = function(creep, task) {
     switch (result) {
         case OK:    	            //0	The operation has been scheduled successfully.
             if (creep.pos.inRangeTo(task.x,task.y,task.range)) {
-                task.loop = false;
                 return gc.RESULT_FINISHED;
             } else {
                 return gc.RESULT_UNFINISHED;

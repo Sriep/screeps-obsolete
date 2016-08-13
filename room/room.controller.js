@@ -13,7 +13,7 @@
  */
 var roomController = { 
     
-    maxProduction: [0,300,550,800,1300,1800,2300,5300,12000],
+    maxProduction: [0,300,550,800,1300,1800,2300,5600,12600],
 
     getRoomOwner: function(room)
     {

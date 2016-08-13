@@ -7,7 +7,7 @@
  */
 var gc = require("gc");
 //var taskActions = require("task.actions")
-var tasks = require("tasks");
+
 var stats = require("stats");
 
 /**
@@ -44,28 +44,31 @@ TaskOffload.prototype.offloadMethod = {
 
 TaskOffload.prototype.doTask = function(creep, task, actions) {
     var tasks = require("tasks");
-  //console.log(creep,"In task Offload target id", tasks.getTargetId(creep));
+  //console.log(creep,"In task Offload target id", tasks.getTargetId(creep), "canuselagtenatives",task.canUseAlternative);
 
     if (creep.carry[task.resource] == 0) {
-      //  console.log("tried Offloading witih no enrgy");
+        //console.log("tried Offloading witih no enrgy");
         tasks.setTargetId(creep, undefined);
         return tasks.Result.Finished;
     }
 
     var target = Game.getObjectById(tasks.getTargetId(creep));
     if (!target) {
-        //console.log(creep,"Offload, No target Id found",task.offloadMethod);
+       // console.log(creep,"Offload, No target Id found",task.offloadMethod, "carryenergy",creep.carry.energy );
         tasks.setTargetId(creep, undefined);
-        if (creep.carry.energy == 0)
+        if (creep.carry.energy == 0) {
+            //console.log("return finished no caryy energy");
             return gc.RESULT_FINISHED;
-        else {
+        } else {
             switch (task.offloadMethod) {
                 case gc.BUILD:
                 case gc.REPAIR:
                 case gc.TRANSFER:
                     if (task.canUseAlternative) {
+                        //console.log("no target id some cary energy uselaterantive true",task.canUseAlternative)
                         return gc.RESULT_ROLLBACK;
                     } else {
+                        //console.log("no target id some cary energy uselaterantive false",task.canUseAlternative)
                         return gc.RESULT_FINISHED;
                     }
                 case gc.UPGRADE_CONTROLLER:
@@ -139,7 +142,7 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
                 if (task.canUseAlternative) {
                     tasks.setTargetId(creep, undefined);
                 }
-             //   console.log(creep,"invalid target abou to return finished")
+                //console.log(creep,"invalid target abou to return finished")
                 return gc.RESULT_FINISHED;
             }
         case ERR_NOT_IN_RANGE:
