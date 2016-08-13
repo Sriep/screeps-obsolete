@@ -19,7 +19,7 @@ var raceBase = require("race.base");
  * @module NeutralHarvestRoute
  */
 
-function  RouteNeutralHarvest  (room, flagName, healParts) {
+function  RouteNeutralHarvest  (room, flagName, fast, healParts) {
     this.type = gc.ROUTE_NEUTRAL_HARVEST;
     this.flagName = flagName;
     var flag = Game.flags[flagName];
@@ -28,8 +28,9 @@ function  RouteNeutralHarvest  (room, flagName, healParts) {
     this.targetRoom = flag.pos.room;
     this.healParts = healParts ? healParts : 0;
     this.resourceId = flag.memory.resourceType;
+    this.fast = fast ? true : false;
 
-    var maxForRoom = raceWorker.maxSizeRoom(Game.rooms[room], true);
+    var maxForRoom = raceWorker.maxSizeRoom(Game.rooms[room], this.fast );
     if (gc.WORKER_FAST_MAX_SIZE == maxForRoom) {
         if (this.healParts > 1)
             maxForRoom -= Math.floor(this.healParts/2);
@@ -47,7 +48,7 @@ function  RouteNeutralHarvest  (room, flagName, healParts) {
         this.size
     );
     this.due = 0;
-    this.body = raceWorker.body(this.size, true);
+    this.body = raceWorker.body(this.size, this.fast);
     for ( var i = 0 ; i < this.healParts ; i++ ) {
         this.body.push(HEAL);
         this.body.unshift(MOVE);

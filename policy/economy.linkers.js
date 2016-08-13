@@ -130,7 +130,7 @@ var economyLinkers = {
                 && build.flagName == flag.name;
         });
         if (!harvesters || harvesters.length == 0) {
-            var order = new RouteNeutralHarvester(room.name, flag.name, healParts);
+            var order = new RouteNeutralHarvester(room.name, flag.name, false, healParts);
             routeBase.attachRoute(
                 room.name,
                 gc.ROUTE_NEUTRAL_HARVEST,
@@ -397,7 +397,7 @@ var economyLinkers = {
             routeBase.attachRoute(room.name, gc.ROUTE_SUPPRESS_KEEPERS, order, gc.PRIORITY_KEEPER_ATTACK);
         }
     },
-
+/*
     attachKeeperRoomHarvesters: function (room, flag) {
         var harvesters = routeBase.filterBuildsF(room, function(build) {
             return build.type == gc.ROUTE_NEUTRAL_HARVEST
@@ -414,7 +414,7 @@ var economyLinkers = {
             );
         }
     },
-
+*/
     maxCreepsCanFitInRoom: function (room) {
         if (!room.storage) {
             return roomOwned.accessPointsType(room, FIND_SOURCES) +  room.find(FIND_SOURCES).length;

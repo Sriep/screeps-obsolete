@@ -85,7 +85,7 @@ var roleRepairer = {
         if(repairTarget)  creep.repair(repairTarget);
         else {
             var buildTarget = this.findBuildTargetInRange(creep);
-            console.log(creep,"build target",buildTarget);
+            //console.log(creep,"build target",buildTarget);
             if (buildTarget) {
                 creep.build(buildTarget);
             }

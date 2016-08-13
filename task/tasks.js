@@ -162,17 +162,17 @@ var tasks = {
             }
         });
         if (danger.length > 0) {
-            console.log(creep,"defensiveRetreat");
+            //console.log(creep,"defensiveRetreat");
             var direction = creep.pos.getDirectionTo(danger[0]);
             var moveDirection;
             var bestTerrain;
-            console.log(creep,creep.pos.roomName,"defensiveRetreat enemy direction", direction);
+          //  console.log(creep,creep.pos.roomName,"defensiveRetreat enemy direction", direction);
             for ( var i = 0 ; i < gc.OPPOSITE_DIRECTION[direction].length ; i++ ) {
 
                 var x = creep.pos.x + gc.DELTA_DIRECTION[gc.OPPOSITE_DIRECTION[direction][i]].x;
                 var y = creep.pos.y + gc.DELTA_DIRECTION[gc.OPPOSITE_DIRECTION[direction][i]].y;
                 var  terrain  = Game.map.getTerrainAt(x, y, creep.room.name);
-                console.log(creep,"i",i,"x",x,"y",y,"terrain",terrain);
+                //console.log(creep,"i",i,"x",x,"y",y,"terrain",terrain);
                 if (gc.PLAIN == terrain
                     || (gc.SWAMP == terrain && bestTerrain != gc.PLAIN) ) {
                     moveDirection = gc.OPPOSITE_DIRECTION[direction][i];
@@ -184,7 +184,7 @@ var tasks = {
                     x = creep.pos.x + gc.DELTA_DIRECTION[gc.SIDEWAYS_DIRECTION[direction][k]].x;
                     y = creep.pos.y + gc.DELTA_DIRECTION[gc.SIDEWAYS_DIRECTION[direction][k]].y;
                     terrain  = Game.map.getTerrainAt(x, y, creep.room.name);
-                    console.log(creep,"k",k,"x",x,"y",y,"terrain",terrain);
+                   // console.log(creep,"k",k,"x",x,"y",y,"terrain",terrain);
                     if (gc.PLAIN == terrain
                         || (gc.SWAMP == terrain && bestTerrain != gc.PLAIN) ) {
                         moveDirection = gc.OPPOSITE_DIRECTION[direction][k];
