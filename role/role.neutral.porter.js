@@ -26,43 +26,51 @@ var roleNeutralPorter = {
     getTaskList: function(creep, homeRoom, flag) {
         var tasks = [];
         //var collectionId = flag.name;
-        if (!flag) return undefined;
-        var collectionId  = flag.memory.mainDumpId;
-        if (!collectionId) return undefined;
-        var collectionObj = Game.getObjectById(collectionId);
+        //console.log(creep,"getTaskList neutral porter role", homeRoom, flag);
+        //if (!flag) return undefined;
+
+        //if (!collectionId) return undefined;
+
 
         // Use ConstructionSite.progress to see if its a construction site
         // as only this structure has a progress field
-        if (!collectionObj || collectionObj.progress !== undefined) {
-            console.log(creep, flag, "roleNeutralPorter.getTaskList  cannot find collection object");
-            return undefined;
-        }
+        //if (!collectionObj || collectionObj.progress !== undefined) {
+           // console.log(creep, flag, "roleNeutralPorter.getTaskList  cannot find collection object");
+            //return undefined;
+        //}
 
         var moveToCollectionRoom = new TaskMoveRoom(flag.pos.roomName);
 
-        //var moveToCollectionObj = new TaskMoveFind(gc.FIND_ID,gc.RANGE_TRANSFER, collectionId);
-        /*var moveToCollectionObj = new TaskMoveFind(
-            gc.FIND_ID,
-            gc.RANGE_TRANSFER,
-            collectionId,
-            undefined,
-            undefined,
-            undefined,
-            "defensiveMoveTo",
-            "tasks"
-        );*/
-        var moveToCollectionObj = new TaskMoveFind(
-            gc.FIND_FUNCTION ,
-            gc.RANGE_TRANSFER,
-            "findPickup",
-            "role.neutral.porter",
-            undefined,
-            undefined,
-            "defensiveMoveTo",
-            "tasks"
-        );
+        var moveToCollectionObj;
+        var collectionObj = Game.getObjectById(flag.memory.mainDumpId);
+        // Use ConstructionSite.progress to see if its a construction site
+        // as only this structure has a progress field
+        if (collectionObj && collectionObj.progress !== undefined) {
+            moveToCollectionObj = new TaskMoveFind(
+                gc.FIND_ID,
+                gc.RANGE_TRANSFER,
+                flag.memory.mainDumpId,
+                undefined,
+                undefined,
+                undefined,
+                "defensiveMoveTo",
+                "tasks"
+            );
+        } else {
+            moveToCollectionObj = new TaskMoveFind(
+                gc.FIND_FUNCTION ,
+                gc.RANGE_TRANSFER,
+                "findPickup",
+                "role.neutral.porter",
+                undefined,
+                undefined,
+                "defensiveMoveTo",
+                "tasks"
+            );
+        }
 
-        var loadUp = new TaskLoadup(flag.memory.resourceType, collectionId);
+        //var loadUp = new TaskLoadup(flag.memory.resourceType, collectionId);
+        var loadUp = new TaskLoadup(flag.memory.resourceType);
         //var moveHomeRoom = new TaskMoveRoom(homeRoom);
         var moveHomeRoom = new TaskMoveRoom(
             homeRoom,
@@ -90,13 +98,16 @@ var roleNeutralPorter = {
                 && struc.store[RESOURCE_ENERGY] > 0);
             }
         });
+
         if (containers.length > 0) {
             containers.sort(function (c1, c2) {
                 return c2.store[RESOURCE_ENERGY] - c1.store[RESOURCE_ENERGY];
             });
+            console.log(creep,"findPickup", containers);
             return containers[0];
         } else {
-            return tasks.getTargetId(creep);
+            console.log(creep,"findPickup no containers found target", tasks.getTargetId(creep));
+            return Game.getObjectById(tasks.getTargetId(creep));
         }
     },
 

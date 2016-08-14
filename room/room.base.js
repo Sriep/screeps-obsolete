@@ -169,20 +169,26 @@ var roomBase = {
     },
 
     sendScoutFromTo: function(fromRoom, toRoom) {
-      //  console.log("send scout from",fromRoom,"to", toRoom);
+        //console.log("send scout from",fromRoom,"to", toRoom);
+        if (!Memory.rooms[fromRoom]) return;
+        if (!Memory.rooms[fromRoom].scouts)
+            Memory.rooms[fromRoom].scouts = {};
+        if  (Memory.rooms[fromRoom].scouts[toRoom]
+            && Game.time - Memory.rooms[fromRoom].scouts[toRoom]
+                 < CREEP_LIFE_TIME * gc.SEND_SCOUT_FREQUENCY_GEN) {
+            //console.log("dont send scout memroy", Memory.rooms[fromRoom].scouts[toRoom]);
+            return;
+        }
+
         var matches = routeBase.filterBuildsF(Game.rooms[fromRoom], function(build) {
             return build.type == gc.ROUTE_SCOUT
                 && build.targetRoom == toRoom;
         });
-
-       // console.log("length mathcs",matches);
-       // if (matches)
-        //    console.log("math",JSON.stringify(matches));
-        if (!matches || matches.length == 0)  {
-            //routeBase.removeRoute(Game.rooms[fromRoom], matches[0].id);
-          //  console.log("abot to attach route");
+        if ((!matches || matches.length == 0))  {
+            //console.log("about to attach route memory",Memory.rooms[fromRoom].scouts[toRoom] );
             var order = new RouteScout(toRoom);
-          //  routeBase.attachRoute(fromRoom, gc.ROLE_SCOUT, order, gc.PRIORITY_SCOUT);
+            routeBase.attachRoute(fromRoom, gc.ROLE_SCOUT, order, gc.PRIORITY_SCOUT);
+            Memory.rooms[fromRoom].scouts[toRoom] = Game.time;
         }
     },
 
@@ -201,15 +207,38 @@ var roomBase = {
         for ( var i = 0 ; i < myRooms.length ; i++ )
         {
             var exits = Game.map.describeExits(myRooms[i].name);
-           // console.log("nearByRooms exits",i,JSON.stringify(exits));
             for ( var j in exits) {
                 if (nearByRooms.indexOf(exits[j]) == -1) {
                     nearByRooms.push(exits[j]);
                 }
             }
-
         }
-       // console.log("nearByRooms nearByRooms", JSON.stringify(nearByRooms));
+        return nearByRooms;
+    },
+
+    roomsInRangeRoom: function (roomName, range, foundSoFar) {
+        var exits = Game.map.describeExits(roomName);
+        //console.log("roomesinrange",range,roomName);
+        for ( var i in exits) {
+            if (foundSoFar.indexOf(exits[i]) == -1) {
+                foundSoFar.push(exits[i]);
+            }
+            if (range > 0) this.roomsInRangeRoom(exits[i], range-1, foundSoFar);
+        }
+    },
+
+    roomsInRange: function (range) {
+        var myRooms = _.filter(Game.rooms, function (room) {
+            return room.controller && room.controller.my
+        });
+        var nearByRooms = [];
+        for ( var i = 0 ; i < myRooms.length ; i++ )
+        {
+            this.roomsInRangeRoom(myRooms[i].name, range-1, nearByRooms);
+            if (nearByRooms.indexOf(myRooms[i].name) == -1) {
+                nearByRooms.push(myRooms[i].name);
+            }
+        }
         return nearByRooms;
     },
 
@@ -224,7 +253,8 @@ var roomBase = {
                     return Infinity;
                 }
                 return 1;
-            }});
+            }
+        });
         //console.log("distanceBetween route", JSON.stringify(route));
         if (ERR_NO_PATH == route)
             return route;

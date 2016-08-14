@@ -105,12 +105,8 @@ var policyPeace = {
      * @returns {none}
      */
     enactPolicy: function (currentPolicy) {
-        //var policyMany2oneLinker = require("policy.many2one.linker");
         var room = Game.rooms[currentPolicy.room];
         console.log("ENACT POLICY PEACE", room);
-        //poolSupply.updateSupplyLevel(room.name
-        //    , roomOwned.calaculateSuplly(room)
-        //    , room.energyCapacityAvailable);
 
         economyLinkers = require("economy.linkers");
         console.log(room, "energyCapacity",room.energyCapacityAvailable , "Energy in build queue",

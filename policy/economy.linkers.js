@@ -53,7 +53,6 @@ var economyLinkers = {
                     flags[i].pos.roomName,
                     flags[i].memory.linkerFrom.distance
                 );
-                //this.attachKeeperRoomHarvesters(room,flag);
             }
 
             if ( gc.FLAG_SOURCE == flags[i].memory.type
@@ -82,21 +81,17 @@ var economyLinkers = {
     },
 
     attachHarvestLinker: function(room, flag, policy) {
-        //var healUnits = 0
-        if ( room.name != flag.pos.roomName)
-                return;
-
-        //}
-        //if (room.name != flag.pos.roomName) return;
+        var healUnits = flag.memory.keeperLairRoom ? gc.KEEPER_HARVESTER_HEALER_PARTS : 0;
+        var defensive = (room.name != flag.pos.roomName);
 
         //var defensive = room.name != flag.pos.roomName;
         var order = new RouteLinker(
             room.name,
             flag.name,
             policy.id,
-            false, //defensive,
+            defensive,
             false,
-            0 //healUnits
+            healUnits
         );
         if (!this.keepMatchedBuildWithSameSize(
                 room, "flagName", flag.name, order)) {
@@ -107,30 +102,42 @@ var economyLinkers = {
                 priority = gc.PRIORITY_NEUTRAL_LINKER;
             if (gc.FLAG_MINERAL == flag.memory.type)
                 priority = gc.PRIORITY_MINER;
-            routeBase.attachRoute(room.name, gc.ROLE_LINKER, order
-                , priority,flag.name);
+            if (flag.memory.keeperLairRoom)
+                priority = gc.PRIORITY_KEEPER_HARVEST;
+            routeBase.attachRoute(
+                room.name,
+                gc.ROLE_LINKER,
+                order,
+                priority,flag.name
+            );
         }
     },
 
     attachNeutralPorter: function(room, flag) {
         var priority;
-        var healParts;
+        //var healParts;
+        //var respawnMultiplyer;
         if (flag.memory.keeperLairRoom) {
             if (!this.keeperRoomSuppressed(flag.pos.roomName))
                 return;
             priority = gc.PRIORITY_KEEPER_PORTER;
-            healParts = gc.KEEPER_HARVESTER_HEALER_PARTS;
+           // healParts = gc.KEEPER_PORTER_HEALER_PARTS;
+            //respawnMultiplyer = gc.KEEPER_RESPAWN_MULTIPLYER;
         } else {
-            priority = gc.PRIORITY_NEUTRAL_PORTER
-            healParts = 0;
+            priority = gc.PRIORITY_NEUTRAL_PORTER;
+            //healParts = 0;
+            //respawnMultiplyer = 1;
         }
 
         var harvesters = routeBase.filterBuildsF(room, function(build) {
-            return build.type == gc.ROUTE_NEUTRAL_HARVEST
+            return build.type == gc.ROUTE_NEUTRAL_PORTER
                 && build.flagName == flag.name;
         });
         if (!harvesters || harvesters.length == 0) {
-            var order = new RouteNeutralHarvester(room.name, flag.name, false, healParts);
+            var order = new RouteNeutralPorter(
+                room.name,
+                flag.name
+            );
             routeBase.attachRoute(
                 room.name,
                 gc.ROUTE_NEUTRAL_HARVEST,
@@ -139,11 +146,8 @@ var economyLinkers = {
                 flag.name
             );
         }
-        //var order = new RouteNeutralPorter(room.name, flag.name, policy.id);
-        //if (!this.keepMatchedBuildWithSameSize(
-        //        room, "flagName", flag.name, order))
-        //    routeBase.attachRoute(room.name, gc.ROLE_NEUTRAL_PORTER,
-       //         order,  gc.PRIORITY_NEUTRAL_PORTER, flag.name);
+        var soldierBody = raceSwordsman.body(gc.SWORDSMAN_NEUTRAL_PATROL_SIZE);
+        this.attachPatrolCreep(flag, room, soldierBody);
     },
 
     useLinkerMiner: function (room, flag) {
@@ -269,7 +273,7 @@ var economyLinkers = {
         //    console.log(flags,"2 attachFlaggedControlRoutesii =",i);
             if (!foundMatchingPatrol) {
                // console.log(room,"attachPatrolCreep flag",flags[i],JSON.stringify(flags[i]));
-                this.attachPatrolCreep(flags[i], room, soldierBody);
+                //this.attachPatrolCreep(flags[i], room, soldierBody);
             }
         }
     },
@@ -308,7 +312,7 @@ var economyLinkers = {
         });
 
         if (!patrols || patrols.length == 0) {
-            var respawn = CREEP_LIFE_TIME - flag.memory.claimerFrom.distance;
+            var respawn = CREEP_LIFE_TIME - flag.memory.linkerFrom.distance;
             var order = new RoutePatrolRoom(
                 room.name,
                 flag.pos.roomName,

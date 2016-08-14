@@ -74,6 +74,7 @@ var routeBase = {
             return;
         }
         var room = Game.rooms[roomName];
+        if (!room) return;
         this.checkSetup(room);
         room.memory.routes.details[routeId] = undefined;
         //console.log(roomName,roomName,"romoveRoute length after",room.memory.routes.details.length);

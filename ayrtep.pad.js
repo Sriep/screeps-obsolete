@@ -61,13 +61,13 @@ var ayrtepPad = {
 
      //   console.log("------------------------------ routes W26S21 ---------------------------");
      //       routeBase.showRoutes("W26S21");
-     //   console.log("------------------------------ routes W25S22 ---------------------------");
-     //      routeBase.showRoutes("W25S22");
-    ////    console.log("------------------------------ routes W25S23 ---------------------------");
-  //         routeBase.showRoutes("W25S23");
-     //   console.log("------------------------------ routes W25S19 ---------------------------");
-    //       routeBase.showRoutes("W25S19");
-    //    console.log("---------------------------------------------------------------------");
+    //    console.log("------------------------------ routes W25S22 ---------------------------");
+    //       routeBase.showRoutes("W25S22");
+          console.log("------------------------------ routes W25S23 ---------------------------");
+           routeBase.showRoutes("W25S23");
+          console.log("------------------------------ routes W25S19 ---------------------------");
+     //       routeBase.showRoutes("W25S19");
+       //   console.log("---------------------------------------------------------------------");
 
       //  console.log("------------------------------ routes sim ---------------------------");
       //       routeBase.showRoutes("sim");
@@ -89,8 +89,6 @@ var ayrtepPad = {
     bottom: function () {
         console.log("START MY  PAD START MY  PAD");
 
-
-
         //Memory.policies[580] = undefined;
     //    for ( var i in Memory.policies ) {
    //       console.log("policy", Memory.policies[i]);
@@ -101,8 +99,14 @@ var ayrtepPad = {
         var w25s22 = Game.rooms["W25S22"];
         var w25s23 = Game.rooms["W25S23"];
 
-        console.log("w25s23 fast",raceWorker.maxSizeRoom(w25s23, true),
-            "w25s23 slow",raceWorker.maxSizeRoom(w25s23, false));
+       // console.log("W25S19",JSON.stringify(Game.map.describeExits("W25S19")),
+        //    "W26S21",JSON.stringify(Game.map.describeExits("W26S21")),
+       //     "W25S22",JSON.stringify(Game.map.describeExits("W25S22")),
+       //     "W25S23",JSON.stringify(Game.map.describeExits("W25S23")));
+
+      //  console.log("rooms within 2",roomBase.roomsInRange(2));
+
+       // console.log("w25s19 energy capacity", w25s19.energyAvailable);
 
         var flag1 = Game.flags["55db3188efa8e3fe66e04b70"];
         var flag2 = Game.flags["55db3189efa8e3fe66e04b81"];
@@ -114,7 +118,7 @@ var ayrtepPad = {
       //  economyLinkers.useLinkerMiner(w25s22, flag3);
 
 
-       // w25s19.memory.routes.details[249] = undefined;
+       //w25s19.memory.routes.details[12].size = 8;
         // w25s23.memory.routes.details[8] = undefined;
         //w25s23.memory.routes.details[4].due= -500;
         // w25s23.memory.routes.details[27] = undefined;
@@ -212,16 +216,11 @@ var ayrtepPad = {
         }
        // var roomController = require("room.controller");
        // console.log("roomcontoler 7",roomController.maxProduction[7]);
-      var creep = Game.creeps["Miles"];//""Miles"];
-       // console.log("suicide",creep.suicide());
-     //   var creep2 = Game.creeps["Ava"];
-       // creep2.suicide();
-      //  var creep3 = Game.creeps["Scarlett"];
-      //  creep3.suicide();
-      //  var creep3 = Game.creeps["Hosiah"];
-     //   creep3.suicide();
+      var creep = Game.creeps["Taylor"];//""Miles"];
 
         //creep.move(TOP);
+        //var flag = Game.flags["55db3176efa8e3fe66e04a58"];
+        //roleBase.switchRoles(creep, gc.ROLE_NEUTRAL_PORTER, "W25S23", flag);
        //roleBase.switchRoles(creep, gc.ROLE_FLEXI_STORAGE_PORTER);
         //roleBase.switchRoles(creep, gc.ROLE_SUPPRESS_KEEPERS, "W25S24");
         //roleBase.switchRoles(creep, gc.ROLE_SUPPRESS_KEEPERS, "W25S24");
@@ -259,10 +258,12 @@ var ayrtepPad = {
       //  creep2.pos.findPathTo(Game.getObjectById(id));
 
      //   creep2.move(BOTTOM_LEFT);
-        var from = new RoomPosition(32,47,"W25S21");
-        var to  = new RoomPosition(36,13,"W25S21");
+        //Memory.rooms["W24S19"].flagged = false;
+
+        var from = new RoomPosition(37,23,"W25S23");
+        var to  = new RoomPosition(39,47,"W25S23");
         var roadBuilder = require("road.builder");
-        //roadBuilder.buildRoad( from, to );
+       // roadBuilder.buildRoad( from, to );
     }
 
 };

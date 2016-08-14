@@ -53,6 +53,12 @@ TaskMoveRoom.prototype.doTask = function(creep, task) {
         return gc.RESULT_UNFINISHED;
     }
 
+    if (task.roomsToVisit == ERR_NO_PATH){
+        ///console.log(creep,"moveroom", creep.room, "rooms to visit", JSON.stringify(task.roomsToVisit));
+        //console.log(creep,"task",JSON.stringify(task));
+        return gc.RESULT_UNFINISHED;
+    }
+
     if ( this.atBorder(creep.pos.x,creep.pos.y ) ) {
         var currentRoom = creep.room;
         var targetRoom = task.roomsToVisit[task.pathIndex].room;
