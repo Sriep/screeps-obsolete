@@ -116,17 +116,17 @@ var economyLinkers = {
     attachNeutralPorter: function(room, flag) {
         var priority;
         //var healParts;
-        //var respawnMultiplyer;
+        var respawnMultiplyer;
         if (flag.memory.keeperLairRoom) {
             if (!this.keeperRoomSuppressed(flag.pos.roomName))
                 return;
             priority = gc.PRIORITY_KEEPER_PORTER;
            // healParts = gc.KEEPER_PORTER_HEALER_PARTS;
-            //respawnMultiplyer = gc.KEEPER_RESPAWN_MULTIPLYER;
+            respawnMultiplyer = gc.RESPAWN_MULTIPLYER_KEEPER;
         } else {
             priority = gc.PRIORITY_NEUTRAL_PORTER;
             //healParts = 0;
-            //respawnMultiplyer = 1;
+            respawnMultiplyer = gc.RESPAWN_MULTIPLYER_NEUTRAL;
         }
 
         var harvesters = routeBase.filterBuildsF(room, function(build) {
@@ -136,7 +136,8 @@ var economyLinkers = {
         if (!harvesters || harvesters.length == 0) {
             var order = new RouteNeutralPorter(
                 room.name,
-                flag.name
+                flag.name,
+                respawnMultiplyer
             );
             routeBase.attachRoute(
                 room.name,
@@ -146,8 +147,10 @@ var economyLinkers = {
                 flag.name
             );
         }
-        var soldierBody = raceSwordsman.body(gc.SWORDSMAN_NEUTRAL_PATROL_SIZE);
-        this.attachPatrolCreep(flag, room, soldierBody);
+        if (!flag.memory.keeperLairRoom) { // Already got protection
+            var soldierBody = raceSwordsman.body(gc.SWORDSMAN_NEUTRAL_PATROL_SIZE);
+            this.attachPatrolCreep(flag, room, soldierBody);
+        }
     },
 
     useLinkerMiner: function (room, flag) {

@@ -21,7 +21,7 @@ function  RouteNeutralPorter  (roomName, flagName, respawnMultiplyer) {
     this.type = gc.ROUTE_NEUTRAL_PORTER;
     this.owner = roomName;
     this.flagName = flagName;
-    this.respawnMultiplyer = respawnMultiplyer ? respawnMultiplyer : 1;
+    this.respawnMultiplyer = respawnMultiplyer ? respawnMultiplyer : 0.9;
    // var maxForRoom = racePorter.maxSizeRoom(Game.rooms[room]);
     var flag = Game.flags[flagName];
     if (!flag) return;

@@ -80,6 +80,7 @@ var gc = {
     TASK_SWITCH_ROLE: "switch.role",
     TASK_FLEXI_LOADUP: "flexi.loadup",
     TASK_SUPPRESS_KEEPERS: "suppress.keepers",
+    TASK_FOLLOW: "task.follow",
 
 
 //Offload switch task's states
@@ -198,6 +199,8 @@ var gc = {
     MIN_ENERGY_CAPACITY_LINKERS: 400,
     MAX_SIM_BATTLE_LENGTH: 20,
     MAX_SIM_DEFENCE_LENGTH: 40,
+    RESPAWN_MULTIPLYER_NEUTRAL: 0.9,
+    RESPAWN_MULTIPLYER_KEEPER: 0.8,
 
     TIME_TRANSFER_LOAD: 1,
     TIME_BUILD_LOAD: 10,
@@ -367,7 +370,6 @@ var gc = {
     KEEPER_PORTER_HEALER_PARTS: 0,
     KEEPER_MARSHALING_RANGE: 2,
     KEEPER_SUPPRESSOR_HEAL_RANGE: 4,
-    KEEPER_RESPAWN_MULTIPLYER: 0.7,
     SOURCE_KEEPER_BODY: [{"type":"tough","hits":100},{"type":"tough","hits":100},
         {"type":"tough","hits":100},{"type":"tough","hits":100},
         {"type":"tough","hits":100},{"type":"tough","hits":100},{"type":"tough","hits":100},

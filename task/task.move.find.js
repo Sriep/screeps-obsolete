@@ -142,19 +142,12 @@ TaskMoveFind.prototype.doTask = function(creep, task) {
             var fModule = require(task.functionModule);
             if (typeof fModule[task.customMoveToFunction] === "function" ) {
                 result = fModule[task.customMoveToFunction](creep, target);
-               // console.log(creep," result = fModule[task.customMoveToFunction](creep, target)",result);
-            }
-            else {
-               // console.log(creep,"following is not a function",fModule[task.customMoveToFunction]);
-                //console.log(creep,"functionmoduel",task.functionModule,"function",task.customMoveToFunction);
             }
         } else {
             result = task.customMoveToFunction(creep, target);
-            //console.log(creep,target,"TaskMoveFind result = task.customMoveToFunction(creep, target)",result);
         }
     } else {
         result = creep.moveTo(target);
-        //console.log(creep,"TaskMoveFind result = creep.moveTo(target)",result);
     }
 
     //console.log(creep,"TaskMoveFind result",result);
