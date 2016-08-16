@@ -55,7 +55,7 @@ var roleWallBuilder = {
         walls.sort(function (a,b) {return (a.hits - b.hits)});
         //console.log(creep,"Walls",walls);
         if(walls.length > 0) {
-            console.log(creep,"found wall to build",walls[0]);
+            //console.log(creep,"found wall to build",walls[0]);
             return 	walls[0];
         }
 

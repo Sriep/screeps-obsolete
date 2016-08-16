@@ -75,7 +75,7 @@ var recurringPolicies = {
         room.memory.links.info.push(link1);
         room.memory.links.info.push(link2);
         room.memory.links.info.push(link3);
-        var policyId = room.memory.polcyId;
+        var policyId = room.memory.policyId;
        // console.log(room,"linksForW26S21", JSON.stringify(room.memory.links));
     },
     //                                  recurring.policies

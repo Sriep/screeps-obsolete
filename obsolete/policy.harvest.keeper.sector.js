@@ -197,10 +197,10 @@ var policyHarvestKeeperSector = {
             }
         });
         if (keepers.length > 0  && this.readyAttackKeeper(policy)) {
-            this.toMovingOut(polcy);
+            this.toMovingOut(policy);
         }
         if (!this.restAndHeal(policy)) {
-            this.toMovingOut(polcy);
+            this.toMovingOut(policy);
         }
     },
 
@@ -267,7 +267,7 @@ var policyHarvestKeeperSector = {
             }
         });
         if (keepers > 0) {
-            this.toMovingOut(polcy);
+            this.toMovingOut(policy);
         } else {
 
         }

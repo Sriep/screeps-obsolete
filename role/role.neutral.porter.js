@@ -27,7 +27,7 @@ var roleNeutralPorter = {
         var tasks = [];
         //var collectionId = flag.name;
         //console.log(creep,"getTaskList neutral porter role", homeRoom, flag);
-        //if (!flag) return undefined;
+        if (!flag) return undefined;
 
         //if (!collectionId) return undefined;
 
@@ -103,10 +103,10 @@ var roleNeutralPorter = {
             containers.sort(function (c1, c2) {
                 return c2.store[RESOURCE_ENERGY] - c1.store[RESOURCE_ENERGY];
             });
-            console.log(creep,"findPickup", containers);
+            //console.log(creep,"findPickup", containers);
             return containers[0];
         } else {
-            console.log(creep,"findPickup no containers found target", tasks.getTargetId(creep));
+           // console.log(creep,"findPickup no containers found target", tasks.getTargetId(creep));
             return Game.getObjectById(tasks.getTargetId(creep));
         }
     },

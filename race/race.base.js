@@ -115,7 +115,9 @@ var raceBase = {
     maxSizeFromEnergy: function(race, room)  {
         module = this.getModuleFromRace(race);
         var withoutBodyPartLimit =  Math.floor(room.energyAvailable / module.BLOCKSIZE);
-        return Math.min(withoutBodyPartLimit, Math.floor(module.BLOCKSIZE_PARTS));
+        //console.log("room.energyAvailable",room.energyAvailable,"module.BLOCKSIZE",module.BLOCKSIZE,
+        //"module.BLOCKSIZE_PARTS",module.BLOCKSIZE_PARTS,"withoutBodyPartLimit",withoutBodyPartLimit);
+        return Math.min(withoutBodyPartLimit, Math.floor(50/module.BLOCKSIZE_PARTS));
     },
 
     maxSizeRoom: function(race, room) {

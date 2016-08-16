@@ -45,6 +45,7 @@ function TaskMoveFind (
     this.customMoveToFunction = customMoveToFunction;
     this.functionModule = functionModule;
     this.rembemerTarget = undefined;
+    this.findList = undefined;
     this.loop = true;
     this.pickup = true;
 }
@@ -104,7 +105,7 @@ TaskMoveFind.prototype.doTask = function(creep, task) {
                 break;
             case this.FindMethod.FindFunction:
                 var module = require(task.findModule);
-                target = module[task.findFunction](creep);
+                target = module[task.findFunction](creep, this.findList);
             //    console.log(creep,"find function returned",target);
                 break;
             default:

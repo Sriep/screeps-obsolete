@@ -23,7 +23,7 @@ function RouteGiftCreep  (room, targetRoom, policyId, body, role, respawnRate) {
     this.type = gc.ROUTE_GIFT_CREEP;
     this.owner = room;
     this.targetRoom = targetRoom;
-    this.policy = policyId;
+    this.policyId = policyId;
     this.respawnRate = respawnRate;
     this.body = body;
     this.role = role;
@@ -47,6 +47,7 @@ RouteGiftCreep.prototype.spawn = function (build, spawn, room ) {
             build.role
         );
         Game.creeps[name].memory.buildReference = build.policy;
+        //Game.creeps[name].memory.policyId = build.policyId;
     }
     return name;
 };

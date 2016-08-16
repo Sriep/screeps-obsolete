@@ -6,7 +6,6 @@
  */
 var roleBase = require("role.base");
 var gc = require("gc");
-//var policyFrameworks = require("policy.declarations");
 /**
  * Abstract base object for policy decisions.
  * @module policy
@@ -31,18 +30,19 @@ var policy = {
         this.checkRoomPolicies();
         for (var i in Memory.policies) {
             var oldPolicyModule = this.getModuleFromPolicy(Memory.policies[i]);
-            var newPolicyDetails = oldPolicyModule.draftNewPolicyId(Memory.policies[i]);
+            var newPolicyDetails = oldPolicyModule.prototype.draftNewPolicyId(Memory.policies[i]);
             if (newPolicyDetails === null) {
                 delete Memory.policies[i];
             } else if ( newPolicyDetails.id != Memory.policies[i].id) {
+                console.log("new policy")
                 var newPolicyModule = this.getModuleFromPolicy(newPolicyDetails);
                 this.activatePolicy(newPolicyDetails);
-                newPolicyModule.switchPolicy(Memory.policies[i], newPolicyDetails);
+                newPolicyModule.prototype.switchPolicy(Memory.policies[i], newPolicyDetails);
                 delete Memory.policies[i];
-                newPolicyModule.enactPolicy(newPolicyDetails);
+                newPolicyModule.prototype.enactPolicy(newPolicyDetails);
             } else {
-                oldPolicyModule.enactPolicy(Memory.policies[i]);
-            } // if(newPolicyDetails !===
+                oldPolicyModule.prototype.enactPolicy(Memory.policies[i]);
+            }
         } // for
     },
 
@@ -52,32 +52,25 @@ var policy = {
      * @var Memory.policies  List of active policies.
      */
     checkRoomPolicies: function() {
-        var policyFrameworks = require("policy.frameworks");
         var policies = Memory.policies;
-        if (policies === undefined) {
-            policies = {};
-        }
-        if (policies[0] === undefined) {
-           // var thePoolPolicyDetails = policyFrameworks.createThePool();
-           // this.activatePolicy(thePoolPolicyDetails);
-        }
+        if (policies === undefined)  policies = {};
 
         for(var roomIndex in Game.rooms) {
             var room = Game.rooms[roomIndex]
             var foundPolicy = false;
             var policiesToBeTerminated = [];
+
             for (var policyIndex in policies) {
                 var policy = policies[policyIndex];
-                if (policy.room !== undefined && policy.room == room.name) {
+                //console.log("checkRoomPolicies", policy.room,room.)
+                if (policy.roomName !== undefined && policy.roomName == room.name) {
                     // Use the first policy found for the room terminate any others.
-           //         console.log("found polcy for room", room);
+                    //console.log("found polciy for room", room);
                     if (!foundPolicy) {
                         foundPolicy = true;
                         room.policyId = policy.id;
                         room.currentPolicy = policy.type;
-              //          console.log("first");
                     } else {
-                   //     console.log("susequent to be reomved");
                         policiesToBeTerminated.push(policy.id);
                     }
                 }
@@ -86,15 +79,18 @@ var policy = {
             for (var i in policiesToBeTerminated) {
                 this.terminate(policiesToBeTerminated[i]);
             }
+
             // Room does not have a policy give it peace
             if (!foundPolicy) {
-                var policyFrameworks = require("policy.frameworks");
-                var newPolicy = policyFrameworks.createPeacePolicy(room.name);
+                var PolicyPeace = require("policy.peace");
+                var PolicyNeutralRoom = require("policy.neutral.room");
+                var newPolicy;
                 if (room.controller != undefined && room.controller.my) {
+                    newPolicy = new PolicyPeace(room.name);
                     console.log("Create peace policy for room",room.name);
                     this.activatePolicy(newPolicy);
                 } else {
-                    var newPolicy = policyFrameworks.createNeutralRoomPolicy(room.name);
+                    newPolicy = new PolicyNeutralRoom(room.name);
                     console.log("Create neutral room policy for room",room.name);
                     this.activatePolicy(newPolicy);
                 }
@@ -102,34 +98,11 @@ var policy = {
         }// for(var roomIndex in Game.rooms)
 
     },
-    
-    shutDownPolicy: function (poicy) {
-        policy.shuttingDown = true;
-    },
 
     // Remove all policies with given id.
     terminate: function(policyId)   {
-      delete Memory.policies[policyId];
-    },
-    
-    
-
-    supportBurden: function(room)
-    {
-       // var room = Game.rooms[policy.workRoom];
-        var supportCount = 0;
-        if (room !== undefined && room.memory.dependantPolicies !== undefined)
-        {
-            var dPolicies = room.memory.dependantPolicies;
-            for (var i in dPolicies) {
-                var policy = this.getPolicyFromId(dPolicies[i]);
-
-                if (undefined !== policy) {
-                    supportCount = supportCount + policy.workersContractedFor - policy.workersAssigned;
-                }
-            }
-        }
-        return supportCount;
+        delete Memory.policies[policyId];
+        //Memory.policies[policyId] = undefined;
     },
 
     reassignCreeps: function (oldPolicy, newPolicy) {
@@ -150,70 +123,29 @@ var policy = {
     },
     
     activatePolicy: function(policyDetails) {
-        var policyFrameworks = require("policy.frameworks");
         if (undefined === policyDetails.id ) {
-            var nextId = this.getNextPolicyId();
-           // console.log(policyDetails,"policyDetails.id "
-          //      ,policyDetails.id ,"next polisy",nextId)
-            policyDetails.id = nextId;
+            policyDetails.id = this.getNextPolicyId();;
         }
         if (undefined === Memory.policies){
             Memory.policies = {};
-          //  var thePoolPolicyDetails = policyFrameworks.createThePool();
-          //  this.activatePolicy(thePoolPolicyDetails);
         }
         var module = this.getModuleFromPolicy(policyDetails);
-        //console.log("activatePolicy id",policyDetails.id,"module",module);
         if (undefined === module) {
-            //console.log("activatePolciy cant make module",JSON.stringify(policyDetails));
             return false;
-        }
-        if (undefined  !== module.validPolicy) {
-            if (!module.validPolicy(policyDetails)) {
-                return false;
-            }
         }
         console.log("making policy", policyDetails.id);
         Memory.policies[policyDetails.id] = policyDetails;
-
-        if (undefined  !== module.initialisePolicy) {
-            console.log(policyDetails,"in activatePolicy about to call initialisePolicy");
-            module.initialisePolicy(policyDetails)
+        if (undefined  !== module.prototype.initialisePolicy
+            && typeof module.prototype.initialisePolicy === "function") {
+            console.log("Initialising policy", policyDetails.id, JSON.stringify(policyDetails));
+            module.prototype.initialisePolicy(policyDetails)
         }
         return true;
-    },
-
-    pushDependantPolicy: function (room,dPolicy) {
-        if (undefined !== room) {
-            if (undefined === room.memory.dependantPolicies
-                || null === room.memory.dependantPolicies)
-            {
-                room.memory.dependantPolicies = [];
-            }
-            room.memory.dependantPolicies.push(dPolicy.id);
-            console.log("In push Dependant Policy about to return ture",room,dPolicy );
-            return true;
-        } else {
-            return false;
-        }
     },
 
     getPolicyFromId: function(id) {
         return Memory.policies[id];
     },
-
-    breakUpLinks: function (policyId)
-    {
-       
-        var creeps = _.filter(Game.creeps, function (creep) {
-            return creep.memory.policyId == policyId.id
-                && ( creep.memory.role == gc.ROLE_LINKER_SOURCE
-                || creep.memory.role == gc.ROLE_LINKER_MINER_STORAGE);
-        });
-        for (var i = 0 ; i < creeps.length ; i++ ) {
-            roleBase.resetTasks(creeps[i]);
-        }
-    } ,
 
     energyStorageAtCapacity: function (room) {
         if (room.energyAvailable == room.energyCapacityAvailable) {
@@ -233,52 +165,6 @@ var policy = {
         }
     },
 
-    convertContractWorkers: function(room, policy, availableRole) {
-       // console.log("in convertContractWorkers room", room, "policy", policy.type, "role", availableRole);
-        var depPolicies = room.memory.dependantPolicies;
-        if (undefined == depPolicies) {
-         //   console.log("cannot find dependance policies room",room, "policy",polcy.id)
-            return;
-        }
-        var workersAvailable = room.find(FIND_MY_CREEPS, {
-            filter: function (creep) {
-                return creep.memory.role == availableRole
-                    && creep.memory.policyId == policy.id
-            }
-        });
-        if (workersAvailable.length >0) {workersAvailable.pop();}
-        var policyIndex = depPolicies.length;
-        var workersAllotted = 0;
-      //  console.log("just before while policyIndex", policyIndex,"workers allowed"
-      //      ,workersAllotted,"wokers avalabe",workersAvailable.length);
-        while (--policyIndex >= 0 && workersAllotted < workersAvailable.length ) {
-
-            var depPolicy = this.getPolicyFromId(depPolicies[policyIndex]);
-          //  console.log("fisrt line of while policy index", policyIndex, "workers alloted",workersAllotted,
-          //      "workers avaliable",workersAvailable.length,"depPolicy",depPolicy );
-
-            if (depPolicy === undefined) {// || depPolicy === null) {
-    //            console.log("about to splice policy at", policyIndex);
-                depPolicies.splice(policyIndex, 1);
-    //            console.log("spliced policy");
-            } else {
-             //   console.log("found valid contract policy", depPolicy.id);
-                var needed = depPolicy.workersContractedFor - depPolicy.workersAssigned;
-                var getting = Math.min(needed, workersAvailable.length - workersAllotted);
-          //      console.log("getting", getting, "needed",needed,"orkersAvailable.length",
-          //          workersAvailable.length, "workersAllotted",workersAllotted);
-                for (var i = 0; i < getting; i++) {
-                    var module = this.getModuleFromPolicy(depPolicy);
-                    module.assignWorker(workersAvailable[workersAllotted + i], depPolicy);
-                }
-                workersAllotted += getting;
-            }
-           // console.log("last line of while policy index", policyIndex, "workers alloted",workersAllotted,
-         //       "workers avaliable",workersAvailable.length,"depPolicy",depPolicy );
-        }
-        //console.log(workersAllotted,"Workers assigned to external contracts");
-    },
-
     initialisePolicy: function(newPolicy) {
         var module = this.getModuleFromPolicy(newPolicy);
         if (undefined !== module) {
@@ -289,17 +175,6 @@ var policy = {
             return false;
         }
         return true;
-    },
-
-    getPolicyCreeps: function (policyId) {
-        var policiesCreeps = [];
-        for ( var creep in Game.creeps)
-        {
-            if (creep.memory.policyId == policyID) {
-                policiesCreeps.push(creep);
-            }
-        }
-        return policiesCreeps;
     },
 
     getModuleFromPolicy: function(p) {

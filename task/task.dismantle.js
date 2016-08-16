@@ -1,11 +1,5 @@
 /**
- * Created by Piers on 12/07/2016.
- */
-/**
- * Created by Piers on 12/07/2016.
- */
-/**
- * Created by Piers on 05/07/2016.
+ * Created by Piers on 15/08/2016.
  */
 /**
  * @fileOverview Screeps module. Task harvest object.
@@ -18,41 +12,33 @@ var tasks = require("tasks");
  * @module tasksHarvest
  */
 
-function TaskAttackId (targetId) {
-    this.taskType = gc.TASK_ATTACK_ID;
-    this.conflicts = gc.ATTACK;
+function TaskDismantle (targetId) {
+    this.taskType = gc.TASK_DISMANTLE;
+    this.conflicts = gc.DISMANTLE;
     this.targetId = targetId;
     this.pickup = false;
     this.loop = true;
 }
 
-TaskAttackId.prototype.doTask = function(creep, task) {
-    //console.log(creep,"InAttackID target", tasks.getTargetId(creep));
+TaskDismantle.prototype.doTask = function(creep, task) {
     var target;
     if (undefined === task.targetId) {
         target = Game.getObjectById(tasks.getTargetId(creep));
     } else {
         target = Game.getObjectById(task.targetId);
     }
-    creep.rangedAttack(target);
-    if (!creep.pos.isNearTo(target)) {
-        tasks.attackClosest(creep);
-    }
-    var result = creep.attack(target);
-    console.log(creep,"attack",target,"result",result);
-   //console.log(creep,"at",creep.pos,"attack",tasks.getTargetId(creep),"result",result);
+    var result = creep.dismantle(target);
+    console.log(creep,"TaskDismantle", target,"restult",result);
     switch (result)
     {
         case OK:	//0	The operation has been scheduled successfully.
-            creep.say("Thump!");
+            creep.say("Bang!");
             return gc.RESULT_UNFINISHED; // THUMP! take that!
         case ERR_NOT_IN_RANGE:	//-9	The target is too far away.
-            creep.say("coward");
             return gc.RESULT_ROLLBACK; // Move closer.
         case ERR_INVALID_TARGET:	//-7	The target is not a valid attackable object.
             this.loop = false;
             tasks.setTargetId(creep, undefined);
-            creep.say("Gotya!");
             return gc.RESULT_FINISHED; // Probably I killed it. Hurrah!
         case ERR_NOT_OWNER:	//-1	You are not the owner of this creep.
         case ERR_BUSY:	//-4	The creep is still being spawned.
@@ -65,24 +51,4 @@ TaskAttackId.prototype.doTask = function(creep, task) {
 
 
 
-module.exports = TaskAttackId;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+module.exports = TaskDismantle

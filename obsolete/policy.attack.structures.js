@@ -64,7 +64,7 @@ var policyAttackStructures = {
     
     getTaskList: function (policy) {
         var taskList = [];
-        console.log("polcyattackstrug about to get TaskWAit");
+        console.log("policyattackstrug about to get TaskWAit");
         if (undefined !== policy.marshallingPoint) {
             var moveToMarshillingPoint = new TaskMovePos(policy.marshallingPoint,this.MARSHALLING_RANGE);
             var marshall = new TaskWait("getState", "policy.attack.structures");

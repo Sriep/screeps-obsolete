@@ -1,0 +1,124 @@
+/**
+ * Created by Piers on 15/08/2016.
+ */
+/**
+ * @fileOverview Screeps module. Abstract role object for creeps
+ * building in a neutral room
+ * @author Piers Shepperson
+ */
+var roleBase = require("role.base");
+var TaskMoveRoom = require("task.move.room");
+var TaskMoveFind = require("task.move.find");
+var TaskHarvest = require("task.harvest");
+var TaskOffload = require("task.offload");
+var TaskAttackId = require("task.attack.id");
+var policy = require("policy");
+var gc = require("gc");
+/**
+ * Abstract role object for creeps building in a neutral room
+ * @module attackRoom
+ */
+var attackRoom = {
+
+    getTaskList: function(creep, roomName, targetList) {
+        var tasks = [];
+        var moveToRoom = new TaskMoveRoom(roomName);
+
+        var findFunction = targetList ? "findNextInList" : "findNextTarget";
+        var moveToTarget = new TaskMoveFind(
+            gc.FIND_FUNCTION ,
+            gc.RANGE_TRANSFER,
+            findFunction,
+            "role.attack.room",
+            undefined,
+            undefined,
+            "moveAndAttack",
+            "tasks"
+        );
+        moveToTarget.findList = targetList;
+        var attackRoom = new TaskAttackId();
+
+        tasks.push(moveToRoom);
+        tasks.push(moveToTarget);
+        tasks.push(attackRoom);
+        return tasks;
+    },
+
+    findNextInList: function(creep, targetList) {
+        if (!targetList || targetList.length == 0) return this.findNextTarget(creep);
+        for ( var i = 0 ; i < targetList ; i++ ) {
+            var targetType = targetList[i];
+            var target;
+            if (targetType == FIND_HOSTILE_CREEPS) {
+                target = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
+                if (target != null) return target;
+            } else {
+                target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                    filter: function(struc) {
+                        return struc.structureType == targetType;
+                    }
+                });
+                if (target != null) return target;
+            }
+        }
+    },
+
+
+    findNextTarget: function(creep) {
+        target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            filter: function(struc) {
+                return struc.structureType == STRUCTURE_TOWER
+            }
+        });
+        console.log(creep,"findNextTarget",target);
+        if (target != null) return target;
+
+        var target = creep.pos.findClosestByPath(FIND_HOSTILE_SPAWNS);
+        console.log(creep,"findNextTarget",target);
+        if (target != null) return target;
+
+        var target = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
+        console.log(creep,"findNextTarget",target);
+        if (target != null) return target;
+
+        target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            filter: function(struc) {
+                return struc.structureType == STRUCTURE_EXTENSION
+            }
+        });
+        console.log(creep,"findNextTarget",target);
+        if (target != null) return target;
+
+        target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            filter: function(struc) {
+                return struc.structureType == STRUCTURE_EXTENSION
+                    || struc.structureType == STRUCTURE_STORAGE
+                    || struc.structureType == STRUCTURE_TERMINAL
+                    || struc.structureType == STRUCTURE_LINK
+                    || struc.structureType == STRUCTURE_LAB
+            }
+        });
+        console.log(creep,"findNextTarget",target);
+        if (target != null) return target;
+
+        var walls = creep.room.find(FIND_STRUCTURES, {
+            filter: function(struc) {
+                return  struc.structureType == STRUCTURE_RAMPART
+                    || struc.structureType == STRUCTURE_WALL
+            }
+        });
+        if (walls.length > 0)
+        {
+            walls.sort( function(t1,t2) { return t1.hits - t2.hits; });
+            return walls[0];
+        }
+
+        target = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES);
+        console.log(creep,"findNextTarget",target);
+        return target;
+    },
+
+};
+
+
+module.exports = attackRoom;

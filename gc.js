@@ -50,6 +50,8 @@ var gc = {
     ROLE_SCOUT: "scout",
     ROLE_WALL_BUILDER: "wall.builder",
     ROLE_SUPPRESS_KEEPERS: "suppress.keepers",
+    ROLE_DISMANTLE_ROOM: "dismantle.room",
+    ROLE_ATTACK_ROOM: "attack.room",
     
     //Tasks
     TASK_MOVE_FIND: "move.find",
@@ -80,7 +82,8 @@ var gc = {
     TASK_SWITCH_ROLE: "switch.role",
     TASK_FLEXI_LOADUP: "flexi.loadup",
     TASK_SUPPRESS_KEEPERS: "suppress.keepers",
-    TASK_FOLLOW: "task.follow",
+    TASK_FOLLOW: "follow",
+    TASK_DISMANTLE: "dismantle",
 
 
 //Offload switch task's states
@@ -111,7 +114,7 @@ var gc = {
     RANGE_TRANSFER: 1,
     RANGE_ATTACK: 1,
     RANGE_RANGED_ATTACK: 3,
-    RANGE_HEAL: 1,
+    RANGE_HEAL: 3,
     
     //task results
     RESULT_FINISHED: "finished",
@@ -119,17 +122,23 @@ var gc = {
     RESULT_ROLLBACK: "rollback",
     RESULT_RESET: "reset",
 
-    //policies
-    POLICY_POLICY_THE_POOL: "the.pool",
+    // Room policies
     POLICY_PEACE: "peace",
-    POLICY_CONSTRUCTION: "construction",
     POLICY_DEFENCE: "defence",
     POLICY_RESCUE: "rescue",
+    POLICY_NEUTRAL_ROOM: "neutral.room",
+    POLICY_BUILD_SPAWN: "buildspawn",
+
+    // Custom policies
+    POLICY_TEMPLATE: "template",
+    POLICY_COORDINATE_ATTACK: "coordinate.attack",
+
+    // Obsolete policies
+    POLICY_POLICY_THE_POOL: "the.pool",
+    POLICY_CONSTRUCTION: "construction",
     POLICY_FOREIGN_HARVEST: "foreign.harvest",
     POLICY_FOREIGN_ROAD: "neutral.road",
-    POLICY_NEUTRAL_ROOM: "neutral.room",
     POLICY_CLAIM: "claim",
-    POLICY_BUILD_SPAWN: "buildspawn",
     POLICY_GIFT_CREEP: "gift.creep",
     POLICY_NEUTRAL_BUILDER: "neutral.builder",
     POLICY_MANY2ONE_LINKERS: "many2one.linker",
@@ -162,6 +171,8 @@ var gc = {
     ROUTE_WALL_BUILDER: "wall.builder",
     ROUTE_SUPPRESS_KEEPERS: "suppress.keepers",
     ROUTE_MINER: "miner",
+    ROUTE_DISMANTLE_ROOM: "dismantle.room",
+    ROUTE_ATTACK_ROOM: "attack.room",
 
     // Linker types
     LINKER_DUMP: "linker.dump",
@@ -200,7 +211,7 @@ var gc = {
     MAX_SIM_BATTLE_LENGTH: 20,
     MAX_SIM_DEFENCE_LENGTH: 40,
     RESPAWN_MULTIPLYER_NEUTRAL: 0.9,
-    RESPAWN_MULTIPLYER_KEEPER: 0.8,
+    RESPAWN_MULTIPLYER_KEEPER: 0.7,
 
     TIME_TRANSFER_LOAD: 1,
     TIME_BUILD_LOAD: 10,

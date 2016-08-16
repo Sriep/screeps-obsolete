@@ -131,7 +131,7 @@ var policyConstruction = {
     switchPolicy: function(oldPolicy, newPolicy)
     {
       //  console.log("In switchPolicy oldPolicy", JSON.stringify(oldPolicy)
-        //    , "newPolcy",JSON.stringify(newPolicy));
+        //    , "newPolicy",JSON.stringify(newPolicy));
 
         //if (oldPolicy === undefined) {
        //     return;

@@ -8,32 +8,32 @@
  * @fileOverview Screeps module. Template.
  * @author Piers Shepperson
  */
-
+"use strict";
+var policy = require("policy");
+var gc = require("gc");
 /**
  * Abstract Policy
- * @module policyTemplate
+ * @module PolicyTemplate
  */
-var policyTemplate = {
-
-    initialisePolicy: function (newPolicy) {
-        return true;
-    },
-
-    draftNewPolicyId: function(oldPolicy) {
-        //return null;
-        if (undefined === Game.rooms[oldPolicy.id]) {
-            return null;
-        }
-        return oldPolicy;
-    },
-
-    switchPolicy: function(oldPolicy, newPolicy)
-    {
-    },
-
-    enactPolicy: function(currentPolicy) {
-    }
-
+function PolicyTemplate () {
+    this.type = gc.POLICY_TEMPLATE;
+    this.roomName = undefined;
 }
 
-module.exports = policyTemplate;
+PolicyTemplate.prototype.initialisePolicy = function (newPolicy) {
+    return true;
+};
+
+PolicyTemplate.prototype.draftNewPolicyId = function(oldPolicy) {
+    //return null;
+    return oldPolicy;
+};
+
+PolicyTemplate.prototype.switchPolicy = function(oldPolicy, newPolicy) {
+    policy.reassignCreeps(oldPolicy, newPolicy);
+};
+
+PolicyTemplate.prototype.enactPolicy = function(currentPolicy) {
+};
+
+module.exports = PolicyTemplate;

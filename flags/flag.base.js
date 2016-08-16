@@ -8,7 +8,6 @@
  */
 "use strict";
 var policy = require("policy");
-var policyFrameworks = require("policy.frameworks");
 
 /**
  * Abstract object to support the policy of minig a source in an unoccumpied

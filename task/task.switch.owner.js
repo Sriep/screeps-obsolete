@@ -22,20 +22,24 @@ function TaskSwitchOwner (newPolicyId, newRoom) {
     this.taskType = gc.TASK_SWITCH_OWNER;
     this.newPolicyId = newPolicyId;
     this.newRoom = newRoom;
+    this.pickup = false;
+    this.loop = true;
 }
 
 TaskSwitchOwner.prototype.doTask = function(creep, task) {
-    if (undefined !== task.newRoom) {
-        if (undefined !== Game.rooms[task.newRoom]) {
-            creep.policyId = Game.rooms[task.newRoom].policyId;
-            return gc.RESULT_FINISHED;
-        }
-    }
-    creep.policyId = task.newPolicyId;
-    if (undefined === role) {
-        roleBase.switchRoles(creep,role);
-        return gc.RESULT_RESET;
-    }
+    console.log(creep,"switch owoner")
+    //if (undefined !== task.newRoom) {
+    //    if (undefined !== Game.rooms[task.newRoom]) {
+    //        creep.policyId = Game.rooms[task.newRoom].policyId;
+    //        return gc.RESULT_FINISHED;
+    //    }
+    //}
+    console.log(creep,"new policy id",task.newPolicyId);
+    creep.memory.policyId = task.newPolicyId;
+    //if (undefined === role) {
+    //    roleBase.switchRoles(creep,role);
+    //    return gc.RESULT_FINISHED;
+    //}
     return gc.RESULT_FINISHED;
 };
 

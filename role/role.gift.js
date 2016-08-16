@@ -17,7 +17,7 @@ var roleGift = {
             taskList.push(moveToRoom);
         }
         if (policyId) {
-            var give = new TaskSwitchOwner(policyId, room, role);
+            var give = new TaskSwitchOwner(policyId, room);
             taskList.push(give);
         }
         if (role) {

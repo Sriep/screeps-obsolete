@@ -28,11 +28,20 @@ var rolePatrolRoom = {
             //moveToLocation = new TaskMovePos(roomPos);
             moveToLocation = new TaskMoveAttackPos(roomPos);
         }
-        var moveToTarget = new TaskMoveFind(gc.FIND_FUNCTION, gc.RANGE_ATTACK,
-            "findEnemyTarget","role.patrol.room");
+        var moveToTarget = new TaskMoveFind(
+            gc.FIND_FUNCTION,
+            gc.RANGE_ATTACK,
+            "findEnemyTarget",
+            "role.patrol.room",
+            undefined,
+            undefined,
+            "moveAndAttack",
+            "tasks"
+        );
         var attackTarget = new  TaskAttackId();
 
         taskList.push(moveToLocation);
+        moveToLocation.loop = false;
         taskList.push(moveToTarget);
         taskList.push(attackTarget);
         return taskList;
@@ -41,6 +50,11 @@ var rolePatrolRoom = {
 
     findEnemyTarget: function (creep) {
         var target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+        //var target = creep.pos.findClosestByRange(FIND_CREEPS, {
+        //    filter: function(creep) {
+        //        return !creep.my;
+        //    }
+        //});
       //   console.log(creep, "in find enemy targets",target);
         return target;
     },

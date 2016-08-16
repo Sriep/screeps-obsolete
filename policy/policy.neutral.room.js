@@ -5,101 +5,43 @@
 "use strict";
 //Bace object
 var policy = require("policy");
-var policyFrameworks = require("policy.frameworks");
+var gc = require("gc");
 
 /**
  * Abstract policy object for neutral rooms. Kind of empty wrapper.
  * @module policyDefence
  */
-var policyNeutralRoom = {
-
-    /**
-     * Determins what the new polciy of or the comming tick should be.
-     * This will changed if all enemy units are removed.
-     * @function draftNewPolicyId
-     * @param   {Object} room  The room we are drafting the policy for.
-     * @returns {enum} Id of policy for comming tick.
-     */
-    draftNewPolicyId: function(oldPolicy) {
-        var room = Game.rooms[oldPolicy.room];
-       // console.log(oldPolicy.room,"dratNewPolicy",room);
-        if (undefined !== room) {
-            if (undefined != room.controller && room.controller.my) {
-
-                var spawnSites = room.find(FIND_CONSTRUCTION_SITES, {
-                    filter: {structureType: STRUCTURE_SPAWN}
-                });
-            //    console.log("draftNewPolicyId looking for spawn",spawnSites);
-                if (spawnSites.length > 0){
-                    return policyFrameworks.createBuildspawn(oldPolicy.room);
-                }
-            }
-        }
-        return oldPolicy;
-
-    },
-
-    initialisePolicy: function (newPolicy) {
-        return true;
-    },
-
-    /**
-     * Handles defence of the room.
-     * @param   {Object} room  The room that might need rescuing.
-     * @returns {none}
-     */
-    enactPolicy: function(currentPolicy) {
-
-   /*
-       // console.log("neutral room", JSON.stringify(currentPolicy));
-        var room = Game.rooms[currentPolicy.room];
-        var roomMem = Memory.rooms[currentPolicy.room];
-        var roomNeam  = currentPolicy.room;
-        var storageRoom = "W26S21";
-      //  var storageId = "577a8dd4b973e61c594592dc";
-        if (room) {
-            var sources = room.find(FIND_SOURCES);
-            // if (currentPolicy.routeToStorageRoom === undefined){
-                var mapTo = Game.map.findRoute(currentPolicy.room, storageRoom);
-                var mapFrom = Game.map.findRoute(storageRoom, currentPolicy.room);
-                currentPolicy.routeToStorageRoom = mapTo;
-                 currentPolicy.routeFromStorageRoom = mapFrom;
-               // for (var i = 0; i < map ; i++) {
-                    //var nextRoom = map[i].room;
-
-
-              //  }
-          //  }
-        }
-*/
-    },
-
-    switchPolicy: function(oldPolicyId, newPolicy)
-    {
-        switch(oldPolicyId) {
-            case policyFrameworks.Type.RESCUE:
-                break;
-            case policyFrameworks.Type.CONSTRUCTION:
-                break;
-            case policyFrameworks.Type.DEFEND:
-                break;
-            case policyFrameworks.Type.PEACE:
-                policy.breakUpLinks(Game.rooms[oldPolicy.room]);
-            default:
-        }
-        policy.reassignCreeps(oldPolicyId, newPolicy);
-    },
-
-    /**
-     * Detects the presence of suspicious enemy units.
-     * @function beingAttacked
-     * @param   {Object} room  The room that might need rescuing.
-     * @returns {Bool} True inidcates we should use a rescue policy.
-     */
-    isNeutralRoom: function(room) {
-        return ture;
-    },
-
+function  PolicyNeutralRoom (roomName) {
+    this.type = gc.POLICY_NEUTRAL_ROOM;
+    this.roomName = roomName;
 }
 
-module.exports = policyNeutralRoom;
+PolicyNeutralRoom.prototype.draftNewPolicyId = function(oldPolicy) {
+    var room = Game.rooms[oldPolicy.roomName];
+    if (undefined !== room) {
+        if (undefined != room.controller && room.controller.my) {
+            var spawnSites = room.find(FIND_CONSTRUCTION_SITES, {
+                filter: {structureType: STRUCTURE_SPAWN}
+            });
+            if (spawnSites.length > 0){
+                var PolicyBuildSpawn = require("policy.build.spawn");
+                return new PolicyBuildSpawn(oldPolicy.roomName);
+            }
+        }
+    }
+    return oldPolicy;
+};
+
+PolicyNeutralRoom.prototype.initialisePolicy = function (newPolicy) {
+    return true;
+};
+
+PolicyNeutralRoom.prototype.enactPolicy = function(currentPolicy) {
+};
+
+PolicyNeutralRoom.prototype.switchPolicy = function(oldPolicyId, newPolicy)
+{
+    policy.reassignCreeps(oldPolicyId, newPolicy);
+};
+
+module.exports = PolicyNeutralRoom;

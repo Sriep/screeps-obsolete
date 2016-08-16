@@ -61,7 +61,7 @@ var policyKeeperSectorMarshal = {
     },
 
     readyAttackKeeper: function (policy) {
-        console.log("In readyAttackKeeper0", policy.id);
+        //console.log("In readyAttackKeeper0", policy.id);
         var myAttackCreeps = _.filter(Game.creeps, function (creep) {
             return creep.memory.policyId == policy.id
                 && creep.getActiveBodyparts(ATTACK) > 0

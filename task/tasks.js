@@ -54,6 +54,9 @@ var tasks = {
                 this.pickUpLooseEnergy(creep);
                 doneActions.actions.add(gc.PICKUP);
             }
+            if (creep.getActiveBodyparts(HEAL) > 0) {
+                this.heal(creep);
+            }
 
           //  if (creep.name == "Jack")
           //      console.log(creep ,"about to do task", task.taskType,"Length of task list is", taskList.length);
@@ -107,6 +110,8 @@ var tasks = {
           //  return;
         } //while
 
+        if (creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES))
+
         if (result == this.Result.Unfinished) {
 
         } else if (0 == taskList.length) {
@@ -152,9 +157,29 @@ var tasks = {
         }
     },
 
+    heal: function (creep) {
+        //if (creep.getActiveBodyparts(HEAL) > 0 && creep.hits < creep.hitsMax)
+        //    creep.heal(creep);
+        if (creep.getActiveBodyparts(HEAL) > 0) {
+            if (creep.hits < creep.hitsMax) {
+                creep.heal(creep);
+            } else {
+                var injured = creep.pos.findClosestByRange(FIND_MY_CREEPS, {
+                    filter: function(c) {
+                        return c.hits < c.hitsMax && c.pos.inRangeTo(creep,gc.RANGE_HEAL);
+                    }
+                });
+                if (injured) {
+                    if (creep.pos.isNearTo(injured))
+                        creep.heal(injured);
+                    else
+                        creep.rangedHeal(injured)
+                }
+            }
+        }
+    },
+
     defensiveRetreat: function (creep, pos, heal) {
-        if (creep.getActiveBodyparts(HEAL) > 0 && creep.hits < creep.hitsMax)
-            creep.heal(creep);
         var danger = creep.pos.findInRange(FIND_HOSTILE_CREEPS, gc.RANGE_RANGED_ATTACK+1,{
             filter: function(object) {
                 return object.getActiveBodyparts(ATTACK) > 0
@@ -198,12 +223,28 @@ var tasks = {
         else return undefined;
     },
 
-    defensiveMoveTo: function (creep, pos, heal) {
+    defensiveMoveTo: function (creep, pos) {
         var result = this.defensiveRetreat(creep, pos);
         if (undefined === result)
             return creep.moveTo(pos);
         else
             return result;
+    },
+
+    moveAndAttack: function (creep, pos) {
+        var target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+        creep.attack(target);
+        creep.rangedAttack(target);
+        return creep.moveTo(pos);
+    },
+
+    attackClosest(creep) {
+        var target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+        if (creep.pos.isNearTo(target)) {
+            var result = creep.attack(target);
+            creep.rangedAttack(target);
+            console.log(creep,"attack",target,"result,result");
+        }
     },
 
     emptyTaskList: function(creep) {
