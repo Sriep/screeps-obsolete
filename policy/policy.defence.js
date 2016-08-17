@@ -96,7 +96,14 @@ PolicyDefence.prototype.beingAttacked = function(room) {
     if (room == undefined) {
         return false;
     }
-    var hostiles = room.find(FIND_HOSTILE_CREEPS);
+    var hostiles = room.find(FIND_HOSTILE_CREEPS, {
+        filter: function(creep) {
+            return creep.getActiveBodyparts(ATTACK) > 0
+                ||  creep.getActiveBodyparts(RANGED_ATTACK) > 0
+                ||  creep.getActiveBodyparts(WORK) > 0
+                ||  creep.getActiveBodyparts(CLAIM) > 0;
+        }
+    });
     if ( !hostiles || 0 == hostiles.length ) return false;
     for ( var i = 0 ; i < hostiles.length ; i++ ) {
         if (hostiles[i].owner  && hostiles[i].owner != "Invader")

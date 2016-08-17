@@ -35,9 +35,13 @@ var gf = {
         return true;
     },
 
-    oppositeDirection: function (pos, direction) {
-
-
+    unique:  function(array) {
+        var unique = [];
+        for (var i = 0; i < array.length; i++) {
+            var current = array[i];
+            if (unique.indexOf(current) < 0) unique.push(current);
+        }
+        return unique;
     },
 
     structureTypeInRange: function (pos, structureType, range) {

@@ -553,13 +553,16 @@ var economyLinkers = {
 
     processBuildQueue: function(room) {
         var spawns = room.find(FIND_MY_SPAWNS);
-        var nextBuild = routeBase.nextBuild(room);
-        if (undefined !== nextBuild) {
+        //console.log(room,spawns,"processBuildQueue");
             var i = spawns.length-1;
+            //console.log(room,spawns,"i",i);
             do {
-                var result = routeBase.spawn(spawns[i], room, nextBuild);
+                var nextBuild = routeBase.nextBuild(room);
+                //console.log(room,spawns[i],"processBuildQueue",JSON.stringify(nextBuild));
+                if (undefined !== nextBuild) {
+                    var result = routeBase.spawn(spawns[i], room, nextBuild);
+                }
             } while ( result == ERR_BUSY && i--)
-        }
     },
 
     existingPorterParts: function (currentPolicy) {

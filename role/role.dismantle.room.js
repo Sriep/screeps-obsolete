@@ -26,11 +26,12 @@ var dismantleRoom = {
         var moveToRoom = new TaskMoveRoom(roomName);
 
         var findFunction = targetList ? "findNextInList" : "findNextTarget";
+        var findModule = targetList ? "role.attack.room" : "role.dismantle.room";
         var moveToTarget = new TaskMoveFind(
             gc.FIND_FUNCTION ,
             gc.RANGE_TRANSFER,
             findFunction,
-            "role.dismantle.room",
+            findModule,
             undefined,
             undefined,
             "defensiveMoveTo",
@@ -45,42 +46,8 @@ var dismantleRoom = {
         return tasks;
     },
 
-    findNextInList: function(creep, targetList) {
-        if (!targetList || targetList.length == 0) return this.findNextTarget(creep);
-        for ( var i = 0 ; i < targetList ; i++ ) {
-            var targetType = targetList[i];
-            var target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                filter: function(struc) {
-                    return struc.structureType == targetType;
-                }
-            });
-            if (target != null) return target;
-        }
-       /* switch (targetList[i]) {
-            case STRUCTURE_SPAWN:
-            case STRUCTURE_EXTENSION:
-            case STRUCTURE_ROAD:
-            case STRUCTURE_WALL:
-            case STRUCTURE_RAMPART:
-            case STRUCTURE_KEEPER_LAIR:
-            case STRUCTURE_PORTAL:
-            case STRUCTURE_CONTROLLER:
-            case STRUCTURE_LINK:
-            case STRUCTURE_STORAGE:
-            case STRUCTURE_TOWER:
-            case STRUCTURE_OBSERVER:
-            case STRUCTURE_POWER_BANK:
-            case STRUCTURE_POWER_SPAWN:
-            case STRUCTURE_EXTRACTOR:
-            case STRUCTURE_LAB:
-            case STRUCTURE_TERMINAL:
-            case STRUCTURE_CONTAINER:
-            case STRUCTURE_NUKER:
-            default:
-            }*/
-    },
-
     findNextTarget: function(creep) {
+        var target;
         target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
             filter: function(struc) {
                 return struc.structureType == STRUCTURE_TOWER
@@ -89,7 +56,7 @@ var dismantleRoom = {
         console.log(creep,"findNextTarget",target);
         if (target != null) return target;
 
-        var target = creep.pos.findClosestByPath(FIND_HOSTILE_SPAWNS);
+        target = creep.pos.findClosestByPath(FIND_HOSTILE_SPAWNS);
         console.log(creep,"findNextTarget",target);
         if (target != null) return target;
 

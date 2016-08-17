@@ -39,7 +39,7 @@ TaskAttackId.prototype.doTask = function(creep, task) {
         tasks.attackClosest(creep);
     }
     var result = creep.attack(target);
-    console.log(creep,"attack",target,"result",result);
+    //console.log(creep,"attack",target,"result",result);
    //console.log(creep,"at",creep.pos,"attack",tasks.getTargetId(creep),"result",result);
     switch (result)
     {

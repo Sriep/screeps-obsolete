@@ -46,25 +46,33 @@ var attackRoom = {
 
     findNextInList: function(creep, targetList) {
         if (!targetList || targetList.length == 0) return this.findNextTarget(creep);
+        var target;
         for ( var i = 0 ; i < targetList ; i++ ) {
-            var targetType = targetList[i];
-            var target;
-            if (targetType == FIND_HOSTILE_CREEPS) {
-                target = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
-                if (target != null) return target;
-            } else {
-                target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                    filter: function(struc) {
-                        return struc.structureType == targetType;
-                    }
-                });
-                if (target != null) return target;
+            switch (targetList[i].type) {
+                case gc.TARGET_ID:
+                    target = Game.getObjectById(targetList[i].target);
+                    if (target !== null) return target;
+                    break;
+                case gc.TARGET_FIND_TYPE:
+                    target = creep.pos.findClosestByPath(targetList[i].target);
+                    if (target != null) return target;
+                    break;
+                case gc.TARGET_STRUCTURE:
+                    target = creep.pos.findClosestByPath(targetList[i].target, {
+                        filter: function(struc) {
+                            return struc.structureType == targetType;
+                        }
+                    });
+                    if (target != null) return target;
+                    break;
+                default:
             }
         }
     },
 
 
     findNextTarget: function(creep) {
+        var target;
         target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
             filter: function(struc) {
                 return struc.structureType == STRUCTURE_TOWER
@@ -73,11 +81,11 @@ var attackRoom = {
         console.log(creep,"findNextTarget",target);
         if (target != null) return target;
 
-        var target = creep.pos.findClosestByPath(FIND_HOSTILE_SPAWNS);
+        target = creep.pos.findClosestByPath(FIND_HOSTILE_SPAWNS);
         console.log(creep,"findNextTarget",target);
         if (target != null) return target;
 
-        var target = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
+        target = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
         console.log(creep,"findNextTarget",target);
         if (target != null) return target;
 

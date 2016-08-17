@@ -212,7 +212,7 @@ var routeBase = {
     spawn: function (spawn, room, build) {
         module = this.moduleFromRoute(build.type);
         var result = module.prototype.spawn(build, spawn, room);
-        console.log("spawn result", result, "build", JSON.stringify(build));
+        //console.log("spawn result", result, "build", JSON.stringify(build));
         if (_.isString(result)) {
            // debugger;
             //console.log("routeBase just before set due");

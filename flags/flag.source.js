@@ -9,6 +9,7 @@
 "use strict";
 var policy = require("policy");
 var roomBase = require("room.base");
+var gc = require("gc");
 /**
  * Abstract object to support the policy of minig a source in an unoccumpied
  * room
@@ -39,6 +40,26 @@ var flagSource = {
             //flag.memory.porterFrom = undefined;
         }
        //console.log("flagSource after if statment", flag, flag.memory.energyCapacity,JSON.stringify(flag.memory));
+    },
+
+    closestInfo: function (flag, findOpts) {
+        var myRooms = roomBase.findClosestOwnedRooms(flag.pos.roomName, gc.MAX_DEPTH_ROOM_SEARCH);
+        var distance, closest;
+        for ( var i = 0 ; i < myRooms.length ; i++ ) {
+            var structure;
+            if (findOpts) {
+                structure = Game.rooms[myRooms[i]].find(FIND_STRUCTURES, findOpts);
+            } else {
+                structure = Game.rooms[myRooms[i]].find(FIND_MY_SPAWNS);
+            }
+            var d = roomBase.distanceBetween(flag.pos, structure.pos);
+            if (!distance || distance > d) {
+                distance = d;
+                closest = myRooms[i];
+            }
+        }
+        return { room : closest, distance : distance };
+        //return { room : roomClosest, distance : distanceClosest };
     },
 
     linkerSupplyRoom : function (flag) {

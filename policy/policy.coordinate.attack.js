@@ -40,7 +40,7 @@ PolicyCoordinateAttack.prototype.initialisePolicy = function (newPolicy) {
 };
 
 PolicyCoordinateAttack.prototype.draftNewPolicyId = function(oldPolicy) {
-    //return null;
+    return null;
     return oldPolicy;
 };
 
@@ -66,8 +66,9 @@ PolicyCoordinateAttack.prototype.enactPolicy = function(currentPolicy) {
     var mila = Game.creeps["Mila"];
     mila.memory.tasks.tasklist = this.dismantleTaskList();
 */
-    //var aria = Game.creeps["Aria"];
-    //roleBase.switchRoles(aria, gc.ROLE_ATTACK_ROOM, "W28S24");
+    var william = Game.creeps["William"];
+    //roleBase.switchRoles(william, gc.ROLE_DISMANTLE_ROOM, "W28S24");
+
     //var leahCaroline = Game.creeps["LeahCaroline"];
     //roleBase.switchRoles(leahCaroline, gc.ROLE_DISMANTLE_ROOM, "W28S24");
    // var TaskMoveFind = require("task.move.find");

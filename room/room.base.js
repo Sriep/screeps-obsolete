@@ -216,17 +216,6 @@ var roomBase = {
         return nearByRooms;
     },
 
-    roomsInRangeRoom: function (roomName, range, foundSoFar) {
-        var exits = Game.map.describeExits(roomName);
-        //console.log("roomesinrange",range,roomName);
-        for ( var i in exits) {
-            if (foundSoFar.indexOf(exits[i]) == -1) {
-                foundSoFar.push(exits[i]);
-            }
-            if (range > 0) this.roomsInRangeRoom(exits[i], range-1, foundSoFar);
-        }
-    },
-
     roomsInRange: function (range) {
         var myRooms = _.filter(Game.rooms, function (room) {
             return room.controller && room.controller.my
@@ -242,11 +231,54 @@ var roomBase = {
         return nearByRooms;
     },
 
-    distanceBetween: function  (posFrom, posTo) {
-        var DEFUALT_DISTANCE_ON_ERROR = 25
+    findClosestOwnedRooms: function (roomName, maxDepth) {
+        var depth = 0;
+        maxDepth = maxDepth ? maxDepth : 5;
+        var closest = [];
+        while ( 0 == closest.length  && depth++ < maxDepth ) {
+            closest = this.findOwnedRooms(roomName,depth);
+        }
+        return gf.unique(closest);
+    },
+
+
+
+    findOwnedRooms: function (roomName, depth) {
+
+        if (this.isMyRoom(roomName)) {
+            //console.log("found my room",roomName, depth);
+            return [ roomName ];
+        }
+        //console.log("findOwnedRooms",roomName, depth);
+        if ( --depth <= 0 || this.isEnemyRoom(roomName)) return [];
+
+        var rooms = [];
+        var exits = Game.map.describeExits(roomName);
+        //console.log("findOwnedRooms", roomName, depth, JSON.stringify(exits));
+        for (var i in exits) {
+            rooms = rooms.concat( this.findOwnedRooms(exits[i], depth) );
+            //console.log(roomName, "findOwnedRooms rooms", JSON.stringify(rooms));
+        }
+        return rooms;
+    },
+
+    roomsInRangeRoom: function (roomName, range, foundSoFar) {
+        if (this.isEnemyRoom(roomName)) return;
+        var exits = Game.map.describeExits(roomName);
+        //console.log("roomesinrange",range,roomName);
+        for ( var i in exits) {
+            if (foundSoFar.indexOf(exits[i]) == -1) {
+                foundSoFar.push(exits[i]);
+            }
+            if (range > 0) this.roomsInRangeRoom(exits[i], range-1, foundSoFar);
+        }
+    },
+
+    distanceBetween: function  (posFrom, posTo, route) {
+        var DEFUALT_DISTANCE_ON_ERROR = 15
         //console.log("distance between start", JSON.stringify(posFrom)
         //    , "posTo", JSON.stringify(posTo));
-        var route = Game.map.findRoute(posFrom.roomName, posTo.roomName, {
+        route = Game.map.findRoute(posFrom.roomName, posTo.roomName, {
             routeCallback(roomName, fromRoomName) {
                 if(!roomBase.canSeeRoom(roomName)
                     || roomBase.isEnemyRoom(roomName)) {	// avoid this room
@@ -258,7 +290,6 @@ var roomBase = {
         //console.log("distanceBetween route", JSON.stringify(route));
         if (ERR_NO_PATH == route)
             return route;
-
         var distance = 0;
         if (route.length > 0) {
             var exit = posFrom.findClosestByPath(route[0].exit);
@@ -293,18 +324,17 @@ var roomBase = {
         return distance;
     },
 
-    distanceBetweenApprox: function  (posFrom, posTo) {
+    distanceBetweenApprox: function  (posFrom, posTo, route) {
        // console.log("distance between start", JSON.stringify(posFrom)
        //     , "posTo", JSON.stringify(posTo));
-        var route = Game.map.findRoute(posFrom.roomName, posTo.roomName, {
-            routeCallback(roomName, fromRoomName) {
-                if(roomBase.isEnemyRoom(roomName)) {	// avoid this room
-                    return Infinity;
-                }
-                return 1;
-            }});
+        route = Game.map.findRoute(posFrom.roomName, posTo.roomName, {
+        routeCallback(roomName, fromRoomName) {
+            if(roomBase.isEnemyRoom(roomName)) {	// avoid this room
+                return Infinity;
+            }
+            return 1;
+        }});
        // console.log("distanceBetween route", JSON.stringify(route));
-
         var distance = 0;
         if (route.length > 0) {
             var exit = posFrom.findClosestByRange(route[0].exit);
@@ -339,15 +369,15 @@ var roomBase = {
                     //console.log("findClosest using range",i,JSON.stringify(exit));
                     //todo some bug. for now arbitrarily set distance to 25, should do something cleverer
                     exit = pos.findClosestByRange(parseInt(i));
-                    if (!distanceClosest || distanceClosest > 25) {
-                        distanceClosest = 25;
+                    if (!distanceClosest || distanceClosest > 15) {
+                        distanceClosest = 15;
                         roomClosest = exits[i];
                     }
                 }
                 if (exit) {
                     var entrance = this.exitToEntrance(exit, exits[i]);
                     var target = entrance.findClosestByRange(findType, Opts);
-                    if (undefined !== target) {
+                    if (!target || undefined !== target) {
                       //  console.log("about to distance betwen pos",JSON.stringify(pos), JSON.stringify(target.pos) );
                         var distance = this.distanceBetween(pos, target.pos);
                    //     console.log("distance",distance );

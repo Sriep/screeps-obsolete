@@ -24,7 +24,7 @@ var TaskOffloadSwitch = require("task.offload.switch");
 var roleFlexiStoragePorter = {
 
     getTaskList: function(creep) {
-        console.log(creep,"In roleFlexiStoragePorter getTaskList");
+       // console.log(creep,"In roleFlexiStoragePorter getTaskList");
         var taskList = [];
         var taskSwitcher =  new TaskOffloadSwitch(creep);
         taskList.push(taskSwitcher);
@@ -37,7 +37,7 @@ var roleFlexiStoragePorter = {
         var tower = creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: function(structure)  {
                 return (structure.structureType == STRUCTURE_TOWER
-                && structure.energy < structure.energyCapacity);
+                && structure.energy <= structure.energyCapacity * 0.5);
             }
         });
         if (tower) {
