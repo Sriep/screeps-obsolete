@@ -32,7 +32,14 @@ function  RouteLinker  (room, flagName, policyId, defensive, fast, healParts) {
    // console.log("In Route Linker");
     if (flag) {
         if (flag.memory.type == gc.FLAG_SOURCE) {
-            var workerParts = flag.memory.energyCapacity / (HARVEST_POWER * ENERGY_REGEN_TIME);
+            var source = Game.getObjectById(flagName);
+            var energyCapacity;
+            if (source && source.energyCapacity) {
+                energyCapacity = source.energyCapacity;
+            } else {
+                energyCapacity = flag.memory.energyCapacity; // should not be here
+            }
+            var workerParts = energyCapacity / (HARVEST_POWER * ENERGY_REGEN_TIME);
             if (room != flag.pos.roomName) workerParts++;
             this.size = Math.min(raceWorker.maxSizeRoom(Game.rooms[room]), Math.ceil(workerParts));
         } else {

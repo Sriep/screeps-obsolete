@@ -8,6 +8,7 @@ var flagBase = require("flag.base");
 var gc = require("gc");
 var cpuUsage = require("cpu.usage");
 var recurringPolicies = require("recurring.policies");
+var buildingBase = require("building.base");
 
 // Any modules that you use that modify the game's prototypes should be require'd
 // before you require the profiler.
@@ -26,10 +27,12 @@ module.exports.loop = function () {
         flagBase.run();
     }
     freememory.freeCreeps();
+
     policy.enactPolicies();
     raceBase.moveCreeps();
+    buildingBase.moveBuildings();
 
-    ayrtepPad.bottom()
+    ayrtepPad.bottom();
 
     console.log("************************ End ",  Game.time, " *********************************");
    // }) // profiler.wrap(function()

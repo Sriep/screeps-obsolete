@@ -18,7 +18,7 @@ var TaskMoveRoom = require("task.move.room");
  * @module tasksHarvest
  */
 
-function TaskMovePos (roomPos, range, pathOps, customMoveToFunction, functionModule) {
+function TaskMovePos (roomPos, range, pathOps, customMoveToFunction, functionModule, finsihCondition, finishModule) {
     this.taskType = gc.TASK_MOVE_POS;
     this.conflicts = gc.MOVE;
     this.roomPos = roomPos;
@@ -30,11 +30,18 @@ function TaskMovePos (roomPos, range, pathOps, customMoveToFunction, functionMod
     this.pathOps = pathOps;
     this.customMoveToFunction = customMoveToFunction;
     this.functionModule = functionModule;
+    this.finsihCondition = finsihCondition;
+    this.finishModule = finishModule;
     this.loop = true;
     this.pickup = true;
 }
 
 TaskMovePos.prototype.doTask = function(creep, task) {
+    if (task.finsihCondition) {
+        var module = require(task.finishModule);
+        var rtv = module[task.finsihCondition](creep);
+        if (rtv) return rtv;
+    }
     if (task.startRoom === undefined) { //First call to function. Initialise data.
         task.startRoom = creep.room.name;
         if (undefined === task.roomPos) {

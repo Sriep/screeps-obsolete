@@ -38,14 +38,17 @@ var roomBase = {
                 this.flagRoom(Game.rooms[room]);
             }
         }
-        var nearByRooms = this.nearByRooms();
+        //var nearByRooms = this.nearByRooms();
+        var nearByRooms = this.roomsInRange(2);
         for ( var i = 0 ; i < nearByRooms.length ; i++ ) {
-            if (Memory.rooms[nearByRooms[i]] === undefined
-                || !Memory.rooms[nearByRooms[i]].flagged) {
-                   roomBase.sendScout(nearByRooms[i]);
-            }
-            if (roomBase.isEnemyRoom(nearByRooms[i])) {
-                roomBase.planInvasion();
+            if (!this.isMyRoom(nearByRooms[i])) {
+                if (Memory.rooms[nearByRooms[i]] === undefined
+                    || !Memory.rooms[nearByRooms[i]].flagged) {
+                    roomBase.sendScout(nearByRooms[i]);
+                }
+                if (roomBase.isEnemyRoom(nearByRooms[i])) {
+                    roomBase.planInvasion();
+                }
             }
         }
     },
@@ -80,7 +83,7 @@ var roomBase = {
             Game.flags[flagName].memory.resourceType = RESOURCE_ENERGY;
           //  console.log("flagPermanents flagName",flagName,"type",Game.flags[flagName].memory.type );
             Game.flags[flagName].memory.energyCapacity = sources[i].energyCapacity;
-            if (room.controller && sources.length >= 2  && !this.isMyRoom(room.name)) {
+            if (room.controller && sources.length >= gc.SOURCES_REVERSE_CONTROLLER  && !this.isMyRoom(room.name)) {
                 Game.flags[flagName].memory.upgradeController = true;
             }
             if (keeperLairs.length > 0) Game.flags[flagName].memory.keeperLairRoom = true;
@@ -91,7 +94,7 @@ var roomBase = {
                 room.controller.pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_CONTROLLER_COLOUR);
             Game.flags[flagName].memory.type = gc.FLAG_CONTROLLER;
             if (!this.isMyRoom(room.name)) {
-                Game.flags[flagName].memory.upgradeController = (sources.length >= 2);
+                Game.flags[flagName].memory.upgradeController = (sources.length >= gc.SOURCES_REVERSE_CONTROLLER);
             }
             if (keeperLairs.length > 0) Game.flags[flagName].memory.keeperLairRoom = true;
         }
@@ -105,6 +108,19 @@ var roomBase = {
             Game.flags[flagName].memory.resourceType = minerals[i].mineralType;
             Game.flags[flagName].memory.extractor = gf.isStructureTypeAtPos(minerals[i].pos, STRUCTURE_EXTRACTOR);
             if (keeperLairs.length > 0) Game.flags[flagName].memory.keeperLairRoom = true;
+        }
+
+        var portals = room.find(FIND_STRUCTURES, {
+            filter: { structureType: STRUCTURE_PORTAL }
+        });
+        for ( i in portals ) {
+            flagName = portals[i].id;
+            if (!Game.flags[flagName])
+                portals[i].pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_PORTAL_COLOUR);
+            Game.flags[flagName].memory.type = gc.FLAG_PORTAL;
+            Game.flags[flagName].memory.destination = portals[i].destination;
+            if (portals[i].ticksToDecay)
+                Game.flags[flagName].memory.decay = Game.time + portals[i].ticksToDecay;
         }
 
         room.memory.flagged = true;
@@ -122,6 +138,31 @@ var roomBase = {
                 structures[i].pos.createFlag(flagName, gc.FLAG_STRUCTURE_COLOUR, gc.FLAG_LINK_COLOUR);
             Game.flags[flagName].memory.type = gc.FLAG_LINK;
         }
+
+        structures = room.find(FIND_STRUCTURES, {
+            filter: function(struc) {
+                return struc.structureType == STRUCTURE_LAB;
+            }
+        });
+        for ( var i = 0 ; i < structures.length ; i++ ) {
+            flagName = structures[i].id;
+            if (!Game.flags[flagName])
+                structures[i].pos.createFlag(flagName, gc.FLAG_LAB_COLOUR, gc.FLAG_LAB_COLOUR);
+            Game.flags[flagName].memory.type = gc.FLAG_LAB;
+        }
+
+        structures = room.find(FIND_STRUCTURES, {
+            filter: function(struc) {
+                return struc.structureType == STRUCTURE_TERMINAL;
+            }
+        });
+        for ( var i = 0 ; i < structures.length ; i++ ) {
+             flagName = structures[i].id;
+            if (!Game.flags[flagName])
+                structures[i].pos.createFlag(flagName, gc.FLAG_STRUCTURE_COLOUR, gc.FLAG_TERMINAL_COLOUR);
+            Game.flags[flagName].memory.type = gc.FLAG_TERMINAL;
+        }
+
     },
 
     isEnemyRoom: function (roomName) {
@@ -275,7 +316,7 @@ var roomBase = {
     },
 
     distanceBetween: function  (posFrom, posTo, route) {
-        var DEFUALT_DISTANCE_ON_ERROR = 15
+        var DEFUALT_DISTANCE_ON_ERROR = 10;
         //console.log("distance between start", JSON.stringify(posFrom)
         //    , "posTo", JSON.stringify(posTo));
         route = Game.map.findRoute(posFrom.roomName, posTo.roomName, {
@@ -369,8 +410,8 @@ var roomBase = {
                     //console.log("findClosest using range",i,JSON.stringify(exit));
                     //todo some bug. for now arbitrarily set distance to 25, should do something cleverer
                     exit = pos.findClosestByRange(parseInt(i));
-                    if (!distanceClosest || distanceClosest > 15) {
-                        distanceClosest = 15;
+                    if (!distanceClosest || distanceClosest > 10) {
+                        distanceClosest = 10;
                         roomClosest = exits[i];
                     }
                 }

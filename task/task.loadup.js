@@ -17,14 +17,15 @@ var tasks = require("tasks");
 function TaskLoadup (resourceId, targetId) {
     this.taskType = gc.TASK_LOADUP;
     this.conflicts = gc.TRANSFER;
-    this.resourceId = resourceId;
+    this.resourceId = resourceId ? resourceId : RESOURCE_ENERGY;
     this.targetId = targetId;
     this.pickup = true;
     this.loop = true;
 }
 
 TaskLoadup.prototype.doTask = function(creep, task) {
-    //console.log(creep,"task loadup")
+    if (!task.resourceId) task.resourceId = RESOURCE_ENERGY;
+    console.log(creep,"task loadup")
     if (!task.targetId) {
         var storage =  Game.getObjectById(tasks.getTargetId(creep));
     } else {
@@ -39,10 +40,10 @@ TaskLoadup.prototype.doTask = function(creep, task) {
     } else {
         //storage.transfer(creep, task.resourceId);
         var result = creep.withdraw(storage, task.resourceId);
-        //console.log(creep, "result of withrewal storage", storage, task.resourceId, "result",result);
+        console.log(creep, "result of withrewal storage", storage, task.resourceId, "result",result);
         switch (result) {
             case OK:                //	0	The operation has been scheduled successfully.
-                if (creep.carry.energy == 0) {
+                if (creep.carry[task.resourceId] == 0) {
                     return gc.RESULT_UNFINISHED;
                 } else {
                     tasks.setTargetId(creep, undefined);

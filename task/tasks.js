@@ -93,13 +93,15 @@ var tasks = {
            //         console.log(creep,"trying to rollback on too short tasklist");
                 }
             }  else  {
-             //   console.log(creep,"check finresult", result,"this.Result.Finished"
-             //       ,this.Result.Finished,"this.Result.Finished" ,this.Result.Failed);
+
                 if (result == this.Result.Finished
                     || result == this.Result.Reset) {
+
+                    //console.log(creep,"check finresult", result,"this.Result.Finished",this.Result.Finished);
                     if (taskList.length > 0){
                         var doneTask = taskList.shift();
                         if (task.loop) {
+                            //console.log(creep,"loop task");
                             taskList.push(doneTask);
                         }
                     }
@@ -250,8 +252,14 @@ var tasks = {
     emptyTaskList: function(creep) {
         console.log(creep,"empty task list");
         creep.say("What to do?")
-    }
+    },
 
+    empty: function(creep) {
+        //console.log(creep,"in empty");
+        if (_.sum(creep.carry) == 0)
+            return gc.RESULT_FINISHED;
+        //return creep.carry[task.resource] == 0;
+    }
 };
 
 module.exports = tasks;

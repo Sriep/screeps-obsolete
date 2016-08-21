@@ -21,7 +21,7 @@ var TaskMoveXY = require("task.move.xy")
  * @module tasksHarvest
  */
 
-function TaskMoveRoom (roomName, pathOps, customMoveToFunction, functionModule) {
+function TaskMoveRoom (roomName, pathOps, customMoveToFunction, functionModule, finsihCondition, finishModule) {
     this.taskType = gc.TASK_MOVE_ROOM;
     this.conflicts = gc.MOVE;
     this.roomName = roomName;
@@ -31,9 +31,18 @@ function TaskMoveRoom (roomName, pathOps, customMoveToFunction, functionModule) 
     //this.movesTowardsCenter = movesTowardsCenter;
     this.customMoveToFunction = customMoveToFunction;
     this.functionModule = functionModule;
+    this.finsihCondition = finsihCondition;
+    this.finishModule = finishModule;
 }
 
 TaskMoveRoom.prototype.doTask = function(creep, task) {
+    //console.log(creep,"taks.roomAme",task.roomName);
+    if (!task.roomName) return gc.RESULT_FINISHED;
+    if (task.finsihCondition) {
+        var module = require(task.finishModule);
+        var rtv = module[task.finsihCondition](creep);
+        if (rtv) return rtv;
+    }
     //console.log(creep,"TaskMoveRoom start");
     //if ( creep.name == "Claire")
     //    console.log(creep,creep.room,JSON.stringify(creep.pos), "start",JSON.stringify(task));
@@ -50,7 +59,7 @@ TaskMoveRoom.prototype.doTask = function(creep, task) {
 
     if ( task.roomsToVisit === undefined
                 || task.pathIndex >= task.roomsToVisit.length ) { // We are lost. Recalculate route.
-       // if ( creep.name == "Claire") console.log(creep,creep.room,"lost");
+        //console.log(creep,creep.room,"lost");
         task.startRoom = creep.room.name;
         task.roomsToVisit = Game.map.findRoute(task.startRoom, task.roomName, task.pathOps);
         task.pathIndex = 0;
@@ -69,7 +78,7 @@ TaskMoveRoom.prototype.doTask = function(creep, task) {
         var targetRoom = task.roomsToVisit[task.pathIndex].room;
         var nextStepD = this.nextStepIntoRoom(creep.pos, targetRoom);
         //if ( creep.name == "Claire")
-       //     console.log(creep,creep.room,"atBorder nextstep",nextStepD);
+           // console.log(creep,creep.room,"atBorder nextstep",nextStepD);
         var result = creep.move(nextStepD);
         if (OK == result) {
             task.pathIndex++;
@@ -83,7 +92,7 @@ TaskMoveRoom.prototype.doTask = function(creep, task) {
     if ( task.roomsToVisit[task.pathIndex] !== undefined) {
         var exit = creep.pos.findClosestByPath(task.roomsToVisit[task.pathIndex].exit);
         //if ( creep.name == "Claire")
-        //    console.log(creep,creep.room,"exit", exit, "roomstovisit",JSON.stringify(task.roomsToVisit),"indiex", task.pathIndex)
+        // console.log(creep,creep.room,"exit", exit, "roomstovisit",JSON.stringify(task.roomsToVisit),"indiex", task.pathIndex)
         if (task.customMoveToFunction) {
             if(task.functionModule) {
                 var fModule = require(task.functionModule);

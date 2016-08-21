@@ -31,6 +31,22 @@ var roleFlexiStoragePorter = {
         return taskList;
     },
 
+    nextLab: function(creep) {
+        if (creep.room.terminal
+            && creep.room.terminal.store[RESOURCE_ENERGY] < gc.LAB_REFILL_ENERGY_THRESHOLD)
+            return creep.room.terminal;
+        var labs = creep.room.find(FIND_STRUCTURES, {
+            filter: function(l) {
+                return l.structureType == STRUCTURE_LAB
+                    && l.energy < l.energyCapacity
+                    && Game.flags[l.id].secondaryColor != COLOR_WHITE;
+            }
+        });
+        if (labs) {
+            labs.sort(function(l1,l2) { return l1.energy - l2.energy; });
+            return labs[0];
+        }
+    },
 
     nextEnergyContainer: function(creep) {
         //Defence first!

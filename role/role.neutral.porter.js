@@ -76,6 +76,8 @@ var roleNeutralPorter = {
             homeRoom,
             undefined,
             "defensiveMoveTo",
+            "tasks",
+            "empty",
             "tasks"
         );
         var moveToOffload = new TaskMoveFind(gc.FIND_FUNCTION,gc.RANGE_TRANSFER,
@@ -91,13 +93,15 @@ var roleNeutralPorter = {
         return tasks;
     },
 
+
+
     findPickup: function (creep) {
         var containers = creep.room.find(FIND_STRUCTURES, {
             filter: function (struc) {
-                return (struc.structureType == STRUCTURE_CONTAINER
-                && struc.store[RESOURCE_ENERGY] > 0);
+                return (struc.structureType == STRUCTURE_CONTAINER);
             }
         });
+        //console.log(creep,creep.room,"continers",containers);
 
         if (containers.length > 0) {
             containers.sort(function (c1, c2) {
@@ -106,7 +110,7 @@ var roleNeutralPorter = {
             //console.log(creep,"findPickup", containers);
             return containers[0];
         } else {
-           // console.log(creep,"findPickup no containers found target", tasks.getTargetId(creep));
+          // console.log(creep,"findPickup no containers found target", tasks.getTargetId(creep));
             return Game.getObjectById(tasks.getTargetId(creep));
         }
     },

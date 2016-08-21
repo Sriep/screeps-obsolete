@@ -43,7 +43,7 @@ var economyRepair = {
             previous = undefined;
         }
         if (!previous) {
-            routeBase.attachRoute(room.name, gc.ROUTE_REPAIRER,order,gc.PRIORITY_REPAIRER);
+            return routeBase.attachRoute(room.name, gc.ROUTE_REPAIRER,order,gc.PRIORITY_REPAIRER);
         }
     },
 
@@ -59,7 +59,7 @@ var economyRepair = {
             previous = undefined;
         }
         if (!previous) {
-            routeBase.attachRoute(room.name, gc.ROUTE_WALL_BUILDER,order,gc.PRIORITY_WALL_BUILDER);
+            return routeBase.attachRoute(room.name, gc.ROUTE_WALL_BUILDER,order,gc.PRIORITY_WALL_BUILDER);
         }
     },
 

@@ -29,15 +29,18 @@ var routeBase = {
         if (!this.checkSetup(room)) return false;
         //console.log("attachRoute rooName",roomName);
         order.id = this.getNextRouteId(room);
+        order.homeYard = roomName;
         if (priority === undefined) {
             order.priority = gc.DEFAULT_ROUTE_PRIORITY;
         } else {
             order.priority = priority;
         }
+        order.basePriority = order.priority;
         if (reference) this.setDueFromActiveRoute(room, order, reference);
         //console.log("attachRoute rooName",JSON.stringify(order));
         room.memory.routes.details[order.id] = order;
-        return true;
+        //console.log(roomName, routeType,"attachRoute order id", order.id);
+        return order.id;
     },
 
     setDueFromActiveRoute: function (room, order, reference) {
@@ -82,6 +85,7 @@ var routeBase = {
 
     resetRoutes: function (roomName) {
         var room = Game.rooms[roomName];
+        delete room.memory.routes;
         room.memory.routes = {};
         room.memory.routes.details = {};
     },
@@ -130,6 +134,7 @@ var routeBase = {
                 if (buildRespawn) {
                     partsPerGen += buildParts *  CREEP_LIFE_TIME / buildRespawn;
                 }
+                //console.log("buildParts",queue[i].type,buildParts, buildRespawn);
             }
         }
         return partsPerGen * CREEP_SPAWN_TIME;
@@ -221,6 +226,11 @@ var routeBase = {
             } else {
                 room.memory.routes.details[build.id].due
                     = room.memory.routes.details[build.id].respawnRate;
+                room.memory.routes.details[build.id].priority
+                    = room.memory.routes.details[build.id].basePriority;
+                if (room.memory.routes.details[build.id].dependancies)
+                    this.handleDependancies(room.memory.routes.details,
+                        room.memory.routes.details[build.id].dependancies);
                 //console.log("routeBase set due to respawn", JSON.stringify(room.memory.routes.details[build.id]));
             }
           //  console.log("routeBase just after set due");
@@ -231,6 +241,12 @@ var routeBase = {
             this.removeRoute(room.name, build.id);
         }
         return result;
+    },
+
+    handleDependancies: function(queue, dependancies) {
+        for ( var i = 0 ; i < dependancies.length ; i++ ){
+            queue[dependancies[i].id].priority = dependancies[i].priority;
+        }
     },
 
 

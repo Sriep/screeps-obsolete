@@ -16,10 +16,10 @@ var roleLinker = {
 
         getTaskList: function(creep, flagName, defensive) {
             var TaskFindMoveLinkerPos = require("task.find.move.linker.pos");
-            console.log(creep,"In roleLinker getTaskList",flagName);
+            //console.log(creep,"In roleLinker getTaskList",flagName);
             var flag = Game.flags[flagName];
             if (!flag) return [];
-            console.log(creep,flagName,"getTaskList flag",flag);
+            //console.log(creep,flagName,"getTaskList flag",flag);
 
             var taskList = [];
 

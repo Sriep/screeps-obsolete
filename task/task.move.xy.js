@@ -14,7 +14,7 @@ var tasks = require("tasks");
  * @module tasksHarvest
  */
 
-function TaskMoveXY (x, y, range, customMoveFunction, functionModule) {
+function TaskMoveXY (x, y, range, customMoveFunction, functionModule, finsihCondition, finishModule) {
     this.taskType = gc.TASK_MOVE_XY;
     this.conflicts = gc.MOVE;
     this.x = x;
@@ -26,11 +26,18 @@ function TaskMoveXY (x, y, range, customMoveFunction, functionModule) {
     }
     this.customMoveFunction = customMoveFunction;
     this.functionModule = functionModule;
+    this.finsihCondition = finsihCondition;
+    this.finishModule = finishModule;
     this.loop = true;
     this.pickup = true;
 }
 
 TaskMoveXY.prototype.doTask = function(creep, task) {
+    if (task.finsihCondition) {
+        var module = require(task.finishModule);
+        var rtv = module[task.finsihCondition](creep);
+        if (rtv) return rtv;
+    }
     var result;
     if (task.customMoveToFunction) {
        // console.log(creep,"customMoveToFunction",JSON.stringify(task));

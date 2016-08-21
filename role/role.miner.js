@@ -62,6 +62,18 @@ var roleMiner = {
     },
 
     findStorage: function(creep) {
+        var labs = creep.room.find(FIND_STRUCTURES, {
+            filter: function(l) {
+                return l.structureType == STRUCTURE_LAB
+                    && creep.carry[l.mineralType] > 0
+                    && l.mineralAmount < gc.LAB_REFILL_MINERAL_THRESHOLD
+            }
+        });
+        if (labs) {
+            labs.sort(function(l1,l2) { return l1.energy - l2.energy; });
+            return labs[0];
+        }
+
         var storages = creep.room.find(FIND_STRUCTURES, {
             filter: function(s) {
                 return ( s.structureType == STRUCTURE_STORAGE

@@ -35,6 +35,7 @@ TaskFlexiLink.prototype.doTask = function(creep, task) {
         if (tasks.defensiveRetreat(creep))
             return gc.RESULT_ROLLBACK;
 
+
     var flag = Game.flags[task.flagName];
     //console.log(creep,"in TaskFlexiLink.doTask flag",flag);
     if (!flag.memory.operator
@@ -42,9 +43,11 @@ TaskFlexiLink.prototype.doTask = function(creep, task) {
         || undefined == flag.memory.linkType)
         initilise(creep,task,flag);
 
-    if ((Game.time - flag.memory.operator.arrived) % gc.LINKER_RESET_RATE == 0 ) {
+    if ((Game.time - flag.memory.operator.arrived) % gc.LINKER_RESET_RATE == 0
+            || !creep.pos.isNearTo(flag.pos)) {
         return TaskFlexiLink.prototype.resetState(creep, task);
     }
+    
   //  console.log(creep, "In TaskFlexiLink doTask linkType", flag.memory.linkType);
     creep.say(flag.memory.linkType);
     var moduleName = "task." + flag.memory.linkType;

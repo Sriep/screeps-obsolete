@@ -58,6 +58,7 @@ var rolePatrolRoom = {
       //   console.log(creep, "in find enemy targets",target);
         return target;
     },
+
 };
 
 

@@ -269,7 +269,7 @@ var roomOwned = {
         var energyPerTrip = CARRY_CAPACITY * workerSize;     
         return energyPerTrip * tripsPerLife;
     },
-    
+
     setWorkerSize: function(room, workerSize, force)  {
         if (workerSize === undefined) {
             if (room.memory.workerSize === undefined) {

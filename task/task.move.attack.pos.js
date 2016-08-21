@@ -44,16 +44,19 @@ TaskMoveAttackPos.prototype.doTask = function(creep, task) {
         //task.roomsToVisit = Game.map.findRoute(task.startRoom, task.roomPos.room, task.pathOps);
         task.pathIndex = 0;
     }
-    attackInPassing(creep);
+    var target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+    if (target) return gc.RESULT_FINISHED;
+
+    //attackInPassing(creep);
     task.roomName = task.roomPos.roomName;
     if (creep.room.name == task.roomPos.roomName
         && !TaskMoveRoom.prototype.atBorder(creep.pos.x,creep.pos.y)) {
         var result = TaskMoveXY.prototype.doTask(creep, task);
-        attackInPassing(creep);
+        //attackInPassing(creep);
         return result;
     }
     TaskMoveRoom.prototype.doTask(creep, task);
-    attackInPassing(creep);
+    //attackInPassing(creep);
     return  gc.RESULT_UNFINISHED;
 };
 

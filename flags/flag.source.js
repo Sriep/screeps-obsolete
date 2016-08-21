@@ -18,22 +18,22 @@ var gc = require("gc");
 var flagSource = {
 
     run: function (flag) {
-       console.log(flag,"flagSource run start", flag.memory.type, flag.pos.roomName);
+       //console.log(flag,"flagSource run start", flag.memory.type, flag.pos.roomName);
         //if (!flag.memory.type)
        //     return;
         //console.log("flagSource before if statment", flag, flag.memory.energyCapacity, JSON.stringify(flag.memory));
         if ( roomBase.isMyRoom(flag.pos.roomName)) {
             // todo Put in code to give real distance. Not sure if would be used usefully.
-            console.log("flagSource flag in my room", flag, flag.memory.energyCapacity);
+            //console.log("flagSource flag in my room", flag, flag.memory.energyCapacity);
             flag.memory.linkerFrom = { room : flag.pos.roomName, distance : 0 };
             flag.memory.porterFrom = { room : flag.pos.roomName, distance : 0 };
         } else if (roomBase.isNeutralRoom(flag.pos.roomName ) ) {
-            console.log("flagSource flag", flag, flag.memory.energyCapacity);
+           // console.log("flagSource flag", flag, flag.memory.energyCapacity);
             flag.memory.linkerFrom = this.linkerSupplyRoom(flag);
             flag.memory.porterFrom = this.porterSupplyRoom(flag);
             //console.log("after flagSource flag", flag);
         } else {
-            console.log("flag source nothing");
+            //console.log("flag source nothing");
             //if (Memory.rooms[flag.pos.roomName])
            //     Memory.rooms[flag.pos.roomName].flagged = false;
             //flag.memory.linkerFrom = undefined;
@@ -52,10 +52,13 @@ var flagSource = {
             } else {
                 structure = Game.rooms[myRooms[i]].find(FIND_MY_SPAWNS);
             }
-            var d = roomBase.distanceBetween(flag.pos, structure.pos);
-            if (!distance || distance > d) {
-                distance = d;
-                closest = myRooms[i];
+            //console.log(flag.pos,"closestInfo",structure,structure[0].pos,"room",myRooms[i],"fndOpts",findOpts);
+            if (structure[0].pos) {
+                var d = roomBase.distanceBetween(flag.pos, structure[0].pos);
+                if (!distance || distance > d) {
+                    distance = d;
+                    closest = myRooms[i];
+                }
             }
         }
         return { room : closest, distance : distance };
@@ -63,17 +66,19 @@ var flagSource = {
     },
 
     linkerSupplyRoom : function (flag) {
-        return roomBase.findClosest(flag.pos, FIND_MY_SPAWNS);
+        return this.closestInfo(flag);
+        //return roomBase.findClosest(flag.pos, FIND_MY_SPAWNS);
     },
 
     porterSupplyRoom : function (flag) {
-        var endergyDump = { filter : function (structure) {
-            return structure.structureType == STRUCTURE_SPAWN
-                || structure.structureType == STRUCTURE_STORAGE
-                || structure.structureType == STRUCTURE_LINK
-                || structure.structureType == STRUCTURE_CONTAINER
-        }};
-        return roomBase.findClosest(flag.pos, FIND_STRUCTURES, endergyDump);
+        return this.closestInfo(flag);
+        //var endergyDump = { filter : function (structure) {
+        //    return structure.structureType == STRUCTURE_SPAWN
+        //        || structure.structureType == STRUCTURE_STORAGE
+        //        || structure.structureType == STRUCTURE_LINK
+        //        || structure.structureType == STRUCTURE_CONTAINER
+        //}};
+        //return roomBase.findClosest(flag.pos, FIND_STRUCTURES, endergyDump);
     }
 
 

@@ -44,6 +44,7 @@ function  RouteNeutralPorter  (roomName, flagName, respawnMultiplyer) {
         flag.memory.energyCapacity,
         size
     );
+    this.respawnRate = Math.ceil(this.respawnRate);
 
     this.body = racePorter.body(size);
   //  console.log(size,"RouteNeutralPorter",this.body);
@@ -60,16 +61,6 @@ function  RouteNeutralPorter  (roomName, flagName, respawnMultiplyer) {
 }
 
 RouteNeutralPorter.prototype.spawn = function (build, spawn, room ) {
-  //  console.log("trying to spawn RouteLinker");
-    //var body = racePorter.body(build.size);
-    //for ( var i = 1 ; i < build.healParts ; i++ ) {
-    //    body.pop();
-   //     body.shift();
-   // }
-   // for ( var i = 0 ; i < build.healParts ; i++ ) {
-   //     body.push(HEAL);
-    //    body.unshift(MOVE);
-    //}
     var flag = Game.flags[build.flagName];
     var name = stats.createCreep(spawn, build.body, undefined, undefined);
     if (_.isString(name)) {
@@ -110,11 +101,11 @@ RouteNeutralPorter.prototype.equals = function (route1, route2 ) {
 };
 
 RouteNeutralPorter.prototype.energyCost = function(build) {
-    return racePorter.energyFromSize(build.size);
+    return raceBase.getEnergyFromBody(build.body);
 };
 
 RouteNeutralPorter.prototype.parts = function(build) {
-    return build.size * 3;
+    return build.body.length;
 };
 
 module.exports = RouteNeutralPorter;

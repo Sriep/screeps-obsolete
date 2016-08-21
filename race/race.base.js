@@ -208,7 +208,7 @@ var raceBase = {
            //     this.recycleCreep(Game.creeps[creepName]);
             } //  if (Game.creeps[creepName].memory.role = ROLE_UNASSIGNED)
         } //  for (var creepName in Game.creeps)
-        this.moveFlags();
+        //this.moveFlags();
 
         stats.upadateTick();
     },
@@ -219,8 +219,9 @@ var raceBase = {
 
             if (flag.memory.type == STRUCTURE_LINK) {
                 var link = Game.getObjectById(flag.name);
-               // console.log(flag,"move flags, nextid",link.memory.nextLinkId);
-                if (link) {
+                // console.log(flag,"move flags, nextid",link.memory.nextLinkId);
+                //console.log(link,"link",link.structureType);
+                if (link.structureType == STRUCTURE_LINK) {
                     if (flag.memory.nextLinkId) {
                         var nextLink = Game.getObjectById(flag.memory.nextLinkId);
                         if (nextLink) {

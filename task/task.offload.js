@@ -15,7 +15,7 @@ var stats = require("stats");
  * @module tasksHarvest
  */
 
-function TaskOffload (offloadMethod, resource,  amount, canUseAlternative) {
+function TaskOffload (offloadMethod, resource,  amount, canUseAlternative, targetId) {
     this.taskType = gc.TASK_OFFLOAD;
     this.conflicts = offloadMethod;
     this.offloadMethod = offloadMethod;
@@ -26,11 +26,12 @@ function TaskOffload (offloadMethod, resource,  amount, canUseAlternative) {
         this.resource = RESOURCE_ENERGY;
         this.ammount = undefined;
     } else {
-        this.resource = resource;
+        this.resource = resource ? resource : RESOURCE_ENERGY;
         this.ammount = amount;
     }
     this.loop = true;
     this.pickup = true;
+    this.targetId = targetId;
     this.canUseAlternative = canUseAlternative;
 }
 
@@ -42,22 +43,29 @@ TaskOffload.prototype.offloadMethod = {
     Upgrade: "upgrade"
 };
 
-TaskOffload.prototype.doTask = function(creep, task, actions) {
+TaskOffload.prototype.doTask = function(creep, task) {
+    if (!task.resource) task.resource = RESOURCE_ENERGY;
+
     var tasks = require("tasks");
-  //console.log(creep,"In task Offload target id", tasks.getTargetId(creep), "canuselagtenatives",task.canUseAlternative);
+  console.log(creep,"In task Offload target id", tasks.getTargetId(creep), "canuselagtenatives",task.canUseAlternative);
 
     if (creep.carry[task.resource] == 0) {
         //console.log("tried Offloading witih no enrgy");
         tasks.setTargetId(creep, undefined);
         return tasks.Result.Finished;
     }
-
-    var target = Game.getObjectById(tasks.getTargetId(creep));
+    var target;
+    if (task.targetId) {
+        target = Game.getObjectById(task.targetId);
+    } else {
+        target = Game.getObjectById(tasks.getTargetId(creep));
+    }
     if (!target) {
-       // console.log(creep,"Offload, No target Id found",task.offloadMethod, "carryenergy",creep.carry.energy );
+        console.log(creep,"Offload, No target Id found",task.offloadMethod, "carryenergy",creep.carry.energy );
         tasks.setTargetId(creep, undefined);
-        if (creep.carry.energy == 0) {
-            //console.log("return finished no caryy energy");
+        //if (creep.carry.energy == 0) {
+        if (creep.carry[task.resource] == 0) {
+            console.log("return finished no caryy energy");
             return gc.RESULT_FINISHED;
         } else {
             switch (task.offloadMethod) {
@@ -65,10 +73,10 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
                 case gc.REPAIR:
                 case gc.TRANSFER:
                     if (task.canUseAlternative) {
-                        //console.log("no target id some cary energy uselaterantive true",task.canUseAlternative)
+                        console.log("no target id some cary energy uselaterantive true",task.canUseAlternative)
                         return gc.RESULT_ROLLBACK;
                     } else {
-                        //console.log("no target id some cary energy uselaterantive false",task.canUseAlternative)
+                        console.log("no target id some cary energy uselaterantive false",task.canUseAlternative)
                         return gc.RESULT_FINISHED;
                     }
                 case gc.UPGRADE_CONTROLLER:
@@ -79,18 +87,18 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
         }
     }
     var result = stats[task.offloadMethod](creep, target, task.resource, task.amount);
-    //console.log(creep,"Task Offload result", result, "target",target,
-    //    "method", JSON.stringify(task.offloadMethod));
+    console.log(creep,"Task Offload result", result, "target",target,
+       "method", JSON.stringify(task.offloadMethod));
     switch (result ) {
         case OK:
-            if (creep.carry.energy == 0
+            if (creep.carry[task.resource] == 0
                 || task.offlaodType == gc.DROP
                 || task.offlaodType == gc.TRANSFER ) {
 
-               // console.log(creep,"offloaded all energy - FINSIHED",task.offloadMethod);
+                console.log(creep,"offloaded all energy - FINSIHED",task.offloadMethod);
               //  creep.say("empty");
                 tasks.setTargetId(creep, undefined);
-                if (creep.carry.energy == 0)
+                if (creep.carry[task.resource] == 0)
                 {
                     return gc.RESULT_FINISHED;
                 } else {
@@ -106,7 +114,7 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
                     case gc.BUILD:
                         if (Game.getObjectById(target.id)) {
                             //creep.say("build same");
-                           // console.log(creep, "Build object still three, result unfinished");
+                            console.log(creep, "Build object still three, result unfinished");
                             return gc.RESULT_UNFINISHED;                          
                         }
                         break;
@@ -121,7 +129,7 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
                     case gc.TRANSFER:
                         tasks.setTargetId(creep, undefined);
                         creep.say("next target");
-                          //console.log("Built object need rollback for nest siet");
+                          console.log("Built object need rollback for nest siet");
                         return gc.RESULT_ROLLBACK;
                     case gc.UPGRADE_CONTROLLER:
                        // creep.say("upgrade");
@@ -136,13 +144,13 @@ TaskOffload.prototype.doTask = function(creep, task, actions) {
         case ERR_FULL:
         case ERR_INVALID_TARGET:
             tasks.setTargetId(creep, undefined);
-            if (creep.carry.energy == 0)     {
+            if (creep.carry[task.resource] == 0)     {
                 return gc.RESULT_FINISHED;
             } else {
                 if (task.canUseAlternative) {
                     tasks.setTargetId(creep, undefined);
                 }
-                //console.log(creep,"invalid target abou to return finished")
+                console.log(creep,"invalid target abou to return finished")
                 return gc.RESULT_FINISHED;
             }
         case ERR_NOT_IN_RANGE:

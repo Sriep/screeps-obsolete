@@ -24,6 +24,7 @@ var RouteMiner = require("route.miner");
 var roomController = require("room.controller")
 var RouteSuppressKeepers = require("route.suppress.keepers");
 var RouteNeutralHarvester = require("route.neutral.harvest");
+var flagBase = require("flag.base");
 
 /**
  * Requisition object for using the pool
@@ -33,54 +34,186 @@ var RouteNeutralHarvester = require("route.neutral.harvest");
 var economyLinkers = {
     LINK_TO_SOURCE_RANGE: 2,
 
-    attachFlaggedRoutes: function (room, policy) {
-
-        if (!this.notReadyForLinkers(room))
+    attachLocalFlaggedRoutes: function(room, policy) {
+        if (!this.readyForLinkers(room))
             return;
 
         var flags = _.filter(Game.flags, function (flag) {
             return ( flag.memory.linkerFrom
-                    && (flag.memory.linkerFrom.room == room.name
-                    || flag.memory.porterFrom.room == room.name) );
+            && room.name == flag.pos.roomName
+            && flag.memory.linkerFrom.room == room.name );
         });
-        for ( var i = 0 ; i < flags.length ; i++ ) {
+        for ( var j = 0 ; j < flags.length ; j++ ) {
+            //console.log("attachFlaggedRoutes this rooms flags",flags[j]);
+            if ( gc.FLAG_SOURCE == flags[j].memory.type
+                || (gc.FLAG_MINERAL == flags[j].memory.type
+                && this.useLinkerMiner(room, flags[j])) )  {
 
-            if (flags[i].memory.keeperLairRoom
-                && flags[i].memory.linkerFrom.room == room.name) {
+                this.attachHarvestLinker(room, flags[j], policy);
 
-                this.suppressKeeperRoom(
-                    room,
-                    flags[i].pos.roomName,
-                    flags[i].memory.linkerFrom.distance
-                );
-            }
-
-            if ( gc.FLAG_SOURCE == flags[i].memory.type
-                || (gc.FLAG_MINERAL == flags[i].memory.type
-                && this.useLinkerMiner(room, flags[i])) )  {
-
-                this.attachHarvestLinker(room, flags[i], policy);
-
-            } else if (gc.FLAG_MINERAL == flags[i].memory.type) {
-                this.attachFlaggedMiner(room, flags[i]);
-            }
-
-            if (flags[i].pos.roomName != room.name
-                && flags[i].memory.porterFrom
-                && room.name == flags[i].memory.porterFrom.room) {
-
-                this.attachNeutralPorter(room, flags[i]);
+            } else if (gc.FLAG_MINERAL == flags[j].memory.type) {
+                this.attachFlaggedMiner(room, flags[j]);
             }
         }
-        this.attachFlaggedControlRoutes(room, policy);
-        //this.attachFlaggedKeeperLairRoutes(room, policy);
+    } ,
 
-        if (Game.time % gc.CHECK_FOR_ORPHANED_BUILDS_RATE == 0 ){
-            this.checkForOrphanedBuilds(room);
+    attachForeignFlaggedRoutes: function (room, policy) {
+        if (!this.readyForForeignLinkers(room)) return;
+        var flags = _.filter(Game.flags, function (f) {
+            return (flagBase.linkerFrom(f, room.name)
+                || flagBase.porterFrom(f, room.name)
+                || flagBase.reverseControllerFrom(f, room.name))
+                && room.name != f.pos.roomName;
+        });
+        var roomNames = flagBase.roomNamesFromFlags(flags);
+        var orderRooms = this.orderForeignRooms(room, roomNames, flags);
+        //console.log("attachForeignRoutes ordered rooms", JSON.stringify(orderRooms) );
+        var spawnTime = room.find(FIND_MY_SPAWNS).length * CREEP_LIFE_TIME;
+        var maxSpawnAvaliable = spawnTime * gc.SPAWN_RESERVE_MULTIPLIER - gc.SPAWN_RESERVE_TIME;
+        var spawnTime = 0;
+       // console.log("maxSpawn", maxSpawnAvaliable,"spawnTime", spawnTime);
+        for ( var i = 0 ; i < orderRooms.length ; i++) {
+            spawnTime += orderRooms[i].spawnTime;
+            //console.log("maxSpawn", maxSpawnAvaliable,"spawnTime", spawnTime);
+            if (spawnTime > maxSpawnAvaliable) {
+                return;
+            }
+            //console.log("roomnames attachForeignFlaggedRoutes", roomNames[i],orderRooms[i].roomName);
+            var roomFlags = _.filter(flags, function(fl) {
+                return fl.pos.roomName == orderRooms[i].roomName
+            });
+            if (roomFlags.length > 0) {
+               // console.log("attachForeignFlaggedRoutes ready for keeper",this.readyForKeeperSuppress(room)
+               // , "laier?",roomFlags[0].memory.keeperLairRoom );
+                if (roomFlags[0].memory.keeperLairRoom
+                    && this.readyForKeeperSuppress(room)) {
+                   //console.log("attachForeignFlaggedRoutes keeper supppress");
+                    this.attachKeeperRoomRoutes(room, orderRooms[i].roomName, roomFlags, policy,i);
+                } else {
+                    this.attachForeignRoomRoutes(room, orderRooms[i].roomName, roomFlags, policy,i);
+                    //this.attachForeignRoomRoutes(myRoom.name, roomFlags, policy);
+                }
+            }
         }
     },
 
-    attachHarvestLinker: function(room, flag, policy) {
+    orderForeignRooms: function(myRoom, roomNames, flags) {
+        var orderedRooms = [];
+        for ( var i = 0 ; i < roomNames.length ; i++ ) {
+            if (!myRoom.memory.roomsToAvoid
+                || myRoom.memory.roomsToAvoid.indexOf(roomName[i]) == -1 )
+            {
+                var roomFlags = _.filter(flags, function(fl) {
+                    return fl.pos.roomName == roomNames[i]
+                });
+                var avDistance = 0, sourceEnergy = 0, count = 0;
+                for ( var j = 0 ; j < roomFlags.length ; j++ ) {
+                    //console.log(myRoom,"roomFlag outside if ",JSON.stringify(roomFlags[j].memory));
+                    if (flagBase.linkerFrom(roomFlags[j], myRoom.name)) {
+                        avDistance += roomFlags[j].memory.linkerFrom.distance;
+                        sourceEnergy += roomFlags[j].memory.energyCapacity;
+                        count++;
+                        //console.log(myRoom,"roomFlag inside if",roomFlags[j]);
+                    }
+                }
+                avDistance = Math.ceil(avDistance / count);
+                //console.log(myRoom,"orderForeignRooms ",roomNames[i], avDistance, sourceEnergy);
+                var spawnTime = this.spawnTimeForeignRoutes(avDistance, 5*sourceEnergy);
+                if (roomFlags[0].memory.keeperLairRoom ) {
+                    spawnTime += MAX_CREEP_SIZE * CREEP_SPAWN_TIME;
+                }
+                if( avDistance > 0 ) {
+                    orderedRooms.push( {
+                        roomName : roomNames[i],
+                        avDistance : avDistance,
+                        spawnTime : spawnTime
+                    });
+                }
+            }
+        }
+        return orderedRooms.sort( function( r1, r2) { return r1.avDistance - r2.avDistance });
+    },
+
+    spawnTimeForeignRoutes: function(distance, energy) {
+        var spawnTime;
+        var workParts = energy/(HARVEST_POWER * CREEP_LIFE_TIME);
+        var linkerParts = workParts * 3;
+        spawnTime = linkerParts * CREEP_SPAWN_TIME *(CREEP_LIFE_TIME)/(CREEP_LIFE_TIME-distance);
+
+        var carryParts = energy * (2*distance) /(CREEP_LIFE_TIME * CARRY_CAPACITY);
+        var porterParts =  carryParts * 1.5 + 1;
+        spawnTime += porterParts * CREEP_SPAWN_TIME;
+
+        var claimParts = CREEP_LIFE_TIME / (CREEP_CLAIM_LIFE_TIME - distance);
+        spawnTime += claimParts * 2;
+        //console.log( "spawnTimeForeignRoutes", distance,"energy", energy,"spawn time", spawnTime);
+
+        return Math.ceil(spawnTime);
+    },
+
+    attachForeignRoomRoutes: function(myRoom, roomName, roomFlags, policy, deltaPriority) {
+        var room = Game.rooms[roomName];
+
+        var contollerFlag = _.filter(roomFlags, function (f) {
+            return f.memory && gc.FLAG_CONTROLLER ==  f.memory.type;
+        })[0];
+        if (contollerFlag && this.readyForReservContorller(myRoom) ) {
+            //console.log(myRoom, "attach cvontoller", contollerFlag);
+            var controllerRouteId = this.attachFlaggedReverseController(contollerFlag, myRoom, policy);
+        }
+        var linkers  = [];
+        //console.log(roomName,"attachForeignRoomRoutes",roomFlags.length);//,JSON.stringify(roomFlags) );
+        for ( var i = 0 ; i < roomFlags.length ; i++ ) {
+            //console.log("attachForeignRoutes flags for room", roomName, JSON.stringify(roomFlags[i].memory));
+            //console.log(i,"inside for loop porter",roomFlags[i], roomName, "myroom", myRoom,
+            //   flagBase.porterFrom(roomFlags[i], myRoom.name), "linkerfrom"
+           //     , flagBase.linkerFrom(roomFlags[i], myRoom.name));
+
+            if (flagBase.porterFrom(roomFlags[i], myRoom.name)) {
+                var porterRouteId = this.attachNeutralPorter(myRoom,roomFlags[i]);
+            }
+
+            if (porterRouteId && flagBase.linkerFrom(roomFlags[i], myRoom.name)) {
+                var linkerRouteId = this.attachHarvestLinker(myRoom, roomFlags[i], policy, deltaPriority);
+
+                linkers.push(linkerRouteId);
+                var dependencies = [];
+                if (controllerRouteId) {
+                    dependencies.push( { id : controllerRouteId, priority : gc.PRIORITY_NEUTRAL_LINKER -3 } );
+                }
+                if (porterRouteId) {
+                    dependencies.push( { id : porterRouteId, priority : gc.PRIORITY_NEUTRAL_LINKER -6 } );
+                }
+               // console.log("attachForeignRoomRoutes likerID",linkerRouteId,
+               //     "dependancies", JSON.stringify(dependencies));
+                if (dependencies.length > 0 && myRoom.memory.routes.details[linkerRouteId]) {
+                    myRoom.memory.routes.details[linkerRouteId].dependancies = dependencies;
+                }
+            }
+        }
+        if (Game.time % gc.CHECK_FOR_ORPHANED_BUILDS_RATE == 0 ){
+            this.checkForOrphanedBuilds(room);
+        }
+        //console.log("attachForeignRoomRoutes end linkers", JSON.stringify(linkers));
+        return linkers;
+    },
+
+    attachKeeperRoomRoutes: function(myRoom, keeperRoomName, roomFlags, policy, deltaPriority) {
+       // var room = Game.rooms[roomName];
+        var suppresorId = this.suppressKeeperRoom(myRoom, roomFlags[0], deltaPriority);
+        if (suppresorId) {
+                          //this.attachForeignRoomRoutes(room, roomNames[i], roomFlags, policy);
+            var linkers = this.attachForeignRoomRoutes(myRoom, keeperRoomName, roomFlags, policy, deltaPriority);
+           // console.log("attachKeeperRoomRoutes linkers length", linkers.length);
+            var dependants = [];
+            for ( var i = 0 ; i < linkers.length ; i++ ) {
+                dependants.push(  { id : linkers[i], priority : gc.PRIORITY_NEUTRAL_LINKER -4 } )
+            }
+            myRoom.memory.routes.details[suppresorId].dependancies = dependants;
+        }
+    },
+
+    attachHarvestLinker: function(room, flag, policy, deltaPriority) {
         var healUnits = flag.memory.keeperLairRoom ? gc.KEEPER_HARVESTER_HEALER_PARTS : 0;
         var defensive = (room.name != flag.pos.roomName);
 
@@ -88,11 +221,12 @@ var economyLinkers = {
         var order = new RouteLinker(
             room.name,
             flag.name,
-            policy.id,
+            policy ? policy.id : undefined,
             defensive,
             false,
             healUnits
         );
+        deltaPriority = deltaPriority ? deltaPriority : 0;
         if (!this.keepMatchedBuildWithSameSize(
                 room, "flagName", flag.name, order)) {
             var priority;
@@ -104,12 +238,15 @@ var economyLinkers = {
                 priority = gc.PRIORITY_MINER;
             if (flag.memory.keeperLairRoom)
                 priority = gc.PRIORITY_KEEPER_HARVEST;
-            routeBase.attachRoute(
+            var id = routeBase.attachRoute(
                 room.name,
                 gc.ROLE_LINKER,
                 order,
-                priority,flag.name
+                priority + deltaPriority,
+                flag.name
             );
+           // console.log("attachHarvestLinker id is", id);
+            return id;
         }
     },
 
@@ -134,22 +271,23 @@ var economyLinkers = {
                 && build.flagName == flag.name;
         });
         if (!harvesters || harvesters.length == 0) {
+            if (!flag.memory.keeperLairRoom) { // Already got protection
+                this.attachPatrolCreep(flag, room);
+            }
             var order = new RouteNeutralPorter(
                 room.name,
                 flag.name,
                 respawnMultiplyer
             );
-            routeBase.attachRoute(
+            var id = routeBase.attachRoute(
                 room.name,
                 gc.ROUTE_NEUTRAL_HARVEST,
                 order,
                 priority,
                 flag.name
             );
-        }
-        if (!flag.memory.keeperLairRoom) { // Already got protection
-            var soldierBody = raceSwordsman.body(gc.SWORDSMAN_NEUTRAL_PATROL_SIZE);
-            this.attachPatrolCreep(flag, room, soldierBody);
+            //console.log("attachNeutralPorter id is", id);
+            return id;
         }
     },
 
@@ -201,7 +339,7 @@ var economyLinkers = {
                     flag.memory.resourceType,
                     flag.pos
                 );
-                routeBase.attachRoute(room.name, gc.ROLE_LINKER, order, gc.PRIORITY_MINER);
+                return routeBase.attachRoute(room.name, gc.ROLE_LINKER, order, gc.PRIORITY_MINER);
             }
         }
     },
@@ -237,106 +375,81 @@ var economyLinkers = {
         return false;
     },
 
-    attachFlaggedControlRoutes: function (room, policy) {
-        var flags = _.filter(Game.flags, function (flag) {
-            return ( gc.FLAG_CONTROLLER == flag.memory.type
-            && flag.memory.claimerFrom
-            && flag.memory.claimerFrom.room == room.name
-            && flag.memory.upgradeController);
-        });
-        for ( var  i = 0 ; i < flags.length ; i++ ) {
-           // console.log(flags[i],flags,flags.length,"start gfor loop attachFlaggedControlRoutes",i);
-
-            var matches = routeBase.filterBuilds(room, "reference", flags[i].name);
-            var foundMatchingController = false, foundMatchingPatrol = false;
-            var claimerBody = raceClaimer.body(raceClaimer.maxSizeRoom(room));
-            var soldierBody = raceSwordsman.body(gc.SWORDSMAN_NEUTRAL_PATROL_SIZE);
-           // console.log(flags,"0 attachFlaggedControlRoutes i = ",i);
-            for (var j = 0; j < matches.length; j++) {
-                if (gc.ROUTE_REMOTE_ACTIONS == matches[j].type) {
-                    if (claimerBody.length == matches[j].body.length) {
-                        foundMatchingController = true;
-                    } else {
-                        console.log(room,"attachFlaggedControlRoutes type",matches[j].type,"lengths",
-                            claimerBody.length,matches[j].body.length);
-                        routeBase.removeRoute(room.name, matches[j].id);
-                    }
-                } else if (gc.ROUTE_PATROL_ROOM == matches[j].type) {
-                    if (soldierBody.length == matches[j].body.length) {
-                        foundMatchingPatrol = true;
-                    } else {
-                        routeBase.removeRoute(room.name, matches[j].id);
-                    }
-                }
-            }
-          //  console.log(flags,"1 attachFlaggedControlRoutes i = ",i);
-            if (!foundMatchingController) {
-                this.attachFlaggedReverseController(flags[i], room, policy, claimerBody);
-            }
-        //    console.log(flags,"2 attachFlaggedControlRoutesii =",i);
-            if (!foundMatchingPatrol) {
-               // console.log(room,"attachPatrolCreep flag",flags[i],JSON.stringify(flags[i]));
-                //this.attachPatrolCreep(flags[i], room, soldierBody);
-            }
-        }
-    },
-
-    attachFlaggedReverseController: function (flag, room, policy, body)
+    attachFlaggedReverseController: function (flag, room, policy)
     {
-       // console.log(flag,"attachFlaggedReverseController");
+        var reservers = routeBase.filterBuildsF(room, function(build) {
+            return build.type == gc.ROUTE_REMOTE_ACTIONS
+                && build.reference == flag.name;
+        });
+        if (reservers.length > 0) return reservers[0].id;
+
+        // console.log(flag,"attachFlaggedReverseController");
+        var claimerBody = raceClaimer.body(raceClaimer.maxSizeRoom(room));
         var actions = {
             room : flag.pos.roomName,
             action : "reserveController",
             findFunction : "findController",
             findFunctionsModule : "policy.remote.actions"
         };
-        var size = body.length/2;
+        var size = claimerBody.length/2;
         var timeReversing = CREEP_CLAIM_LIFE_TIME - flag.memory.claimerFrom.distance;
         var ticksReversedLifetime = size * timeReversing;
         var respawn = ticksReversedLifetime - Math.ceil(gc.REVERSE_CLAIM_SAFETYNET / size);
         var order = new RouteRemoteActions(
             room.name,
             actions,
-            body,
+            claimerBody,
             respawn,
-            policy.id,
+            policy ? policy.id : undefined,
             flag.name,
             size
         );
       //  console.log(flag,"attachFlaggedReverseController",JSON.stringify(order));
-        routeBase.attachRoute(room.name, gc.ROUTE_REMOTE_ACTIONS,order,
+        return routeBase.attachRoute(room.name, gc.ROUTE_REMOTE_ACTIONS,order,
             gc.PRIORITY_REVERSE_CONTROLLER,flag.name);
     },
 
-    attachPatrolCreep: function (flag, room, body) {
+    attachPatrolCreep: function (flag, room) {
+        var soldierBody = raceSwordsman.body(gc.SWORDSMAN_NEUTRAL_PATROL_SIZE);
         var patrols = routeBase.filterBuildsF(room, function(build) {
             return build.type == gc.ROUTE_PATROL_ROOM
                 && build.patrolRoom == flag.pos.roomName;
         });
+        if (patrols.length > 0) return patrols[0].id;
 
-        if (!patrols || patrols.length == 0) {
-            var respawn = CREEP_LIFE_TIME - flag.memory.linkerFrom.distance;
-            var order = new RoutePatrolRoom(
-                room.name,
-                flag.pos.roomName,
-                {roomName: flag.pos.roomName, x: 25, y: 25},
-                body,
-                respawn,
-                flag.name,
-                gc.SWORDSMAN_NEUTRAL_PATROL_SIZE
-            );
-            //   console.log(flag,"attachPatrolCreep",JSON.stringify(order));
-            routeBase.attachRoute(room.name, gc.ROUTE_PATROL_ROOM,
-                order,gc.PRIORITY_ROOM_PATROL,flag.name);
-        }
+        var respawn = CREEP_LIFE_TIME - flag.memory.linkerFrom.distance;
+        var order = new RoutePatrolRoom(
+            room.name,
+            flag.pos.roomName,
+            {roomName: flag.pos.roomName, x: 25, y: 25},
+            soldierBody,
+            respawn,
+            flag.name,
+            gc.SWORDSMAN_NEUTRAL_PATROL_SIZE
+        );
+        //   console.log(flag,"attachPatrolCreep",JSON.stringify(order));
+        return routeBase.attachRoute(room.name, gc.ROUTE_PATROL_ROOM,
+            order,gc.PRIORITY_ROOM_PATROL,flag.name);
+
     },
 
-    notReadyForLinkers: function (room) {
-        return room.energyCapacityAvailable > gc.MIN_ENERGY_CAPACITY_LINKERS;
+    readyForLinkers: function (room) {
+        return room.energyCapacityAvailable >= gc.MIN_ENERGY_CAPACITY_LINKERS;
     },
 
-    alreadyInBulidQueue: function(room, flag) {
-        return routeBase.filterBuilds(room,"flagName", flag.name).length > 0;
+    readyForForeignLinkers: function (room) {
+        return room.energyCapacityAvailable > gc.MIN_ENERGY_CAPACITY_FOREIGN_LINKERS;
+    },
+
+    readyForReservContorller: function (room) {
+        return room.energyCapacityAvailable >= gc.MIN_ENERGY_CAPACITY_FOREIGN_LINKERS;
+    },
+
+
+    readyForKeeperSuppress: function (room) {
+        //console.log("readyForKeeperSuppress  room energy",room.energyCapacityAvailable,
+        //    ">",gc.MIN_ENERGY_CAPACITY_KEEPER_ROOM);
+        return room.energyCapacityAvailable >= gc.MIN_ENERGY_CAPACITY_KEEPER_ROOM;
     },
 
     attachFlexiStoragePorters: function (room, policy) {
@@ -349,16 +462,13 @@ var economyLinkers = {
     ///        this.porterShortfall(room,policy), "existing parts",  this.existingPorterParts(policy)
     //        ,"porterPartsNeeded",this.porterPartsNeeded(room));
 
-        console.log(room, "attachFlexiStoragePorters, 0 < porterShortfall",
-            this.porterShortfall(room,policy), "existing parts",  this.existingPorterParts(policy));
-        //this.porterPartsNeeded(room);
-
         var creeps = _.filter(Game.creeps, function (creep) {
             return creep.memory.policyId == policy.id
                 && creep.memory.role == gc.ROLE_FLEXI_STORAGE_PORTER});
-
-        console.log(room,"attachFlexiStoragePorters creeps", creeps.length ,
-            "< max can fit in room",this.maxCreepsCanFitInRoom(room),"policy.id",policy.id );
+       // console.log(room, "attachFlexiStoragePorters, 0 < porterShortfall",
+      //      this.porterShortfall(room,policy), "existing parts",  this.existingPorterParts(policy),
+      //      "creeps", creeps.length ,
+      //      "< max can fit in room",this.maxCreepsCanFitInRoom(room),"policy.id",policy.id );
 
      //  console.log(room,"number of porter parts needed",this.porterPartsNeeded(room));
 
@@ -370,7 +480,6 @@ var economyLinkers = {
         if ( 0 < this.porterShortfall(room,policy)
             && routeBase.filterBuilds(room,"type",gc.ROUTE_FLEXI_STORAGE_PORTER).length == 0) {
 
-
            if (creeps.length <= this.maxCreepsCanFitInRoom(room)) {
                 var order = new RouteFlexiStoragePorter(room.name, 0, policy.id);
                // console.log("attachFlexiStoragePorters creeplife", this.creepLifeTicks(policy),
@@ -381,69 +490,46 @@ var economyLinkers = {
                 } else {
                     priority = gc.PRIORITY_HOME_PORTER
                 }
-                routeBase.attachRoute(room.name, gc.ROUTE_FLEXI_STORAGE_PORTER,order,priority);
+                return routeBase.attachRoute(room.name, gc.ROUTE_FLEXI_STORAGE_PORTER,order,priority);
            }
         }
         //console.log(room,"End of attachFlexiStoragePorters");
     },
 
-    suppressKeeperRoom: function(room, keeperRoom, distance) {
-       // console.log("suppressKeeperRoom", room, keeperRoom, distance);
-        if (room.energyCapacityAvailable < roomController.maxProduction[7])
-            return;
+    suppressKeeperRoom: function(room, flag, deltaPriority) {
+        var keeperRoom = flag.pos.roomName;
+        var distance = flag.memory.linkerFrom.distance;
+         console.log("suppressKeeperRoom", room, keeperRoom, distance);
+        //if (room.energyCapacityAvailable < roomController.maxProduction[7])
+        //    return;
 
         var suppressors = routeBase.filterBuildsF(room, function(build) {
            return build.type == gc.ROUTE_SUPPRESS_KEEPERS
                && build.keeperRoom == keeperRoom;
         });
-       // console.log("suppressKeeperRoom", suppressors);
+        deltaPriority = deltaPriority ? deltaPriority : 0;
+        //console.log("suppressKeeperRoom", JSON.stringify(suppressors));
         if (suppressors.length == 0) {
             var respawnRate = CREEP_LIFE_TIME - gc.KEEPER_ATTACK_SPAWN_RATE_BUFFER - distance;
             var order = new RouteSuppressKeepers(keeperRoom, undefined, respawnRate, 14, 11);
-         //   console.log("suppressKeeperRoom order", JSON.stringify(order));
-            routeBase.attachRoute(room.name, gc.ROUTE_SUPPRESS_KEEPERS, order, gc.PRIORITY_KEEPER_ATTACK);
-        }
-    },
-/*
-    attachKeeperRoomHarvesters: function (room, flag) {
-        var harvesters = routeBase.filterBuildsF(room, function(build) {
-            return build.type == gc.ROUTE_NEUTRAL_HARVEST
-                && build.flagName == flag.name;
-        });
-        if (!harvesters || harvesters.length == 0) {
-            var order = new RouteNeutralHarvester(room.name, flag.name, gc.KEEPER_HARVESTER_HEALER_PARTS);
-            routeBase.attachRoute(
+            //console.log(room.name,"suppressKeeperRoom order", JSON.stringify(order));
+            var id = routeBase.attachRoute(
                 room.name,
-                gc.ROUTE_NEUTRAL_HARVEST,
+                gc.ROUTE_SUPPRESS_KEEPERS,
                 order,
-                gc.PRIORITY_KEEPER_HARVEST,
-                flag.name
+                gc.PRIORITY_KEEPER_ATTACK + deltaPriority
             );
+           // console.log(room.name,"suppressKeeperRoom id of route",id)
+            return id;
         }
     },
-*/
+
     maxCreepsCanFitInRoom: function (room) {
         if (!room.storage) {
             return roomOwned.accessPointsType(room, FIND_SOURCES) +  room.find(FIND_SOURCES).length;
         } else {
             return roomOwned.accessPointsType(room, FIND_SOURCES)
                 +  room.find(FIND_SOURCES).length + 6;
-        }
-    },
-
-    attachRepairer: function (room) {
-        var matches = routeBase.filterBuilds(room,"type", gc.ROUTE_REPAIRER);
-        var previous;
-        if (matches && matches[0]) {
-            previous = matches[0]
-        }
-        var order = new RouteRepairer(room.name, policy.id);
-        if ( previous && previous.size != order.size) {
-            routeBase.removeRoute(room.name,previous.id);
-            previous = undefined;
-        }
-        if (!previous) {
-            routeBase.attachRoute(room.name, gc.ROUTE_REPAIRER,order,gc.PRIORITY_REPAIRER);
         }
     },
 
@@ -459,6 +545,7 @@ var economyLinkers = {
     },
 
     checkForOrphanedBuilds: function (room ) {
+        if (!room.memory.routes) return;
         var builds = _.filter(room.memory.routes.details, function (build) {
             return ( build !== undefined && build.owner == room.name );
         });
@@ -631,74 +718,8 @@ var economyLinkers = {
     },
 };
 
-
-
 module.exports = economyLinkers;
 
-/*
- attachFlaggedKeeperLairRoutes: function(room, policy) {
- if (room.controller.level < gc.KEEPER_HARVEST_MIN_CONTROLLER_LEVEL)
- return;
- var keeperPolicies = _.filter(Memory.policies, function (policy) {
- return ( (policy.type == gc.POLICY_KEEPER_SECTOR_MARSHAL
- || policy.type == gc.POLICY_KEEPER_SECTOR_ATTACK
- || policy.type == gc.POLICY_KEEPER_SECTOR_AFTER_ACTION
- || policy.type == gc.POLICY_KEEPER_SECTOR_SUPPRESS)
- && policy.keeperRoom == room.name);
- });
- if (!keeperPolicies) return;
- for ( var i = 0 ; i < keeperPolicies.length ; i++ ) {
- this.keeperRoomSendSolders(room, keeperPolicies[i])
- if (keeperPolicies[i].roomCleared) {
- var flags = _.filter(Game.flags, function (flag) {
- return ( flag.memory.policyId == keeperPolicies[i].id);
- });
- for ( var j = 0 ; j < flags.length ;  j ++ ) {
- switch (flag.memory.type) {
- case gc.FLAG_SOURCE:
- this.keeperRoomSendHarvesters(room, policy, flags[j]);
- this.keeperRoomSendPorters(room, policy, flag[j]);
- break;
- case gc.FLAG_MINERAL:
- this.keeperRoomSendMiners(room, policy, flag[j]);
- break;
- default:
- } // switch
- } // for j
- } else {
- var gifts = routeBase.filterBuilds(room, "policy", keeperPolicies[i].id);
- for ( var k = 0 ; k < gifts.length ; k++ ){
- routeBase.removeRoute(gifts[k].id);
- }
- } // if (policy.roomCleared)
- } // for i
- },
-
-
- keeperRoomSendHarvesters: function(room, policy, flag) {
- var gifts = routeBase.filterBuildsF(room, function(build) {
- return build.policy == flag.memory.policyId && build.role == gc.ROLE_LINKER;
- });
- if (gifts.length == 0) {
- var order = new RouteLinker( room.name, flag.name, policy.id );
- routeBase.attachRoute(room, gc.ROLE_GIFT, order, gc.PRIORITY_KEEPER_HARVEST);
- }
- },
-
- keeperRoomSendPorters: function(room, policy, flag) {
- var gifts = routeBase.filterBuildsF(room, function(build) {
- return build.policy == flag.memory.policyId && build.role == gc.ROLE_NEUTRAL_PORTER;
- });
- if (gifts.length == 0) {
- var order = new RouteLinker( room.name, flag.name, policy.id );
- routeBase.attachRoute(room, gc.ROLE_GIFT, order, gc.PRIORITY_KEEPER_PORTER);
- }
- },
-
- keeperRoomSendMiners: function(room, flag) {
- // TODO Mine minerals in cleared keeper rooms.
- },
- */
 
 
 

@@ -36,7 +36,7 @@ var roleWallBuilder = {
             "moveAndRepair",
             "role.repairer"
         );
-        var offload = new TaskOffload(gc.REPAIR);
+        var offload = new TaskOffload(gc.REPAIR, RESOURCE_ENERGY);
 
         tasks.push(loadup);
         tasks.push(findWall);

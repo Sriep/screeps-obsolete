@@ -275,6 +275,8 @@ console.log("assignRoles havester", havesters_needed, "upgraders",upgraders_need
      //  }
     },
 
+
+
     body: function (size, fast) {
         var body = [];
 
