@@ -13,6 +13,8 @@
  */
 "use strict";
 var gc = require("gc");
+var gf = require("gf");
+var labColours = require("lab.colours");
 /**
  * Task move object. Used when we need to find the object to move to.
  * @module routeBase
@@ -290,8 +292,46 @@ var routeBase = {
             room.memory.routes.details = {};
         }
         return true;
-    }
+    },
 
+    reserveBoosts: function(body) {
+        var labs = room.find(FIND_STRUCTURES, {
+            filter: function(l) {
+                return l.structureType == STRUCTURE_LAB
+                && Game.flags[l.id]
+                && l.mineralAmount >  Game.flags[l.id].reserved
+                                       ?  (Game.flags[l.id].reserved+1) * LAB_BOOST_MINERAL : LAB_BOOST_MINERAL
+                && l.energy >  Game.flags[l.id].reserved
+                                ? (Game.flags[l.id].reserved+1) * LAB_BOOST_ENERGY : LAB_BOOST_ENERGY
+                && Game.flags[l.id].secondaryColor != COLOR_WHITE
+                && !Game.flags[l.id].memory.reserved;
+            }
+        });
+        var newBody = bosy.slice(0);
+        for ( var i = 0 ; i < labs.length ; i++ ) {
+            var flag = Game.flags[lab[i].id];
+            var resource = labColours.resource(flag.color, flag.secondaryColor);
+            var boostPart = _.findKey(BOOSTS,resource);
+            //var boostAmount =
+            if (body.indexOf(boostPart) != -1) {
+                var numParts = gf.countValues(body, boostPart);
+                var reserved = flag.memory.reserved ? flag.memory.reserved : 0;
+                var resource = lab[i].mineralAmount - reserved;
+                var energy = lab[i].energy = reserved;
+                var reserveParts = Math.min(numParts,
+                                      Math.min(Math.floor(resource/LAB_BOOST_MINERAL),
+                                          Math.floor(energy/LAB_BOOST_ENERGY)));
+
+                for ( var j = 0 ; j < newBody ; j++  ) {
+
+                }
+
+
+
+            }
+        }
+
+    }
 };
 
 

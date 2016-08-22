@@ -10,16 +10,18 @@
  * mod.thing == 'a thing'; // true
  */
 var gc = require("gc");
+var gf = require("gf");
 var roleBase = require("role.base");
 var TaskMoveFind = require("task.move.find");
 var TaskHarvest = require("task.harvest");
 var TaskOffload = require("task.offload");
 var TaskMovePos = require("task.move.pos");
 var TaskMoveRoom = require("task.move.room");
+var roleMoveResource = require("role.move.resource");
 var _ = require('lodash');
 
 var roleMiner = {
-    getTaskList: function(creep, homeRoom, mineId, resourceId, minePos, defensive) {
+    getTaskList: function (creep, homeRoom, mineId, resourceId, minePos, defensive) {
         var tasks = [];
         //var moveToMineral = new TaskMoveFind(gc.FIND_ID ,gc.RANGE_HARVEST, mineId);
         //function TaskMovePos (roomPos, range, pathOps, customMoveToFunction, functionModule)
@@ -27,8 +29,8 @@ var roleMiner = {
             minePos = Game.getObjectById(mineId).pos
         }
 
-        var moveToStorage = new TaskMoveFind(gc.FIND_FUNCTION,gc.RANGE_TRANSFER
-            , "findStorage","role.miner");
+        var moveToStorage = new TaskMoveFind(gc.FIND_FUNCTION, gc.RANGE_TRANSFER
+            , "findStorage", "role.miner");
         var offload = new TaskOffload(gc.TRANSFER, resourceId);
         if (defensive) {
             var moveToMineral = new TaskMovePos(
@@ -47,49 +49,58 @@ var roleMiner = {
                 "tasks"
             );
         } else {
-             moveToMineral = new TaskMovePos(minePos,1);
-             harvest = new TaskHarvest(mineId);
-             moveToStorageRoom = new TaskMoveRoom(homeRoom);
+            moveToMineral = new TaskMovePos(minePos, 1);
+            harvest = new TaskHarvest(mineId);
+            moveToStorageRoom = new TaskMoveRoom(homeRoom);
         }
 
         tasks.push(moveToMineral);
         tasks.push(harvest);
-        tasks.push(moveToStorageRoom);
+        if (homeRoom != minePos.roomName) {
+            tasks.push(moveToStorageRoom);
+        }
         tasks.push(moveToStorage);
         tasks.push(offload);
         //console.log(creep,"roleminer tasks",JSON.stringify(tasks));
         return tasks;
     },
 
-    findStorage: function(creep) {
-        var labs = creep.room.find(FIND_STRUCTURES, {
-            filter: function(l) {
-                return l.structureType == STRUCTURE_LAB
-                    && creep.carry[l.mineralType] > 0
-                    && l.mineralAmount < gc.LAB_REFILL_MINERAL_THRESHOLD
-            }
-        });
-        if (labs) {
-            labs.sort(function(l1,l2) { return l1.energy - l2.energy; });
-            return labs[0];
-        }
+    findStorage: function (creep) {
+        var resourceId = gf.mostAbundantNonEnergyStore(creep.carry);
+        //console.log(creep,"findStorage resourceId",resourceId);
+        return roleMoveResource.findOffloadTarget(creep.room, resourceId);
+        /*
+         var labs = creep.room.find(FIND_STRUCTURES, {
+         filter: function(l) {
+         return l.structureType == STRUCTURE_LAB
+         && creep.carry[l.mineralType] > 0
+         && l.mineralAmount < gc.LAB_REFILL_MINERAL_THRESHOLD
+         }
+         });
+         if (labs) {
+         labs.sort(function(l1,l2) { return l1.energy - l2.energy; });
+         return labs[0];
+         }
 
-        var storages = creep.room.find(FIND_STRUCTURES, {
-            filter: function(s) {
-                return ( s.structureType == STRUCTURE_STORAGE
-                    || s.structureType == STRUCTURE_TERMINAL )
-                    && s.storeCapacity - _.sum(s.store) > gc.KEEP_FREE_STORAGE_SPACE
-            }
-        });
-        if (storages) {
-            if (1 < storages.length) {
-                return creep.pos.findClosestByPath(storages);
-            }
-            return storages[0];
-        }
-        return undefined;
-    },
 
+         var storages = creep.room.find(FIND_STRUCTURES, {
+         filter: function(s) {
+         return ( s.structureType == STRUCTURE_STORAGE
+         || s.structureType == STRUCTURE_TERMINAL )
+         && s.storeCapacity - _.sum(s.store) > gc.KEEP_FREE_STORAGE_SPACE
+         }
+         });
+         cnosole.log(creep,"findStorage",storages);
+         if (storages) {
+         if (1 < storages.length) {
+         return creep.pos.findClosestByPath(storages);
+         }
+
+         return storages[0];
+         }
+         return undefined;
+         */
+    }
 };
 
 

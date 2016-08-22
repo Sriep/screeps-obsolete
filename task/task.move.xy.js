@@ -52,8 +52,8 @@ TaskMoveXY.prototype.doTask = function(creep, task) {
         result = creep.moveTo(task.x,task.y);
     }
 
-   // console.log(creep,"TaskMoveXY",result);
-    //creep.say(result);
+    //console.log(creep,"TaskMoveXY",result);
+   // creep.say(result);
     switch (result) {
         case OK:    	            //0	The operation has been scheduled successfully.
             if (creep.pos.inRangeTo(task.x,task.y,task.range)) {

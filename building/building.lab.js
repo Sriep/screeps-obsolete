@@ -38,8 +38,10 @@ var buildingLab = {
                             && lab.pos.inRangeTo(l, gc.RANGE_REACTION);
                     }
                 });
+                console.log(lab.room,"move lab",lab,lab1s, lab2s);
                 if (lab1s.length>0 && lab2s.length>0) {
-                    lab.runReaction(lab1s[0], lab2s[0]);
+                    var result = lab.runReaction(lab1s[0], lab2s[0]);
+                    console.log(lab.room,lab,"runReaction",result);
                 }
             }
         }

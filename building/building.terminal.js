@@ -28,9 +28,10 @@ var buildingTerminal = {
                 if (terminal.store[resourceId] > 5000) {
                     var lab = Game.getObjectById(flagName);
                     if (lab.mineralAmount < gc.LAB_REFILL_MINERAL_THRESHOLD) {
-                        console.log(terminal,"fond lab resource",resourceId,"has resouce",terminal.store[resourceId]);
-                        if (!this.roomHasResource(lab.room, resourceId)) {
-                            var result = terminal.send(resourceId, 2000, lab.room.name);
+                       // console.log(terminal,"fond lab resource",resourceId,"has resouce",terminal.store[resourceId]);
+                        if (!this.roomHasResource(lab.room, resourceId)
+                            && this.roomHasTerminalWithSpace(lab.room)) {
+                            var result = terminal.send(resourceId, gc.TERMINAL_TERMINAL_SEND_AMOUNT, lab.room.name);
                             console.log(terminal,"send resourceId",resourceId,"result",result);
                         }
                     }
@@ -39,7 +40,6 @@ var buildingTerminal = {
         }
     },
 
-
     roomHasResource(room, resourceId) {
         if (room.storage.store[resourceId] > 0) return true;
         if (room.terminal.store[resourceId] > 0) return true;
@@ -47,7 +47,7 @@ var buildingTerminal = {
             var order = Game.market.incomingTransactions[i];
             if ( order.to = room.name
                     && order.resourceType == resourceId
-                    && order.time > Game.time - 5)
+                    && order.time > Game.time - 10)
                 return true;
         }
         var creepsCarryingResource = room.find(FIND_MY_CREEPS, {
@@ -56,8 +56,32 @@ var buildingTerminal = {
             }
         });
         return creepsCarryingResource.length > 0;
+    },
+
+    roomHasTerminalWithSpace(room) {
+        if (!room.terminal) return false;
+        return _.sum(room.terminal.store) < room.terminal.storeCapacity - 2 * gc.TERMINAL_TERMINAL_SEND_AMOUNT;
     }
 
 };
 
 module.exports = buildingTerminal;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

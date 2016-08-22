@@ -46,6 +46,7 @@ var policyFrameworkes = require("policy.frameworks");
 var RouteGiftCreep = require("route.gift.creep");
 var RouteSuppressKeepers = require("route.suppress.keepers");
 var roomController = require("room.controller");
+var labColours = require("lab.colours");
 
 var ayrtepPad = {
     top: function () {
@@ -78,9 +79,9 @@ var ayrtepPad = {
      //     console.log("---------------------------------------------------------------------");
 
 
-       // console.log("------------------------------ routes sim ---------------------------");
-      //       routeBase.showRoutes("sim");
-      //  console.log("------------------------------ routes sim ---------------------------");
+        console.log("------------------------------ routes sim ---------------------------");
+             routeBase.showRoutes("sim");
+        console.log("------------------------------ routes sim ---------------------------");
 
 
     //   var creeps = _.filter(Game.creeps, function (creep) {
@@ -100,9 +101,12 @@ var ayrtepPad = {
         console.log("START MY  PAD START MY  PAD");
 
         //console.log("cost",Game.market.calcTransactionCost(1000,"W26S21","W25S23"));
+        var boost = _.findKey(BOOSTS,RESOURCE_KEANIUM_ACID);
+        console.log("find boost RESOURCE_KEANIUM_ACID",boost);
 
         //Memory.policies[580] = undefined;outgoingTransactions
         //console.log(JSON.stringify(Game.market.outgoingTransactions));
+        //console.log(JSON.stringify(labColours));
         for ( var i in Memory.policies ) {
            // console.log("policy",i, Memory.policies[i].type, Memory.policies[i].roomName);
             //console.log("number of policies", Memory.policies)
@@ -148,6 +152,10 @@ var ayrtepPad = {
         var w26s21 = Game.rooms["W26S21"];
         var w25s22 = Game.rooms["W25S22"];
         var w25s23 = Game.rooms["W25S23"];
+       // var sim = Game.rooms["sim"];
+
+       // sim.memory.routes.details[7].priority = 1;
+       // sim.memory.routes.details[8].priority = 1;
         //console.log("swordsman size W25S19 ", raceBase.maxSizeFromEnergy(gc.RACE_SWORDSMAN, w25s19));
         //console.log("swordsman size w26s21 ", raceBase.maxSizeFromEnergy(gc.RACE_SWORDSMAN, w26s21));
         //console.log("swordsman size W25S22 ", raceBase.maxSizeFromEnergy(gc.RACE_SWORDSMAN, w25s22));
@@ -184,6 +192,8 @@ var ayrtepPad = {
         //w25s23.memory.routes.details[422] = undefined;
         //w25s23.memory.routes.details[5]= 750;
         // w25s23.memory.routes.details[27] = undefined;
+
+
 /*
         var flag = Game.flags["55db3188efa8e3fe66e04b70"];
         var maxForRoom = raceWorker.maxSizeRoom(w25s19);
@@ -252,7 +262,7 @@ var ayrtepPad = {
         }
 
 
-        var creep = Game.creeps["Christian"];//""Miles"];
+        var creep = Game.creeps["Ethan"];//""Miles"];
        // creep.moveTo(Game.getObjectById("5769790d4673b865097b5ba9"));
         //console.log(creep.attack(Game.getObjectById("5769790d4673b865097b5ba9")));
         //roleBase.switchRoles(creep, gc.ROLE_ATTACK_ROOM, "W23S19");
@@ -299,7 +309,7 @@ var ayrtepPad = {
         }
 */
 
-        //routeBase.resetRoutes("sim");
+       // routeBase.resetRoutes("sim");
         //routeBase.resetRoutes("W26S21");
         //routeBase.resetRoutes("W25S22");
         //routeBase.resetRoutes("W25S23");
@@ -332,9 +342,21 @@ var ayrtepPad = {
      //   }
        // var roomController = require("room.controller");
        // console.log("roomcontoler 7",roomController.maxProduction[7]);
-     //var creep = Game.creeps["Victoria"];//""Miles"];
-      // roleBase.switchRoles(creep,gc.ROLE_MOVE_RESOURCE,Game.getObjectById("57a8c118a8e324986f9dc2e9"),
-      //      Game.getObjectById("577a641bb4633dec4b04f15f"),RESOURCE_OXYGEN);
+
+
+    var creep = Game.creeps["Evan"];
+     //   var parth = creep.pos.findPathTo(36,26);
+    //    console.log(creep,"parth",JSON.stringify(parth));
+    //    console.log(creep, creep.moveTo(36,26));
+        //creep.moveTo(creep.room.terminal);
+        //creep.move(BOTTOM);
+  //   console.log( "isy transfer",creep.transfer(creep.room.storage, "L"));
+     //roleBase.switchRoles(creep, gc.ROLE_FLEXI_STORAGE_PORTER);
+
+    //   roleBase.switchRoles(creep,gc.ROLE_MOVE_RESOURCE,Game.getObjectById("57a8c118a8e324986f9dc2e9"),
+    //        Game.getObjectById("577a641bb4633dec4b04f15f"),"O");
+//
+
         if (Game.time == 13004744    ) {
             var size = raceWorker.maxSizeRoom(w25s23);
             var body = raceWorker.body(raceWorker.maxSizeRoom(w26s21));

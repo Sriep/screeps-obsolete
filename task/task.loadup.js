@@ -25,7 +25,7 @@ function TaskLoadup (resourceId, targetId) {
 
 TaskLoadup.prototype.doTask = function(creep, task) {
     if (!task.resourceId) task.resourceId = RESOURCE_ENERGY;
-    console.log(creep,"task loadup")
+    //console.log(creep,"task loadup")
     if (!task.targetId) {
         var storage =  Game.getObjectById(tasks.getTargetId(creep));
     } else {
@@ -40,7 +40,7 @@ TaskLoadup.prototype.doTask = function(creep, task) {
     } else {
         //storage.transfer(creep, task.resourceId);
         var result = creep.withdraw(storage, task.resourceId);
-        console.log(creep, "result of withrewal storage", storage, task.resourceId, "result",result);
+        //console.log(creep, "result of withrewal storage", storage, task.resourceId, "result",result);
         switch (result) {
             case OK:                //	0	The operation has been scheduled successfully.
                 if (creep.carry[task.resourceId] == 0) {

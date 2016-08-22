@@ -43,9 +43,9 @@ TaskMoveRoom.prototype.doTask = function(creep, task) {
         var rtv = module[task.finsihCondition](creep);
         if (rtv) return rtv;
     }
-    //console.log(creep,"TaskMoveRoom start");
+    ///console.log(creep,"TaskMoveRoom start");
     //if ( creep.name == "Claire")
-    //    console.log(creep,creep.room,JSON.stringify(creep.pos), "start",JSON.stringify(task));
+       // console.log(creep,creep.room,JSON.stringify(creep.pos), "start",JSON.stringify(task));
     if (task.startRoom === undefined || task.roomsToVisit == ERR_NO_PATH) { //First call to function. Initialise data.
        // if ( creep.name == "Claire") console.log(creep,creep.room,"at startroom or no path");
         task.startRoom = creep.room.name;
@@ -53,13 +53,13 @@ TaskMoveRoom.prototype.doTask = function(creep, task) {
         task.pathIndex = 0;
     }
     if (creep.room.name == task.roomName && !this.atBorder(creep.pos.x,creep.pos.y)) {
-        //console.log(creep,"TaskMoveRoom at right room");
+      //  console.log(creep,"TaskMoveRoom at right room");
         return gc.RESULT_FINISHED;
     }
 
     if ( task.roomsToVisit === undefined
                 || task.pathIndex >= task.roomsToVisit.length ) { // We are lost. Recalculate route.
-        //console.log(creep,creep.room,"lost");
+     //  console.log(creep,creep.room,"lost");
         task.startRoom = creep.room.name;
         task.roomsToVisit = Game.map.findRoute(task.startRoom, task.roomName, task.pathOps);
         task.pathIndex = 0;
@@ -68,7 +68,7 @@ TaskMoveRoom.prototype.doTask = function(creep, task) {
 
     if (task.roomsToVisit == ERR_NO_PATH){
        // if ( creep.name == "Claire") console.log(creep,creep.room," no path");
-        //console.log(creep,"moveroom no path", creep.room, "rooms to visit", JSON.stringify(task.roomsToVisit));
+       // console.log(creep,"moveroom no path", creep.room, "rooms to visit", JSON.stringify(task.roomsToVisit));
         //console.log(creep,"task",JSON.stringify(task));
         return gc.RESULT_UNFINISHED;
     }
@@ -78,7 +78,7 @@ TaskMoveRoom.prototype.doTask = function(creep, task) {
         var targetRoom = task.roomsToVisit[task.pathIndex].room;
         var nextStepD = this.nextStepIntoRoom(creep.pos, targetRoom);
         //if ( creep.name == "Claire")
-           // console.log(creep,creep.room,"atBorder nextstep",nextStepD);
+         //   console.log(creep,creep.room,"atBorder nextstep",nextStepD);
         var result = creep.move(nextStepD);
         if (OK == result) {
             task.pathIndex++;
@@ -103,9 +103,9 @@ TaskMoveRoom.prototype.doTask = function(creep, task) {
         } else {
             result = creep.moveTo(exit);
         }
-        // console.log(creep,"result",result);
+         //console.log(creep,"result",result);
     } else {
-        console.log(creep,"duh! about to return finish");
+       // console.log(creep,"duh! about to return finish");
         return gc.RESULT_FINISHED;
     }
 

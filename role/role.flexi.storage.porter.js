@@ -33,12 +33,13 @@ var roleFlexiStoragePorter = {
 
     nextLab: function(creep) {
         if (creep.room.terminal
-            && creep.room.terminal.store[RESOURCE_ENERGY] < gc.LAB_REFILL_ENERGY_THRESHOLD)
+            && creep.room.terminal.store[RESOURCE_ENERGY] < gc.TERMINAL_ENERGY_REFILL_THRESHOLD)
             return creep.room.terminal;
         var labs = creep.room.find(FIND_STRUCTURES, {
             filter: function(l) {
                 return l.structureType == STRUCTURE_LAB
-                    && l.energy < l.energyCapacity
+                    && l.energy < gc.LAB_REFILL_ENERGY_THRESHOLD
+                    && Game.flags[l.id]
                     && Game.flags[l.id].secondaryColor != COLOR_WHITE;
             }
         });

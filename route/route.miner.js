@@ -36,7 +36,7 @@ function RouteMiner (roomName, mineId, resourceId, minePos, respawnRate, size, f
     this.fast = fast ? fast : (roomName != this.minePos.roomName);
     this.size = size ? size : raceWorker.maxSizeRoom(Game.rooms[roomName], this.fast);
     this.body = raceWorker.body(this.size, this.fast);
-    this.defensive = defensive ? defensive : false;
+    this.defensive = defensive ? defensive :  (roomName != this.minePos.roomName);
     this.due = 0;
 }
 

@@ -125,7 +125,7 @@ var tasks = {
     showTasks: function (creep) {
         var taskList = creep.memory.tasks.tasklist;
         for ( var i in taskList)  {
-            console.log(creep,"task",i,"is", JSON.stringify(taskList[i]));
+           // console.log(creep,"task",i,"is", JSON.stringify(taskList[i]));
         }
     },
 
@@ -181,7 +181,7 @@ var tasks = {
         }
     },
 
-    defensiveRetreat: function (creep, pos, heal) {
+    defensiveRetreat: function (creep, pos) {
         var danger = creep.pos.findInRange(FIND_HOSTILE_CREEPS, gc.RANGE_RANGED_ATTACK+1,{
             filter: function(object) {
                 return object.getActiveBodyparts(ATTACK) > 0

@@ -117,6 +117,26 @@ var gf = {
                 perimeter.push( { x : i, y : -N } );
         }
         return perimeter;
+    },
+
+    countValues(array, value) {
+        var count;
+        for( var i = 0 ; i < array.length ; i++ ) {
+            if (array[i] == value) count++;
+        }
+        return count;
+    },
+
+    mostAbundantNonEnergyStore: function (store, exclude) {
+        var exclude = exclude ? exclude : RESOURCE_ENERGY;
+        var maxSoFar = 0, mostAbundantResource;
+        for ( var resource in store ) {
+            if ( store[resource] > maxSoFar && resource != exclude ) {
+                maxSoFar = store[resource];
+                mostAbundantResource = resource;
+            }
+        }
+        return mostAbundantResource;
     }
 
 };

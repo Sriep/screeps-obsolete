@@ -59,12 +59,12 @@ TaskFlexiLoadup.prototype.doTask = function(creep, task) {
     }
 
     if ( task.state == gc.SWITCH_STATE_REPAIR) {
-        //console.log("switch to offload");
+       // console.log("switch to offload");
         this.switchToOffload(creep, task);
         return gc.RESULT_FINISHED;
 
     } else { // task.state == gc.SWITCH_STATE_FILLUP)
-        //console.log("switchToFillUp");
+      //  console.log("switchToFillUp");
         this.switchToFillUp(creep, task);
         return gc.RESULT_FINISHED
     }

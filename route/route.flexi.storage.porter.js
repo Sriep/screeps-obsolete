@@ -38,7 +38,6 @@ RouteFlexiStoragePorter.prototype.spawn = function (build, spawn, room ) {
     var body = raceWorker.body(build.size);
     var name = stats.createCreep(spawn, body, undefined, undefined);
     //console.log("RouteFlexiStoragePorter spawn result", name);
-    debugger;
     if (_.isString(name)) {
         roleBase.switchRoles(Game.creeps[name],
             gc.ROLE_FLEXI_STORAGE_PORTER);

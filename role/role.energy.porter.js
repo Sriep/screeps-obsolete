@@ -26,7 +26,7 @@ var roleEnergyPorter = {
         var tower = creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: function(structure)  {
                 return (structure.structureType == STRUCTURE_TOWER
-                    && structure.energy < structure.energyCapacity);
+                    && structure.energy < structure.energyCapacity * gc.TOWER_REFILL_THRESHOLD);
             }
         });
        // console.log(creep,"nextEnergyContainer towers",tower);
@@ -36,10 +36,9 @@ var roleEnergyPorter = {
 
         var extension = creep.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: function(structure)  {
-                return (structure.structureType == STRUCTURE_EXTENSION ||
-                    structure.structureType == STRUCTURE_SPAWN ||
-                    structure.structureType == STRUCTURE_TOWER)
-                    && structure.energy < structure.energyCapacity;
+                return (structure.structureType == STRUCTURE_EXTENSION
+                        || structure.structureType == STRUCTURE_SPAWN )
+                        && structure.energy < structure.energyCapacity;
             }
         });
     //    console.log(creep,"nextEnergyContainer first extension",extension);

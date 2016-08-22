@@ -33,6 +33,7 @@ function TaskOffload (offloadMethod, resource,  amount, canUseAlternative, targe
     this.pickup = true;
     this.targetId = targetId;
     this.canUseAlternative = canUseAlternative;
+    this.dropOnFull = undefined;
 }
 
 TaskOffload.prototype.offloadMethod = {
@@ -45,12 +46,16 @@ TaskOffload.prototype.offloadMethod = {
 
 TaskOffload.prototype.doTask = function(creep, task) {
     if (!task.resource) task.resource = RESOURCE_ENERGY;
+    if (this.offloadMethod == this.offloadMethod.Drop) {
+        creep.drop(task.resource);
+        return gc.RESULT_FINISHED;
+    }
 
     var tasks = require("tasks");
-  console.log(creep,"In task Offload target id", tasks.getTargetId(creep), "canuselagtenatives",task.canUseAlternative);
+    //console.log(creep,"In task Offload target id", tasks.getTargetId(creep), "canuselagtenatives",JSON.stringify(task));
 
     if (creep.carry[task.resource] == 0) {
-        //console.log("tried Offloading witih no enrgy");
+       // console.log("tried Offloading witih no enrgy");
         tasks.setTargetId(creep, undefined);
         return tasks.Result.Finished;
     }
@@ -61,11 +66,11 @@ TaskOffload.prototype.doTask = function(creep, task) {
         target = Game.getObjectById(tasks.getTargetId(creep));
     }
     if (!target) {
-        console.log(creep,"Offload, No target Id found",task.offloadMethod, "carryenergy",creep.carry.energy );
+        //console.log(creep,"Offload, No target Id found",task.offloadMethod, "carryenergy",creep.carry.energy );
         tasks.setTargetId(creep, undefined);
         //if (creep.carry.energy == 0) {
         if (creep.carry[task.resource] == 0) {
-            console.log("return finished no caryy energy");
+           // console.log(creep,"return finished no caryy energy");
             return gc.RESULT_FINISHED;
         } else {
             switch (task.offloadMethod) {
@@ -73,10 +78,10 @@ TaskOffload.prototype.doTask = function(creep, task) {
                 case gc.REPAIR:
                 case gc.TRANSFER:
                     if (task.canUseAlternative) {
-                        console.log("no target id some cary energy uselaterantive true",task.canUseAlternative)
+                       // console.log(creep,"no target id return rollback uselaterantive true",task.canUseAlternative)
                         return gc.RESULT_ROLLBACK;
                     } else {
-                        console.log("no target id some cary energy uselaterantive false",task.canUseAlternative)
+                      //  console.log(creep,"no target id return finished uselaterantive false",task.canUseAlternative)
                         return gc.RESULT_FINISHED;
                     }
                 case gc.UPGRADE_CONTROLLER:
@@ -87,15 +92,15 @@ TaskOffload.prototype.doTask = function(creep, task) {
         }
     }
     var result = stats[task.offloadMethod](creep, target, task.resource, task.amount);
-    console.log(creep,"Task Offload result", result, "target",target,
-       "method", JSON.stringify(task.offloadMethod));
+   // console.log(creep,"Task Offload result", result, "target",target,
+  //     "method", JSON.stringify(task.offloadMethod));
     switch (result ) {
         case OK:
             if (creep.carry[task.resource] == 0
                 || task.offlaodType == gc.DROP
                 || task.offlaodType == gc.TRANSFER ) {
 
-                console.log(creep,"offloaded all energy - FINSIHED",task.offloadMethod);
+               // console.log(creep,"offloaded all energy - FINSIHED",task.offloadMethod);
               //  creep.say("empty");
                 tasks.setTargetId(creep, undefined);
                 if (creep.carry[task.resource] == 0)
@@ -114,7 +119,7 @@ TaskOffload.prototype.doTask = function(creep, task) {
                     case gc.BUILD:
                         if (Game.getObjectById(target.id)) {
                             //creep.say("build same");
-                            console.log(creep, "Build object still three, result unfinished");
+                            //console.log(creep, "Build object still three, result unfinished");
                             return gc.RESULT_UNFINISHED;                          
                         }
                         break;
@@ -128,8 +133,8 @@ TaskOffload.prototype.doTask = function(creep, task) {
                         }
                     case gc.TRANSFER:
                         tasks.setTargetId(creep, undefined);
-                        creep.say("next target");
-                          console.log("Built object need rollback for nest siet");
+                       // creep.say("next target");
+                       // console.log("Transfer");
                         return gc.RESULT_ROLLBACK;
                     case gc.UPGRADE_CONTROLLER:
                        // creep.say("upgrade");
@@ -144,13 +149,16 @@ TaskOffload.prototype.doTask = function(creep, task) {
         case ERR_FULL:
         case ERR_INVALID_TARGET:
             tasks.setTargetId(creep, undefined);
+            if (task.dropOnFull)
+                creep.drop(task.resource);
+
             if (creep.carry[task.resource] == 0)     {
                 return gc.RESULT_FINISHED;
             } else {
                 if (task.canUseAlternative) {
                     tasks.setTargetId(creep, undefined);
                 }
-                console.log(creep,"invalid target abou to return finished")
+                //console.log(creep,"invalid target abou to return finished")
                 return gc.RESULT_FINISHED;
             }
         case ERR_NOT_IN_RANGE:
@@ -175,7 +183,7 @@ TaskOffload.prototype.offloadTargetId = function (creep)
             || object.structureType == STRUCTURE_EXTENSION) ;
         }
     });
-    console.log(creep,"offloadTargetId list of possable new offload targets",energyDumps.length)
+    //console.log(creep,"offloadTargetId list of possable new offload targets",energyDumps.length)
     energyDumps.sort(function (a, b) {
         var spaceA,spaceB;
         if (a.structureType == STRUCTURE_CONTAINER || a.structureType == STRUCTURE_STORAGE ) {
@@ -191,7 +199,7 @@ TaskOffload.prototype.offloadTargetId = function (creep)
         return spaceB - spaceA;
     });
     creep.say(energyDumps[0].structureType);
-    console.log(creep,"offloadTargetId mover to dump",energyDumps[0].id,energyDumps[0].structureType);
+    //console.log(creep,"offloadTargetId mover to dump",energyDumps[0].id,energyDumps[0].structureType);
     return energyDumps[0].id;
 };
 

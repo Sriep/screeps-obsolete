@@ -70,7 +70,7 @@ var economyLinkers = {
         //console.log("attachForeignRoutes ordered rooms", JSON.stringify(orderRooms) );
         var spawnTime = room.find(FIND_MY_SPAWNS).length * CREEP_LIFE_TIME;
         var maxSpawnAvaliable = spawnTime * gc.SPAWN_RESERVE_MULTIPLIER - gc.SPAWN_RESERVE_TIME;
-        var spawnTime = 0;
+        spawnTime = 0;
        // console.log("maxSpawn", maxSpawnAvaliable,"spawnTime", spawnTime);
         for ( var i = 0 ; i < orderRooms.length ; i++) {
             spawnTime += orderRooms[i].spawnTime;
@@ -214,6 +214,7 @@ var economyLinkers = {
     },
 
     attachHarvestLinker: function(room, flag, policy, deltaPriority) {
+        console.log(room,"attachHarvestLinker",flag);
         var healUnits = flag.memory.keeperLairRoom ? gc.KEEPER_HARVESTER_HEALER_PARTS : 0;
         var defensive = (room.name != flag.pos.roomName);
 
@@ -234,10 +235,12 @@ var economyLinkers = {
                 priority = gc.PRIORITY_LINKER;
             else
                 priority = gc.PRIORITY_NEUTRAL_LINKER;
+
             if (gc.FLAG_MINERAL == flag.memory.type)
                 priority = gc.PRIORITY_MINER;
             if (flag.memory.keeperLairRoom)
                 priority = gc.PRIORITY_KEEPER_HARVEST;
+
             var id = routeBase.attachRoute(
                 room.name,
                 gc.ROLE_LINKER,
@@ -245,7 +248,7 @@ var economyLinkers = {
                 priority + deltaPriority,
                 flag.name
             );
-           // console.log("attachHarvestLinker id is", id);
+            console.log(flag,"attachHarvestLinker id is", id);
             return id;
         }
     },
@@ -292,7 +295,9 @@ var economyLinkers = {
     },
 
     useLinkerMiner: function (room, flag) {
+        //console.log(flag,"useLinkerMiner",flag.memory.type);
         if (flag.memory.type != gc.FLAG_MINERAL) return false;
+        //console.log(flag,"useLinkerMiner extractor",flag.memory.extractor);
         if (!flag.memory.extractor) return false;
 
         var storage = room.find(FIND_STRUCTURES, {
@@ -302,21 +307,31 @@ var economyLinkers = {
                     && store.storeCapacity - _.sum(store.store) > gc.KEEP_FREE_STORAGE_SPACE
             }
         });
-        var inRange = flag.pos.findInRange(storage,2);
-       // console.log("useLinkerMiner", room, "flag",flag,"storage",
-       //     storage,"inRAnge",inRange.length>0);
-        return inRange.length > 0;
+        var storageInRange = flag.pos.findInRange(storage,2);
+        //console.log(flag,"useLinkerMiner",storageInRange);
+        if (!storageInRange || storageInRange.length == 0) return false;
+
+        var mineral = Game.getObjectById(flag.name);
+        //console.log(flag,"useLinkerMiner mineralAmount",mineral.mineralAmount);
+        if (mineral.mineralAmount > 0) return true;
+
+        var links = room.find(FIND_STRUCTURES, {
+            filter: function(store) {
+                return store.structureType == STRUCTURE_LINK
+            }
+        });
+        var linksInRange = flag.pos.findInRange(links,2);
+        //console.log(flag,"useLinkerMiner links",linksInRange);
+        return linksInRange.length > 0;
     },
 
     attachFlaggedMiner: function (room, flag) {
         var matches = routeBase.filterBuildsF(room, function(build) {
             return build.mineId == flag.name;
         });
-
-        var exhausted = this.mineralExhausted(flag);
+        var exhausted = (Game.getObjectById(flag.name).mineralAmount == 0);
         if ( (matches && matches[0] && gc.ROUTE_LINKER == matches[0].type)
               || exhausted ) {
-            if (matches[0])
                 routeBase.removeRoute(room, matches[0].id);
         }
 
@@ -337,16 +352,12 @@ var economyLinkers = {
                     room.name,
                     flag.name,
                     flag.memory.resourceType,
-                    flag.pos
+                    flag.pos,
+                    CREEP_LIFE_TIME
                 );
-                return routeBase.attachRoute(room.name, gc.ROLE_LINKER, order, gc.PRIORITY_MINER);
+                return routeBase.attachRoute(room.name, gc.ROLE_MINER, order, gc.PRIORITY_MINER);
             }
         }
-    },
-
-    mineralExhausted: function (flag) {
-        var mineral = Game.getObjectById(flag.name);
-        return mineral.mineralAmount == 0;
     },
 
     keeperRoomSuppressed: function (roomName) {
