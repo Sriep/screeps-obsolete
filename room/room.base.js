@@ -343,7 +343,7 @@ var roomBase = {
                 //todo hack think this is a bug in screeps code. Come with better fix.
             }
             var entrance = this.exitToEntrance(exit, route[0].room);
-
+            if (!entrance) return distance + DEFUALT_DISTANCE_ON_ERROR;
             for (var i = 1; i < route.length; i++) {
                 exit = entrance.findClosestByPath(route[i].exit);
                 if (exit) {
@@ -358,10 +358,7 @@ var roomBase = {
             }
         }
         //console.log(distance,"distance between from", posFrom,"to", posTo, "entrance", JSON.stringify(entrance));
-        if (entrance)
-            distance += posTo.findPathTo(entrance).length;
-        else
-            distance += DEFUALT_DISTANCE_ON_ERROR;
+        distance += posTo.findPathTo(entrance).length;
         return distance;
     },
 

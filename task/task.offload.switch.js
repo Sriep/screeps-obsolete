@@ -58,14 +58,14 @@ TaskOffloadSwitch.prototype.doTask = function(creep) {
         return gc.RESULT_UNFINISHED;
 
     if (this.checkSwitchTransportMinerals(creep)) {
-        console.log(creep,"this.state creep", this.state(creep),"portersWithState",
-            this.portersWithState(creep, gc.SWITCH_STATE_MINERAL_TRANSPORT))
+        //console.log(creep,"this.state creep", this.state(creep),"portersWithState",
+        //    this.portersWithState(creep, gc.SWITCH_STATE_MINERAL_TRANSPORT))
 
         var requireMoveFrom = roleMoveResource.requireMoveMineralsFrom(creep.room);
         if(requireMoveFrom) {
             var plan = this.planMoveFrom(creep, requireMoveFrom);
             if (plan) {
-                console.log(creep,"TaskOffloadSwitch from plan",JSON.stringify(plan));
+          //      console.log(creep,"TaskOffloadSwitch from plan",JSON.stringify(plan));
                 this.enactTrasportPlan(creep, plan);
                 return gc.RESULT_RESET
             }
@@ -74,7 +74,7 @@ TaskOffloadSwitch.prototype.doTask = function(creep) {
         if(requireMoveTo) {
             plan = this.planMoveTo(creep, requireMoveTo);
             if (plan) {
-                console.log(creep,"TaskOffloadSwitch to plan",JSON.stringify(plan));
+             //   console.log(creep,"TaskOffloadSwitch to plan",JSON.stringify(plan));
                 this.enactTrasportPlan(creep, plan);
                 return gc.RESULT_RESET
             }
@@ -411,7 +411,7 @@ TaskOffloadSwitch.prototype.portersWithState = function (creep, switchState) {
                     && creep.memory.tasks.switchState == switchState;
         }
     });
-    console.log(creep,switchState, "portersWithState",JSON.stringify(creeps));
+    //console.log(creep,switchState, "portersWithState",JSON.stringify(creeps));
     return creeps;
 };
 

@@ -36,14 +36,17 @@ function TaskMoveRoom (roomName, pathOps, customMoveToFunction, functionModule, 
 }
 
 TaskMoveRoom.prototype.doTask = function(creep, task) {
-    //console.log(creep,"taks.roomAme",task.roomName);
-    if (!task.roomName) return gc.RESULT_FINISHED;
+    //console.log(creep,"task.roomAme",task.roomName);
+    if (!task.roomName) {
+       // console.log(creep, "no room name",JSON.stringify(task));
+        return gc.RESULT_FINISHED;
+    }
     if (task.finsihCondition) {
         var module = require(task.finishModule);
         var rtv = module[task.finsihCondition](creep);
         if (rtv) return rtv;
     }
-    ///console.log(creep,"TaskMoveRoom start");
+    //console.log(creep,"TaskMoveRoom start");
     //if ( creep.name == "Claire")
        // console.log(creep,creep.room,JSON.stringify(creep.pos), "start",JSON.stringify(task));
     if (task.startRoom === undefined || task.roomsToVisit == ERR_NO_PATH) { //First call to function. Initialise data.
@@ -53,7 +56,7 @@ TaskMoveRoom.prototype.doTask = function(creep, task) {
         task.pathIndex = 0;
     }
     if (creep.room.name == task.roomName && !this.atBorder(creep.pos.x,creep.pos.y)) {
-      //  console.log(creep,"TaskMoveRoom at right room");
+       //console.log(creep,"TaskMoveRoom at right room");
         return gc.RESULT_FINISHED;
     }
 
@@ -105,7 +108,7 @@ TaskMoveRoom.prototype.doTask = function(creep, task) {
         }
          //console.log(creep,"result",result);
     } else {
-       // console.log(creep,"duh! about to return finish");
+        //console.log(creep,"duh! about to return finish");
         return gc.RESULT_FINISHED;
     }
 

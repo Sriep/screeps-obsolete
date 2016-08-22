@@ -16,12 +16,12 @@ var raceHealer = {
     BLOCKSIZE: 250 + 50,
     BLOCKSIZE_PARTS: 2,
 
-    body: function (size) {
+    body: function (heal, move) {
         var body = [];
-        for (var i = 0 ; i < size ; i++) {
+        for (var i = 0 ; i < move ; i++) {
             body.push(MOVE);
         } // for
-        for (var i = 0 ; i < size ; i++) {
+        for (i = 0 ; i < heal ; i++) {
             body.push(HEAL);
         } // for
         return body;

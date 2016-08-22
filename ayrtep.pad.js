@@ -47,10 +47,12 @@ var RouteGiftCreep = require("route.gift.creep");
 var RouteSuppressKeepers = require("route.suppress.keepers");
 var roomController = require("room.controller");
 var labColours = require("lab.colours");
+var TaskBoost = require("task.boost");
 
 var ayrtepPad = {
     top: function () {
         "use strict";
+
 
       /*  console.log("------------------------------ flags -------------------------------");
         for ( var i in Game.flags) {
@@ -74,14 +76,14 @@ var ayrtepPad = {
     //   console.log("------------------------------ routes W25S19 ---------------------------");
       //      routeBase.showRoutes("W25S19");
       //    console.log("---------------------------------------------------------------------");
-      //   console.log("------------------------------ routes W28S23 ---------------------------");
-      //      routeBase.showRoutes("W28S23");
+     //    console.log("------------------------------ routes W28S23 ---------------------------");
+     //       routeBase.showRoutes("W28S23");
      //     console.log("---------------------------------------------------------------------");
 
 
-        console.log("------------------------------ routes sim ---------------------------");
-             routeBase.showRoutes("sim");
-        console.log("------------------------------ routes sim ---------------------------");
+       // console.log("------------------------------ routes sim ---------------------------");
+       //      routeBase.showRoutes("sim");
+      //  console.log("------------------------------ routes sim ---------------------------");
 
 
     //   var creeps = _.filter(Game.creeps, function (creep) {
@@ -101,8 +103,8 @@ var ayrtepPad = {
         console.log("START MY  PAD START MY  PAD");
 
         //console.log("cost",Game.market.calcTransactionCost(1000,"W26S21","W25S23"));
-        var boost = _.findKey(BOOSTS,RESOURCE_KEANIUM_ACID);
-        console.log("find boost RESOURCE_KEANIUM_ACID",boost);
+        //var boost = _.findKey(BOOSTS,RESOURCE_KEANIUM_ACID);
+        //console.log("find boost RESOURCE_KEANIUM_ACID",boost);
 
         //Memory.policies[580] = undefined;outgoingTransactions
         //console.log(JSON.stringify(Game.market.outgoingTransactions));
@@ -344,14 +346,19 @@ var ayrtepPad = {
        // console.log("roomcontoler 7",roomController.maxProduction[7]);
 
 
-    var creep = Game.creeps["Evan"];
-     //   var parth = creep.pos.findPathTo(36,26);
+    var creep = Game.creeps["Max"];
+    var targetList = [
+        { type : 1, target : "576c83b832e496403a3989dd" },
+        { type : 1, target : "576c83b568abfd183ad17e42"}
+    ];
+    //roleBase.switchRoles(creep, gc.ROLE_DISMANTLE_ROOM,"W28S24",targetList);
+      //  var parth = creep.pos.findPathTo(36,26);
     //    console.log(creep,"parth",JSON.stringify(parth));
     //    console.log(creep, creep.moveTo(36,26));
         //creep.moveTo(creep.room.terminal);
         //creep.move(BOTTOM);
   //   console.log( "isy transfer",creep.transfer(creep.room.storage, "L"));
-     //roleBase.switchRoles(creep, gc.ROLE_FLEXI_STORAGE_PORTER);
+    // roleBase.switchRoles(creep, gc.ROLE_FLEXI_STORAGE_PORTER);
 
     //   roleBase.switchRoles(creep,gc.ROLE_MOVE_RESOURCE,Game.getObjectById("57a8c118a8e324986f9dc2e9"),
     //        Game.getObjectById("577a641bb4633dec4b04f15f"),"O");
@@ -379,7 +386,7 @@ var ayrtepPad = {
 
       //var creep3 = Game.creeps["Jack"];
         //console.log(creep,creep.move(LEFT));
-        //roleBase.screepwitchRoles(creep, gc.ROLE_FLEXI_STORAGE_PORTER);
+        //roleBase.switchRoles(creep, gc.ROLE_FLEXI_STORAGE_PORTER);
         //roleBase.switchRoles(creep, gc.ROLE_FLEXI_STORAGE_PORTER);
         //roleBase.switchRoles(creep3, gc.ROLE_FLEXI_STORAGE_PORTER);
         ////creep.memory.policyId = 79114;
@@ -395,57 +402,31 @@ var ayrtepPad = {
         //creep4.move(LEFT);
        // creep2.move(LEFT);
 
-        //var creep3 = Game.creeps["Sarah"]
-        //roleBase.switchRoles(creep2, gc.ROLE_FLEXI_STORAGE_PORTER);
+      //  var routeBase = require("route.base");
+       // var raceWorker = require("race.worker");
+      //  var RouteGiftCreep = require("route.gift.creep");
 
-        //var flag = Game.flags["55db3176efa8e3fe66e04a58"];
-        //roleBase.switchRoles(creep1, gc.ROLE_DISMANTLE_ROOM, "W28S24");
-       //roleBase.switchRoles(creep, gc.ROLE_FLEXI_STORAGE_PORTER);
-        //roleBase.switchRoles(creep, gc.ROLE_SUPPRESS_KEEPERS, "W25S24");
-        //roleBase.switchRoles(creep, gc.ROLE_SUPPRESS_KEEPERS, "W25S24");
-       // var flag = Game.flags["55db318aefa8e3fe66e04b86"];
-       // roleBase.switchRoles(creep, gc.ROLE_NEUTRAL_HARVESTER, "W25S23","W26S23"
-       //     ,"55db3176efa8e3fe66e04a58",RESOURCE_ENERGY);
-        // Maria
-        //roleBase.switchRoles(creep, gc.ROLE_MINER, "W25S22","56e14bf41f7d4167346e0a9b",
-       //        RESOURCE_KEANIUM);
-       //creep.drop(RESOURCE_ENERGY);,
-       //roleBase.switchRoles(creep, gc.ROLE_LINKER, "55db318aefa8e3fe66e04b8a", true);
-       //creep, flagName, defensive
+        var TaskBoost = require("task.boost");
+        if (Game.time == 13033799 ) {
+             var body = raceWorker.body(1);
+             var testOrder = new RouteGiftCreep("W25S23","W25S23",undefined,body,undefined,0);
+             routeBase.attachRoute("W25S23",undefined,testOrder,1);
+        }
+        var creep = Game.creeps["Callie"];
+        roleBase.switchRoles(creep, gc.ROLE_FOLLOW,Game.getObjectById("57bb0bf42f63355e14241868"));
 
-
-    //    var TaskMoveRoom = require("task.move.room");
- //      var move2529 = new TaskMoveRoom ("W25S19", undefined, 5);
-       // creep.memory.tasks.tasklist = []
-       // creep.memory.tasks.tasklist.push(move2529);
-       // creep.memory.policyId = 0;
-      // roleBase.switchRoles(creep, gc.ROLE_FLEXI_STORAGE_PORTER);
-        //roleBase.switchRoles(creep, gc.ROLE_PATROL_ROOM);
-       // roleBase.switchRoles(creep, gc.ROLE_NEUTRAL_PORTER);
-     // roleBase.switchRoles(creep, gc.ROLE_FLEXI_STORAGE_PORTER);
-
-       // roleBase.switchRoles(creep, gc.ROLE_PATROL_ROOM, "W26S24");
-
-        //   creep.moveTo(path);
-        //console.log("Memory.rooms[W25S24].suppressed",Memory.rooms["W25S24"].suppressed);
-
-        //var creep2= Game.creeps["Nicholas"]; //55db3176efa8e3fe66e04a58
-        //var x = 36, y=11;
-        //var terrain = Game.map.getTerrainAt(x, y, creep2.room.name);
-       // terrain = Game.map.getTerrainAt(x, y, "W25S23");
-        //console.log(x,y,creep2.room.name,"terrain",terrain);
-      //  creep2.pos.findPathTo(Game.getObjectById(id));
-
-     //   creep2.move(BOTTOM_LEFT);
-        //Memory.rooms["W24S19"].flagged = false;
-        //console.log("closest to W24S22",
-        //    JSON.stringify(roomBase.findClosestOwnedRooms("W24S22",3)));
-
-        //console.log("is enemy room",roomBase.isEnemyRoom("W24S23"));
-
-///
-        //var r1 = _.findKey(REACTIONS, function(o) { return {  _.findKey(o,"OH") : "OH"  } } );
-       // console.log("r1",r1);
+        if (Game.time == 13034210   ) {
+            var creep = Game.creeps["Callie"];
+            var taskList = [];
+            var moveToLab =  new TaskMoveFind(
+                gc.FIND_ID,
+                1,
+                "57b70598a03b6e9a4c8e4eb3");
+            var boost = new TaskBoost("57b70598a03b6e9a4c8e4eb3");
+            taskList.push(moveToLab);
+            taskList.push(boost);
+            creep.memory.tasks.tasklist = taskList;
+        }
 
         var from = new RoomPosition(41,32,"W25S24");
         var to  = new RoomPosition(29,47,"W25S24");

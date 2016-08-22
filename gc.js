@@ -53,6 +53,7 @@ var gc = {
     ROLE_DISMANTLE_ROOM: "dismantle.room",
     ROLE_ATTACK_ROOM: "attack.room",
     ROLE_MOVE_RESOURCE: "move.resource",
+    ROLE_FOLLOW: "follow",
     
     //Tasks
     TASK_MOVE_FIND: "move.find",
@@ -85,6 +86,7 @@ var gc = {
     TASK_SUPPRESS_KEEPERS: "suppress.keepers",
     TASK_FOLLOW: "follow",
     TASK_DISMANTLE: "dismantle",
+    TASK_BOOST: "boost",
 
 
 //Offload switch task's states

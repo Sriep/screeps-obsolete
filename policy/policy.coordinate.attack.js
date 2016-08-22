@@ -20,11 +20,19 @@ var roleBase = require("role.base");
 var gc = require("gc");
 /**
  * Abstract Policy
+ *
  * @module policyCoordinateAttack
  */
 function  PolicyCoordinateAttack () {
     this.type =  gc.POLICY_COORDINATE_ATTACK
 }
+
+//if (Game.time == 12880839  ) {
+//    var PolicyCoordinateAttack = require("policy." + gc.POLICY_COORDINATE_ATTACK);
+//    var attack = new PolicyCoordinateAttack();
+//    console.log("attack", JSON.stringify(attack));
+//    policy.activatePolicy(attack);
+//}
 
 PolicyCoordinateAttack.prototype.initialisePolicy = function (newPolicy) {
     var sapperBody = raceSapper.body(25,13,12);
@@ -58,65 +66,6 @@ PolicyCoordinateAttack.prototype.enactPolicy = function(currentPolicy) {
        creeps[i].memory.tasks.tasklist = this.moveTaskList();
        creeps[i].memory.role = "movingSomewhere";
     }
-/*
-    var aria = Game.creeps["Aria"];
-    aria.memory.tasks.tasklist = this.attackTaskList();
-    var leahCaroline = Game.creeps["LeahCaroline"];
-    leahCaroline.memory.tasks.tasklist = this.dismantleTaskList();
-    var mila = Game.creeps["Mila"];
-    mila.memory.tasks.tasklist = this.dismantleTaskList();
-*/
-    var william = Game.creeps["William"];
-    //roleBase.switchRoles(william, gc.ROLE_DISMANTLE_ROOM, "W28S24");
-
-    //var leahCaroline = Game.creeps["LeahCaroline"];
-    //roleBase.switchRoles(leahCaroline, gc.ROLE_DISMANTLE_ROOM, "W28S24");
-   // var TaskMoveFind = require("task.move.find");
-   // var TaskDismantle = require("task.dismantle");
-    //var mila = Game.creeps["Xavier"];
-    //roleBase.switchRoles(mila, gc.ROLE_ATTACK_ROOM, "W28S24");
-    //var mila = Game.creeps["Brooklyn"];
-    //roleBase.switchRoles(mila, gc.ROLE_DISMANTLE_ROOM, "W28S24");
-
-
-
-
-
-
-/*
-    var attackCreeps = _.filter(Game.creeps, function(c) {
-        return c.memory.policyId == currentPolicy.id
-            && c.memory.role == "movingSomewhere"
-            && c.room.name == "W28S25"
-            && c.pos.inRangeTo(21,19,1);
-    });
-    //console.log("Attack?",attackCreeps.length);
-    if (attackCreeps.length == 3) {
-        for ( var j = 0 ; j < creeps.length ; j++ ) {
-            if (creeps[j].getActiveBodyParts(ATTACK) > 0)
-                creeps[i].memory.tasks.tasklist = this.prototype.attackTaskList();
-            else if (creeps[j].getActiveBodyParts(WORK) > 0)
-                creeps[i].memory.tasks.tasklist = this.prototype.dismantleTaskList();
-        }
-    }
-*/
-
-/*
-    var attackCreeps = _.filter(Game.creeps, function(c) {
-        return c.memory.policyId == currentPolicy.id
-            && c.memory.role == "movingSomewhere"
-            && c.room.name == "W28S25"
-            && c.pos.inRangeTo(22,4,1);
-    });
-    //console.log("Attack?",attackCreeps.length);
-    if (attackCreeps.length == 3) {
-        for ( var j = 0 ; j < creeps.length ; j++ ) {
-            if (creeps[j].getActiveBodyParts(ATTACK) > 0)
-                roleBase.switchRoles(creeps[j], gc.ROLE_ATTACK_ROOM,"W28S24");
-            else if (creeps[j].getActiveBodyParts(WORK) > 0)
-                roleBase.switchRoles(creeps[j], gc.ROLE_DISMANTLE_ROOM,"W28S24");
-        }
-    }*/
 };
 
 PolicyCoordinateAttack.prototype.attackTaskList = function() {

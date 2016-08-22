@@ -326,12 +326,14 @@ var economyLinkers = {
     },
 
     attachFlaggedMiner: function (room, flag) {
+        console.log(room,"attach miner",flag);
         var matches = routeBase.filterBuildsF(room, function(build) {
             return build.mineId == flag.name;
         });
         var exhausted = (Game.getObjectById(flag.name).mineralAmount == 0);
         if ( (matches && matches[0] && gc.ROUTE_LINKER == matches[0].type)
               || exhausted ) {
+                console.log(room,"remove miner route",flag);
                 routeBase.removeRoute(room, matches[0].id);
         }
 

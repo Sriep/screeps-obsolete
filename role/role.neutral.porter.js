@@ -80,8 +80,16 @@ var roleNeutralPorter = {
             "empty",
             "tasks"
         );
-        var moveToOffload = new TaskMoveFind(gc.FIND_FUNCTION,gc.RANGE_TRANSFER,
-                            "findTargetOffload", "role.neutral.porter");
+        var moveToOffload = new TaskMoveFind(
+            gc.FIND_FUNCTION,
+            gc.RANGE_TRANSFER,
+            "findTargetOffload",
+            "role.neutral.porter",
+            undefined,
+            undefined,
+            "moveAndRepair",
+            "role.repairer"
+        );
         var offload = new TaskOffload (gc.TRANSFER, flag.memory.resourceType,  undefined, true);
 
         tasks.push(moveToCollectionRoom);

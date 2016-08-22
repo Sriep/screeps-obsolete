@@ -33,12 +33,14 @@ function TaskFollow (targetId, customMoveToFunction, functionModule) {
 
 TaskFollow.prototype.doTask = function(creep, task) {
     var target = Game.getObjectById(task.targetId);
+    console.log(creep,"TaskFollow",target);
     if (!target) return gc.RESULT_FINISHED;
     if (target.room == creep.room) {
         creep.moveTo(target);
     } else {
-        this.roomName = creep.room;
-        TaskMoveRoom.prototype.doTask(creep, task, task.customMoveToFunction, task.functionModule);
+        task.roomName = target.room;
+        //console.log(creep,"follow targt",target,target.room, target.pos.roomName)
+        TaskMoveRoom.prototype.doTask(creep, task);
     }
     return  gc.RESULT_UNFINISHED;
 };
