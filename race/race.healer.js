@@ -18,6 +18,7 @@ var raceHealer = {
 
     body: function (heal, move) {
         var body = [];
+        if (!move) move = heal;
         for (var i = 0 ; i < move ; i++) {
             body.push(MOVE);
         } // for

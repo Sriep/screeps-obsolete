@@ -17,12 +17,10 @@ var raceSapper = require("race.sapper");
  * @module RouteAttackRoom
  */
 
-function RouteAttackRoom (targetRoomName, move, work, heal, respawn, targetList) {
+function RouteAttackRoom (targetRoomName, body, respawn, targetList) {
     this.type = gc.ROUTE_ATTACK_ROOM;
     this.targetRoomName = targetRoomName;
-    this.move = move;
-    this.work = work;
-    this.heal = heal;
+    this.body = body;
     this.respawn = respawn ? respawn : 0;
     this.targetList = targetList;
     this.due = 0;
@@ -30,8 +28,8 @@ function RouteAttackRoom (targetRoomName, move, work, heal, respawn, targetList)
 
 RouteAttackRoom.prototype.spawn = function (build, spawn) {
     //console.log("RouteMiner spawn", spawn, JSON.stringify(build));
-    var body = raceSapper.body(build.move, build.work, build.heal);
-    var name = stats.createCreep(spawn, body, undefined, undefined);
+    //var body = raceSapper.body(build.move, build.work, build.heal);
+    var name = stats.createCreep(spawn, build.body, undefined, undefined);
     if (_.isString(name)) {
         console.log("Spawning miner",name);
         roleBase.switchRoles(

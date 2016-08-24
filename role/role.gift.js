@@ -8,7 +8,8 @@ var TaskSwitchRole = require("task.switch.role");
 
 var roleGift = {
 
-    getTaskList: function(creep,room, policyId, role) {
+    getTaskList: function(creep,room, policyId, role, preDefiendTaskList) {
+        if (preDefiendTaskList) return preDefiendTaskList;
         var taskList = [];
         if (!room && policyId)
             room = Memory.policies[policyId].room;

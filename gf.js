@@ -120,7 +120,7 @@ var gf = {
     },
 
     countValues(array, value) {
-        var count;
+        var count = 0;
         for( var i = 0 ; i < array.length ; i++ ) {
             if (array[i] == value) count++;
         }

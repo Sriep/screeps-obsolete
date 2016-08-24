@@ -32,6 +32,7 @@ function TaskMovePos (roomPos, range, pathOps, customMoveToFunction, functionMod
     this.functionModule = functionModule;
     this.finsihCondition = finsihCondition;
     this.finishModule = finishModule;
+    this.heal = true;
     this.loop = true;
     this.pickup = true;
 }

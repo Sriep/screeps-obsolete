@@ -54,7 +54,7 @@ var tasks = {
                 this.pickUpLooseEnergy(creep);
                 doneActions.actions.add(gc.PICKUP);
             }
-            if (creep.getActiveBodyparts(HEAL) > 0) {
+            if (creep.getActiveBodyparts(HEAL) > 0 && task.heal) {
                 this.heal(creep);
             }
 

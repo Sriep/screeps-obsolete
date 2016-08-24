@@ -14,8 +14,9 @@
  */
 var raceSapper = {
 
-    body: function (move, work, heal) {
+    body: function (work, heal, move) {
         if (move+work+heal > 50) return;
+        if (!move) move = work + heal;
         var body = [];
         for (var i = 0 ; i < move ; i++) {
             body.push(MOVE);

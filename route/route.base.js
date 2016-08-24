@@ -15,6 +15,7 @@
 var gc = require("gc");
 var gf = require("gf");
 var labColours = require("lab.colours");
+var roleBase = require("role.base");
 /**
  * Task move object. Used when we need to find the object to move to.
  * @module routeBase
@@ -97,7 +98,7 @@ var routeBase = {
         if (!room) return;
         this.checkSetup(room);
         for (var i in  room.memory.routes.details) {
-            console.log(roomName,JSON.stringify(room.memory.routes.details[i]));
+            console.log(i,roomName,JSON.stringify(room.memory.routes.details[i]));
         }
     },
 
@@ -214,37 +215,6 @@ var routeBase = {
         return mostOverdueRoute;
     },
 
-
-
-    spawn: function (spawn, room, build) {
-        module = this.moduleFromRoute(build.type);
-        var result = module.prototype.spawn(build, spawn, room);
-        //console.log("spawn result", result, "build", JSON.stringify(build));
-        if (_.isString(result)) {
-           // debugger;
-            //console.log("routeBase just before set due");
-            if (0 == room.memory.routes.details[build.id].respawnRate) {
-                this.removeRoute(room.name, build.id);
-            } else {
-                room.memory.routes.details[build.id].due
-                    = room.memory.routes.details[build.id].respawnRate;
-                room.memory.routes.details[build.id].priority
-                    = room.memory.routes.details[build.id].basePriority;
-                if (room.memory.routes.details[build.id].dependancies)
-                    this.handleDependancies(room.memory.routes.details,
-                        room.memory.routes.details[build.id].dependancies);
-                //console.log("routeBase set due to respawn", JSON.stringify(room.memory.routes.details[build.id]));
-            }
-          //  console.log("routeBase just after set due");
-            Game.creeps[result].memory.builtBy = room.name;
-            Game.creeps[result].memory.buildType = build.type;
-        } else if (ERR_GCL_NOT_ENOUGH == result || ERR_INVALID_ARGS == result) {
-            console.log("routeBase spawn result",result, "invalid build details", JSON.stringify(build));
-            this.removeRoute(room.name, build.id);
-        }
-        return result;
-    },
-
     handleDependancies: function(queue, dependancies) {
         for ( var i = 0 ; i < dependancies.length ; i++ ){
             queue[dependancies[i].id].priority = dependancies[i].priority;
@@ -294,47 +264,124 @@ var routeBase = {
         return true;
     },
 
-    reserveBoosts: function(body) {
+    spawn: function (spawn, room, build) {
+        module = this.moduleFromRoute(build.type);
+
+        var result;
+        //if (build.type = gc.ROUTE_WALL_BUILDER)
+        //    result = this.boostSpawn(build, module, spawn, room);
+        //else
+             result = module.prototype.spawn(build, spawn, room);
+        //console.log("spawn result", result, "build", JSON.stringify(build));
+        if (_.isString(result)) {
+            // debugger;
+            console.log("routeBase just before set due",build.id
+                ,room.memory.routes.details[build.id].respawnRate);
+            if (0 == room.memory.routes.details[build.id].respawnRate) {
+                this.removeRoute(room.name, build.id);
+            } else {
+                room.memory.routes.details[build.id].due
+                    = room.memory.routes.details[build.id].respawnRate;
+                room.memory.routes.details[build.id].priority
+                    = room.memory.routes.details[build.id].basePriority;
+                if (room.memory.routes.details[build.id].dependancies)
+                    this.handleDependancies(room.memory.routes.details,
+                        room.memory.routes.details[build.id].dependancies);
+                //console.log("routeBase set due to respawn", JSON.stringify(room.memory.routes.details[build.id]));
+            }
+            //  console.log("routeBase just after set due");
+            Game.creeps[result].memory.builtBy = room.name;
+            Game.creeps[result].memory.buildType = build.type;
+        } else if (ERR_GCL_NOT_ENOUGH == result || ERR_INVALID_ARGS == result) {
+            console.log("routeBase spawn result",result, "invalid build details", JSON.stringify(build));
+            this.removeRoute(room.name, build.id);
+        }
+        return result;
+    },
+
+    boostSpawn: function(build, module, spawn, room) {
+        return module.prototype.spawn(build, spawn, room);
+        var result = spawn.canCreateCreep(build.body);
+        if (OK != result) return result;
+        var boostInfo =  this.reserveBoosts(room, build.body,["build","fatigue"]);// build.boostActions);
+        if (boostInfo) {
+            console.log("boostSpawn boostInfo", JSON.stringify(boostInfo));
+            var name = spawn.createCreep(boostInfo.body);
+            if (_.isString(name)) {
+                var switchParamers = module.prototype.roleParameters(build);
+                console.log("boostSpawn switchParamers", JSON.stringify(switchParamers));
+                //function(creep, labIds, role, roleParameters)
+                roleBase.switchRoles(
+                    Game.creeps[name],
+                    gc.ROLE_BOOST_AND_SWITCH,
+                    boostInfo.boostLabs,
+                    switchParamers.role,
+                    switchParamers.parameters
+                );
+                Game.creeps[name].memory.policyId = build.policyId;
+                Game.creeps[name].memory.buildReference = build.owner;
+            }
+            return name;
+        } else {
+            return module.prototype.spawn(build, spawn, room);
+        }
+    },
+
+    reserveBoosts: function(room, body, boostAction) {
+        console.log("reserveBoosts",boostAction);
+        var boostLabs = [];
         var labs = room.find(FIND_STRUCTURES, {
             filter: function(l) {
+                var flag = Game.flags[l.id];
+                if (!flag) return false;
                 return l.structureType == STRUCTURE_LAB
-                && Game.flags[l.id]
-                && l.mineralAmount >  Game.flags[l.id].reserved
-                                       ?  (Game.flags[l.id].reserved+1) * LAB_BOOST_MINERAL : LAB_BOOST_MINERAL
-                && l.energy >  Game.flags[l.id].reserved
-                                ? (Game.flags[l.id].reserved+1) * LAB_BOOST_ENERGY : LAB_BOOST_ENERGY
-                && Game.flags[l.id].secondaryColor != COLOR_WHITE
-                && !Game.flags[l.id].memory.reserved;
+                    && flag.secondaryColor != COLOR_WHITE
+                    && l.mineralAmount > LAB_BOOST_MINERAL
+                    && l.energy  > LAB_BOOST_ENERGY
             }
         });
-        var newBody = bosy.slice(0);
-        for ( var i = 0 ; i < labs.length ; i++ ) {
-            var flag = Game.flags[lab[i].id];
-            var resource = labColours.resource(flag.color, flag.secondaryColor);
-            var boostPart = _.findKey(BOOSTS,resource);
-            //var boostAmount =
-            if (body.indexOf(boostPart) != -1) {
-                var numParts = gf.countValues(body, boostPart);
-                var reserved = flag.memory.reserved ? flag.memory.reserved : 0;
-                var resource = lab[i].mineralAmount - reserved;
-                var energy = lab[i].energy = reserved;
-                var reserveParts = Math.min(numParts,
-                                      Math.min(Math.floor(resource/LAB_BOOST_MINERAL),
-                                          Math.floor(energy/LAB_BOOST_ENERGY)));
+        if (labs.length > 0) {
+            var newBody = body.slice(0);
+            console.log(newBody,"reserveBoosts",labs);
+            for ( var i = 0 ; i < labs.length ; i++ ) {
+                var flag = Game.flags[labs[i].id];
+                //var boosts = labs[i].mineralAmount - flag.partsReserved;
+                var resource = labColours.resource(flag.color, flag.secondaryColor);
+                var maxBoosts = Math.floor(Math.min(labs[i].mineralAmount/LAB_BOOST_MINERAL,
+                                                     labs[i].energy/LAB_BOOST_ENERGY));
+                var boostPart = _.findKey(BOOSTS,resource);
+                var action = _.findKey( BOOSTS[boostPart][resource] );
+                var multiplyer = BOOSTS[boostPart][resource][action];
+                console.log(flag,"flag maxBoosts",maxBoosts,"resource",resource,"boostPart",
+                    boostPart,"action",action,"multiplyer",multiplyer);
+                if (boostAction.indexOf(action)  != -1
+                    &&  body.indexOf(boostPart) != -1) {
 
-                for ( var j = 0 ; j < newBody ; j++  ) {
-
-                }
-
-
-
+                    var numParts = gf.countValues(body, boostPart);
+                    var partsBoosted = Math.min(maxBoosts,  numParts - Math.ceil(numParts/multiplyer));
+                    console.log("numParts",numParts,"partsBoosted",partsBoosted);
+                    for ( var j = 0 ; j < partsBoosted ; j++ ) {
+                        var index = newBody.indexOf(boostPart);
+                        console.log(j,"in for index",index,"newBody",newBody)  ;
+                        newBody.splice(index,1);
+                    }
+                    //flag.partsReserved = flag.partsReserved + partsBoosted;
+                    boostLabs.push(labs[i].id);
+                } // if
+            } // for
+            if (boostLabs.length > 0) {
+                return { body : newBody, boostLabs : boostLabs };
             }
         }
-
     }
 };
 
-
+// var boostPart = _.findKey(BOOSTS,"UO");
+// var action = BOOSTS[WORK]["UO"];
+// var key = _.findKey(action);
+// var multiplyer = BOOSTS[WORK]["UO"][key];
+// console.log("boostPart", boostPart,"action",JSON.stringify(action),"key",key,"mult",multiplyer);
+// boostPart work action {"harvest":2} key harvest mult 2
 
 module.exports = routeBase;
 

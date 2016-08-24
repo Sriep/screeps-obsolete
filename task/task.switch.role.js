@@ -21,17 +21,28 @@ var roleBase = require("role.base");
  * @module TaskSwitchRole
  */
 
-function TaskSwitchRole (role,para1,para2,para3,para4,para5,para6,para7,para8,para9,para10) {
+function TaskSwitchRole (role, parameters) {
     this.taskType = gc.TASK_SWITCH_ROLE;
     this.role = role;
-    this.para1 = para1;
-    this.para2 = para2;
-    this.para3 = para3;
-    this.para4 = para4;
+    this.parameters = parameters ? parameters : [];
 }
 
 TaskSwitchRole.prototype.doTask = function(creep, task) {
-    roleBase.switchRoles(creep, task.role,task.para1, task.para2,task.para3,task.para4,task.para4);
+    console.log(creep,"TaskSwitchRole");
+    roleBase.switchRoles(
+        creep,
+        task.role,
+        task.parameters[0],
+        task.parameters[1],
+        task.parameters[2],
+        task.parameters[3],
+        task.parameters[4],
+        task.parameters[5],
+        task.parameters[6],
+        task.parameters[7],
+        task.parameters[8],
+        task.parameters[9]
+    );
     return gc.RESULT_RESET
 };
 

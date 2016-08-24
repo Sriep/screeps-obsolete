@@ -54,6 +54,7 @@ var gc = {
     ROLE_ATTACK_ROOM: "attack.room",
     ROLE_MOVE_RESOURCE: "move.resource",
     ROLE_FOLLOW: "follow",
+    ROLE_BOOST_AND_SWITCH: "boost.and.switch",
     
     //Tasks
     TASK_MOVE_FIND: "move.find",
@@ -156,6 +157,7 @@ var gc = {
     POLICY_KEEPER_SECTOR_ATTACK: "keeper.sector.attack",
     POLICY_KEEPER_SECTOR_AFTER_ACTION: "keeper.sector.after.action",
     POLICY_KEEPER_SECTOR_SUPPRESS: "keeper.sector.suppress",
+    POLICY_ATTACK_W25S23: "attack.w29w23",
 
     // flags
     FLAG_SOURCE: "source",
@@ -185,6 +187,7 @@ var gc = {
     ROUTE_DISMANTLE_ROOM: "dismantle.room",
     ROUTE_ATTACK_ROOM: "attack.room",
     ROUTE_MOVE_RESOURCE: "move.resource",
+    ROUTE_BOOST_AND_SWITCH: "boost.and.switch",
 
     BUILDING_LINK: "building." + STRUCTURE_LINK,
     BUILDING_LAB: "lab." + STRUCTURE_LAB,
@@ -234,7 +237,6 @@ var gc = {
     MANY2ONE_REQUIRED_LIFE: 5000,
     LOAD_FROM_CONTAINER_RATIO: 0.4,
     STORAGE_STOCKPILE: 15000,
-    DEFAULT_ROUTE_PRIORITY: 10,
     REVERSE_CLAIM_SAFETYNET: 100,
     MIDDLE_AGE_CREEP_LIFE_TO_LIVE: 750,
     THE_POOL: 0,
@@ -252,16 +254,16 @@ var gc = {
     RESPAWN_MULTIPLYER_NEUTRAL: 0.9,
     RESPAWN_MULTIPLYER_KEEPER: 0.7,
 
-    TIME_TRANSFER_LOAD: 1,
+    TIME_TRANSFER_LOAD: 179,
     TIME_BUILD_LOAD: 10,
     TIME_UPGRADE_LOAD: 50,
 
     // Rates
-    ROOM_UPDATE_RATE: 307,
-    FLAG_UPDATE_RATE: 133,
-    LINKER_RESET_RATE: 503,
+    ROOM_UPDATE_RATE: 177,
+    FLAG_UPDATE_RATE: 379,
+    LINKER_RESET_RATE: 217,
     CHECK_FOR_ORPHANED_BUILDS_RATE: 191,
-    ATTACH_FLAGGED_ROUTES_RATE: 171,
+    ATTACH_FLAGGED_ROUTES_RATE: 177,
     SEND_SCOUT_FREQUENCY_GEN: 3,
 
     //Build priorities
@@ -278,7 +280,8 @@ var gc = {
     PRIORITY_KEEPER_ATTACK: 110,
     PRIORITY_KEEPER_HARVEST: 140,
     PRIORITY_KEEPER_PORTER: 140,
-    PRIORITY_MINER: 180,
+    PRIORITY_MINER: 160,
+    DEFAULT_ROUTE_PRIORITY: 170,
 
     //flag colours
     FLAG_PERMANENT_COLOUR: COLOR_BLUE,

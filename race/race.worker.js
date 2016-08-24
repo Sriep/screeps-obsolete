@@ -275,6 +275,20 @@ console.log("assignRoles havester", havesters_needed, "upgraders",upgraders_need
      //  }
     },
 
+    bodyE: function (work, carry, move) {
+        if ( work + cary + move > 50 ) return undefined;
+        var body = [];
+            for (var i = 0; i < carry; i++) {
+                body.push(CARRY);
+            }
+            for (var j = 0; j < move; j++) {
+                body.push(MOVE);
+            }
+            for (var k = 0; k < work; k++) {
+                body.push(WORK);
+            }
+    },
+
 
 
     body: function (size, fast) {

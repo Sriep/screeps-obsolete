@@ -46,6 +46,7 @@ function TaskMoveFind (
     this.functionModule = functionModule;
     this.rembemerTarget = undefined;
     this.findList = undefined;
+    this.heal = true;
     this.loop = true;
     this.pickup = true;
 }
@@ -119,19 +120,19 @@ TaskMoveFind.prototype.doTask = function(creep, task) {
         }
 
     }
-     //console.log(creep,"taskmovefind2 target",target);
+    // console.log(creep,"taskmovefind2 target",target);
 
     if (!target) {
       //  console.log(creep,"find RESULT_FINISHED and cound not find any target")
        // creep.say("No target");
         return gc.RESULT_FINISHED;
     }
-  //  console.log(creep,"movefind target", target);
+    //console.log(creep,"movefind target", target);
 
     var distanceToGo = creep.pos.getRangeTo(target);
     if (distanceToGo <= task.range) {
-     //   console.log(creep,"find RESULT_FINISHED before move");
-     //   console.log(creep,"distanceToGo",distanceToGo,"<= range",task.range)
+      //  console.log(creep,"find RESULT_FINISHED before move");
+       // //console.log(creep,"distanceToGo",distanceToGo,"<= range",task.range)
       //  creep.say("there");
         return gc.RESULT_FINISHED;
     }

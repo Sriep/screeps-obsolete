@@ -19,7 +19,7 @@ var raceSwordsman = require("race.swordsman");
  * @module RouteGiftCreep
  */
 
-function RouteGiftCreep  (room, targetRoom, policyId, body, role, respawnRate) {
+function RouteGiftCreep  (room, targetRoom, policyId, body, role, respawnRate, taskList) {
     this.type = gc.ROUTE_GIFT_CREEP;
     this.owner = room;
     this.targetRoom = targetRoom;
@@ -27,6 +27,7 @@ function RouteGiftCreep  (room, targetRoom, policyId, body, role, respawnRate) {
     this.respawnRate = respawnRate;
     this.body = body;
     this.role = role;
+    this.taskList = taskList;
     if (undefined == body) {
         this.body = raceSwordsman.body(1);
     }
@@ -44,7 +45,8 @@ RouteGiftCreep.prototype.spawn = function (build, spawn, room ) {
             gc.ROLE_GIFT,
             build.targetRoom,
             build.policyId,
-            build.role
+            build.role,
+            build.taskList
         );
         Game.creeps[name].memory.buildReference = build.policy;
         //Game.creeps[name].memory.policyId = build.policyId;

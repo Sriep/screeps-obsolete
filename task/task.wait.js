@@ -22,6 +22,7 @@ function TaskWait (whatFor, moduleName,turns) {
     }
     this.moduleName = moduleName;
     this.turns = turns;
+    this.heal = true;
     this.loop = false;
     this.pickup = true;
 }

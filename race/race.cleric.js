@@ -16,9 +16,10 @@ var raceCleric = {
     BLOCKSIZE: 250 + 80 + 50 + 50,
     BLOCKSIZE_PARTS: 4,
 
-    body: function (attack, heal) {
+    body: function (attack, heal, move) {
+        if (!move) move = attack + heal;
         var body = [];
-        for (var i = 0 ; i < attack + heal ; i++) {
+        for (var i = 0 ; i < move ; i++) {
             body.push(MOVE);
         }
         for (var j = 0 ; j < attack ; j++) {

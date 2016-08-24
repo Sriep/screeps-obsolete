@@ -78,15 +78,15 @@ var attackRoom = {
                 return struc.structureType == STRUCTURE_TOWER
             }
         });
-        console.log(creep,"findNextTarget",target);
+      //  console.log(creep,"findNextTarget",target);
         if (target != null) return target;
 
         target = creep.pos.findClosestByPath(FIND_HOSTILE_SPAWNS);
-        console.log(creep,"findNextTarget",target);
+      //  console.log(creep,"findNextTarget",target);
         if (target != null) return target;
 
         target = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
-        console.log(creep,"findNextTarget",target);
+       // console.log(creep,"findNextTarget",target);
         if (target != null) return target;
 
         target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
@@ -94,7 +94,7 @@ var attackRoom = {
                 return struc.structureType == STRUCTURE_EXTENSION
             }
         });
-        console.log(creep,"findNextTarget",target);
+      //  console.log(creep,"findNextTarget",target);
         if (target != null) return target;
 
         target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
@@ -106,7 +106,7 @@ var attackRoom = {
                     || struc.structureType == STRUCTURE_LAB
             }
         });
-        console.log(creep,"findNextTarget",target);
+      //  console.log(creep,"findNextTarget",target);
         if (target != null) return target;
 
         var walls = creep.room.find(FIND_STRUCTURES, {
@@ -122,7 +122,7 @@ var attackRoom = {
         }
 
         target = creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES);
-        console.log(creep,"findNextTarget",target);
+      //  console.log(creep,"findNextTarget",target);
         return target;
     },
 

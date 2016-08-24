@@ -28,9 +28,9 @@ module.exports.loop = function () {
     }
     freememory.freeCreeps();
 
-    policy.enactPolicies();
     raceBase.moveCreeps();
     buildingBase.moveBuildings();
+    policy.enactPolicies();
 
     ayrtepPad.bottom();
 

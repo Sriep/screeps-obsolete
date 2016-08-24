@@ -28,6 +28,8 @@ function  RouteWallBuilder  (room, size) {
     } else {
         this.size = raceWorker.maxSizeRoom(Game.rooms[room], true);
     }
+    this.body = raceWorker.body(this.size, true);
+    this.boostActions = ["build","fatigue"];
     this.respawnRate = CREEP_LIFE_TIME;
     this.due = 0;
 }
@@ -45,6 +47,10 @@ RouteWallBuilder.prototype.spawn = function (build, spawn, room ) {
     return name;
 };
 
+RouteWallBuilder.prototype.roleParameters  = function (build) {
+    return { role : gc.ROLE_WALL_BUILDER, parameters : [] };
+};
+
 RouteWallBuilder.prototype.energyCost = function(build) {
     return raceWorker.energyFromSize(build.size);
 };
@@ -54,3 +60,18 @@ RouteWallBuilder.prototype.parts = function(build) {
 };
 
 module.exports = RouteWallBuilder;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

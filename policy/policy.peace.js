@@ -106,10 +106,10 @@ PolicyPeace.prototype.enactPolicy = function (currentPolicy) {
     economyLinkers = require("economy.linkers");
 
     var nSpawns = room.find(FIND_MY_SPAWNS).length;
-    //console.log(room, "energyCapacity",room.energyCapacityAvailable , "Energy in build queue",
-    //        Math.ceil(routeBase.buildQueueEnergyPerGen(room)),
-    ////        "spawn time",Math.ceil(routeBase.buldQueueRespawnTimePerGen(room)),
-    //        "number spawns", nSpawns, "Spawn time", nSpawns*1500 );
+ //   console.log(room, "energyCapacity",room.energyCapacityAvailable , "Energy in build queue",
+ //           Math.ceil(routeBase.buildQueueEnergyPerGen(room)),
+ //           "spawn time",Math.ceil(routeBase.buldQueueRespawnTimePerGen(room)),
+ //           "number spawns", nSpawns, "Spawn time", nSpawns*1500 );
    // console.log(room, "Energy mined", economyLinkers.energyFromLinkersGen(room),
    //         "Average supply journey", roomOwned.avProductionSupplyDistance(room),"Average upgarde distance",
    //         roomOwned.avUpgradeDistance(room));
@@ -138,7 +138,7 @@ PolicyPeace.prototype.enactPolicy = function (currentPolicy) {
         economyLinkers.attachLocalFlaggedRoutes(room, currentPolicy);
         economyLinkers.attachForeignFlaggedRoutes(room, currentPolicy);
         economyRepair.attachWallBuilder(room, currentPolicy);
-        //economyLinkers.oldattachForeignFlaggedRoutes(room, currentPolicy);
+        economyLinkers.removeExhausedMiners(room);
     }
     economyLinkers.attachFlexiStoragePorters(room, currentPolicy);
     economyLinkers.processBuildQueue(room, currentPolicy);

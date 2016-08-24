@@ -27,8 +27,16 @@ TaskDismantle.prototype.doTask = function(creep, task) {
     } else {
         target = Game.getObjectById(task.targetId);
     }
+    target = creep.pos.findClosestByRange(FIND_STRUCTURES,
+        {filter: {structureType: STRUCTURE_WALL}});
+
+    console.log(creep,"target",target,"hits before",target.hits);
+
     var result = creep.dismantle(target);
+
     console.log(creep,"TaskDismantle", target,"restult",result);
+    console.log(creep,"target",target,"hits after",target.hits);
+
     switch (result)
     {
         case OK:	//0	The operation has been scheduled successfully.

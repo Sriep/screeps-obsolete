@@ -44,7 +44,7 @@ var economyLinkers = {
             && flag.memory.linkerFrom.room == room.name );
         });
         for ( var j = 0 ; j < flags.length ; j++ ) {
-            //console.log("attachFlaggedRoutes this rooms flags",flags[j]);
+            //console.log("attachFlaggedRoutes this rooms flags",flags[j],flags[j].memory.type );
             if ( gc.FLAG_SOURCE == flags[j].memory.type
                 || (gc.FLAG_MINERAL == flags[j].memory.type
                 && this.useLinkerMiner(room, flags[j])) )  {
@@ -65,6 +65,7 @@ var economyLinkers = {
                 || flagBase.reverseControllerFrom(f, room.name))
                 && room.name != f.pos.roomName;
         });
+       // console.log(room,"attachForeignFlaggedRoutes",flags);
         var roomNames = flagBase.roomNamesFromFlags(flags);
         var orderRooms = this.orderForeignRooms(room, roomNames, flags);
         //console.log("attachForeignRoutes ordered rooms", JSON.stringify(orderRooms) );
@@ -87,7 +88,7 @@ var economyLinkers = {
                // , "laier?",roomFlags[0].memory.keeperLairRoom );
                 if (roomFlags[0].memory.keeperLairRoom
                     && this.readyForKeeperSuppress(room)) {
-                   //console.log("attachForeignFlaggedRoutes keeper supppress");
+                    //console.log("attachForeignFlaggedRoutes keeper supppress",roomFlags);
                     this.attachKeeperRoomRoutes(room, orderRooms[i].roomName, roomFlags, policy,i);
                 } else {
                     this.attachForeignRoomRoutes(room, orderRooms[i].roomName, roomFlags, policy,i);
@@ -116,7 +117,7 @@ var economyLinkers = {
                         //console.log(myRoom,"roomFlag inside if",roomFlags[j]);
                     }
                 }
-                avDistance = Math.ceil(avDistance / count);
+                if (count != 0) avDistance = Math.ceil(avDistance / count);
                 //console.log(myRoom,"orderForeignRooms ",roomNames[i], avDistance, sourceEnergy);
                 var spawnTime = this.spawnTimeForeignRoutes(avDistance, 5*sourceEnergy);
                 if (roomFlags[0].memory.keeperLairRoom ) {
@@ -147,12 +148,13 @@ var economyLinkers = {
         var claimParts = CREEP_LIFE_TIME / (CREEP_CLAIM_LIFE_TIME - distance);
         spawnTime += claimParts * 2;
         //console.log( "spawnTimeForeignRoutes", distance,"energy", energy,"spawn time", spawnTime);
-
         return Math.ceil(spawnTime);
     },
 
     attachForeignRoomRoutes: function(myRoom, roomName, roomFlags, policy, deltaPriority) {
         var room = Game.rooms[roomName];
+        if (myRoom == "W25S23")
+            console.log(myRoom,"attachForeignRoutes flags for room",roomName, roomFlags);
 
         var contollerFlag = _.filter(roomFlags, function (f) {
             return f.memory && gc.FLAG_CONTROLLER ==  f.memory.type;
@@ -164,16 +166,21 @@ var economyLinkers = {
         var linkers  = [];
         //console.log(roomName,"attachForeignRoomRoutes",roomFlags.length);//,JSON.stringify(roomFlags) );
         for ( var i = 0 ; i < roomFlags.length ; i++ ) {
-            //console.log("attachForeignRoutes flags for room", roomName, JSON.stringify(roomFlags[i].memory));
+            if (myRoom == "W25S23")
+                console.log("attachForeignRoutes flags for room", roomName, JSON.stringify(roomFlags[i].memory));
             //console.log(i,"inside for loop porter",roomFlags[i], roomName, "myroom", myRoom,
-            //   flagBase.porterFrom(roomFlags[i], myRoom.name), "linkerfrom"
-           //     , flagBase.linkerFrom(roomFlags[i], myRoom.name));
+            ////   flagBase.porterFrom(roomFlags[i], myRoom.name), "linkerfrom"
+            //    , flagBase.linkerFrom(roomFlags[i], myRoom.name));
 
             if (flagBase.porterFrom(roomFlags[i], myRoom.name)) {
                 var porterRouteId = this.attachNeutralPorter(myRoom,roomFlags[i]);
             }
+            if (flagBase.linkerFrom(roomFlags[i], myRoom.name)
+                && roomFlags[i].memory.type == gc.FLAG_MINERAL ) {
+                console.log(myRoom, "attachForeignRoomRoutes flags", JSON.stringify(roomFlags[i].memory));
+                this.attachFlaggedMiner(myRoom, roomFlags[i]);
+            } else  if (porterRouteId && flagBase.linkerFrom(roomFlags[i], myRoom.name)) {
 
-            if (porterRouteId && flagBase.linkerFrom(roomFlags[i], myRoom.name)) {
                 var linkerRouteId = this.attachHarvestLinker(myRoom, roomFlags[i], policy, deltaPriority);
 
                 linkers.push(linkerRouteId);
@@ -190,6 +197,7 @@ var economyLinkers = {
                     myRoom.memory.routes.details[linkerRouteId].dependancies = dependencies;
                 }
             }
+
         }
         if (Game.time % gc.CHECK_FOR_ORPHANED_BUILDS_RATE == 0 ){
             this.checkForOrphanedBuilds(room);
@@ -201,8 +209,10 @@ var economyLinkers = {
     attachKeeperRoomRoutes: function(myRoom, keeperRoomName, roomFlags, policy, deltaPriority) {
        // var room = Game.rooms[roomName];
         var suppresorId = this.suppressKeeperRoom(myRoom, roomFlags[0], deltaPriority);
+        //console.log(suppresorId,"attachForeignFlaggedRoutes keeper supppress",roomFlags);
         if (suppresorId) {
                           //this.attachForeignRoomRoutes(room, roomNames[i], roomFlags, policy);
+            console.log(myRoom, "attachKeeperRoomRoutes",roomFlags);
             var linkers = this.attachForeignRoomRoutes(myRoom, keeperRoomName, roomFlags, policy, deltaPriority);
            // console.log("attachKeeperRoomRoutes linkers length", linkers.length);
             var dependants = [];
@@ -214,7 +224,7 @@ var economyLinkers = {
     },
 
     attachHarvestLinker: function(room, flag, policy, deltaPriority) {
-        console.log(room,"attachHarvestLinker",flag);
+        //console.log(room,"attachHarvestLinker",flag);
         var healUnits = flag.memory.keeperLairRoom ? gc.KEEPER_HARVESTER_HEALER_PARTS : 0;
         var defensive = (room.name != flag.pos.roomName);
 
@@ -326,14 +336,17 @@ var economyLinkers = {
     },
 
     attachFlaggedMiner: function (room, flag) {
-        console.log(room,"attach miner",flag);
+        console.log(room,"attachFlaggedMiner miner",flag);
         var matches = routeBase.filterBuildsF(room, function(build) {
             return build.mineId == flag.name;
         });
-        var exhausted = (Game.getObjectById(flag.name).mineralAmount == 0);
+        var mineral = Game.getObjectById(flag.name);
+        if (!mineral) return;
+        var exhausted = (mineral.mineralAmount == 0);
         if ( (matches && matches[0] && gc.ROUTE_LINKER == matches[0].type)
               || exhausted ) {
-                console.log(room,"remove miner route",flag);
+               // console.log(room,"remove miner route",flag);
+            if (matches[0])
                 routeBase.removeRoute(room, matches[0].id);
         }
 
@@ -512,7 +525,7 @@ var economyLinkers = {
     suppressKeeperRoom: function(room, flag, deltaPriority) {
         var keeperRoom = flag.pos.roomName;
         var distance = flag.memory.linkerFrom.distance;
-         console.log("suppressKeeperRoom", room, keeperRoom, distance);
+         //console.log("suppressKeeperRoom", room, keeperRoom, distance);
         //if (room.energyCapacityAvailable < roomController.maxProduction[7])
         //    return;
 
@@ -558,7 +571,7 @@ var economyLinkers = {
     },
 
     checkForOrphanedBuilds: function (room ) {
-        if (!room.memory.routes) return;
+        if (!room || !room.memory.routes) return;
         var builds = _.filter(room.memory.routes.details, function (build) {
             return ( build !== undefined && build.owner == room.name );
         });
@@ -729,6 +742,18 @@ var economyLinkers = {
          */
         return porterShortfall;
     },
+
+    removeExhausedMiners: function (room) {
+        var matches = routeBase.filterBuildsF(room, function (build) {
+            return build.type == gc.ROUTE_MINER
+        });
+        for ( var i = 0 ; i < matches.length ; i++ ) {
+            var mine = Game.getObjectById(matches[i].mineId);
+            if(mine && mine.mineralAmount == 0) {
+                routeBase.removeRoute(room, matches[i].id);
+            }
+        }
+    }
 };
 
 module.exports = economyLinkers;

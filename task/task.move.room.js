@@ -33,12 +33,12 @@ function TaskMoveRoom (roomName, pathOps, customMoveToFunction, functionModule, 
     this.functionModule = functionModule;
     this.finsihCondition = finsihCondition;
     this.finishModule = finishModule;
+    this.heal = true;
 }
 
 TaskMoveRoom.prototype.doTask = function(creep, task) {
     //console.log(creep,"task.roomAme",task.roomName);
     if (!task.roomName) {
-       // console.log(creep, "no room name",JSON.stringify(task));
         return gc.RESULT_FINISHED;
     }
     if (task.finsihCondition) {
@@ -56,7 +56,8 @@ TaskMoveRoom.prototype.doTask = function(creep, task) {
         task.pathIndex = 0;
     }
     if (creep.room.name == task.roomName && !this.atBorder(creep.pos.x,creep.pos.y)) {
-       //console.log(creep,"TaskMoveRoom at right room");
+        //task.loop = false;
+        //console.log(creep,"TaskMoveRoom at right room");
         return gc.RESULT_FINISHED;
     }
 

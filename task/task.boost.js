@@ -34,17 +34,19 @@ TaskBoost.prototype.doTask = function(creep, task) {
     console.log(creep,"result of boost",result,"lab mineral",lab.mineralType);
     switch (result) {
         case OK:                        //	0	The operation has been scheduled successfully.
+            tasks.setTargetId(creep, undefined);
             return gc.RESULT_FINISHED;
         case ERR_NOT_OWNER:	            // -1	You are not the owner of this lab.
         case ERR_NOT_FOUND:	            // -5	The mineral containing in the lab cannot boost any of the creep's body parts.
         case ERR_INVALID_TARGET:	    // -7	The targets is not valid creep object.
+            tasks.setTargetId(creep, undefined);
             return gc.RESULT_FINISHED;
         case ERR_NOT_ENOUGH_RESOURCES:	// -6	The lab does not have enough energy or minerals.
             return gc.RESULT_UNFINISHED;
         case ERR_NOT_IN_RANGE:	        // -9	The targets are too far away.
             return gc.RESULT_ROLLBACK;
     }
-
+    tasks.setTargetId(creep, undefined);
     return gc.RESULT_FINISHED;
 };
 

@@ -45,7 +45,7 @@ function  RouteLinker  (room, flagName, policyId, defensive, fast, healParts) {
         } else {
             this.size = gc.LINKING_MINER_SIZE;
         }
-        this.respawnRate = CREEP_LIFE_TIME - flag.memory.porterFrom.distance - CREEP_SPAWN_TIME;
+        this.respawnRate = CREEP_LIFE_TIME - flag.memory.linkerFrom.distance - CREEP_SPAWN_TIME;
     }
     this.defensive = defensive ? defensive : false;
     this.fast = fast ? fast : false;

@@ -25,24 +25,30 @@ var raceWorker = require("race.worker");
  * @module RouteMiner
  */
 
-function RouteMiner (roomName, mineId, resourceId, minePos, respawnRate, size, fast, defensive) {
+function RouteMiner (roomName, mineId, resourceId, minePos, respawnRate, size, fast, defensive, healParts) {
     this.type = gc.ROUTE_MINER;
     this.roomName = roomName;
     this.mineId = mineId;
     this.resourceId = resourceId;
-
     this.minePos = minePos ? minePos : Game.getObjectById(mineId).pos;
     this.respawnRate = respawnRate ? respawnRate : CREEP_LIFE_TIME;
     this.fast = fast ? fast : (roomName != this.minePos.roomName);
     this.size = size ? size : raceWorker.maxSizeRoom(Game.rooms[roomName], this.fast);
-    this.body = raceWorker.body(this.size, this.fast);
+    this.body = raceWorker.body(--this.size, this.fast);
     this.defensive = defensive ? defensive :  (roomName != this.minePos.roomName);
+    this.healParts = healParts ? healParts : 0;
+
     this.due = 0;
 }
 
 RouteMiner.prototype.spawn = function (build, spawn) {
     //console.log("RouteMiner spawn", spawn, JSON.stringify(build));
+    for ( var i = 0 ; i < build.healParts ; i++ ) {
+        build.body.push(HEAL);
+        build.body.unshift(MOVE);
+    }
     var name = stats.createCreep(spawn, build.body, undefined, undefined);
+    console.log(spawn,spawn.room,"try to build miner result",name)
     if (_.isString(name)) {
         console.log("Spawning miner",name);
         roleBase.switchRoles(

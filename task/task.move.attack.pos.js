@@ -22,7 +22,7 @@ var TaskMoveRoom = require("task.move.room");
  */
 
 function TaskMoveAttackPos (roomPos, range, pathOps) {
-    this.taskType = gc.TASK_MOVE_POS;
+    this.taskType = gc.TASK_MOVE_ATTACK_POS;
     this.conflicts = gc.MOVE;
     this.roomPos = roomPos;
     if (range === undefined) {

@@ -26,21 +26,38 @@ function TaskFollow (targetId, customMoveToFunction, functionModule) {
     this.conflicts = gc.MOVE;
     this.targetId = targetId;
     this.customMoveToFunction = customMoveToFunction;
-    this.functionModule = functionModule;
+    this.functionModule = functionModule
+    this.heal = true;
     this.loop = true;
     this.pickup = true;
 }
 
 TaskFollow.prototype.doTask = function(creep, task) {
-    var target = Game.getObjectById(task.targetId);
+    var target = Game.getObjectById(task.targetId)
+    if (!target) return gc.RESULT_FINISHED
     console.log(creep,"TaskFollow",target);
     if (!target) return gc.RESULT_FINISHED;
     if (target.room == creep.room) {
-        creep.moveTo(target);
+        var result;
+        if (task.customMoveToFunction) {
+            if(task.functionModule) {
+                var fModule = require(task.functionModule);
+                result = fModule[task.customMoveToFunction](creep, target);
+            } else {
+                result = task.customMoveToFunction(creep, target);
+            }
+        } else {
+            result = creep.moveTo(target);
+        }
+
+        //creep.moveTo(target);
     } else {
         task.roomName = target.room;
         //console.log(creep,"follow targt",target,target.room, target.pos.roomName)
         TaskMoveRoom.prototype.doTask(creep, task);
+    }
+    if (creep.getActiveBodyparts(HEAL) > 0) {
+        tasks.heal(creep);
     }
     return  gc.RESULT_UNFINISHED;
 };
