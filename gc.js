@@ -21,6 +21,10 @@ var gc = {
     MOVE: "move",
     SUICIDE: "suicide",
     WITHDRAW: "withdraw",
+
+    CAPACITY: "capacity",
+    FATIGUE: "fatigue",
+    DAMAGE: "damage",
     
     //Races
     RACE_WORKER:  "worker",
@@ -158,6 +162,7 @@ var gc = {
     POLICY_KEEPER_SECTOR_AFTER_ACTION: "keeper.sector.after.action",
     POLICY_KEEPER_SECTOR_SUPPRESS: "keeper.sector.suppress",
     POLICY_ATTACK_W25S23: "attack.w29w23",
+    POLICY_ATTACK_W24S23: "attack.w24s23",
 
     // flags
     FLAG_SOURCE: "source",
@@ -210,8 +215,15 @@ var gc = {
     PORTER_FAST_MAX_SIZE: 25,
     SWORDSMAN_NEUTRAL_PATROL_SIZE: 5,
 
+    // Bosst configure
+    AUTO_BOOST_CREEPS: true,
+    BOOST_RESERVE: 15,
+
+    // CPU saving configuration
+    MOVE_TO_CACHE_TICKS: 10, // Game default is 5
+
     // How much free spawn time to leave
-    SPAWN_RESERVE_MULTIPLIER: 0.90,
+    SPAWN_RESERVE_MULTIPLIER: 0.80,
     SPAWN_RESERVE_TIME: 500,
 
     //Thresolds
@@ -252,7 +264,7 @@ var gc = {
     MAX_SIM_DEFENCE_LENGTH: 40,
 
     RESPAWN_MULTIPLYER_NEUTRAL: 0.9,
-    RESPAWN_MULTIPLYER_KEEPER: 0.7,
+    RESPAWN_MULTIPLYER_KEEPER: 0.8,
 
     TIME_TRANSFER_LOAD: 179,
     TIME_BUILD_LOAD: 10,
@@ -263,7 +275,7 @@ var gc = {
     FLAG_UPDATE_RATE: 379,
     LINKER_RESET_RATE: 217,
     CHECK_FOR_ORPHANED_BUILDS_RATE: 191,
-    ATTACH_FLAGGED_ROUTES_RATE: 177,
+    ATTACH_FLAGGED_ROUTES_RATE: 143,
     SEND_SCOUT_FREQUENCY_GEN: 3,
 
     //Build priorities
@@ -274,13 +286,13 @@ var gc = {
     PRIORITY_NEUTRAL_LINKER: 100,
     PRIORITY_REVERSE_CONTROLLER: 110,
     PRIORITY_REPAIRER: 160,
-    PRIORITY_WALL_BUILDER: 160,
+    PRIORITY_WALL_BUILDER: 120,
     PRIORITY_ROOM_PATROL: 110,
     PRIORITY_SCOUT: 90,
     PRIORITY_KEEPER_ATTACK: 110,
-    PRIORITY_KEEPER_HARVEST: 140,
-    PRIORITY_KEEPER_PORTER: 140,
-    PRIORITY_MINER: 160,
+    PRIORITY_KEEPER_HARVEST: 120,
+    PRIORITY_KEEPER_PORTER: 120,
+    PRIORITY_MINER: 120,
     DEFAULT_ROUTE_PRIORITY: 170,
 
     //flag colours

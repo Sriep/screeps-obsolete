@@ -6,7 +6,6 @@
  * @author Piers Shepperson
  */
 var gc = require("gc");
-//var taskActions = require("task.actions")
 
 var stats = require("stats");
 

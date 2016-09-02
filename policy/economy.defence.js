@@ -9,21 +9,11 @@
  * @author Piers Shepperson
  */
 "use strict";
-var roomOwned = require("room.owned");
 var routeBase = require("route.base");
-var RouteLinker = require("route.linker");
-var RouteNeutralPorter = require("route.neutral.porter");
-var RouteRemoteActions = require("route.remote.actions");
-var RouteRepairer = require("route.repairer");
-var RouteFlexiStoragePorter = require("route.flexi.storage.porter");
 var gc = require("gc");
-var policy = require("policy");
-var raceClaimer = require("race.claimer");
 var RoutePatrolRoom = require("route.patrol.room");
-var RouteGiftCreep  = require("route.gift.creep");
 var raceSwordsman = require("race.swordsman");
-var raceWorker = require("race.worker");
-var RouteWallBuilder = require("route.wall.builder");
+
 /**
  * Requisition object for using the pool
  * @module economyDefence
@@ -53,6 +43,7 @@ var economyDefence = {
     }
 
 };
+
 var respawn = CREEP_LIFE_TIME - flag.memory.claimerFrom.distance;
 var order = new RoutePatrolRoom(
     room.name,

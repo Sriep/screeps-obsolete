@@ -10,7 +10,6 @@ var gc = require("gc");
 var stats = require("stats");
 var roleBase = require("role.base");
 var raceWorker = require("race.worker");
-var raceBase = require("race.base");
 
 /**
  * Task move object. Used when we need to find the object to move to.

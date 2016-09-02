@@ -6,7 +6,6 @@
  * @author Piers Shepperson
  */
 "use strict";
-var raceBase = require("race.base");
 var BattleSimCreep = require("battle.sim.creep");
 var battleQuickEstimates = require("battle.quick.estimate");
 var gc = require("gc");

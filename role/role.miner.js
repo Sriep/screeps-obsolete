@@ -11,7 +11,6 @@
  */
 var gc = require("gc");
 var gf = require("gf");
-var roleBase = require("role.base");
 var TaskMoveFind = require("task.move.find");
 var TaskHarvest = require("task.harvest");
 var TaskOffload = require("task.offload");
@@ -53,6 +52,11 @@ var roleMiner = {
             harvest = new TaskHarvest(mineId);
             moveToStorageRoom = new TaskMoveRoom(homeRoom);
         }
+        moveToMineral.pickup = false;
+        harvest.pickup = false;
+        moveToStorageRoom.pickup = false;
+        moveToStorage.pickup = false;
+        offload.pickup = false;
 
         tasks.push(moveToMineral);
         tasks.push(harvest);

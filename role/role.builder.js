@@ -8,7 +8,6 @@
  */
 var gc = require("gc");
 var stats = require("stats");
-var roleBase = require("role.base");
 var TaskMoveFind = require("task.move.find");
 var TaskHarvest = require("task.harvest");
 var TaskOffload = require("task.offload");

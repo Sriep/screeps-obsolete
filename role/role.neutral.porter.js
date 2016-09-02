@@ -23,10 +23,9 @@ var tasks = require("tasks");
  */
 var roleNeutralPorter = {
 
-    getTaskList: function(creep, homeRoom, flag) {
+    getTaskList: function(creep, homeRoom, flagName) {
         var tasks = [];
-        //var collectionId = flag.name;
-        //console.log(creep,"getTaskList neutral porter role", homeRoom, flag);
+        var flag = Game.flags[flagName];
         if (!flag) return undefined;
 
         //if (!collectionId) return undefined;
@@ -42,6 +41,7 @@ var roleNeutralPorter = {
         var moveToCollectionRoom = new TaskMoveRoom(flag.pos.roomName);
 
         var moveToCollectionObj;
+        if (!flag.memory) return;
         var collectionObj = Game.getObjectById(flag.memory.mainDumpId);
         // Use ConstructionSite.progress to see if its a construction site
         // as only this structure has a progress field

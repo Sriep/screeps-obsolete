@@ -18,7 +18,6 @@
 var gc = require("gc");
 var stats = require("stats");
 var roleBase = require("role.base");
-var raceBase = require("race.base");
 var raceWorker = require("race.worker");
 /**
  * Task move object. Used when we need to find the object to move to.
@@ -27,6 +26,7 @@ var raceWorker = require("race.worker");
 
 function RouteMiner (roomName, mineId, resourceId, minePos, respawnRate, size, fast, defensive, healParts) {
     this.type = gc.ROUTE_MINER;
+    this.role = gc.ROLE_MINER;
     this.roomName = roomName;
     this.mineId = mineId;
     this.resourceId = resourceId;
@@ -37,7 +37,7 @@ function RouteMiner (roomName, mineId, resourceId, minePos, respawnRate, size, f
     this.body = raceWorker.body(--this.size, this.fast);
     this.defensive = defensive ? defensive :  (roomName != this.minePos.roomName);
     this.healParts = healParts ? healParts : 0;
-
+    //this.boostActions = [gc.HARVEST, gc.CAPACITY,gc.FATIGUE];
     this.due = 0;
 }
 
@@ -63,6 +63,16 @@ RouteMiner.prototype.spawn = function (build, spawn) {
         Game.creeps[name].memory.buildReference = build.mineId;
     }
     return name;
+};
+
+RouteMiner.prototype.roleParameters  = function (build) {
+    var parameters = [];
+    parameters.push(build.roomName);
+    parameters.push(build.mineId);
+    parameters.push(build.resourceId);
+    parameters.push(build.minePos);
+    parameters.push(build.defensive);
+    return  parameters;
 };
 
 RouteMiner.prototype.energyCost = function(build) {

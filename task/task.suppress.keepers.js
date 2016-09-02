@@ -15,7 +15,6 @@
  * @author Piers Shepperson
  */
 var gc = require("gc");
-var tasks = require("tasks");
 /**
  * Task harvest object.
  * @module tasksHarvest

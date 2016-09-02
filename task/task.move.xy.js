@@ -49,7 +49,7 @@ TaskMoveXY.prototype.doTask = function(creep, task) {
             result = task.customMoveToFunction(creep, xy);
         }
     } else {
-        result = creep.moveTo(task.x,task.y);
+        result = creep.moveTo(task.x,task.y, { reusePath :  gc.MOVE_TO_CACHE_TICKS } );
     }
 
     //console.log(creep,"TaskMoveXY",result);

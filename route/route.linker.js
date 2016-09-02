@@ -16,7 +16,6 @@ var gc = require("gc");
 var stats = require("stats");
 var roleBase = require("role.base");
 var raceWorker = require("race.worker");
-var raceBase = require("race.base");
 
 /**
  * Task move object. Used when we need to find the object to move to.
@@ -25,6 +24,7 @@ var raceBase = require("race.base");
 
 function  RouteLinker  (room, flagName, policyId, defensive, fast, healParts) {
     this.type = gc.ROUTE_LINKER;
+    this.role = gc.ROLE_LINKER;
     this.owner = room;
     this.flagName = flagName;
     this.policyId = policyId;
@@ -50,6 +50,8 @@ function  RouteLinker  (room, flagName, policyId, defensive, fast, healParts) {
     this.defensive = defensive ? defensive : false;
     this.fast = fast ? fast : false;
     this.healParts = healParts ? healParts : 0;
+    this.body = RouteLinker.prototype.getLinkerBody(room, energyCapacity, this.healParts );
+    //this.boostActions = [gc.HARVEST, gc.CAPACITY,gc.FATIGUE];
     this.due = 0;
 }
 
@@ -68,9 +70,36 @@ RouteLinker.prototype.spawn = function (build, spawn, room ) {
             build.defensive);
         Game.creeps[name].memory.policyId = build.policyId;
         Game.creeps[name].memory.buildReference = build.flagName;
+        Game.creeps[name].memory.testNewLinkerBody = build.body;
     }
     return name;
 };
+
+RouteLinker.prototype.getLinkerBody = function ( buildRoom, sourceEnergy, healParts ) {
+    var room = Game.rooms[buildRoom];
+    //console.log(room,buildRoom,"getLinkerBody")
+    var workParts = sourceEnergy / (HARVEST_POWER * ENERGY_REGEN_TIME);
+    var moveParts = workParts;
+    var enrgyForCarry = room.energyCapacityAvailable - BODYPART_COST[WORK] * workParts
+                            - BODYPART_COST[MOVE] * moveParts - BODYPART_COST[HEAL] * healParts;
+    var carryParts;
+    if (healParts > 0) {
+        carryParts = Math.min(MAX_CREEP_SIZE - workParts - moveParts - healParts,
+            Math.floor(enrgyForCarry/BODYPART_COST[CARRY]) );
+    } else {
+        carryParts = Math.min(MAX_CREEP_SIZE - workParts - moveParts,
+                             Math.floor(enrgyForCarry/BODYPART_COST[CARRY]) )
+    }
+    return raceWorker.bodyE(workParts, carryParts, moveParts, healParts);
+};
+
+RouteLinker.prototype.roleParameters  = function (build) {
+    var parameters = [];
+    parameters.push(build.flagName);
+    parameters.push(build.defensive);
+    return  parameters;
+};
+
 
 RouteLinker.prototype.equals = function (route1, route2 ) {
     return route1.type == route.type

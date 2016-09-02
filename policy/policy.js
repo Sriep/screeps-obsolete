@@ -4,7 +4,6 @@
  * decisions
  * @author Piers Shepperson
  */
-var roleBase = require("role.base");
 var gc = require("gc");
 /**
  * Abstract base object for policy decisions.
@@ -179,6 +178,7 @@ var policy = {
 
     getModuleFromPolicy: function(p) {
         var name = "policy." + p.type;
+        //console.log("getModuleFromPolicy",p)
         if (p.type) {
             var modulePtr = require(name);
             return modulePtr;

@@ -9,11 +9,7 @@
  * @fileOverview Screeps module. Race of creeps that transport energy around
  * @author Piers Shepperson
  */
-//roleBase = require("role.base");
 var gc = require("gc");
-var TaskMoveFind = require("task.move.find");
-var TaskOffload = require("task.offload");
-var TaskLoadup = require("task.loadup");
 var TaskOffloadSwitch = require("task.offload.switch");
 /**
  * Abstract  Race of creeps that transport energy around.
@@ -26,7 +22,7 @@ var roleFlexiStoragePorter = {
     getTaskList: function(creep) {
        // console.log(creep,"In roleFlexiStoragePorter getTaskList");
         var taskList = [];
-        var taskSwitcher =  new TaskOffloadSwitch(creep);
+        var taskSwitcher =  new TaskOffloadSwitch();
         taskList.push(taskSwitcher);
         return taskList;
     },

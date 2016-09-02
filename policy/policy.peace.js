@@ -39,7 +39,6 @@ function PolicyPeace  (roomName) {
 PolicyPeace.prototype.draftNewPolicyId = function (oldPolicy) {
     var PolicyBuildspawn = require("policy.build.spawn");
     var PolicyDefence = require("policy.defence");
-    var PolicyNeutralRoom = require("policy.neutral.room");
     var PolicyRescue = require("policy.rescue");
 
     var room = Game.rooms[oldPolicy.roomName];
@@ -47,6 +46,7 @@ PolicyPeace.prototype.draftNewPolicyId = function (oldPolicy) {
         return oldPolicy;
 
     if (!room || !room.controller.my) {
+        var PolicyNeutralRoom = require("policy.neutral.room");
         return new PolicyNeutralRoom(roomName);
     }
 
@@ -102,16 +102,15 @@ PolicyPeace.prototype.connvertToFlexiWorkers = function (room, currentPolicy) {
  */
 PolicyPeace.prototype.enactPolicy = function (currentPolicy) {
     var room = Game.rooms[currentPolicy.roomName];
-    //console.log("ENACT POLICY PEACE", room);
-    economyLinkers = require("economy.linkers");
+  //  console.log("ENACT POLICY PEACE", room);
 
     var nSpawns = room.find(FIND_MY_SPAWNS).length;
- //   console.log(room, "energyCapacity",room.energyCapacityAvailable , "Energy in build queue",
- //           Math.ceil(routeBase.buildQueueEnergyPerGen(room)),
- //           "spawn time",Math.ceil(routeBase.buldQueueRespawnTimePerGen(room)),
- //           "number spawns", nSpawns, "Spawn time", nSpawns*1500 );
-   // console.log(room, "Energy mined", economyLinkers.energyFromLinkersGen(room),
-   //         "Average supply journey", roomOwned.avProductionSupplyDistance(room),"Average upgarde distance",
+   // console.log(room, "energyCapacity",room.energyCapacityAvailable , "Energy in build queue",
+  //         Math.ceil(routeBase.buildQueueEnergyPerGen(room)),
+    //        "spawn time",Math.ceil(routeBase.buldQueueRespawnTimePerGen(room)),
+   //        "number spawns", nSpawns, "Spawn time", nSpawns*1500 );
+  //  console.log(room, "Energy mined", economyLinkers.energyFromLinkersGen(room),
+  //          "Average supply journey", roomOwned.avProductionSupplyDistance(room),"Average upgarde distance",
    //         roomOwned.avUpgradeDistance(room));
 
     routeBase.update(room);
@@ -138,8 +137,9 @@ PolicyPeace.prototype.enactPolicy = function (currentPolicy) {
         economyLinkers.attachLocalFlaggedRoutes(room, currentPolicy);
         economyLinkers.attachForeignFlaggedRoutes(room, currentPolicy);
         economyRepair.attachWallBuilder(room, currentPolicy);
-        economyLinkers.removeExhausedMiners(room);
+
     }
+    economyLinkers.removeExhausedMiners(room);
     economyLinkers.attachFlexiStoragePorters(room, currentPolicy);
     economyLinkers.processBuildQueue(room, currentPolicy);
 

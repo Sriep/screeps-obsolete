@@ -3,8 +3,7 @@
  * related to rooms in which we are fighting a war.
  * @author Piers Shepperson
  */
- 
- //var roomOwned = require("room.owned");
+
 
 /**
  * Abstract object containing data and functions

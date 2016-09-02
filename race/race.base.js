@@ -4,18 +4,12 @@
  * @author Piers Shepperson
  */
 "use strict";
-//var roomOwned = require("room.owned");
-var raceWorker = require("race.worker"); 
-var roleHarvester = require("role.harvester");
-var roleUpgrader = require("role.upgrader");
-var roleBuilder = require("role.builder");
-var roleRepairer = require("role.repairer");
-//var roadBuilder = require("road.builder");
+
+var raceWorker = require("race.worker");
 var roleBase = require("role.base");
 var stats = require("stats");
 var tasks = require("tasks");
 var gc = require("gc");
-var roleNeutralBuilder = require("role.neutral.builder")
 
 /**
  * Abstract base object containing data and functions for use by my creeps.

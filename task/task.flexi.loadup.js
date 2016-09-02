@@ -14,7 +14,6 @@
 "use strict";
 var gc = require("gc");
 var tasks = require("tasks");
-var roleEnergyPorter = require("role.energy.porter");
 var TaskMoveFind = require("task.move.find");
 var TaskLoadup = require("task.loadup");
 var TaskOffload = require("task.offload");

@@ -10,7 +10,6 @@
  */
 "use strict";
 var gc = require("gc");
-var tasks = require("tasks");
 var TaskMoveXY = require("task.move.xy");
 var TaskMoveRoom = require("task.move.room");
 /**

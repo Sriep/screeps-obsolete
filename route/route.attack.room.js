@@ -10,8 +10,6 @@ var gc = require("gc");
 var stats = require("stats");
 var roleBase = require("role.base");
 var raceBase = require("race.base");
-var raceWorker = require("race.worker");
-var raceSapper = require("race.sapper");
 /**
  * Task move object. Used when we need to find the object to move to.
  * @module RouteAttackRoom

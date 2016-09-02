@@ -20,12 +20,15 @@ function TaskLinkerBuild (flagName) {
     this.taskType = gc.TASK_LINKER_BUILD;
     this.conflicts = gc.HARVEST;
     this.flagName = flagName;
+    this.heal = true;
     this.pickup = true;
     this.loop = true;
 }
 
 TaskLinkerBuild.prototype.doTask = function(creep, task) {
   //  console.log(creep,"TaskLinkerBuild.doTask")
+
+
     var flag = Game.flags[task.flagName];
     var source =  Game.getObjectById(task.flagName);
     if (!source) return TaskFlexiLink.prototype.help(creep, task);

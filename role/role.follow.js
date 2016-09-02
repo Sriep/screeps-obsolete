@@ -13,10 +13,10 @@ var TaskFollow = require("task.follow")
 
 var roleFollow = {
 
-    getTaskList: function(creep, target, customMoveToFunction, functionModule ) {
-        if (!target) return {};
+    getTaskList: function(creep, targetId, customMoveToFunction, functionModule ) {
+        if (!targetId) return {};
         var taskList = [];
-        var follow = new TaskFollow(target.id, customMoveToFunction, functionModule ) ;
+        var follow = new TaskFollow(targetId, customMoveToFunction, functionModule ) ;
         taskList.push(follow);
         return taskList;
     }

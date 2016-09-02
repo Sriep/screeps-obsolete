@@ -25,6 +25,7 @@ function TaskFlexiLink (flagName) {
     this.taskType = gc.TASK_FLEXI_LINK;
     this.conflicts = gc.HARVEST;
     this.flagName = flagName;
+    this.heal = true;
     this.pickup = true;
     this.loop = true;
     this.defensiveRetreat = false;

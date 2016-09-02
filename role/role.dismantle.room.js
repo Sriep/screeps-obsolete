@@ -7,12 +7,10 @@
  * @author Piers Shepperson
  */
 "use strict";
-var roleBase = require("role.base");
 var TaskMoveRoom = require("task.move.room");
 var TaskMoveFind = require("task.move.find");
-var TaskHarvest = require("task.harvest");
-var TaskOffload = require("task.offload");
 var TaskDismantle = require("task.dismantle");
+var tasks = require("tasks");
 var policy = require("policy");
 var gc = require("gc");
 /**
@@ -47,6 +45,7 @@ var dismantleRoom = {
     },
 
     findNextTarget: function(creep) {
+        //tasks.setTargetId(creep,undefined);
         var target;
         target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
             filter: function(struc) {

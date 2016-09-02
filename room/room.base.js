@@ -7,8 +7,6 @@
  * @author Piers Shepperson
  */
 "use strict";
-var raceWorker = require("race.worker");
-var roleBase = require("role.base");
 var RouteScout = require("route.scout");
 var routeBase = require("route.base");
 var gc = require("gc");

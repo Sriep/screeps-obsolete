@@ -7,9 +7,6 @@
  */
 "use strict";
 var gc = require("gc");
-var TaskActions = require("task.actions")
-
-
 /**
  * Task move object. Used when we need to find the object to move to.
  * @module tasksHarvest
@@ -107,7 +104,7 @@ TaskMoveFind.prototype.doTask = function(creep, task) {
             case this.FindMethod.FindFunction:
                 var module = require(task.findModule);
                 target = module[task.findFunction](creep, this.findList);
-                //console.log(creep,"find function returned",target);
+                if (creep.name == "Carter") console.log(creep,"find function returned",target);
                 break;
             default:
                 //console.log(creep,"Invalid find method");
@@ -148,7 +145,7 @@ TaskMoveFind.prototype.doTask = function(creep, task) {
             result = task.customMoveToFunction(creep, target);
         }
     } else {
-        result = creep.moveTo(target);
+        result = creep.moveTo(target, { reusePath :  gc.MOVE_TO_CACHE_TICKS } );
         //console.log(creep,"taskmovefind moveTo",target, result);
     }
 

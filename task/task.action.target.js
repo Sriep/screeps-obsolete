@@ -10,7 +10,6 @@
  */
 "use strict";
 var gc = require("gc");
-var TaskActions = require("task.actions")
 var tasks = require("tasks");
 
 /**
@@ -33,7 +32,6 @@ TaskActionTarget.prototype.doTask = function(creep, task) {
     }
   //  console.log("in TaskActionTarget", task["conflicts"],JSON.stringify(task));
     var rtv = creep[task.action](target);
-    console.log
     if (rtv == OK) {
         return gc.RESULT_FINISHED;
     } else {

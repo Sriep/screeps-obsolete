@@ -14,7 +14,6 @@
 "use strict";
 var gc = require("gc");
 var tasks = require("tasks");
-var TaskMoveXY = require("task.move.xy")
 
 /**
  * Task move object. Used when we need to find the object to move to.

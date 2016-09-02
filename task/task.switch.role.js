@@ -43,6 +43,8 @@ TaskSwitchRole.prototype.doTask = function(creep, task) {
         task.parameters[8],
         task.parameters[9]
     );
+    creep.memory.InTaskSwitchRoleRoleIS = task.role;
+    creep.memory.InTaskSwitchRoleParametersARE = task.parameters;
     return gc.RESULT_RESET
 };
 

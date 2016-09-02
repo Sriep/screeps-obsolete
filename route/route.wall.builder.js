@@ -13,7 +13,6 @@ var gc = require("gc");
 var stats = require("stats");
 var roleBase = require("role.base");
 var raceWorker = require("race.worker");
-var raceBase = require("race.base");
 
 /**
  * Task move object. Used when we need to find the object to move to.
@@ -22,6 +21,7 @@ var raceBase = require("race.base");
 
 function  RouteWallBuilder  (room, size) {
     this.type = gc.ROUTE_WALL_BUILDER;
+    this.role = gc.ROLE_WALL_BUILDER;
     this.owner = room;
     if (size) {
         this.size = size;
@@ -29,26 +29,26 @@ function  RouteWallBuilder  (room, size) {
         this.size = raceWorker.maxSizeRoom(Game.rooms[room], true);
     }
     this.body = raceWorker.body(this.size, true);
-    this.boostActions = ["build","fatigue"];
+    this.boostActions = [gc.BUILD,gc.FATIGUE];
     this.respawnRate = CREEP_LIFE_TIME;
     this.due = 0;
 }
 
 RouteWallBuilder.prototype.spawn = function (build, spawn, room ) {
     //console.log("trying to spawn RouteFlexiStoragePorter");
-    var body = raceWorker.body(build.size, true);
-    var name = stats.createCreep(spawn, body, undefined, undefined);
+    //var body = raceWorker.body(build.size, true);
+    var name = stats.createCreep(spawn, build.body, undefined, undefined);
     if (_.isString(name)) {
-        roleBase.switchRoles(Game.creeps[name],
-            gc.ROLE_WALL_BUILDER);
+        roleBase.switchRoles(Game.creeps[name],build.role);
         Game.creeps[name].memory.policyId = build.policyId;
         Game.creeps[name].memory.buildReference = build.owner;
+        Game.creeps[name].memory.boostInfoSet = "have not set boost stuff";
     }
     return name;
 };
 
 RouteWallBuilder.prototype.roleParameters  = function (build) {
-    return { role : gc.ROLE_WALL_BUILDER, parameters : [] };
+    return [];
 };
 
 RouteWallBuilder.prototype.energyCost = function(build) {

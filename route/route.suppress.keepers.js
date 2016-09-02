@@ -18,8 +18,6 @@
 var gc = require("gc");
 var stats = require("stats");
 var roleBase = require("role.base");
-var raceBase = require("race.base");
-var raceScout = require("race.scout");
 var raceCleric = require("race.cleric");
 /**
  * Task move object. Used when we need to find the object to move to.
@@ -28,6 +26,7 @@ var raceCleric = require("race.cleric");
 
 function RouteSuppressKeepers (keeperRoom, body, respawnRate, atttack, heal) {
     this.type = gc.ROUTE_SUPPRESS_KEEPERS;
+    this.role = gc.ROLE_SUPPRESS_KEEPERS;
     this.keeperRoom = keeperRoom;
     if (body) {
         this.body = body;
@@ -38,6 +37,9 @@ function RouteSuppressKeepers (keeperRoom, body, respawnRate, atttack, heal) {
         this.respawnRate = respawnRate;
     else
         this.respawnRate = CREEP_LIFE_TIME - 100;
+    //this.boostActions = [gc.ATTACK,gc.HEAL,gc.FATIGUE];
+    this.boostActions = [gc.ATTACK,gc.HEAL];
+    this.replaceWithToughs = true;
     this.due = 0;
 }
 
@@ -54,6 +56,12 @@ RouteSuppressKeepers.prototype.spawn = function (build, spawn) {
         Memory.rooms[build.keeperRoom].suppressed = Game.time;
     }
     return name;
+};
+
+RouteSuppressKeepers.prototype.roleParameters  = function (build) {
+    var parameters = [];
+    parameters.push(build.keeperRoom);
+    return  parameters;
 };
 
 RouteSuppressKeepers.prototype.energyCost = function(build) {    // Hack until raceBase.energyFromBody gets implemented

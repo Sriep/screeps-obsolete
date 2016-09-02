@@ -6,13 +6,11 @@
  * building in a neutral room
  * @author Piers Shepperson
  */
-var roleBase = require("role.base");
 var TaskMoveRoom = require("task.move.room");
 var TaskMoveFind = require("task.move.find");
-var TaskHarvest = require("task.harvest");
-var TaskOffload = require("task.offload");
 var TaskAttackId = require("task.attack.id");
 var policy = require("policy");
+var tasks = require("tasks");
 var gc = require("gc");
 /**
  * Abstract role object for creeps building in a neutral room
@@ -46,15 +44,18 @@ var attackRoom = {
 
     findNextInList: function(creep, targetList) {
         if (!targetList || targetList.length == 0) return this.findNextTarget(creep);
+        tasks.setTargetId(creep,undefined);
         var target;
         for ( var i = 0 ; i < targetList ; i++ ) {
             switch (targetList[i].type) {
                 case gc.TARGET_ID:
                     target = Game.getObjectById(targetList[i].target);
+                    console.log("findNextInList ID",target);
                     if (target !== null) return target;
                     break;
                 case gc.TARGET_FIND_TYPE:
                     target = creep.pos.findClosestByPath(targetList[i].target);
+                    console.log("findNextInList TARGET_FIND_TYPE",target);
                     if (target != null) return target;
                     break;
                 case gc.TARGET_STRUCTURE:
@@ -63,6 +64,7 @@ var attackRoom = {
                             return struc.structureType == targetType;
                         }
                     });
+                    console.log("findNextInList TARGET_STRUCTURE",target);
                     if (target != null) return target;
                     break;
                 default:

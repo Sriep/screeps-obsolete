@@ -44,7 +44,7 @@ RouteBoostAndSwitch.prototype.spawn = function (build, spawn) {
 };
 
 RouteBoostAndSwitch.prototype.energyCost = function(build) {    // Hack until raceBase.energyFromBody gets implemented
-    return raceBase.energyFromSize(build.body.length);
+    return raceBase.getEnergyFromBody(build.body);
 };
 
 RouteBoostAndSwitch.prototype.parts = function(build) {

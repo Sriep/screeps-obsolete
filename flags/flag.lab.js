@@ -11,8 +11,6 @@
  */
 "use strict";
 var policy = require("policy");
-var policyFramework = require("policy.frameworks");
-var roomBase = require("room.base");
 
 /**
  * Abstract object to support the policy of minig a source in an unoccumpied

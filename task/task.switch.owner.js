@@ -11,7 +11,6 @@
 "use strict";
 var gc = require("gc");
 var tasks = require("tasks");
-var roleBase = require("role.base");
 
 /**
  * Task move object. Used when we need to find the object to move to.

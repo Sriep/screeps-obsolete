@@ -11,7 +11,6 @@ var TaskAttackId = require("task.attack.id");
 var TaskMoveFind = require("task.move.find");
 var TaskMoveRoom = require("task.move.room");
 var TaskMoveAttackPos = require("task.move.attack.pos");
-var TaskMovePos = require("task.move.pos");
 /**
  * Abstract role object for creeps building in a neutral room
  * @module policy

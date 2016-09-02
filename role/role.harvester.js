@@ -7,7 +7,6 @@
  * mod.thing == 'a thing'; // true
  */
 var gc = require("gc");
-var roleBase = require("role.base");
 var TaskMoveFind = require("task.move.find");
 var TaskHarvest = require("task.harvest");
 var TaskOffload = require("task.offload");

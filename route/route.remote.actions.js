@@ -27,9 +27,9 @@ var raceBase = require("race.base");
  * @module NeutralHarvestRoute
  */
 
-function  RouteRemoteActions  (room, remoteActions, body, respawnRate, policyId, reference) {
+function  RouteRemoteActions  (remoteActions, body, respawnRate, policyId, reference) {
     this.type = gc.ROUTE_REMOTE_ACTIONS;
-    this.owner = room;
+    //this.owner = room;
     if (Array.isArray(remoteActions)) {
         this.remoteActions = remoteActions;
     } else {

@@ -67,7 +67,7 @@ var tasks = {
                 if (task.taskType == "task.switch.role") return;
                 var moduleName = "task." + task.taskType;
                 var taskModule = require(moduleName);
-                result = taskModule.prototype.doTask(creep, task, doneActions);
+                result = taskModule.prototype.doTask(creep, task);
 
               //  if (creep.name == "Jack")
               //     console.log(creep, "done", task.taskType,"Task, return", result);
@@ -228,16 +228,20 @@ var tasks = {
     defensiveMoveTo: function (creep, pos) {
         var result = this.defensiveRetreat(creep, pos);
         if (undefined === result)
-            return creep.moveTo(pos);
+            return creep.moveTo(pos, { reusePath :  gc.MOVE_TO_CACHE_TICKS } );
         else
             return result;
     },
 
     moveAndAttack: function (creep, pos) {
         var target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-        creep.attack(target);
-        creep.rangedAttack(target);
-        return creep.moveTo(pos);
+        if (target) {
+            creep.attack(target);
+            creep.rangedAttack(target);
+            creep.moveTo(pos);
+        } else {
+            return creep.moveTo(pos , { reusePath :  gc.MOVE_TO_CACHE_TICKS });
+        }
     },
 
     attackClosest(creep) {

@@ -8,7 +8,6 @@
  */
 "use strict";
 var gc = require("gc");
-var roleBase = require("role.base");
 var stats = require("stats");
 var TaskMoveFind = require("task.move.find");
 var TaskHarvest = require("task.harvest");

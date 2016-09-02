@@ -158,14 +158,15 @@ var raceWorker = {
         }
         return deltaChange;
 	},
-	
+
+    // Obsolete
     assignWorkerRoles: function(currentPolicy, 
                     havesters_needed, 
                     upgraders_needed, 
                     builders_needed, 
                     repairers_needed)
     {     
-console.log("assignRoles havester", havesters_needed, "upgraders",upgraders_needed,
+    console.log("assignRoles havester", havesters_needed, "upgraders",upgraders_needed,
     "builders",builders_needed,"repairers",repairers_needed);
         var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == this.ROLE_HARVESTER
             && creep.memory.policyId == currentPolicy.id);
@@ -275,18 +276,30 @@ console.log("assignRoles havester", havesters_needed, "upgraders",upgraders_need
      //  }
     },
 
-    bodyE: function (work, carry, move) {
-        if ( work + cary + move > 50 ) return undefined;
+    bodyE: function (work, carry, move, heal) {
+        if ( work + carry + move > 50 ) return undefined;
         var body = [];
+        if (carry) {
             for (var i = 0; i < carry; i++) {
                 body.push(CARRY);
             }
+        }
+        if (move) {
             for (var j = 0; j < move; j++) {
                 body.push(MOVE);
             }
+        }
+        if (work) {
             for (var k = 0; k < work; k++) {
                 body.push(WORK);
             }
+        }
+        if (heal) {
+            for (var k = 0; k < heal; k++) {
+                body.push(HEAL);
+            }
+        }
+        return body;
     },
 
 

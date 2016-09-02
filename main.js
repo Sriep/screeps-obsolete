@@ -21,17 +21,17 @@ module.exports.loop = function () {
    // console.log("************************ Start ", Game.time," *********************************");
     PathFinder.use(true);
     ayrtepPad.top();
-
-    roomBase.examineRooms();
-    if (Game.time % gc.FLAG_UPDATE_RATE == 0 ){
-        flagBase.run();
-    }
     freememory.freeCreeps();
 
     raceBase.moveCreeps();
     buildingBase.moveBuildings();
     policy.enactPolicies();
 
+
+    roomBase.examineRooms();
+    if (Game.time % gc.FLAG_UPDATE_RATE == 0 ){
+        flagBase.run();
+    }
     ayrtepPad.bottom();
 
     console.log("************************ End ",  Game.time, " *********************************");

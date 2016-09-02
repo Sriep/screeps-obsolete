@@ -11,11 +11,9 @@
  */
 "use strict";
 
-var roleBase = require("role.base");
 var gc = require("gc");
 var stats = require("stats");
 var TaskMoveFind = require("task.move.find");
-var TaskHarvest = require("task.harvest");
 var TaskOffload = require("task.offload");
 var TaskFlexiLoadup = require("task.flexi.loadup");
 var _ = require('lodash');

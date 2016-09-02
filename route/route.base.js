@@ -75,14 +75,16 @@ var routeBase = {
     },
 
     removeRoute: function(roomName, routeId) {
+        //console.log(roomName,"removeRoute1",routeId);
         if (undefined === routeId) {
             console.log("Trying to remove an undefined route");
             return;
         }
         var room = Game.rooms[roomName];
-        if (!room) return;
-        this.checkSetup(room);
-        room.memory.routes.details[routeId] = undefined;
+        if (!room ) return;
+        if (!this.checkSetup(room)) return;
+        delete room.memory.routes.details[routeId];
+        //room.memory.routes.details[routeId] = undefined;
         //console.log(roomName,roomName,"romoveRoute length after",room.memory.routes.details.length);
     },
 
@@ -268,10 +270,14 @@ var routeBase = {
         module = this.moduleFromRoute(build.type);
 
         var result;
-        //if (build.type = gc.ROUTE_WALL_BUILDER)
-        //    result = this.boostSpawn(build, module, spawn, room);
-        //else
-             result = module.prototype.spawn(build, spawn, room);
+        //if (gc.ROUTE_WALL_BUILDER  == build.type ) {
+        if ( gc.AUTO_BOOST_CREEPS && build.boostActions && build.boostActions.length > 0 ) {
+            result = this.boostSpawn(build, module, spawn, room);
+            //result = module.prototype.spawn(build, spawn, room);
+        }
+        else {
+            result = module.prototype.spawn(build, spawn, room);
+        }
         //console.log("spawn result", result, "build", JSON.stringify(build));
         if (_.isString(result)) {
             // debugger;
@@ -292,6 +298,15 @@ var routeBase = {
             //  console.log("routeBase just after set due");
             Game.creeps[result].memory.builtBy = room.name;
             Game.creeps[result].memory.buildType = build.type;
+
+            if ( gc.AUTO_BOOST_CREEPS && build.boostActions && build.boostActions.length > 0 ) {
+                //result = this.boostSpawn(build, module, spawn, room);
+                Game.creeps[result].memory.stuff = "about to set stuff";
+                Game.creeps[result].memory.noboostroleParameters = module.prototype.roleParameters(build);
+                Game.creeps[result].memory.boostInfo
+                    = this.reserveBoosts(room, build.body, build.boostActions,build.replaceWithToughs);
+            }
+
         } else if (ERR_GCL_NOT_ENOUGH == result || ERR_INVALID_ARGS == result) {
             console.log("routeBase spawn result",result, "invalid build details", JSON.stringify(build));
             this.removeRoute(room.name, build.id);
@@ -300,35 +315,55 @@ var routeBase = {
     },
 
     boostSpawn: function(build, module, spawn, room) {
-        return module.prototype.spawn(build, spawn, room);
+        var name;
         var result = spawn.canCreateCreep(build.body);
         if (OK != result) return result;
-        var boostInfo =  this.reserveBoosts(room, build.body,["build","fatigue"]);// build.boostActions);
-        if (boostInfo) {
+        var boostInfo =  this.reserveBoosts(room, build.body, build.boostActions, build.replaceWithToughs);
+        var roleParameters = module.prototype.roleParameters(build);
+
+        if ( boostInfo
+            && boostInfo.body
+            && boostInfo.boostLabs && boostInfo.boostLabs.length > 0) {
+
             console.log("boostSpawn boostInfo", JSON.stringify(boostInfo));
-            var name = spawn.createCreep(boostInfo.body);
-            if (_.isString(name)) {
-                var switchParamers = module.prototype.roleParameters(build);
-                console.log("boostSpawn switchParamers", JSON.stringify(switchParamers));
-                //function(creep, labIds, role, roleParameters)
-                roleBase.switchRoles(
-                    Game.creeps[name],
-                    gc.ROLE_BOOST_AND_SWITCH,
-                    boostInfo.boostLabs,
-                    switchParamers.role,
-                    switchParamers.parameters
-                );
-                Game.creeps[name].memory.policyId = build.policyId;
-                Game.creeps[name].memory.buildReference = build.owner;
-            }
+            //return module.prototype.spawn(build, spawn, room);
+            name = spawn.createCreep(boostInfo.body);
+            //Game.creeps[name].memory.boostInfoSet = "boostSpawn have set boost info";
+            //Game.creeps[name].memory.boostInfo = boostInfo;
+            Game.creeps[name].memory.policyId = build.policyId;
+            //Game.creeps[name].memory.buildDotRole = build.role;
+            //Game.creeps[name].memory.boostroleParameters = roleParameters;
+            Game.creeps[name].memory.buildReference = build.owner;
+            roleBase.switchRoles(
+                Game.creeps[name],
+                gc.ROLE_BOOST_AND_SWITCH,
+                boostInfo.boostLabs,
+                build.role,
+                roleParameters
+            );
+            Game.creeps[name].memory.AFTERsetroleInforstIf = boostInfo;
+            Game.creeps[name].memory.AFTERandtheparamters = roleParameters;
             return name;
         } else {
-            return module.prototype.spawn(build, spawn, room);
+            name = spawn.createCreep(build.body);
+            roleBase.switchRolesA(
+                Game.creeps[name],
+                build.role,
+                roleParameters
+            );
+            //Game.creeps[name].memory.boostInfoSet = "have set boost info boost info included";
+            //Game.creeps[name].memory.buildDotRole = build.role;
+            Game.creeps[name].memory.noboostroleParameters = roleParameters;
+            Game.creeps[name].memory.boostInfo = boostInfo;
+            Game.creeps[name].memory.policyId = build.policyId;
+            Game.creeps[name].memory.buildReference = build.owner;
+            return name;
+            //return module.prototype.spawn(build, spawn, room);
         }
     },
 
-    reserveBoosts: function(room, body, boostAction) {
-        console.log("reserveBoosts",boostAction);
+    reserveBoosts: function(room, body, boostAction, replaceWithToughs) {
+        //console.log("reserveBoosts",boostAction);
         var boostLabs = [];
         var labs = room.find(FIND_STRUCTURES, {
             filter: function(l) {
@@ -336,41 +371,49 @@ var routeBase = {
                 if (!flag) return false;
                 return l.structureType == STRUCTURE_LAB
                     && flag.secondaryColor != COLOR_WHITE
-                    && l.mineralAmount > LAB_BOOST_MINERAL
-                    && l.energy  > LAB_BOOST_ENERGY
+                    && l.mineralAmount > LAB_BOOST_MINERAL* gc.BOOST_RESERVE
+                    && l.energy  > LAB_BOOST_ENERGY * gc.BOOST_RESERVE;
             }
         });
-        if (labs.length > 0) {
+        if (labs.length > 0 && body) {
             var newBody = body.slice(0);
-            console.log(newBody,"reserveBoosts",labs);
+            var actionsAdded = [];
+            //console.log(newBody,"reserveBoosts",labs);
             for ( var i = 0 ; i < labs.length ; i++ ) {
                 var flag = Game.flags[labs[i].id];
-                //var boosts = labs[i].mineralAmount - flag.partsReserved;
                 var resource = labColours.resource(flag.color, flag.secondaryColor);
                 var maxBoosts = Math.floor(Math.min(labs[i].mineralAmount/LAB_BOOST_MINERAL,
                                                      labs[i].energy/LAB_BOOST_ENERGY));
                 var boostPart = _.findKey(BOOSTS,resource);
                 var action = _.findKey( BOOSTS[boostPart][resource] );
                 var multiplyer = BOOSTS[boostPart][resource][action];
-                console.log(flag,"flag maxBoosts",maxBoosts,"resource",resource,"boostPart",
-                    boostPart,"action",action,"multiplyer",multiplyer);
+                //console.log(flag,"flag maxBoosts",maxBoosts,"resource",resource,"boostPart",
+                //    boostPart,"action",action,"multiplyer",multiplyer);
                 if (boostAction.indexOf(action)  != -1
                     &&  body.indexOf(boostPart) != -1) {
 
                     var numParts = gf.countValues(body, boostPart);
                     var partsBoosted = Math.min(maxBoosts,  numParts - Math.ceil(numParts/multiplyer));
-                    console.log("numParts",numParts,"partsBoosted",partsBoosted);
-                    for ( var j = 0 ; j < partsBoosted ; j++ ) {
-                        var index = newBody.indexOf(boostPart);
-                        console.log(j,"in for index",index,"newBody",newBody)  ;
-                        newBody.splice(index,1);
+                    //console.log("numParts",numParts,"partsBoosted",partsBoosted);
+                    if ( actionsAdded.indexOf(action) == -1 ) {
+                        for ( var j = 0 ; j < partsBoosted ; j++ ) {
+                            var index = newBody.indexOf(boostPart);
+                            //console.log(j,"in for index",index,"newBody",newBody)  ;
+                            newBody.splice(index,1);
+                        }
                     }
-                    //flag.partsReserved = flag.partsReserved + partsBoosted;
+                    actionsAdded.push(action);
                     boostLabs.push(labs[i].id);
                 } // if
             } // for
             if (boostLabs.length > 0) {
                 return { body : newBody, boostLabs : boostLabs };
+            }
+        }
+        if (replaceWithToughs && body && newBody) {
+            var toughs = body.length - newBody.length;
+            for ( var k = 0 ; k < toughs ; k++ ) {
+                newBody.unshift(TOUGH);
             }
         }
     }

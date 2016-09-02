@@ -19,6 +19,7 @@ var racePorter = require("race.porter");
 
 function  RouteNeutralPorter  (roomName, flagName, respawnMultiplyer) {
     this.type = gc.ROUTE_NEUTRAL_PORTER;
+    this.role = gc.ROLE_NEUTRAL_PORTER;
     this.owner = roomName;
     this.flagName = flagName;
     this.respawnMultiplyer = respawnMultiplyer ? respawnMultiplyer : 0.9;
@@ -28,23 +29,18 @@ function  RouteNeutralPorter  (roomName, flagName, respawnMultiplyer) {
     var room = Game.rooms[roomName];
     var maxSizeRoom = Math.min( Math.floor((room.energyCapacityAvailable-50)/racePorter.BLOCKSIZE),
                                     gc.PORTER_SLOW_MAX_SIZE);
-   // console.log("room.energyCapacityAvailable",room.energyCapacityAvailable,
-  //      "racePorter.BLOCKSIZE",racePorter.BLOCKSIZE,"PORTER_SLOW_MAX_SIZE",gc.PORTER_SLOW_MAX_SIZE,
-   //     "maxSizeRoom",maxSizeRoom);
-
-    var sizeForOnePerGen = RouteNeutralPorter.prototype.sizeForOneGenerationRespawn(
-        flag.memory.porterFrom.distance,
-        flag.memory.energyCapacity
-    );
-   // console.log(room,"RouteNeutralPorter",maxSizeRoom,"maxForRoom size onegen",sizeForOnePerGen)
-    var size = Math.min(maxSizeRoom, sizeForOnePerGen);
-   // console.log(size,"in routeneutralpoeter");
+    //var sizeForOnePerGen = RouteNeutralPorter.prototype.sizeForOneGenerationRespawn(
+    //    flag.memory.porterFrom.distance,
+    //    flag.memory.energyCapacity
+   // );
+   // var size = Math.min(maxSizeRoom, sizeForOnePerGen);
+    var size = maxSizeRoom;
     this.respawnRate = this.respawnMultiplyer * RouteNeutralPorter.prototype.calcRespawnRate(
         flag.memory.porterFrom.distance,
         flag.memory.energyCapacity,
         size
     );
-    this.respawnRate = Math.ceil(this.respawnRate);
+    this.respawnRate = Math.min(Math.ceil(this.respawnRate), CREEP_LIFE_TIME);
 
     this.body = racePorter.body(size);
   //  console.log(size,"RouteNeutralPorter",this.body);
@@ -55,22 +51,21 @@ function  RouteNeutralPorter  (roomName, flagName, respawnMultiplyer) {
         this.body.pop();
         this.body.push(WORK);
     }
-
-    //this.healParts = healParts ? healParts : 0;
+    this.boostActions = [gc.CAPACITY,gc.FATIGUE];
     this.due = 0;
 }
 
-RouteNeutralPorter.prototype.spawn = function (build, spawn, room ) {
-    var flag = Game.flags[build.flagName];
+RouteNeutralPorter.prototype.spawn = function ( build, spawn, room ) {
     var name = stats.createCreep(spawn, build.body, undefined, undefined);
     if (_.isString(name)) {
         roleBase.switchRoles(Game.creeps[name],
-            gc.ROLE_NEUTRAL_PORTER,
+            build.role,
             build.owner,
-            flag
+            build.flagName
         );
         Game.creeps[name].memory.builtIn = build.owner;
         Game.creeps[name].memory.buildReference = build.flagName;
+        Game.creeps[name].memory.boostInfoSet = "have not set boost stuff";
     }
     return name;
 };
@@ -91,13 +86,11 @@ RouteNeutralPorter.prototype.calcRespawnRate = function(distance, energyCapacity
     return Math.ceil(CREEP_LIFE_TIME/numberWorkersNeeded);
 };
 
-RouteNeutralPorter.prototype.equals = function (route1, route2 ) {
-    return route1.type == route.type
-        && route1.owner == route2.owner
-        && route1.flagName == route2.flagName
-        && route1.policyId == route2.policyId
-        && route1.size == route2.size
-        && route1.respawnRate == route2.respawnRate;
+RouteNeutralPorter.prototype.roleParameters  = function (build) {
+    var parameters = [];
+    parameters.push(build.owner);
+    parameters.push(build.flagName);
+    return  parameters;
 };
 
 RouteNeutralPorter.prototype.energyCost = function(build) {

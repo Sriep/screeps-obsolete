@@ -8,8 +8,6 @@
 //Bace object
 var policy = require("policy");
 var roleBase = require("role.base");
-var raceBase = require("race.base");
-var stats = require("stats");
 var gc = require("gc");
 var raceWorker = require("race.worker");
 
@@ -61,7 +59,8 @@ PolicyBuildSpawn.prototype.enactPolicy = function(currentPolicy) {
     //console.log("In build spawn",room,"creeps",creeps.length);
     for(var i = 0 ; i < creeps.length ; i++ ) {
         if (raceWorker.isWorker(creeps[i].body)) {
-            if (creeps[i].memory.policyId != currentPolicy.id) {
+            if (creeps[i].memory.policyId != currentPolicy.id
+                && creeps[i].memory.role != gc.ROLE_FLEXI_STORAGE_PORTER) {
                 roleBase.switchRoles(creeps[i], gc.ROLE_FLEXI_STORAGE_PORTER);
             }
 

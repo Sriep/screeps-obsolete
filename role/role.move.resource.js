@@ -19,7 +19,9 @@ var labColours = require("lab.colours");
 
 var roleMoveResource = {
 
-    getTaskList: function(creep, from, to, resourceId) {
+    getTaskList: function(creep, fromId, toId, resourceId) {
+        var from = Game.getObjectById(fromId);
+        var to = Game.getObjectById(toId);
         var moveToFrom = new TaskMovePos(from.pos,1);
         var loadup = new  TaskLoadup (resourceId, from.id);
         var moveToTo = new TaskMovePos(to.pos,1);

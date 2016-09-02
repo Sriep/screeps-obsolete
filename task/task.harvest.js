@@ -6,8 +6,6 @@
  * @author Piers Shepperson
  */
 var gc = require("gc");
-var TaskActions = require("task.actions");
-var TaskMoveFind = require("task.move.find");
 
 /**
  * Task harvest object.

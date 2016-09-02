@@ -295,7 +295,7 @@ var roleBase = {
     },
 
 	findTargetSource: function(creep) {
-      //  console.log(creep,"IN find target source");
+        console.log(creep,"IN find target source");
         var roomOwned = require("room.owned");
 	    var sources = creep.room.find(FIND_SOURCES);
         var target;
@@ -353,7 +353,7 @@ var roleBase = {
              //   console.log("else",target);
             }
         }
-      //  console.log(creep,"findTargetSource target",target,"length sources", sources.length);
+        console.log(creep,"findTargetSource target",target,"length sources", sources.length);
       //  console.log(creep,"findTargetSources access", JSON.stringify(access),"clostse index",iClosest);
         //creep.memory.tasks.targtId = target;
 
@@ -526,7 +526,26 @@ var roleBase = {
         //console.log(creep,"back form module.getTaskList", JSON.stringify(creep.memory.tasks.tasklist));
 
         creep.memory.role = role;
+        //tasks.setTargetId(creep,undefined);
+        creep.memory.tasks.targetId = undefined;
         return true;
+    },
+
+    switchRolesA: function (creep, role, parameters) {
+        this.switchRoles(
+            creep,
+            role,
+            parameters[0],
+            parameters[1],
+            parameters[3],
+            parameters[4],
+            parameters[5],
+            parameters[6],
+            parameters[7],
+            parameters[8],
+            parameters[9],
+            parameters[10]
+        )
     },
 
     getModuleFromRole: function (role){
