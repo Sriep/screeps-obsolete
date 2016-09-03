@@ -64,10 +64,9 @@ TaskMoveFind.prototype.doTask = function(creep, task) {
     } else {
         tasks.setTargetId(creep, undefined);
     }
-    //console.log(creep,"taskmovefind target",target);
-
+   // if (creep.name == "Maya") console.log(creep,"taskmovefind target",target,"task.method",task.method);
     if (!target) {
-        //console.log(creep,"no target look for one method",task.method);
+        console.log(creep,"no target look for one method",task.method);
         switch (task.method) {
             case this.FindMethod.FindId:
                 target = Game.getObjectById(task.findId);
@@ -94,17 +93,20 @@ TaskMoveFind.prototype.doTask = function(creep, task) {
                //     , {filter: {structureType: task.findStructure}});
                 target = creep.pos.findClosestByRange(FIND_STRUCTURES
                     , {filter: {structureType: task.findStructure}});
+                if (creep.name == "Maya") console.log(creep,"find FindStructure ",target);
                 break;
             case this.FindMethod.FindFilter:
                // target = creep.pos.findClosestByPath(FIND_MY_STRUCTURES
                //     , {filter: task.findFilter});
                 target = creep.pos.findClosestByRange(FIND_STRUCTURES
                     , {filter: task.findFilter});
+                if (creep.name == "Maya") console.log(creep,"find FindFilter ",target);
                 break;
             case this.FindMethod.FindFunction:
                 var module = require(task.findModule);
-                target = module[task.findFunction](creep, this.findList);
-                if (creep.name == "Carter") console.log(creep,"find function returned",target);
+                target = module[task.findFunction](creep, task.findList);
+                //console.log(creep,"find function returned",target,"module",module,
+               //     "this.findList",this.findList);
                 break;
             default:
                 //console.log(creep,"Invalid find method");
@@ -115,9 +117,8 @@ TaskMoveFind.prototype.doTask = function(creep, task) {
             tasks.setTargetId(creep, target.id);
          //   console.log(creep,"movefind setTargetId to",tasks.getTargetId(creep),"of",target);
         }
-
     }
-    // console.log(creep,"taskmovefind2 target",target);
+    //if (creep.name == "Maya") console.log(creep,"taskmovefind2 target",target);
 
     if (!target) {
       //  console.log(creep,"find RESULT_FINISHED and cound not find any target")
@@ -149,7 +150,7 @@ TaskMoveFind.prototype.doTask = function(creep, task) {
         //console.log(creep,"taskmovefind moveTo",target, result);
     }
 
-    //console.log(creep,"TaskMoveFind result",result);
+    //if (creep.name == "Maya") console.log(creep,"TaskMoveFind result",result);
     distanceToGo = creep.pos.getRangeTo(target);
     if (distanceToGo <= task.range) {
        //console.log(creep,"find RESULT_FINISHED; after move range <= abut ");

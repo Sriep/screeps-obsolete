@@ -53,7 +53,7 @@ var flagSource = {
                 structure = Game.rooms[myRooms[i]].find(FIND_MY_SPAWNS);
             }
             //console.log(flag.pos,"closestInfo",structure,structure[0].pos,"room",myRooms[i],"fndOpts",findOpts);
-            if (structure[0].pos) {
+            if (structure.length > 0 &&  structure[0].pos) {
                 var d = roomBase.distanceBetween(flag.pos, structure[0].pos);
                 if (!distance || distance > d) {
                     distance = d;

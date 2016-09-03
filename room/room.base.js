@@ -413,7 +413,7 @@ var roomBase = {
                 if (exit) {
                     var entrance = this.exitToEntrance(exit, exits[i]);
                     var target = entrance.findClosestByRange(findType, Opts);
-                    if (!target || undefined !== target) {
+                    if (target) {
                       //  console.log("about to distance betwen pos",JSON.stringify(pos), JSON.stringify(target.pos) );
                         var distance = this.distanceBetween(pos, target.pos);
                    //     console.log("distance",distance );

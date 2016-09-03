@@ -47,7 +47,7 @@ PolicyPeace.prototype.draftNewPolicyId = function (oldPolicy) {
 
     if (!room || !room.controller.my) {
         var PolicyNeutralRoom = require("policy.neutral.room");
-        return new PolicyNeutralRoom(roomName);
+        return new PolicyNeutralRoom(room.name);
     }
 
     if (PolicyDefence.prototype.beingAttacked(room)) {
@@ -58,7 +58,7 @@ PolicyPeace.prototype.draftNewPolicyId = function (oldPolicy) {
         return new PolicyBuildspawn(room.name);
     }
 
-    if (PolicyRescue.prototype.needsRescue(room)) {
+    if (PolicyRescue.prototype.needsRescue(room, oldPolicy)) {
         return new PolicyRescue(room.name, oldPolicy);
     }
     return oldPolicy;

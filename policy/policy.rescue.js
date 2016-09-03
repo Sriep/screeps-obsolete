@@ -135,7 +135,7 @@ PolicyRescue.prototype.switchPolicy = function(oldPolicy, newPolicy)
  * @param   {Object} room  The room that might need rescuing.
  * @returns {Bool} True inidcates we should use a rescue policy.
  */
-    PolicyRescue.prototype.needsRescue = function(room, policy) {
+ PolicyRescue.prototype.needsRescue = function(room, policy) {
     if (room === undefined) {
         return false;
     }

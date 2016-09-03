@@ -295,7 +295,7 @@ var roleBase = {
     },
 
 	findTargetSource: function(creep) {
-        console.log(creep,"IN find target source");
+        //console.log(creep,"IN find target source");
         var roomOwned = require("room.owned");
 	    var sources = creep.room.find(FIND_SOURCES);
         var target;
@@ -353,7 +353,7 @@ var roleBase = {
              //   console.log("else",target);
             }
         }
-        console.log(creep,"findTargetSource target",target,"length sources", sources.length);
+        //console.log(creep,"findTargetSource target",target,"length sources", sources.length);
       //  console.log(creep,"findTargetSources access", JSON.stringify(access),"clostse index",iClosest);
         //creep.memory.tasks.targtId = target;
 

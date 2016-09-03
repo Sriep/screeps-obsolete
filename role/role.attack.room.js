@@ -43,6 +43,7 @@ var attackRoom = {
     },
 
     findNextInList: function(creep, targetList) {
+        //console.log(creep,"start of findNextInList",JSON.stringify(targetList));
         if (!targetList || targetList.length == 0) return this.findNextTarget(creep);
         tasks.setTargetId(creep,undefined);
         var target;
@@ -80,7 +81,7 @@ var attackRoom = {
                 return struc.structureType == STRUCTURE_TOWER
             }
         });
-      //  console.log(creep,"findNextTarget",target);
+        console.log(creep,"findNextTarget",target);
         if (target != null) return target;
 
         target = creep.pos.findClosestByPath(FIND_HOSTILE_SPAWNS);

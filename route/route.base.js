@@ -29,8 +29,9 @@ var routeBase = {
 
     attachRoute: function (roomName, routeType, order, priority, reference) {
         var room = Game.rooms[roomName];
+        console.log(room,roomName,"attachRoute");
         if (!this.checkSetup(room)) return false;
-        //console.log("attachRoute rooName",roomName);
+        console.log("attachRoute rooName",roomName);
         order.id = this.getNextRouteId(room);
         order.homeYard = roomName;
         if (priority === undefined) {
@@ -40,9 +41,9 @@ var routeBase = {
         }
         order.basePriority = order.priority;
         if (reference) this.setDueFromActiveRoute(room, order, reference);
-        //console.log("attachRoute rooName",JSON.stringify(order));
+        console.log("attachRoute rooName",JSON.stringify(order));
         room.memory.routes.details[order.id] = order;
-        //console.log(roomName, routeType,"attachRoute order id", order.id);
+        console.log(roomName, routeType,"attachRoute order id", order.id);
         return order.id;
     },
 

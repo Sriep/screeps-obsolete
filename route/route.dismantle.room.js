@@ -27,9 +27,9 @@ function RouteDismantleRoom (targetRoomName, body, respawn, targetList) {
 
 RouteDismantleRoom.prototype.spawn = function (build, spawn) {
     //console.log("RouteMiner spawn", spawn, JSON.stringify(build));
-    var name = stats.createCreep(spawn, body, undefined, undefined);
+    var name = stats.createCreep(spawn, build.body, undefined, undefined);
     if (_.isString(name)) {
-        console.log("Spawning miner",name);
+        console.log("Spawning room dismanler",name);
         roleBase.switchRoles(
             Game.creeps[name],
             gc.ROLE_DISMANTLE_ROOM,
