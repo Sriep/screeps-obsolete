@@ -148,7 +148,7 @@ TaskOffloadSwitch.prototype.moveToStorage = function (creep) {
         }
     }
     //if (creep.name == "Carter") console.log(creep, "in move to storage offload swithc energy", energy)
-        if (energy > 0) {
+    if (energy > 0) {
         energyDumps.sort(this.energyDumpSortOrder);
         moveToStorage = new TaskMoveFind(gc.FIND_ID, gc.RANGE_TRANSFER, energyDumps[0].id);
         moveToStorage.mode = gc.FLEXIMODE_CONTAINER;
@@ -178,14 +178,20 @@ TaskOffloadSwitch.prototype.energyDumpSortOrder = function(a, b) {
     var bEnergy, aEnergy;
     if (a.structureType == STRUCTURE_LINK) {
         aEnergy = a.energy;
+    } else if (b.structureType == STRUCTURE_TERMINAL) {
+        aEnergy = Math.max(0, a.energy - gc.TERMINAL_RESERVE)
     } else {
         aEnergy = a.store[RESOURCE_ENERGY];
     }
+
     if (b.structureType == STRUCTURE_LINK) {
         bEnergy = b.energy;
+    } else  if (b.structureType == STRUCTURE_TERMINAL) {
+        aEnergy = Math.max(0, b.energy - gc.TERMINAL_RESERVE)
     } else {
         bEnergy = b.store[RESOURCE_ENERGY];
     }
+
     return bEnergy - aEnergy;
 };
 

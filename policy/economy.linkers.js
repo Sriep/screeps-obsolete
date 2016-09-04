@@ -51,7 +51,7 @@ var economyLinkers = {
                 this.attachFlaggedMiner(room, flags[j]);
             }
         }
-    } ,
+    },
 
     attachForeignFlaggedRoutes: function (room, policy) {
         if (!this.readyForForeignLinkers(room)) return;
@@ -60,12 +60,12 @@ var economyLinkers = {
                 || flagBase.porterFrom(f, room.name)
                 || flagBase.reverseControllerFrom(f, room.name))
                 && room.name != f.pos.roomName
-                && f.secondaryColor != COLOR_RED;
+                && f.secondaryColor != gc.FLAG_IGNORE_COLOR;
         });
-        console.log(room,"attachForeignFlaggedRoutes",flags);
+        //console.log(room,"attachForeignFlaggedRoutes",flags);
         var roomNames = flagBase.roomNamesFromFlags(flags);
         var orderRooms = this.orderForeignRooms(room, roomNames, flags);
-        console.log(room,"attachForeignRoutes ordered rooms", JSON.stringify(orderRooms) );
+        //console.log(room,"attachForeignRoutes ordered rooms", JSON.stringify(orderRooms) );
         var spawnTime = room.find(FIND_MY_SPAWNS).length * CREEP_LIFE_TIME;
         var maxSpawnAvaliable = spawnTime * gc.SPAWN_RESERVE_MULTIPLIER - gc.SPAWN_RESERVE_TIME;
         spawnTime = 0;

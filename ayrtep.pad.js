@@ -11,10 +11,11 @@ var routeBase = require("route.base");
 var ayrtepPad = {
     top: function () {
         //console.log("------------------------------ flags -------------------------------");
-        //for ( var i in Game.flags) {
-        //    if (Game.flags[i].memory.type == "source")
-        //   console.log(Game.flags[i].pos,i, JSON.stringify(Game.flags[i].memory));
-        //}
+     //   for ( var i in Game.flags) {
+         //   if (Game.flags[i].memory.type == "constructedWall")
+         //       Game.flags[i].memory.type == "wall"
+           //console.log(Game.flags[i].pos,i, JSON.stringify(Game.flags[i].memory));
+      //  }
         //console.log("------------------------------ flags -------------------------------");
 
         //Memory.rooms["W28S22"].flagged = false;
@@ -23,9 +24,9 @@ var ayrtepPad = {
       //      routeBase.showRoutes("W26S21");
        //console.log("------------------------------ routes W25S22 ---------------------------");
        //   routeBase.showRoutes("W25S22");
-        console.log("------------------------------ routes W25S23 ---------------------------");
-          routeBase.showRoutes("W25S23");
-        console.log("------------------------------ routes W25S19 ---------------------------");
+    //    console.log("------------------------------ routes W25S23 ---------------------------");
+    //      routeBase.showRoutes("W25S23");
+    //    console.log("------------------------------ routes W25S19 ---------------------------");
     //       routeBase.showRoutes("W25S19");
     //   console.log("------------------------------ routes W28S23 ---------------------------");
     //      routeBase.showRoutes("W24S23");
@@ -106,13 +107,10 @@ var ayrtepPad = {
         //routeBase.resetRoutes("W25S24");
         //console.log("room.memory.routes.nextRouteId",w25s23.memory.routes.nextRouteId);
 
-        //var  creep = Game.creeps["Samantha"];
-        //creep.drop("U");
-        //creep.move(LEFT);
-        //var  creep = Game.creeps["Michael"];
-        //creep.moveTo(Game.getObjectById("57c98edeb80ae1d315dfcc97"));
-        ///creep.dismantle(Game.getObjectById("57c98edeb80ae1d315dfcc97"));
+        //var  creep = Game.creeps["Eli"];
+        //creep.moveTo(creep.room.controller);
         //creep.upgradeController(creep.room.controller);
+
         //creep.drop("U");
        // creep.move(LEFT);
         // creep.transfer(cre
@@ -130,7 +128,7 @@ var ayrtepPad = {
 
       //  creep2.move(BOTTOM)
       //  roleBase.switchRoles(creep2, gc.ROLE_SUPPRESS_KEEPERS,"W24S24");
-        var  creep3 = Game.creeps["Carter"];
+        //var  creep3 = Game.creeps["Carter"];
         //roleBase.switchRoles(creep3, gc.ROLE_FLEXI_STORAGE_PORTER);
         //creep3.move(RIGHT)
         //creep.drop(RESOURCE_ENERGY);
@@ -228,11 +226,12 @@ var ayrtepPad = {
             routeBase.attachRoute("W25S23",undefined,orderW25s23,60);
         }
 
-        var gc = require("gc");
-        var roleBase = require("role.base");
-        var  Mayo = Game.creeps["Mayo"];
-       // var targetList = [
-       //     { type : gc.TARGET_ID, target : "57c98edeb80ae1d315dfcc97" },
+       // var gc = require("gc");
+       // var roleBase = require("role.base");
+       // var AriaRuby = Game.creeps["AriaRuby"];
+       // console.log("AriaRuby",AriaRuby.transfer(AriaRuby.room.storage,"Z"));
+        //var targetList = [
+        //    { type : gc.TARGET_ID, target : "57c98edeb80ae1d315dfcc97" },
         //    { type : gc.TARGET_ID, target : "57c9537bdc05b2b82ee06881" },
         //];
         //roleBase.switchRoles(Mayo,"W24S23",targetList)
@@ -240,12 +239,14 @@ var ayrtepPad = {
 
         //roomBase.sendScoutFromTo("W28S23", "W29S23");
         //console.log("wokerbody£",raceWorker.bodyE(37,0,13));
+        var gc = require("gc");
+        console.log("TERMINAL_RESERVE",gc.TERMINAL_RESERVE,"TERMINAL_RESTOCK_THRESHOLD",gc.TERMINAL_RESTOCK_THRESHOLD);
 
 
         var from = new RoomPosition(32,1,"W28S24");
         var to  = new RoomPosition(19,19,"W28S24");
         var roadBuilder = require("road.builder");
-      //  roadBuilder.buildRoad( from, to );
+        // roadBuilder.buildRoad( from, to );
     }
 
 };

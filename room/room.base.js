@@ -108,6 +108,16 @@ var roomBase = {
             if (keeperLairs.length > 0) Game.flags[flagName].memory.keeperLairRoom = true;
         }
 
+        var walls = room.find(FIND_STRUCTURES, {
+            filter: { structureType: STRUCTURE_WALL }
+        });
+        for ( i in walls ) {
+            flagName = walls[i].id;
+            if (!Game.flags[flagName])
+                walls[i].pos.createFlag(flagName, gc.FLAG_PERMANENT_COLOUR, gc.FLAG_WALL_COLOUR);
+            Game.flags[flagName].memory.type = gc.FLAG_WALL;
+        }
+
         var portals = room.find(FIND_STRUCTURES, {
             filter: { structureType: STRUCTURE_PORTAL }
         });

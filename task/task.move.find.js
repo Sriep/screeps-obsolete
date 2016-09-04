@@ -66,7 +66,7 @@ TaskMoveFind.prototype.doTask = function(creep, task) {
     }
    // if (creep.name == "Maya") console.log(creep,"taskmovefind target",target,"task.method",task.method);
     if (!target) {
-        console.log(creep,"no target look for one method",task.method);
+       // console.log(creep,"no target look for one method",task.method);
         switch (task.method) {
             case this.FindMethod.FindId:
                 target = Game.getObjectById(task.findId);
@@ -93,14 +93,14 @@ TaskMoveFind.prototype.doTask = function(creep, task) {
                //     , {filter: {structureType: task.findStructure}});
                 target = creep.pos.findClosestByRange(FIND_STRUCTURES
                     , {filter: {structureType: task.findStructure}});
-                if (creep.name == "Maya") console.log(creep,"find FindStructure ",target);
+                //if (creep.name == "Maya") console.log(creep,"find FindStructure ",target);
                 break;
             case this.FindMethod.FindFilter:
                // target = creep.pos.findClosestByPath(FIND_MY_STRUCTURES
                //     , {filter: task.findFilter});
                 target = creep.pos.findClosestByRange(FIND_STRUCTURES
                     , {filter: task.findFilter});
-                if (creep.name == "Maya") console.log(creep,"find FindFilter ",target);
+                //if (creep.name == "Maya") console.log(creep,"find FindFilter ",target);
                 break;
             case this.FindMethod.FindFunction:
                 var module = require(task.findModule);

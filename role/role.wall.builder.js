@@ -47,7 +47,8 @@ var roleWallBuilder = {
             filter: function(object) {
                 return object.hits < object.hitsMax
                     && ( object.structureType == STRUCTURE_RAMPART
-                        || object.structureType == STRUCTURE_WALL );
+                        || object.structureType == STRUCTURE_WALL )
+                    && ( !Game.flags[object.id] || Game.flags[object.id].secondaryColor != gc.FLAG_IGNORE_COLOR );
             }
         });
         walls.sort(function (a,b) {return (a.hits - b.hits)});

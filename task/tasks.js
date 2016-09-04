@@ -39,8 +39,10 @@ var tasks = {
         result = this.Result.Finished;
         var doneActions = new TaskActions(gc.CREEP);
         var actionCount = 0;
-        while ((result == this.Result.Finished || result == this.Result.Rollback)
-                            && taskList.length > 0 && actionCount++ < gc.MAX_TASK_ACTIONS) {
+        while ((result == this.Result.Finished
+                    || result == this.Result.Rollback
+                    || result == this.Result.Reset )
+                && taskList.length > 0 && actionCount++ < gc.MAX_TASK_ACTIONS) {
             var task = taskList[0];
             while (task !== undefined && task === null) {
                 taskList.shift();
@@ -94,9 +96,8 @@ var tasks = {
                 }
             }  else  {
 
-                if (result == this.Result.Finished
-                    || result == this.Result.Reset) {
-
+                if (result == this.Result.Finished) {
+                   // || result == this.Result.Reset) {
                     //console.log(creep,"check finresult", result,"this.Result.Finished",this.Result.Finished);
                     if (taskList.length > 0){
                         var doneTask = taskList.shift();

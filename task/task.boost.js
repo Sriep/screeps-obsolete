@@ -30,8 +30,8 @@ TaskBoost.prototype.doTask = function(creep, task) {
         return gc.RESULT_FINISHED;
 
     var result = lab.boostCreep(creep, task.amount);
-    creep.say("result");
-    console.log(creep,"result of boost",result,"lab mineral",lab.mineralType);
+    //creep.say("result");
+   //console.log(creep,"result of boost",result,"lab mineral",lab.mineralType);
     switch (result) {
         case OK:                        //	0	The operation has been scheduled successfully.
             tasks.setTargetId(creep, undefined);
