@@ -21,31 +21,30 @@ var roleBase = require("role.base");
  * @module TaskSwitchRole
  */
 
-function TaskSwitchRole (role, parameters) {
+function TaskSwitchRole (role, parameters, switchCondition) {
     this.taskType = gc.TASK_SWITCH_ROLE;
     this.role = role;
     this.parameters = parameters ? parameters : [];
+    this.switchCondition = switchCondition;
+    this.loop = true;
 }
 
 TaskSwitchRole.prototype.doTask = function(creep, task) {
-    console.log(creep,"TaskSwitchRole");
-    roleBase.switchRoles(
-        creep,
-        task.role,
-        task.parameters[0],
-        task.parameters[1],
-        task.parameters[2],
-        task.parameters[3],
-        task.parameters[4],
-        task.parameters[5],
-        task.parameters[6],
-        task.parameters[7],
-        task.parameters[8],
-        task.parameters[9]
-    );
-    creep.memory.InTaskSwitchRoleRoleIS = task.role;
-    creep.memory.InTaskSwitchRoleParametersARE = task.parameters;
-    return gc.RESULT_RESET
+    //console.log(creep,"TaskSwitchRole");
+    if (!task.switchCondition || task.switchCondition(creep))
+    {
+        roleBase.switchRolesA(
+            creep,
+            task.role,
+            task.parameters
+        );
+        creep.memory.InTaskSwitchRoleRoleIS = task.role;
+        creep.memory.InTaskSwitchRoleParametersARE = task.parameters;
+        return gc.RESULT_RESET
+    } else {
+        return gc.RESULT_FINISHED;
+    }
+
 };
 
 module.exports = TaskSwitchRole;

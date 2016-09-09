@@ -20,9 +20,9 @@ var ayrtepPad = {
 
         //Memory.rooms["W28S22"].flagged = false;
 
-       // console.log("------------------------------ routes W26S21 ---------------------------");
-      //      routeBase.showRoutes("W26S21");
-       //console.log("------------------------------ routes W25S22 ---------------------------");
+       console.log("------------------------------ routes W26S21 ---------------------------");
+            routeBase.showRoutes("W26S21");
+       console.log("------------------------------ routes W25S22 ---------------------------");
        //   routeBase.showRoutes("W25S22");
     //    console.log("------------------------------ routes W25S23 ---------------------------");
     //      routeBase.showRoutes("W25S23");
@@ -51,7 +51,7 @@ var ayrtepPad = {
         //var w26s21 = Game.rooms["W26S21"];
         //var w26s22 = Game.rooms["W26S22"];
         //var w25s22 = Game.rooms["W25S22"];
-        var w25s23 = Game.rooms["W25S23"];
+        //var w25s23 = Game.rooms["W25S23"];
         //var w24s23 = Game.rooms["W24S23"];
 
         //w25s19.memory.routes.details[12].size = 8;
@@ -60,7 +60,7 @@ var ayrtepPad = {
 
        // delete w25s23.memory.routes.details[29];
         //w25s23.memory.routes.details[39].priority = gc.PRIORITY_LINKER;
-        //delete w26s21.memory.routes.details[155];
+        //delete w26s21.memory.routes.details[5];
         //delete w25s23.memory.routes.details[3];
 
         //var creep = Game.creeps["Bentley"];
@@ -107,7 +107,8 @@ var ayrtepPad = {
         //routeBase.resetRoutes("W25S24");
         //console.log("room.memory.routes.nextRouteId",w25s23.memory.routes.nextRouteId);
 
-        //var  creep = Game.creeps["Eli"];
+        var  creep = Game.creeps["WyattDeclan"];
+        //creep.move(BOTTOM)
         //creep.moveTo(creep.room.controller);
         //creep.upgradeController(creep.room.controller);
 
@@ -236,12 +237,10 @@ var ayrtepPad = {
         //];
         //roleBase.switchRoles(Mayo,"W24S23",targetList)
 
-
         //roomBase.sendScoutFromTo("W28S23", "W29S23");
         //console.log("wokerbody£",raceWorker.bodyE(37,0,13));
         var gc = require("gc");
         console.log("TERMINAL_RESERVE",gc.TERMINAL_RESERVE,"TERMINAL_RESTOCK_THRESHOLD",gc.TERMINAL_RESTOCK_THRESHOLD);
-
 
         var from = new RoomPosition(32,1,"W28S24");
         var to  = new RoomPosition(19,19,"W28S24");
