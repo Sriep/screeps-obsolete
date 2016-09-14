@@ -27,15 +27,17 @@ TaskDismantle.prototype.doTask = function(creep, task) {
     } else {
         target = Game.getObjectById(task.targetId);
     }
-    target = creep.pos.findClosestByRange(FIND_STRUCTURES,
-        {filter: {structureType: STRUCTURE_WALL}});
+    //target = creep.pos.findClosestByRange(FIND_STRUCTURES,
+    //    {filter: {structureType: STRUCTURE_WALL}});
 
-    //console.log(creep,"target",target,"hits before",target.hits);
+   //console.log(creep,"TaskDismantle this.targetId ",task.targetId
+   //     ,"tasks.getTargetId(creep)",tasks.getTargetId(creep));
+    //console.log(creep,"TaskDismantle target",target,"hits before",target.hits);
 
     var result = creep.dismantle(target);
 
-    console.log(creep,"TaskDismantle", target,"restult",result);
-    //console.log(creep,"target",target,"hits after",target.hits);
+    //console.log(creep,"TaskDismantle", target,"restult",result);
+    //console.log(creep,"TaskDismantle target",target,"hits after",target.hits);
 
     switch (result)
     {
