@@ -20,13 +20,13 @@ var ayrtepPad = {
 
         //Memory.rooms["W28S22"].flagged = false;
 
-       console.log("------------------------------ routes W26S21 ---------------------------");
-            routeBase.showRoutes("W26S21");
-       console.log("------------------------------ routes W25S22 ---------------------------");
+    //   console.log("------------------------------ routes W26S21 ---------------------------");
+    //        routeBase.showRoutes("W26S21");
+    //   console.log("------------------------------ routes W25S22 ---------------------------");
        //   routeBase.showRoutes("W25S22");
-    //    console.log("------------------------------ routes W25S23 ---------------------------");
-    //      routeBase.showRoutes("W25S23");
-    //    console.log("------------------------------ routes W25S19 ---------------------------");
+     //   console.log("------------------------------ routes W25S23 ---------------------------");
+     //     routeBase.showRoutes("W25S23");
+     //   console.log("------------------------------ routes W25S19 ---------------------------");
     //       routeBase.showRoutes("W25S19");
     //   console.log("------------------------------ routes W28S23 ---------------------------");
     //      routeBase.showRoutes("W24S23");
@@ -58,7 +58,7 @@ var ayrtepPad = {
         //w25s23.memory.routes.details[12604].respawnRate = 1500;
         //w25s23.memory.routes.details[15].basePriority = 100;
 
-       // delete w25s23.memory.routes.details[29];
+       //delete w25s23.memory.routes.details[1266];
         //w25s23.memory.routes.details[39].priority = gc.PRIORITY_LINKER;
         //delete w26s21.memory.routes.details[5];
         //delete w25s23.memory.routes.details[3];
@@ -206,15 +206,15 @@ var ayrtepPad = {
                 order,gc.PRIORITY_ROOM_PATROL);
         }
 
-        if (Game.time == 13359926             ) {
+        if (Game.time == 13359926 ) {
             var gc = require("gc");
             var raceWorker = require("race.worker");
             var RouteDismantleRoom = require("route.dismantle.room");
             var routeBase = require("route.base");
-            var sapperBody = raceWorker.bodyE(25,0,25);
+            var sapperBody = raceWorker.bodyE(1,0,1);
             //RouteDismantleRoom (targetRoomName, body, respawn, targetList)
             var targetList = [
-                     { type : gc.TARGET_ID, target : "57c98edeb80ae1d315dfcc97" },
+                     { type : gc.TARGET_ID, target : "57c9568b55d5bc0d46e2c9ff" },
                      { type : gc.TARGET_ID, target : "57c9537bdc05b2b82ee06881" },
             ];
             var orderW25s23 = new RouteDismantleRoom(

@@ -30,12 +30,12 @@ TaskDismantle.prototype.doTask = function(creep, task) {
     target = creep.pos.findClosestByRange(FIND_STRUCTURES,
         {filter: {structureType: STRUCTURE_WALL}});
 
-    console.log(creep,"target",target,"hits before",target.hits);
+    //console.log(creep,"target",target,"hits before",target.hits);
 
     var result = creep.dismantle(target);
 
     console.log(creep,"TaskDismantle", target,"restult",result);
-    console.log(creep,"target",target,"hits after",target.hits);
+    //console.log(creep,"target",target,"hits after",target.hits);
 
     switch (result)
     {

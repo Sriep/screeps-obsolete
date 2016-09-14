@@ -43,11 +43,12 @@ var attackRoom = {
     },
 
     findNextInList: function(creep, targetList) {
-        //console.log(creep,"start of findNextInList",JSON.stringify(targetList));
+        console.log(creep,"start of findNextInList",JSON.stringify(targetList));
         if (!targetList || targetList.length == 0) return this.findNextTarget(creep);
         tasks.setTargetId(creep,undefined);
         var target;
-        for ( var i = 0 ; i < targetList ; i++ ) {
+        for ( var i = 0 ; i < targetList.length ; i++ ) {
+            console.log("findNextInList i",i,"type",targetList[i].type);
             switch (targetList[i].type) {
                 case gc.TARGET_ID:
                     target = Game.getObjectById(targetList[i].target);
@@ -69,6 +70,7 @@ var attackRoom = {
                     if (target != null) return target;
                     break;
                 default:
+                    console.log("findNextInList default type",targetList[i].type);
             }
         }
     },

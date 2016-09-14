@@ -187,7 +187,7 @@ TaskOffloadSwitch.prototype.energyDumpSortOrder = function(a, b) {
     if (b.structureType == STRUCTURE_LINK) {
         bEnergy = b.energy;
     } else  if (b.structureType == STRUCTURE_TERMINAL) {
-        aEnergy = Math.max(0, b.energy - gc.TERMINAL_RESERVE)
+        bEnergy = Math.max(0, b.energy - gc.TERMINAL_RESERVE)
     } else {
         bEnergy = b.store[RESOURCE_ENERGY];
     }

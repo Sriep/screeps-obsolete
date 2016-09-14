@@ -105,8 +105,8 @@ TaskMoveFind.prototype.doTask = function(creep, task) {
             case this.FindMethod.FindFunction:
                 var module = require(task.findModule);
                 target = module[task.findFunction](creep, task.findList);
-                //console.log(creep,"find function returned",target,"module",module,
-               //     "this.findList",this.findList);
+                console.log(creep,"find function returned",target,"module",module,
+                    "this.findList",task.findList);
                 break;
             default:
                 //console.log(creep,"Invalid find method");
@@ -157,7 +157,7 @@ TaskMoveFind.prototype.doTask = function(creep, task) {
       //  creep.say("There");
         return gc.RESULT_FINISHED;
     }  else {
-       //console.log(creep,"result of moveTo",result);
+       // console.log(creep,"result of moveTo",result);
         creep.say(result);
         switch (result) {
             case OK:    //	0	The operation has been scheduled successfully.
