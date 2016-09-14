@@ -1,6 +1,7 @@
 # Screeps AI #
 This is my screeps library. Designed as a platform for developing screeps AI software. Still in development.
 It has been tested with my ongoing game and the simulation room training mode. But otherwise, stability cannot be guaranteed.
+Also check out my [webpage](http://screepsstrategies.co.uk) for more details.
 
 ## Usage
 Clone repository to your machine then use  [Grunt](http://support.screeps.com/hc/en-us/articles/203022512-Committing-local-scripts-using-Grunt)

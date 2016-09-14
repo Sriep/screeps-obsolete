@@ -107,8 +107,8 @@ var ayrtepPad = {
         //routeBase.resetRoutes("W25S24");
         //console.log("room.memory.routes.nextRouteId",w25s23.memory.routes.nextRouteId);
 
-        var  creep = Game.creeps["WyattDeclan"];
-        //creep.move(BOTTOM)
+        var  creep = Game.creeps["Stella"];
+        //creep.move(TOP_LEFT)
         //creep.moveTo(creep.room.controller);
         //creep.upgradeController(creep.room.controller);
 
