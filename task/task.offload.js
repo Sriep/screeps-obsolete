@@ -23,10 +23,10 @@ function TaskOffload (offloadMethod, resource,  amount, canUseAlternative, targe
         || offloadMethod == TaskOffload.Upgrade)
     {
         this.resource = RESOURCE_ENERGY;
-        this.ammount = undefined;
+        this.amount = undefined;
     } else {
         this.resource = resource ? resource : RESOURCE_ENERGY;
-        this.ammount = amount;
+        this.amount = amount;
     }
     this.loop = true;
     this.pickup = true;
@@ -53,7 +53,7 @@ TaskOffload.prototype.doTask = function(creep, task) {
     var tasks = require("tasks");
     //console.log(creep,"In task Offload target id", tasks.getTargetId(creep), "canuselagtenatives",JSON.stringify(task));
 
-    if (creep.carry[task.resource] == 0) {
+    if (creep.carry[task.resource] == 0 || !creep.carry[task.resource]) {
        // console.log("tried Offloading witih no enrgy");
         tasks.setTargetId(creep, undefined);
         return tasks.Result.Finished;
@@ -96,8 +96,8 @@ TaskOffload.prototype.doTask = function(creep, task) {
     switch (result ) {
         case OK:
             if (creep.carry[task.resource] == 0
-                || task.offlaodType == gc.DROP
-                || task.offlaodType == gc.TRANSFER ) {
+                || task.offloadMethod == gc.DROP
+                || task.offloadMethod == gc.TRANSFER ) {
 
                // console.log(creep,"offloaded all energy - FINSIHED",task.offloadMethod);
               //  creep.say("empty");
