@@ -9,7 +9,6 @@
 var TaskMoveRoom = require("task.move.room");
 var TaskMoveFind = require("task.move.find");
 var TaskAttackId = require("task.attack.id");
-var policy = require("policy");
 var tasks = require("tasks");
 var gc = require("gc");
 /**
@@ -43,21 +42,21 @@ var attackRoom = {
     },
 
     findNextInList: function(creep, targetList) {
-        console.log(creep,"start of findNextInList",JSON.stringify(targetList));
+       // console.log(creep,"start of findNextInList",JSON.stringify(targetList));
         if (!targetList || targetList.length == 0) return this.findNextTarget(creep);
         tasks.setTargetId(creep,undefined);
         var target;
         for ( var i = 0 ; i < targetList.length ; i++ ) {
-            console.log("findNextInList i",i,"type",targetList[i].type);
+           // console.log("findNextInList i",i,"type",targetList[i].type);
             switch (targetList[i].type) {
                 case gc.TARGET_ID:
                     target = Game.getObjectById(targetList[i].target);
-                    console.log("findNextInList ID",target);
+                   // console.log("findNextInList ID",target);
                     if (target !== null) return target;
                     break;
                 case gc.TARGET_FIND_TYPE:
                     target = creep.pos.findClosestByPath(targetList[i].target);
-                    console.log("findNextInList TARGET_FIND_TYPE",target);
+                   // console.log("findNextInList TARGET_FIND_TYPE",target);
                     if (target != null) return target;
                     break;
                 case gc.TARGET_STRUCTURE:
@@ -66,11 +65,11 @@ var attackRoom = {
                             return struc.structureType == targetType;
                         }
                     });
-                    console.log("findNextInList TARGET_STRUCTURE",target);
+                   // console.log("findNextInList TARGET_STRUCTURE",target);
                     if (target != null) return target;
                     break;
                 default:
-                    console.log("findNextInList default type",targetList[i].type);
+                   // console.log("findNextInList default type",targetList[i].type);
             }
         }
     },
@@ -83,7 +82,7 @@ var attackRoom = {
                 return struc.structureType == STRUCTURE_TOWER
             }
         });
-        console.log(creep,"findNextTarget",target);
+      //  console.log(creep,"findNextTarget",target);
         if (target != null) return target;
 
         target = creep.pos.findClosestByPath(FIND_HOSTILE_SPAWNS);

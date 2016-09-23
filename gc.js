@@ -102,6 +102,7 @@ var gc = {
     SWITCH_STATE_REPAIR: "repair",
     SWITCH_STATE_MINERAL_TRANSPORT: "mineral",
     SWITCH_STATE_NO_ACTION: "nome",
+    SWITCH_STATE_REPAIR_WALL: "repair",
     
     //TaskMoveFind.prototype.FindMethod
     FIND_ID : "find.id",
@@ -223,8 +224,8 @@ var gc = {
     MOVE_TO_CACHE_TICKS: 10, // Game default is 5
 
     // How much free spawn time to leave
-    SPAWN_RESERVE_MULTIPLIER: 0.90,
-    SPAWN_RESERVE_TIME: 300,
+    SPAWN_RESERVE_MULTIPLIER: 0.80,
+    SPAWN_RESERVE_TIME: 400,
 
     //Thresolds
     REPAIRER_THRESHOLD: 5,
@@ -249,7 +250,7 @@ var gc = {
     BLOCKSIZE_COST_WORKER: 200,
     MANY2ONE_REQUIRED_LIFE: 5000,
     LOAD_FROM_CONTAINER_RATIO: 0.4,
-    STORAGE_STOCKPILE: 15000,
+    STORAGE_STOCKPILE: 20000,
     REVERSE_CLAIM_SAFETYNET: 150,
     MIDDLE_AGE_CREEP_LIFE_TO_LIVE: 750,
     THE_POOL: 0,
@@ -276,7 +277,7 @@ var gc = {
     FLAG_UPDATE_RATE: 173,
     LINKER_RESET_RATE: 211,
     CHECK_FOR_ORPHANED_BUILDS_RATE: 313,
-    ATTACH_FLAGGED_ROUTES_RATE: 133,
+    ATTACH_FLAGGED_ROUTES_RATE: 183,
     SEND_SCOUT_FREQUENCY_GEN: 3,
 
     //Build priorities

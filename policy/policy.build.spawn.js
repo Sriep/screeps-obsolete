@@ -70,7 +70,9 @@ PolicyBuildSpawn.prototype.enactPolicy = function(currentPolicy) {
 
 PolicyBuildSpawn.prototype.switchPolicy = function(oldPolicyId, newPolicy)
 {
-    policy.reassignCreeps(oldPolicyId, newPolicy);
+    var room = Game.rooms[oldPolicy.roomName];
+    policy.reassignCreeps(oldPolicy, newPolicy);
+    room.memory.repairWall = false;
 };
 
 

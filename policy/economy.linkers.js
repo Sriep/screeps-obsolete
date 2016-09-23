@@ -65,18 +65,18 @@ var economyLinkers = {
         //console.log(room,"attachForeignFlaggedRoutes",flags);
         var roomNames = flagBase.roomNamesFromFlags(flags);
         var orderRooms = this.orderForeignRooms(room, roomNames, flags);
-        //console.log(room,"attachForeignRoutes ordered rooms", JSON.stringify(orderRooms) );
+        console.log(room,"attachForeignRoutes ordered rooms", JSON.stringify(orderRooms) );
         var spawnTime = room.find(FIND_MY_SPAWNS).length * CREEP_LIFE_TIME;
         var maxSpawnAvaliable = spawnTime * gc.SPAWN_RESERVE_MULTIPLIER - gc.SPAWN_RESERVE_TIME;
         spawnTime = 0;
        // console.log(room,"maxSpawn", maxSpawnAvaliable,"spawnTime", spawnTime);
         for ( var i = 0 ; i < orderRooms.length ; i++) {
             spawnTime += orderRooms[i].spawnTime;
-           // console.log(room,"maxSpawn", maxSpawnAvaliable,"spawnTime", spawnTime);
+           console.log(room,"maxSpawn", maxSpawnAvaliable,"spawnTime", spawnTime);
             if (spawnTime > maxSpawnAvaliable) {
                 return;
             }
-            //console.log(room,"roomnames attachForeignFlaggedRoutes", roomNames[i],orderRooms[i].roomName);
+            console.log(room,"roomnames attachForeignFlaggedRoutes", roomNames[i],orderRooms[i].roomName);
             var roomFlags = _.filter(flags, function(fl) {
                 return fl.pos.roomName == orderRooms[i].roomName
             });
@@ -85,7 +85,7 @@ var economyLinkers = {
                // , "laier?",roomFlags[0].memory.keeperLairRoom );
                 if (roomFlags[0].memory.keeperLairRoom
                     && this.readyForKeeperSuppress(room)) {
-                    //console.log("attachForeignFlaggedRoutes keeper supppress",roomFlags);
+                    console.log("attachForeignFlaggedRoutes keeper supppress",roomFlags);
                     this.attachKeeperRoomRoutes(room, orderRooms[i].roomName, roomFlags, policy,i);
                 } else {
                     this.attachForeignRoomRoutes(room, orderRooms[i].roomName, roomFlags, policy,i);
@@ -151,9 +151,6 @@ var economyLinkers = {
 
     attachForeignRoomRoutes: function(myRoom, roomName, roomFlags, policy, deltaPriority) {
         var room = Game.rooms[roomName];
-        if (myRoom == "W25S23")
-            console.log(myRoom,"attachForeignRoutes flags for room",roomName, roomFlags);
-
         var contollerFlag = _.filter(roomFlags, function (f) {
             return f.memory && gc.FLAG_CONTROLLER ==  f.memory.type;
         })[0];
@@ -164,9 +161,7 @@ var economyLinkers = {
         var linkers  = [];
         //console.log(roomName,"attachForeignRoomRoutes",roomFlags.length);//,JSON.stringify(roomFlags) );
         for ( var i = 0 ; i < roomFlags.length ; i++ ) {
-            if (myRoom == "W25S23")
-                console.log("attachForeignRoutes flags for room", roomName, JSON.stringify(roomFlags[i].memory));
-            //console.log(i,"inside for loop porter",roomFlags[i], roomName, "myroom", myRoom,
+             //console.log(i,"inside for loop porter",roomFlags[i], roomName, "myroom", myRoom,
             ////   flagBase.porterFrom(roomFlags[i], myRoom.name), "linkerfrom"
             //    , flagBase.linkerFrom(roomFlags[i], myRoom.name));
 
@@ -207,7 +202,7 @@ var economyLinkers = {
     attachKeeperRoomRoutes: function(myRoom, keeperRoomName, roomFlags, policy, deltaPriority) {
        // var room = Game.rooms[roomName];
         var suppresorId = this.suppressKeeperRoom(myRoom, roomFlags[0], deltaPriority);
-        //console.log(suppresorId,"attachKeeperRoomRoutes keeper supppress",roomFlags);
+        console.log(suppresorId,"attachKeeperRoomRoutes keeper supppress",roomFlags);
         if (suppresorId) {
                           //this.attachForeignRoomRoutes(room, roomNames[i], roomFlags, policy);
             console.log(myRoom, "attachKeeperRoomRoutes",roomFlags);
@@ -345,7 +340,7 @@ var economyLinkers = {
               || exhausted ) {
                // console.log(room,"remove miner route",flag);
             if (matches[0])
-                routeBase.removeRoute(room, matches[0].id);
+                routeBase.removeRoute(room.name, matches[0].id);
         }
 
         if (!matches || matches.length == 0 && !exhausted) {
@@ -384,7 +379,7 @@ var economyLinkers = {
             if (matches[i].type == order.type) {
                 if (matches[i].size == order.size
                     && matches[i].respawnRate == order.respawnRate) {
-                  //  console.log("keepMatchedBuildWithSameSize")
+                    // console.log("keepMatchedBuildWithSameSize")
                     // todo If linkers die need new ones quick. Should put somewhere else.
                     if (matches[i].priority == gc.PRIORITY_LINKER && matches[i].due >0 ) {
                         routeBase.resetDueIfRouteNotActive(room, matches[i], matches[i].flagName);
@@ -659,7 +654,45 @@ var economyLinkers = {
         return productionParts + upgradeParts;
     },
 
-    processBuildQueue: function(room) {
+    processBuildQueue: function(room, maxPriority) {
+        var spawns = room.find(FIND_MY_SPAWNS);
+        //console.log(room,spawns,"processBuildQueue");
+        var i = spawns.length-1;
+        //console.log(room,spawns,"i",i);
+        do {
+            var nextBuild = routeBase.nextBuild(room);
+            //console.log(room,spawns[i],"processBuildQueue",JSON.stringify(nextBuild));
+            if (undefined !== nextBuild) {
+                //console.log(room,"processBuildQueue priority", nextBuild.priority,maxPriority,
+                //    !maxPriority, !maxPriority || nextBuild.priority > maxPriority);
+                if (!maxPriority || nextBuild.priority > maxPriority) {
+                    var result = routeBase.spawn(spawns[i], room, nextBuild);
+                }
+                //console.log(room,"result of build", result);
+            }
+        } while ( result == ERR_BUSY && i--)
+    },
+
+    processTruncatedBuildQueue: function(room, maxPriority) {
+        var spawns = room.find(FIND_MY_SPAWNS);
+        //console.log(room,spawns,"processBuildQueue");
+        var i = spawns.length-1;
+        //console.log(room,spawns,"i",i);
+        do {
+            var nextBuild = routeBase.nextBuild(room);
+           //if (nextBuild.priority > maxPriority) {
+                //console.log(room,spawns[i],"processBuildQueue",JSON.stringify(nextBuild));
+                if (undefined !== nextBuild) {
+                    if (!maxPriority || nextBuild.priority >= maxPriority) {
+                        var result = routeBase.spawn(spawns[i], room, nextBuild);
+                    }
+                    //console.log(room,"result of build", result);
+                }
+            //}
+        } while ( result == ERR_BUSY && i--)
+    },
+
+    processPrioirtyDependantBuildQueue: function(room, maxPriority) {
         var spawns = room.find(FIND_MY_SPAWNS);
         //console.log(room,spawns,"processBuildQueue");
             var i = spawns.length-1;
@@ -668,7 +701,9 @@ var economyLinkers = {
                 var nextBuild = routeBase.nextBuild(room);
                 //console.log(room,spawns[i],"processBuildQueue",JSON.stringify(nextBuild));
                 if (undefined !== nextBuild) {
-                    var result = routeBase.spawn(spawns[i], room, nextBuild);
+                    //if (!maxPriority || maxPriority > nextBuild.priority){
+                        var result = routeBase.spawn(spawns[i], room, nextBuild);
+                    //}
                     //console.log(room,"result of build", result);
                 }
             } while ( result == ERR_BUSY && i--)

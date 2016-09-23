@@ -122,7 +122,9 @@ PolicyRescue.prototype.enactPolicy = function(currentPolicy) {
 
 PolicyRescue.prototype.switchPolicy = function(oldPolicy, newPolicy)
 {
+    var room = Game.rooms[oldPolicy.roomName];
     policy.reassignCreeps(oldPolicy, newPolicy);
+    room.memory.repairWall = false;
 };
 
  /**
@@ -160,7 +162,6 @@ PolicyRescue.prototype.switchPolicy = function(oldPolicy, newPolicy)
   //  console.log(room,"Needs rescue",needsRescue,",yongCreeps lenght",  youngCreeps.length, "numLinks", numLinks);
     return needsRescue;
 };
-
 
 module.exports = PolicyRescue;
 

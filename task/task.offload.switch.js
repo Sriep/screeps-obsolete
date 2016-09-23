@@ -30,7 +30,8 @@ TaskOffloadSwitch.prototype.State = {
     SWITCH_STATE_FILLUP:  gc.SWITCH_STATE_FILLUP,
     SWITCH_STATE_UPGRADE:  gc.SWITCH_STATE_UPGRADE,
     SWITCH_STATE_MINERAL_TRANSPORT: gc.SWITCH_STATE_MINERAL_TRANSPORT,
-    SWITCH_STATE_NO_ACTION: gc.SWITCH_STATE_NO_ACTION
+    SWITCH_STATE_NO_ACTION: gc.SWITCH_STATE_NO_ACTION,
+    SWITCH_STATE_REPAIR_WALL: gc.SWITCH_STATE_REPAIR_WALL
 };
 
 
@@ -44,6 +45,7 @@ function TaskOffloadSwitch () {
 
 TaskOffloadSwitch.prototype.doTask = function(creep) {
     //if (creep.name == "Carter") console.log(creep,"start of TaskOffloadSwitch")
+    //console.log(creep,"TaskOffloadSwitch state", creep.memory.tasks.state)
     if (!this.state(creep)) {
         if (creep.memory.tasks && creep.memory.tasks.state)
             this.changeState(creep, creep.memory.tasks.state);
@@ -69,7 +71,7 @@ TaskOffloadSwitch.prototype.doTask = function(creep) {
         if(requireMoveFrom) {
             var plan = this.planMoveFrom(creep, requireMoveFrom);
             if (plan) {
-          //      console.log(creep,"TaskOffloadSwitch from plan",JSON.stringify(plan));
+                //console.log(creep,"TaskOffloadSwitch from plan",JSON.stringify(plan));
                 this.enactTrasportPlan(creep, plan);
                 return gc.RESULT_RESET
             }
@@ -78,7 +80,7 @@ TaskOffloadSwitch.prototype.doTask = function(creep) {
         if(requireMoveTo) {
             plan = this.planMoveTo(creep, requireMoveTo);
             if (plan) {
-             //   console.log(creep,"TaskOffloadSwitch to plan",JSON.stringify(plan));
+                //console.log(creep,"TaskOffloadSwitch to plan",JSON.stringify(plan));
                 this.enactTrasportPlan(creep, plan);
                 return gc.RESULT_RESET
             }
@@ -86,26 +88,31 @@ TaskOffloadSwitch.prototype.doTask = function(creep) {
     }
 
     if (creep.carry.energy == 0 ) {
-        //if (creep.name == "Carter") console.log(creep,"switch to fill up");
+       // console.log(creep,"switchToFillUp");
         this.switchToFillUp(creep);
         return gc.RESULT_RESET
     }
     
     if (this.needEmergencyUpgrade(creep)) {
-        //if (creep.name == "Carter") console.log(creep,"switchToUpgradeing emergancy");
+        //console.log(creep,"switchToUpgradeing");
         this.switchToUpgradeing(creep);
-        //console.log(creep,"TaskOffloadSwitch needEmergencyUpgrade");
         return gc.RESULT_RESET
     }
 
     if (roleEnergyPorter.nextEnergyContainer(creep)){
+      //  console.log(creep,"nextEnergyContainer");
         this.switchToProduction(creep);
-        //if (creep.name == "Carter") console.log(creep,"TaskOffloadSwitch switchToProduction");
         return gc.RESULT_RESET
     }
 
+    if(this.repairWall(creep)) {
+     //   console.log(creep,"repairWall");
+        this.switchToRepairWall(creep);
+        return gc.RESULT_RESET;
+    }
+
     if (creep.room.controller && creep.room.controller.level >= 6 && roleFlexiStoragePorter.nextLab(creep)) {
-        //if (creep.name == "Carter") console.log(creep,"TaskOffloadSwitch switchToStockLab");
+      //  console.log(creep,"switchToStockLab");
         this.switchToStockLab(creep);
         return gc.RESULT_RESET
     }
@@ -113,12 +120,11 @@ TaskOffloadSwitch.prototype.doTask = function(creep) {
 
     var constructionSites = creep.room.find(FIND_CONSTRUCTION_SITES);
     if (constructionSites.length > 0) {
+        console.log(creep,"switchToConstruction");
         this.switchToConstruction(creep);
-        //if (creep.name == "Carter") console.log(creep,"TaskOffloadSwitch switchToConstruction");
         return gc.RESULT_RESET
     }
-
-    //if (creep.name == "Carter") console.log(creep,"TaskOffloadSwitch switchToUpgradeing");
+    //console.log(creep,"switchToUpgradeing");
     this.switchToUpgradeing(creep);
     return gc.RESULT_RESET;
 };
@@ -133,26 +139,39 @@ TaskOffloadSwitch.prototype.moveToStorage = function (creep) {
     var moveToStorage;
     var energyDumps = creep.room.find(FIND_STRUCTURES, {
                         filter: function(object) {
-                            return (object.structureType == STRUCTURE_CONTAINER
+                            return (object.structureType == STRUCTURE_STORAGE
                             || object.structureType == STRUCTURE_STORAGE
                             || object.structureType == STRUCTURE_TERMINAL
-                            || object.structureType == STRUCTURE_LINK) ;
+                            //|| object.structureType == STRUCTURE_LINK)
+                            ) && object.store[RESOURCE_ENERGY] > 0;
                         }
     });
     var energy = 0;
     for ( var i = 0 ; i < energyDumps.length ; i++ ) {
+        //if (energyDumps[i].energy > 0) console.log(creep,"moveToStorage energydupm",energyDumps[i],energyDumps[i].energy);
         if (energyDumps[i].structureType == STRUCTURE_LINK) {
+           // if (energyDumps[i].energy > 0)
+          //      console.log(creep,"moveToStorage energydupm",energyDumps[i],energyDumps[i].energy);
             energy += energyDumps[i].energy;
-        } else {
+        } else  if (energyDumps[i].structureType == STRUCTURE_STORAGE || energyDumps[i].structureType == STRUCTURE_STORAGE){
+           // if (energyDumps[i].store[RESOURCE_ENERGY] > 0)
+          //      console.log(creep,"moveToStorage energydupm",energyDumps[i], energyDumps[i].store[RESOURCE_ENERGY]);
             energy = energy + energyDumps[i].store[RESOURCE_ENERGY];
+        } else if (energyDumps[i].structureType == STRUCTURE_TERMINAL) {
+            if (energyDumps[i].store[RESOURCE_ENERGY] > gc.TERMINAL_RESERVE) {
+                energy = energy + energyDumps[i].store[RESOURCE_ENERGY];
+            }
         }
     }
     //if (creep.name == "Carter") console.log(creep, "in move to storage offload swithc energy", energy)
+    //console.log(creep,"moveToStorage energy",energy);//, "dumps", JSON.stringify(energyDumps));
     if (energy > 0) {
         energyDumps.sort(this.energyDumpSortOrder);
+       // console.log(creep,"moveToStorage dump",energyDumps[0]);
         moveToStorage = new TaskMoveFind(gc.FIND_ID, gc.RANGE_TRANSFER, energyDumps[0].id);
         moveToStorage.mode = gc.FLEXIMODE_CONTAINER;
     } else {
+       // console.log(creep,"moveToStorage harvest");
         moveToStorage = new TaskMoveFind(
             gc.FIND_FUNCTION,
             gc.RANGE_HARVEST,
@@ -215,15 +234,39 @@ TaskOffloadSwitch.prototype.switchToFillUp = function (creep) {
     this.changeState(creep,this.State.SWITCH_STATE_FILLUP);
 };
 
-TaskOffloadSwitch.prototype.switchOffLoadMinerals = function (creep) {
+TaskOffloadSwitch.prototype.repairWall = function(creep) {
+   // console.log(creep,"repair wall", creep.room.memory.repairWall);
+    //return false;
+    return creep.room.memory.repairWall;
+};
 
+TaskOffloadSwitch.prototype.switchToRepairWall = function(creep) {
+    var newTaskList = [];
+    console.log(creep,"switch to repair wall");
+    var findWall = new TaskMoveFind(
+        gc.FIND_FUNCTION,
+        gc.RANGE_REPAIR,
+        "findTarget",
+        "role.wall.builder",
+        undefined,
+        undefined,
+        "moveAndRepair",
+        "role.repairer"
+    );
+    var offload = new TaskOffload(gc.REPAIR, RESOURCE_ENERGY);
+    var switchTaskLists = new TaskOffloadSwitch();
 
+    newTaskList.push(findWall);
+    newTaskList.push(offload);
+    newTaskList.push(switchTaskLists);
+    creep.memory.tasks.tasklist = newTaskList;
+    this.changeState(creep, this.State.SWITCH_STATE_REPAIR_WALL);
 };
 
 TaskOffloadSwitch.prototype.switchToMineralTransport = function (creep) {
     var plan = roleMoveResource.findLabAndStorage(creep.room);
     if (!plan) return;
-    console.log(creep,"switchToMineralTransport",JSON.stringify(plan));
+   // console.log(creep,"switchToMineralTransport",JSON.stringify(plan));
     var moveToStorage = new TaskMovePos(plan.from.pos,1);
     var loadup = new  TaskLoadup (plan.resource, plan.from.id);
     var moveToLab = new TaskMovePos(plan.to.pos,1);
@@ -245,33 +288,7 @@ TaskOffloadSwitch.prototype.switchToMineralTransport = function (creep) {
     creep.memory.tasks.tasklist = newTaskList;
     this.changeState(creep,this.State.SWITCH_STATE_MINERAL_TRANSPORT);
 };
-/*
-TaskOffloadSwitch.prototype.needMineralTransport = function (creep) {
-    var labs = creep.room.find(FIND_STRUCTURES, {
-        filter: function(l) {
-            return l.structureType == STRUCTURE_LAB
-                && l.secondaryColor == COLOR_WHITE
-                && l.color != COLOR_WHITE
-                && l.mineralAmount < gc.LAB_REFILL_MINERAL_THRESHOLD
-        }
-    });
-    if (labs.length > 0) {
-        var transportCreeps = creep.room.find(FIND_MY_CREEPS, {
-            filter: function(c) {
-                return this.state(c) == gc.SWITCH_STATE_MINERAL_TRANSPORT
-                        && c.name != creep.name;
-            }
-        });
-        if (transportCreeps.length == 0) {
-            for ( var i = 0 ; i < labs.length ; i++ ) {
-                if (creep.room.storage && creep.room.storage.store[labs[i].mineralType] > 0
-                     || creep.room.terminal && creep.room.terminal.store[labs[i].mineralType] > 0)
-                    return true;
-            }
-        }
-    }
-};
-*/
+
 TaskOffloadSwitch.prototype.switchToProduction = function (creep) {
     var moveToEnergyContainer = new TaskMoveFind(
         gc.FIND_FUNCTION,
