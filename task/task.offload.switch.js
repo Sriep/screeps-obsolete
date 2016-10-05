@@ -161,6 +161,8 @@ TaskOffloadSwitch.prototype.moveToStorage = function (creep) {
             if (energyDumps[i].store[RESOURCE_ENERGY] > gc.TERMINAL_RESERVE) {
                 energy = energy + energyDumps[i].store[RESOURCE_ENERGY];
             }
+        }   else if (energyDumps[i].structureType === STRUCTURE_CONTAINER) {
+            energy += energyDumps[i].store[RESOURCE_ENERGY];
         }
     }
     //if (creep.name == "Carter") console.log(creep, "in move to storage offload swithc energy", energy)

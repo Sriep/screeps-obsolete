@@ -90,6 +90,19 @@ TaskHarvest.prototype.doTask = function(creep, task) {
         case    ERR_BUSY:                    //	-4	The creep is still being spawned.
         case    ERR_NO_BODYPART:	        // -12	There are no WORK body parts in this creep’s body.
                                           //   console.log("failed harvest with some other error");
+        case ERR_TIRED:
+            if (!creep.memory.harvestCount) {
+                creep.memory.harvestCount = 0;
+            } else {
+                creep.memory.harvestCount += 1;
+            }
+            if (creep.memory.harvestCount < 5 && creep.ticksToLive > 50) {
+                return gc.RESULT_UNFINISHED;
+            } else {
+                delete creep.memory.harvestCount;
+                return gc.RESULT_FINISHED;
+            }
+
         default:
            // console.log("Something wrong harvest error");
             return gc.RESULT_FINISHED;
