@@ -5,7 +5,7 @@
  */
 "use strict";
 var policy = require("policy");
-var npcInvaderBattle = require("npc.invader.battle");
+//var npcInvaderBattle = require("npc.invader.battle");
 var BattleDefenceEstimate = require("battle.defence.estimate");
 var stats = require("stats");
 var raceSwordsman = require("race.swordsman");
